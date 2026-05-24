@@ -112,6 +112,8 @@ function EcosystemShell({
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      {/* BACKGROUND */}
+
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -128,6 +130,10 @@ function EcosystemShell({
     </div>
   );
 }
+
+/* =========================================================
+   HOME SCREEN
+========================================================= */
 
 function HomeScreen({
   setScreen,
@@ -149,12 +155,10 @@ function HomeScreen({
 
   return (
     <EcosystemShell screen="home" setScreen={setScreen}>
+      {/* HERO */}
+
       <section className="grid gap-6 lg:grid-cols-[1.55fr_0.95fr]">
-
-        {/* HERO */}
-
         <div className="rounded-[2.25rem] border border-white/10 bg-black/25 p-8 shadow-2xl backdrop-blur-xl md:p-10">
-
           <div className="uppercase tracking-[0.35em] text-emerald-100/70 text-xs">
             Connected Food Ecosystem Experience
           </div>
@@ -171,7 +175,6 @@ function HomeScreen({
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-
             <PillButton active>
               Begin Guided Tour
             </PillButton>
@@ -183,13 +186,11 @@ function HomeScreen({
             <PillButton onClick={() => setScreen("marketplace")}>
               Marketplace
             </PillButton>
-
           </div>
 
           {/* LIVE STATUS */}
 
           <div className="mt-10 grid md:grid-cols-3 gap-4">
-
             {[
               ["50 Youth Active", "Summer Workforce Active"],
               ["Marketplace Preparing", "Distribution & Inventory"],
@@ -199,7 +200,6 @@ function HomeScreen({
               ["Harvest Teams Active", "Daily Rhythm Active"],
             ].map(([title, subtitle]) => (
               <GlassCard key={title} className="p-5">
-
                 <div className="uppercase tracking-[0.25em] text-emerald-100/65 text-xs">
                   Live Ecosystem
                 </div>
@@ -211,17 +211,14 @@ function HomeScreen({
                 <div className="mt-2 text-sm text-emerald-50/70">
                   {subtitle}
                 </div>
-
               </GlassCard>
             ))}
-
           </div>
         </div>
 
         {/* OVERVIEW */}
 
         <GlassCard className="p-7">
-
           <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
             Living Ecosystem Overview
           </div>
@@ -239,7 +236,6 @@ function HomeScreen({
           </p>
 
           <div className="mt-8 space-y-4">
-
             {[
               "Youth Workforce Development",
               "Marketplace & Distribution",
@@ -254,19 +250,16 @@ function HomeScreen({
                 </div>
               </GlassCard>
             ))}
-
           </div>
 
           {/* LANGUAGE */}
 
           <div className="mt-8">
-
             <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
               Language
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-
               {languages.map((lang) => (
                 <button
                   key={lang}
@@ -280,7 +273,6 @@ function HomeScreen({
                   {lang}
                 </button>
               ))}
-
             </div>
           </div>
         </GlassCard>
@@ -289,7 +281,6 @@ function HomeScreen({
       {/* DAILY RHYTHM */}
 
       <section className="mt-20">
-
         <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
           Daily Ecosystem Rhythm
         </div>
@@ -299,7 +290,6 @@ function HomeScreen({
         </h2>
 
         <div className="mt-10 grid lg:grid-cols-4 gap-5">
-
           {[
             "Arrival Experience",
             "Morning Activation",
@@ -316,14 +306,12 @@ function HomeScreen({
               </div>
             </GlassCard>
           ))}
-
         </div>
       </section>
 
       {/* FOOD FLOW */}
 
       <section className="mt-24">
-
         <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
           Food Destination Flow
         </div>
@@ -340,7 +328,6 @@ function HomeScreen({
         </p>
 
         <div className="mt-12 grid lg:grid-cols-6 gap-4">
-
           {[
             ["/SAM_0384.JPG", "Grow"],
             ["/SAM_0393.JPG", "Harvest"],
@@ -353,28 +340,28 @@ function HomeScreen({
               key={title}
               className="overflow-hidden"
             >
-
               <img
                 src={img}
+                alt={title}
                 className="h-[220px] w-full object-cover"
               />
 
               <div className="p-5">
-
                 <div className="text-2xl font-bold">
                   {title}
                 </div>
-
               </div>
-
             </GlassCard>
           ))}
-
         </div>
       </section>
     </EcosystemShell>
   );
 }
+
+/* =========================================================
+   ROLE PATHWAYS
+========================================================= */
 
 function RolePathwaysScreen({
   setScreen,
@@ -383,7 +370,6 @@ function RolePathwaysScreen({
 }) {
   return (
     <EcosystemShell screen="roles" setScreen={setScreen}>
-
       <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
         Ecosystem Role Pathways
       </div>
@@ -397,14 +383,13 @@ function RolePathwaysScreen({
         {/* YOUTH */}
 
         <GlassCard className="overflow-hidden">
-
           <img
             src="/SAM_0401.JPG"
+            alt="Youth Workforce"
             className="h-[430px] w-full object-cover"
           />
 
           <div className="p-8">
-
             <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
               Youth Workforce Journey
             </div>
@@ -422,7 +407,6 @@ function RolePathwaysScreen({
             </p>
 
             <div className="mt-8 grid md:grid-cols-2 gap-4">
-
               {[
                 "Morning activation",
                 "Cultivation teams",
@@ -435,35 +419,6 @@ function RolePathwaysScreen({
                   {item}
                 </GlassCard>
               ))}
-
-            </div>
-
-            {/* ENDING */}
-
-            <div className="mt-10">
-
-              <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-                Ending Decision
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-3">
-
-                {[
-                  "Continue to Leadership",
-                  "Explore Marketplace",
-                  "Become Future Mentor",
-                  "Join Grower Pathway",
-                  "Return to Ecosystem",
-                ].map((item) => (
-                  <button
-                    key={item}
-                    className="rounded-full border border-white/10 bg-white/10 px-5 py-3 hover:bg-white/20"
-                  >
-                    {item}
-                  </button>
-                ))}
-
-              </div>
             </div>
           </div>
         </GlassCard>
@@ -537,6 +492,10 @@ function RolePathwaysScreen({
   );
 }
 
+/* =========================================================
+   PLACEHOLDER SCREENS
+========================================================= */
+
 function PlaceholderScreen({
   title,
   screen,
@@ -548,7 +507,6 @@ function PlaceholderScreen({
 }) {
   return (
     <EcosystemShell screen={screen} setScreen={setScreen}>
-
       <GlassCard className="p-12 text-center">
 
         <div className="text-6xl font-black">
@@ -560,10 +518,13 @@ function PlaceholderScreen({
         </p>
 
       </GlassCard>
-
     </EcosystemShell>
   );
 }
+
+/* =========================================================
+   APP
+========================================================= */
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
