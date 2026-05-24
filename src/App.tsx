@@ -27,9 +27,9 @@ const LANGS: LangKey[] = [
   "Français",
 ];
 
-/* ==================================================
+/* =========================================================
    REAL ECOSYSTEM IMAGES
-================================================== */
+========================================================= */
 
 const ecosystemHero =
   "/images/ConnectFoodEcosystem_withimages.png";
@@ -54,9 +54,9 @@ const pathwayImages: Record<PathwayKey, string> = {
   partners: "/images/Partners.png",
 };
 
-/* ==================================================
+/* =========================================================
    LANGUAGE
-================================================== */
+========================================================= */
 
 const ui = {
   English: {
@@ -198,9 +198,9 @@ const ui = {
   },
 };
 
-/* ==================================================
+/* =========================================================
    PATHWAYS
-================================================== */
+========================================================= */
 
 const pathways = {
   orientation: {
@@ -311,7 +311,9 @@ export default function App() {
 
       <section className="min-h-screen bg-[radial-gradient(circle_at_top_left,#6d7f47,transparent_30%),linear-gradient(135deg,#0f2314,#18361b,#4b5b2d)] px-6 py-8">
 
-        {/* HEADER */}
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
 
         <header className="mx-auto flex max-w-7xl flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
@@ -353,19 +355,21 @@ export default function App() {
               onClick={() =>
                 setSelected("orientation")
               }
-              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-black text-white backdrop-blur-md"
+              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-black text-white backdrop-blur-md transition hover:bg-white/20"
             >
               {copy.guided}
             </button>
           </div>
         </header>
 
-        {/* HERO */}
+        {/* =====================================================
+            HERO
+        ===================================================== */}
 
         {!selected && (
           <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-2">
 
-            {/* LEFT */}
+            {/* LEFT PANEL */}
 
             <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
 
@@ -407,14 +411,14 @@ export default function App() {
               </div>
             </div>
 
-            {/* RIGHT */}
+            {/* RIGHT IMAGE */}
 
             <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
 
               <img
                 src={ecosystemHero}
                 alt="Bronson Family Farm Ecosystem"
-                className="h-[760px] w-full object-cover"
+                className="h-[760px] w-full object-contain bg-[#102414]"
               />
 
               <div className="p-6">
@@ -427,12 +431,16 @@ export default function App() {
           </section>
         )}
 
-        {/* PATHWAY */}
+        {/* =====================================================
+            PATHWAY DETAIL SCREEN
+        ===================================================== */}
 
         {selected && active && (
           <section className="mx-auto mt-8 max-w-7xl">
 
             <div className="grid gap-6 lg:grid-cols-2">
+
+              {/* LEFT */}
 
               <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
 
@@ -465,6 +473,8 @@ export default function App() {
                 </div>
               </div>
 
+              {/* RIGHT IMAGE */}
+
               <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
 
                 <img
@@ -472,7 +482,7 @@ export default function App() {
                     pathwayImages[selected]
                   }
                   alt={active.title}
-                  className="h-[760px] w-full object-cover"
+                  className="h-[760px] w-full object-contain bg-[#102414]"
                 />
               </div>
             </div>
