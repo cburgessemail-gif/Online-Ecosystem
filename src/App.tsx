@@ -13,6 +13,8 @@ const IMG = {
   prep: "/images/SAM_0412.JPG",
   community: "/images/SAM_0415.JPG",
   family: "/images/SAM_0417.JPG",
+  morning: "/images/SAM_0391.JPG",
+  field: "/images/SAM_0380.JPG",
 };
 
 function PillButton({ children, active = false, onClick }: { children: React.ReactNode; active?: boolean; onClick?: () => void }) {
@@ -31,7 +33,7 @@ function PhotoCard({ title, subtitle, image, height = "260px" }: { title: string
   return (
     <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-emerald-950 shadow-xl" style={{ height }}>
       <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${image}")` }} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-6">
         <div className="text-2xl font-black leading-tight">{title}</div>
         {subtitle && <div className="mt-2 text-sm leading-6 text-emerald-50/85">{subtitle}</div>}
@@ -56,7 +58,7 @@ function Shell({ children, screen, setScreen }: { children: React.ReactNode; scr
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${IMG.hero}")` }} />
-      <div className="fixed inset-0 bg-gradient-to-br from-black/88 via-emerald-950/76 to-black/94" />
+      <div className="fixed inset-0 bg-gradient-to-br from-black/80 via-emerald-950/60 to-black/90" />
       <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
         <Navigation screen={screen} setScreen={setScreen} />
         {children}
@@ -74,7 +76,7 @@ function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen
         <div className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-black/30 shadow-2xl backdrop-blur-xl">
           <div className="relative min-h-[620px]">
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${IMG.hero}")` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/45 to-black/15" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/35 to-black/5" />
             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
               <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Connected Food Ecosystem Experience</div>
               <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">Bronson Family Farm</h1>
