@@ -1,494 +1,375 @@
-import { useMemo, useState } from "react";
-
-type LangKey =
-  | "English"
-  | "Español"
-  | "Tagalog"
-  | "Italiano"
-  | "עברית"
-  | "Français";
-
-type PathwayKey =
-  | "orientation"
-  | "supervisor"
-  | "tasks"
-  | "attendance"
-  | "assessments"
-  | "marketplace"
-  | "parents"
-  | "partners";
-
-const LANGS: LangKey[] = [
-  "English",
-  "Español",
-  "Tagalog",
-  "Italiano",
-  "עברית",
-  "Français",
-];
-
-/* =========================================================
-   REAL ECOSYSTEM IMAGES
-========================================================= */
-
-const ecosystemHero =
-  "/images/ConnectFoodEcosystem_withimages.png";
-
-const pathwayImages: Record<PathwayKey, string> = {
-  orientation: "/images/SAM_0417.JPG",
-
-  supervisor: "/images/Fence_volunteers.png",
-
-  tasks: "/images/SAM_0405.JPG",
-
-  attendance: "/images/SAM_0410.JPG",
-
-  assessments: "/images/SAM_0420.JPG",
-
-  marketplace:
-    "/images/ConnectFoodEcosystem_withimages.png",
-
-  parents:
-    "/images/Seeds_Jubilee Gardens.png",
-
-  partners: "/images/Partners.png",
-};
-
-/* =========================================================
-   LANGUAGE
-========================================================= */
-
-const ui = {
-  English: {
-    title:
-      "Summer 2026 Digital Training & Supervisor Management System",
-
-    badge:
-      "BRONSON FAMILY FARM YOUTH WORKFORCE PROGRAM",
-
-    hero:
-      "Welcome to the Youth Workforce Program",
-
-    subtitle:
-      "A guided digital training and supervisor management ecosystem for youth growers, supervisors, attendance, assessments, marketplace harvest flow, family connection, and regional food access.",
-
-    guided:
-      "Begin Guided Tour",
-
-    pathways:
-      "Workforce Pathways",
-
-    back:
-      "Back to Ecosystem",
-  },
-
-  Español: {
-    title:
-      "Sistema Digital de Supervisión 2026",
-
-    badge:
-      "PROGRAMA JUVENIL",
-
-    hero:
-      "Bienvenidos",
-
-    subtitle:
-      "Sistema digital para jóvenes, supervisores y familias.",
-
-    guided:
-      "Comenzar",
-
-    pathways:
-      "Rutas",
-
-    back:
-      "Regresar",
-  },
-
-  Tagalog: {
-    title:
-      "Digital Workforce System",
-
-    badge:
-      "YOUTH PROGRAM",
-
-    hero:
-      "Maligayang Pagdating",
-
-    subtitle:
-      "Digital ecosystem para sa kabataan.",
-
-    guided:
-      "Simulan",
-
-    pathways:
-      "Pathways",
-
-    back:
-      "Bumalik",
-  },
-
-  Italiano: {
-    title:
-      "Sistema Digitale",
-
-    badge:
-      "PROGRAMMA",
-
-    hero:
-      "Benvenuti",
-
-    subtitle:
-      "Sistema digitale per giovani.",
-
-    guided:
-      "Inizia",
-
-    pathways:
-      "Percorsi",
-
-    back:
-      "Indietro",
-  },
-
-  עברית: {
-    title:
-      "מערכת דיגיטלית",
-
-    badge:
-      "תוכנית",
-
-    hero:
-      "ברוכים הבאים",
-
-    subtitle:
-      "מערכת לנוער ומשפחות.",
-
-    guided:
-      "התחל",
-
-    pathways:
-      "מסלולים",
-
-    back:
-      "חזרה",
-  },
-
-  Français: {
-    title:
-      "Système Numérique",
-
-    badge:
-      "PROGRAMME",
-
-    hero:
-      "Bienvenue",
-
-    subtitle:
-      "Système numérique jeunesse.",
-
-    guided:
-      "Commencer",
-
-    pathways:
-      "Parcours",
-
-    back:
-      "Retour",
-  },
-};
-
-/* =========================================================
-   PATHWAYS
-========================================================= */
-
-const pathways = {
-  orientation: {
-    title:
-      "Youth Orientation",
-
-    description:
-      "Youth learn PPE, hydration, safety, teamwork, respect, field operations, marketplace purpose, and ecosystem responsibilities.",
-
-    outcome:
-      "Youth begin the summer ready for structured participation.",
-  },
-
-  supervisor: {
-    title:
-      "Supervisor Dashboard",
-
-    description:
-      "Supervisors track attendance, participation, assessments, teamwork, and field observations directly from mobile devices.",
-
-    outcome:
-      "Supervisors become operational ecosystem leaders.",
-  },
-
-  tasks: {
-    title:
-      "Daily Farm Tasks",
-
-    description:
-      "Youth complete planting, harvesting, composting, irrigation, cleanup, and distribution preparation.",
-
-    outcome:
-      "Youth connect labor to real food system outcomes.",
-  },
-
-  attendance: {
-    title:
-      "Attendance Tracking",
-
-    description:
-      "Track check-in, participation, rotation, consistency, and workforce readiness.",
-
-    outcome:
-      "Attendance becomes measurable accountability.",
-  },
-
-  assessments: {
-    title:
-      "Youth Assessments",
-
-    description:
-      "Measure growth in teamwork, leadership, safety, responsibility, and communication.",
-
-    outcome:
-      "Youth leave with visible growth and workforce readiness.",
-  },
-
-  marketplace: {
-    title:
-      "Marketplace Harvest Flow",
-
-    description:
-      "Produce moves from field to washing, sorting, labeling, storage, schools, and marketplace destinations.",
-
-    outcome:
-      "Youth understand how food becomes community impact.",
-  },
-
-  parents: {
-    title:
-      "Parent / Guardian Connection",
-
-    description:
-      "Parents remain connected to attendance, progress, reminders, and youth development.",
-
-    outcome:
-      "Families become connected stakeholders.",
-  },
-
-  partners: {
-    title:
-      "Partner Ecosystem",
-
-    description:
-      "Partners support workforce development, tools, seeds, fencing, health, food access, and operational sustainability.",
-
-    outcome:
-      "Community resources become integrated ecosystem infrastructure.",
-  },
-};
-
-export default function App() {
-  const [lang, setLang] =
-    useState<LangKey>("English");
-
-  const [selected, setSelected] =
-    useState<PathwayKey | null>(null);
-
-  const copy = ui[lang];
-
-  const active = useMemo(() => {
-    if (!selected) return null;
-    return pathways[selected];
-  }, [selected]);
-
+export default function BronsonFamilyFarmEcosystemDemo() {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#102414] text-white">
+    <div className="min-h-screen bg-[#07120d] text-white overflow-hidden">
+      {/* MASTER ECOSYSTEM FOUNDATION */}
 
-      <section className="min-h-screen bg-[radial-gradient(circle_at_top_left,#6d7f47,transparent_30%),linear-gradient(135deg,#0f2314,#18361b,#4b5b2d)] px-6 py-8">
+      {/* HERO / ENTRANCE EXPERIENCE */}
+      <section
+        className="relative min-h-screen bg-cover bg-center"
+        style={{ backgroundImage: "url('/GrowArea.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-emerald-950/70 to-black/85" />
 
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
-
-        <header className="mx-auto flex max-w-7xl flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-          <div className="flex items-center gap-4 rounded-[2rem] border border-white/15 bg-white/10 px-5 py-5 shadow-2xl backdrop-blur-md">
-
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 text-2xl font-black">
-              BFF
-            </div>
-
-            <div>
-
-              <div className="text-xs uppercase tracking-[0.35em] text-white/70">
-                {copy.badge}
-              </div>
-
-              <div className="mt-2 text-2xl font-black leading-tight">
-                {copy.title}
-              </div>
-            </div>
+        <div className="relative z-10 px-6 py-8 md:px-12">
+          {/* NAVIGATION */}
+          <div className="flex flex-wrap gap-3 mb-8">
+            {[
+              'Entrance',
+              'Our Story',
+              'Role Pathways',
+              'Marketplace',
+              'Youth Workforce',
+              'Events',
+              'Nutrition',
+              'Partners',
+            ].map((item) => (
+              <button
+                key={item}
+                className="rounded-full border border-white/10 bg-white/10 px-5 py-3 backdrop-blur-md hover:bg-white/20 transition"
+              >
+                {item}
+              </button>
+            ))}
           </div>
 
-          <div className="flex items-center gap-4">
-
-            <select
-              value={lang}
-              onChange={(e) =>
-                setLang(e.target.value as LangKey)
-              }
-              className="rounded-full bg-white px-6 py-4 text-lg font-black text-[#102414]"
-            >
-              {LANGS.map((l) => (
-                <option key={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
-
-            <button
-              onClick={() =>
-                setSelected("orientation")
-              }
-              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-black text-white backdrop-blur-md transition hover:bg-white/20"
-            >
-              {copy.guided}
-            </button>
-          </div>
-        </header>
-
-        {/* =====================================================
-            HERO
-        ===================================================== */}
-
-        {!selected && (
-          <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-2">
-
-            {/* LEFT PANEL */}
-
-            <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
-
-              <div className="text-sm uppercase tracking-[0.4em] text-white/60 font-black">
-                Launch Ready
+          {/* MAIN HERO */}
+          <div className="grid lg:grid-cols-[1.6fr_0.9fr] gap-6">
+            <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8 md:p-10 shadow-2xl">
+              <div className="uppercase tracking-[0.35em] text-emerald-100/70 text-xs">
+                Connected Food Ecosystem Experience
               </div>
 
-              <h1 className="mt-8 text-7xl font-black leading-[0.92]">
-                {copy.hero}
+              <h1 className="mt-5 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight">
+                Bronson Family Farm
               </h1>
 
-              <p className="mt-8 text-2xl leading-relaxed text-white/85">
-                {copy.subtitle}
+              <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/85">
+                A living ecosystem connecting youth workforce development,
+                growers, marketplace systems, schools, nutrition, agritourism,
+                food access, leadership, and community wellness.
               </p>
 
-              <div className="mt-10 grid gap-5 md:grid-cols-2">
-
-                {Object.entries(pathways).map(
-                  ([key, value]) => (
-                    <button
-                      key={key}
-                      onClick={() =>
-                        setSelected(
-                          key as PathwayKey
-                        )
-                      }
-                      className="rounded-2xl border border-white/15 bg-black/20 p-5 text-left transition hover:scale-[1.02] hover:bg-white/10"
-                    >
-                      <div className="text-xl font-black">
-                        {value.title}
-                      </div>
-
-                      <div className="mt-3 text-sm text-white/70">
-                        {value.outcome}
-                      </div>
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* RIGHT IMAGE */}
-
-            <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
-
-              <img
-                src={ecosystemHero}
-                alt="Bronson Family Farm Ecosystem"
-                className="h-[760px] w-full object-contain bg-[#102414]"
-              />
-
-              <div className="p-6">
-
-                <div className="rounded-2xl bg-black/35 px-6 py-5 text-xl font-black">
-                  Bronson Family Farm real operational ecosystem
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* =====================================================
-            PATHWAY DETAIL SCREEN
-        ===================================================== */}
-
-        {selected && active && (
-          <section className="mx-auto mt-8 max-w-7xl">
-
-            <div className="grid gap-6 lg:grid-cols-2">
-
-              {/* LEFT */}
-
-              <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
-
-                <button
-                  onClick={() =>
-                    setSelected(null)
-                  }
-                  className="rounded-full border border-white/20 bg-black/20 px-6 py-3 text-sm font-black"
-                >
-                  {copy.back}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button className="rounded-full bg-emerald-400 text-black px-6 py-3 font-bold">
+                  Begin Guided Tour
                 </button>
 
-                <h2 className="mt-8 text-6xl font-black leading-[0.95]">
-                  {active.title}
-                </h2>
+                <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3">
+                  Enter Ecosystem
+                </button>
 
-                <p className="mt-8 text-2xl leading-relaxed text-white/85">
-                  {active.description}
-                </p>
-
-                <div className="mt-10 rounded-3xl border border-white/15 bg-black/20 p-8">
-
-                  <div className="text-sm uppercase tracking-[0.35em] text-white/60">
-                    Ecosystem Outcome
-                  </div>
-
-                  <div className="mt-4 text-3xl font-black">
-                    {active.outcome}
-                  </div>
-                </div>
+                <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3">
+                  Marketplace
+                </button>
               </div>
 
-              {/* RIGHT IMAGE */}
-
-              <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
-
-                <img
-                  src={
-                    pathwayImages[selected]
-                  }
-                  alt={active.title}
-                  className="h-[760px] w-full object-contain bg-[#102414]"
-                />
+              {/* LIVE ECOSYSTEM STATUS */}
+              <div className="mt-10 grid md:grid-cols-3 gap-4">
+                {[
+                  ['50 Youth Active', 'Summer Workforce Active'],
+                  ['Marketplace Preparing', 'Distribution & Inventory'],
+                  ['Warm Growing Conditions', 'Weather & Irrigation Active'],
+                  ['Schools Supported', 'Community Destinations Active'],
+                  ['118 Acres Activated', 'Ecosystem Production Active'],
+                  ['Harvest Teams Deployed', 'Daily Rhythm Active'],
+                ].map(([title, subtitle]) => (
+                  <div
+                    key={title}
+                    className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-lg"
+                  >
+                    <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
+                      Live Ecosystem
+                    </div>
+                    <div className="mt-3 text-2xl font-bold">{title}</div>
+                    <div className="mt-2 text-sm text-emerald-50/75">
+                      {subtitle}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </section>
-        )}
+
+            {/* LIVING ECOSYSTEM OVERVIEW */}
+            <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-7 shadow-2xl">
+              <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+                Living Ecosystem Overview
+              </div>
+
+              <h2 className="mt-5 text-4xl font-bold leading-tight">
+                A place people want to return to.
+              </h2>
+
+              <p className="mt-6 text-lg leading-9 text-emerald-50/82">
+                Bronson Family Farm is designed to connect workforce,
+                agriculture, wellness, schools, growers, community
+                revitalization, and marketplace systems into one immersive
+                ecosystem.
+              </p>
+
+              <div className="mt-8 space-y-4">
+                {[
+                  'Family Legacy',
+                  'Youth Workforce Development',
+                  'Marketplace & Distribution',
+                  'Schools & Community Food Access',
+                  'Grower Network',
+                  'Health & Nutrition',
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-white/10 bg-white/10 p-4"
+                  >
+                    <div className="font-semibold text-xl">{item}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
-    </main>
+
+      {/* DAILY ECOSYSTEM RHYTHM */}
+      <section className="px-6 md:px-12 py-20 bg-gradient-to-b from-[#07120d] to-[#102218]">
+        <div className="max-w-7xl mx-auto">
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Daily Ecosystem Rhythm
+          </div>
+
+          <h2 className="mt-5 text-5xl font-black">
+            The ecosystem operates with movement, purpose, and structure.
+          </h2>
+
+          <div className="mt-12 grid lg:grid-cols-4 gap-5">
+            {[
+              'Arrival Experience',
+              'Morning Activation',
+              'Team Deployment',
+              'Motivational Activity Block',
+              'Deep Work Session',
+              'Marketplace Rotation',
+              'Reflection Session',
+              'Closing Circle',
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-[1.5rem] border border-white/10 bg-white/10 p-6 backdrop-blur-xl"
+              >
+                <div className="text-2xl font-bold leading-tight">
+                  {item}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOD DESTINATION FLOW */}
+      <section className="px-6 md:px-12 py-20 bg-[#08110d]">
+        <div className="max-w-7xl mx-auto">
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Where The Food Goes
+          </div>
+
+          <h2 className="mt-5 text-5xl font-black leading-tight">
+            Grow → Harvest → Prepare → Marketplace → Schools → Community
+            Destinations → Families
+          </h2>
+
+          <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/85">
+            Youth and growers are not simply gardening. Food grown through the
+            ecosystem supports marketplaces, schools, events, wellness
+            initiatives, families, and community destinations.
+          </p>
+
+          <div className="mt-12 grid lg:grid-cols-7 gap-4">
+            {[
+              'Grow',
+              'Harvest',
+              'Prepare',
+              'Marketplace',
+              'Schools',
+              'Community',
+              'Families',
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-[1.5rem] border border-white/10 bg-white/10 p-6 text-center backdrop-blur-lg"
+              >
+                <div className="text-2xl font-bold">{item}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ROLE PATHWAYS */}
+      <section className="px-6 md:px-12 py-20 bg-gradient-to-b from-[#08110d] to-[#102218]">
+        <div className="max-w-7xl mx-auto">
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Ecosystem Role Pathways
+          </div>
+
+          <h2 className="mt-5 text-5xl font-black">
+            Every pathway leads somewhere meaningful.
+          </h2>
+
+          <div className="mt-12 grid lg:grid-cols-2 gap-6">
+            {[
+              {
+                title: 'Youth Workforce Journey',
+                content:
+                  'Youth participate in cultivation, leadership, marketplace preparation, reflection, wellness, and food distribution systems.',
+                ending:
+                  'Continue to Leadership • Become Mentor • Explore Marketplace',
+              },
+              {
+                title: 'Grower Pathway',
+                content:
+                  'Growers connect to education, production systems, markets, and community support.',
+                ending:
+                  'Join Grower Network • Sell Through Marketplace • Mentor Youth',
+              },
+              {
+                title: 'Marketplace Pathway',
+                content:
+                  'The marketplace connects customers, schools, food access, and economic activity.',
+                ending:
+                  'Shop Marketplace • Become Vendor • Support Youth Workforce',
+              },
+              {
+                title: 'Partner Pathway',
+                content:
+                  'Partners strengthen infrastructure, schools, youth workforce systems, and food distribution.',
+                ending:
+                  'Become Sponsor • Schedule Meeting • Support Ecosystem',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[2rem] border border-white/10 bg-black/25 p-8 backdrop-blur-xl"
+              >
+                <div className="text-4xl font-black leading-tight">
+                  {item.title}
+                </div>
+
+                <p className="mt-6 text-lg leading-9 text-emerald-50/85">
+                  {item.content}
+                </p>
+
+                <div className="mt-8 uppercase tracking-[0.25em] text-xs text-emerald-100/70">
+                  Ending Decision
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5 text-base leading-8">
+                  {item.ending}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* OPERATIONAL COMMAND CENTER */}
+      <section className="px-6 md:px-12 py-20 bg-[#08110d]">
+        <div className="max-w-7xl mx-auto">
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Ecosystem Command Center
+          </div>
+
+          <h2 className="mt-5 text-5xl font-black">
+            Operational visibility across the ecosystem.
+          </h2>
+
+          <div className="mt-12 grid lg:grid-cols-3 gap-6">
+            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-7 backdrop-blur-xl">
+              <div className="text-3xl font-bold">Youth Workforce</div>
+              <ul className="mt-5 space-y-3 text-lg leading-8 text-emerald-50/82">
+                <li>50 Youth Active</li>
+                <li>PPE Verification</li>
+                <li>Leadership Challenges</li>
+                <li>Badge Progress</li>
+                <li>Reflection Submissions</li>
+              </ul>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-7 backdrop-blur-xl">
+              <div className="text-3xl font-bold">Supervisor Layer</div>
+              <ul className="mt-5 space-y-3 text-lg leading-8 text-emerald-50/82">
+                <li>Participation Tracking</li>
+                <li>Task Completion</li>
+                <li>Leadership Scoring</li>
+                <li>Daily Observations</li>
+                <li>Pathway Advancement</li>
+              </ul>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-7 backdrop-blur-xl">
+              <div className="text-3xl font-bold">Live Ecosystem Feed</div>
+              <ul className="mt-5 space-y-3 text-lg leading-8 text-emerald-50/82">
+                <li>Harvest Team active in Grow Zone 2</li>
+                <li>Marketplace inventory updated</li>
+                <li>School distribution preparing</li>
+                <li>Leadership challenge completed</li>
+                <li>Reflection submissions active</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEEDBACK & COMMUNITY VOICE */}
+      <section className="px-6 md:px-12 py-20 bg-gradient-to-b from-[#08110d] to-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Feedback & Community Voice
+          </div>
+
+          <h2 className="mt-5 text-5xl font-black">
+            The ecosystem listens and responds.
+          </h2>
+
+          <div className="mt-10 grid lg:grid-cols-2 gap-6">
+            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
+              <div className="text-2xl font-bold">
+                What inspired you today?
+              </div>
+
+              <textarea
+                className="mt-6 w-full h-44 rounded-2xl border border-white/10 bg-black/30 p-5 text-white outline-none resize-none"
+                placeholder="Share your feedback, reflections, and ideas..."
+              />
+
+              <button className="mt-6 rounded-full bg-emerald-400 text-black px-6 py-3 font-bold">
+                Submit Reflection
+              </button>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 backdrop-blur-xl">
+              <div className="text-2xl font-bold">
+                Continue Your Journey
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                {[
+                  'Join Workforce',
+                  'Become Grower',
+                  'Explore Marketplace',
+                  'Attend Event',
+                  'Become Partner',
+                  'Volunteer',
+                ].map((item) => (
+                  <button
+                    key={item}
+                    className="rounded-full border border-white/10 bg-white/10 px-5 py-3 hover:bg-white/20"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
