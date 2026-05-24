@@ -1,415 +1,661 @@
-{/* =========================================================
-   ROLE PATHWAYS — FULL ECOSYSTEM JOURNEYS
-   PRESERVE EXISTING ARCHITECTURE / ATMOSPHERE
-========================================================= */}
+import React, { useMemo, useState } from "react";
 
-<section className="px-6 md:px-12 py-24 bg-gradient-to-b from-[#07120d] to-[#102218]">
-  <div className="max-w-7xl mx-auto">
+type Screen =
+  | "home"
+  | "story"
+  | "roles"
+  | "events"
+  | "nutrition"
+  | "marketplace";
 
-    <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
-      Ecosystem Role Pathways
+type Language =
+  | "English"
+  | "Español"
+  | "Tagalog"
+  | "Italiano"
+  | "Patwa"
+  | "Hebrew";
+
+function PillButton({
+  children,
+  onClick,
+  active = false,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  active?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full border px-5 py-3 text-sm font-medium backdrop-blur-md transition hover:scale-[1.01] ${
+        active
+          ? "border-emerald-200/30 bg-emerald-400/20 text-white"
+          : "border-white/10 bg-white/10 text-white hover:bg-white/15"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function GlassCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`rounded-[2rem] border border-white/10 bg-black/20 shadow-2xl backdrop-blur-xl ${className}`}
+    >
+      {children}
     </div>
+  );
+}
 
-    <h2 className="mt-5 text-5xl md:text-6xl font-black leading-tight">
-      Every pathway moves through the ecosystem.
-    </h2>
+function Navigation({
+  screen,
+  setScreen,
+}: {
+  screen: Screen;
+  setScreen: (screen: Screen) => void;
+}) {
+  return (
+    <div className="mb-8 flex flex-wrap gap-3">
+      <PillButton onClick={() => setScreen("home")} active={screen === "home"}>
+        Entrance
+      </PillButton>
 
-    <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/82">
-      Guests, youth, growers, supervisors, marketplace teams, schools,
-      partners, and families all participate in one connected living system.
-    </p>
+      <PillButton onClick={() => setScreen("story")} active={screen === "story"}>
+        Our Story
+      </PillButton>
 
-    {/* =========================================================
-       YOUTH WORKFORCE
-    ========================================================= */}
+      <PillButton onClick={() => setScreen("roles")} active={screen === "roles"}>
+        Role Pathways
+      </PillButton>
 
-    <div className="mt-16 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
+      <PillButton onClick={() => setScreen("events")} active={screen === "events"}>
+        Events
+      </PillButton>
 
-      <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
-        <img
-          src="/SAM_0401.JPG"
-          className="h-[520px] w-full object-cover"
-        />
+      <PillButton
+        onClick={() => setScreen("nutrition")}
+        active={screen === "nutrition"}
+      >
+        Nutrition
+      </PillButton>
 
-        <div className="p-8">
+      <PillButton
+        onClick={() => setScreen("marketplace")}
+        active={screen === "marketplace"}
+      >
+        Marketplace
+      </PillButton>
+    </div>
+  );
+}
 
-          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Youth Workforce Journey
+function EcosystemShell({
+  children,
+  screen,
+  setScreen,
+}: {
+  children: React.ReactNode;
+  screen: Screen;
+  setScreen: (screen: Screen) => void;
+}) {
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/GrowArea.jpg')",
+        }}
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-emerald-950/65 to-black/85" />
+
+      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
+        <Navigation screen={screen} setScreen={setScreen} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function HomeScreen({
+  language,
+  setLanguage,
+  setScreen,
+}: {
+  language: Language;
+  setLanguage: (language: Language) => void;
+  setScreen: (screen: Screen) => void;
+}) {
+  const languages: Language[] = [
+    "English",
+    "Español",
+    "Tagalog",
+    "Italiano",
+    "Patwa",
+    "Hebrew",
+  ];
+
+  return (
+    <EcosystemShell screen="home" setScreen={setScreen}>
+      <section className="grid gap-6 lg:grid-cols-[1.55fr_0.95fr]">
+
+        {/* HERO */}
+
+        <div className="rounded-[2.25rem] border border-white/10 bg-black/25 p-8 shadow-2xl backdrop-blur-xl md:p-10">
+
+          <div className="uppercase tracking-[0.35em] text-emerald-100/70 text-xs">
+            Connected Food Ecosystem Experience
           </div>
 
-          <h3 className="mt-4 text-5xl font-black leading-tight">
-            Youth participate in a real food ecosystem.
-          </h3>
+          <h1 className="mt-5 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight">
+            Bronson Family Farm
+          </h1>
 
-          <p className="mt-6 text-lg leading-9 text-emerald-50/82">
-            Youth cultivate, harvest, prepare, organize, reflect,
-            lead, and help move food toward marketplaces,
-            schools, community destinations, and families.
+          <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/85">
+            A living ecosystem connecting youth workforce development,
+            growers, marketplace systems, schools, wellness, agritourism,
+            food access, leadership, and community revitalization.
           </p>
 
-          <div className="mt-8 grid md:grid-cols-2 gap-4">
+          <div className="mt-8 flex flex-wrap gap-3">
+
+            <PillButton active>
+              Begin Guided Tour
+            </PillButton>
+
+            <PillButton onClick={() => setScreen("roles")}>
+              Enter Pathways
+            </PillButton>
+
+            <PillButton onClick={() => setScreen("marketplace")}>
+              Open Marketplace
+            </PillButton>
+
+          </div>
+
+          {/* LIVE STATUS */}
+
+          <div className="mt-10 grid md:grid-cols-3 gap-4">
 
             {[
-              "Morning activation and ecosystem briefing",
-              "Cultivation and harvest teams",
-              "Marketplace preparation",
-              "Leadership and teamwork challenges",
-              "Motivational activity blocks",
-              "Reflection and ecosystem participation",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl border border-white/10 bg-white/10 p-5"
-              >
-                {item}
-              </div>
-            ))}
-
-          </div>
-
-          {/* ENDING DECISION */}
-
-          <div className="mt-10">
-
-            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-              Ending Decision
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-3">
-
-              {[
-                "Continue to Leadership",
-                "Explore Marketplace",
-                "Become Future Mentor",
-                "Join Grower Pathway",
-                "Return to Ecosystem",
-              ].map((item) => (
-                <button
-                  key={item}
-                  className="rounded-full border border-white/10 bg-white/10 px-5 py-3 hover:bg-white/20 transition"
-                >
-                  {item}
-                </button>
-              ))}
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* YOUTH WORKFORCE COMMAND CENTER */}
-
-      <div className="space-y-6">
-
-        <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-7">
-
-          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Workforce Command Center
-          </div>
-
-          <h3 className="mt-4 text-4xl font-black">
-            Operational ecosystem activity
-          </h3>
-
-          <div className="mt-8 grid gap-4">
-
-            {[
-              ["50 Youth Active", "Summer workforce session active"],
-              ["PPE Verified", "Safety & readiness checks complete"],
-              ["Marketplace Prep", "Distribution preparation active"],
-              ["Leadership Challenge", "Team-based ecosystem activity"],
-              ["Reflection Submitted", "Daily growth & participation"],
+              ["50 Youth Active", "Summer Workforce Active"],
+              ["Marketplace Preparing", "Inventory & Distribution Active"],
+              ["Warm Growing Conditions", "Irrigation & Harvest Active"],
+              ["Schools Supported", "Community Food Destinations"],
+              ["118 Acres Activated", "Operational Ecosystem"],
+              ["Harvest Teams Active", "Daily Rhythm In Motion"],
             ].map(([title, subtitle]) => (
-              <div
-                key={title}
-                className="rounded-2xl border border-white/10 bg-white/10 p-5"
-              >
-                <div className="text-2xl font-bold">
+              <GlassCard key={title} className="p-5">
+
+                <div className="uppercase tracking-[0.25em] text-emerald-100/65 text-xs">
+                  Live Ecosystem
+                </div>
+
+                <div className="mt-3 text-2xl font-bold">
                   {title}
                 </div>
 
                 <div className="mt-2 text-sm text-emerald-50/70">
                   {subtitle}
                 </div>
-              </div>
+
+              </GlassCard>
             ))}
 
           </div>
         </div>
 
-        {/* DAILY RHYTHM */}
+        {/* OVERVIEW */}
 
-        <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-7">
+        <GlassCard className="p-7">
 
-          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Daily Ecosystem Rhythm
+          <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+            Living Ecosystem Overview
           </div>
 
-          <div className="mt-6 space-y-4">
+          <h2 className="mt-5 text-4xl font-black leading-tight">
+            A place people want to return to.
+          </h2>
+
+          <p className="mt-6 text-lg leading-9 text-emerald-50/82">
+            Bronson Family Farm connects workforce, agriculture,
+            schools, wellness, marketplace systems, growers,
+            leadership, and community participation into one immersive ecosystem.
+          </p>
+
+          <div className="mt-8 space-y-4">
 
             {[
-              "Arrival Experience",
-              "Morning Activation",
-              "Team Deployment",
-              "Motivational Activity Block",
-              "Deep Work Session",
-              "Marketplace Rotation",
-              "Reflection Session",
-              "Closing Circle",
+              "Youth Workforce Development",
+              "Marketplace & Distribution",
+              "Schools & Community Food Access",
+              "Grower Ecosystem",
+              "Nutrition & Wellness",
+              "Family Legacy & Land Restoration",
             ].map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl border border-white/10 bg-white/10 p-4"
-              >
-                {item}
-              </div>
+              <GlassCard key={item} className="p-5">
+                <div className="text-xl font-semibold">
+                  {item}
+                </div>
+              </GlassCard>
             ))}
 
           </div>
-        </div>
 
-      </div>
-    </div>
+          {/* LANGUAGES */}
 
-    {/* =========================================================
-       FOOD DESTINATION FLOW
-    ========================================================= */}
+          <div className="mt-8">
 
-    <div className="mt-20">
+            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+              Language
+            </div>
 
-      <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
-        Food Destination Flow
-      </div>
+            <div className="mt-4 flex flex-wrap gap-2">
 
-      <h2 className="mt-5 text-5xl font-black leading-tight">
-        Grow → Harvest → Prepare → Marketplace → Schools → Community
-      </h2>
-
-      <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/82">
-        Youth and growers are not simply gardening.
-        Food produced through the ecosystem supports
-        marketplaces, schools, wellness initiatives,
-        community events, and families.
-      </p>
-
-      <div className="mt-12 grid lg:grid-cols-6 gap-4">
-
-        {[
-          ["/SAM_0384.JPG", "Grow"],
-          ["/SAM_0393.JPG", "Harvest"],
-          ["/SAM_0412.JPG", "Prepare"],
-          ["/marketplace.jpg", "Marketplace"],
-          ["/community-school.jpg", "Schools"],
-          ["/community-family.jpg", "Families"],
-        ].map(([img, title]) => (
-          <div
-            key={title}
-            className="rounded-[1.75rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl"
-          >
-            <img
-              src={img}
-              className="h-[220px] w-full object-cover"
-            />
-
-            <div className="p-5">
-
-              <div className="text-2xl font-bold">
-                {title}
-              </div>
+              {languages.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`rounded-full px-4 py-2 text-sm transition ${
+                    language === lang
+                      ? "bg-white text-black"
+                      : "border border-white/10 bg-white/10 text-white"
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
 
             </div>
           </div>
-        ))}
+        </GlassCard>
+      </section>
 
-      </div>
-    </div>
+      {/* DAILY RHYTHM */}
 
-    {/* =========================================================
-       MARKETPLACE EXPERIENCE
-    ========================================================= */}
+      <section className="mt-20">
 
-    <div className="mt-24 grid lg:grid-cols-[0.95fr_1.05fr] gap-6">
-
-      <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
-
-        <img
-          src="/marketplace.jpg"
-          className="h-full w-full object-cover"
-        />
-
-      </div>
-
-      <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8">
-
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Marketplace Ecosystem
+        <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+          Daily Ecosystem Rhythm
         </div>
 
-        <h3 className="mt-4 text-5xl font-black leading-tight">
-          The marketplace connects food, education, wellness, and community.
-        </h3>
+        <h2 className="mt-5 text-5xl font-black">
+          The ecosystem moves with purpose and structure.
+        </h2>
 
-        <p className="mt-6 text-lg leading-9 text-emerald-50/82">
-          Marketplace systems connect growers,
-          youth workforce activity, schools,
-          community distribution, wellness initiatives,
-          and local purchasing into one living economy.
-        </p>
-
-        <div className="mt-10 grid md:grid-cols-2 gap-4">
+        <div className="mt-10 grid lg:grid-cols-4 gap-5">
 
           {[
-            "Youth-grown produce",
-            "School support",
-            "Community distribution",
-            "SNAP-accessible food systems",
-            "Seasonal produce",
-            "Value-added products",
+            "Arrival Experience",
+            "Morning Activation",
+            "Team Deployment",
+            "Motivational Activity Block",
+            "Deep Work Session",
+            "Marketplace Rotation",
+            "Reflection Session",
+            "Closing Circle",
           ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/10 p-5"
-            >
-              {item}
-            </div>
+            <GlassCard key={item} className="p-6">
+              <div className="text-2xl font-bold leading-tight">
+                {item}
+              </div>
+            </GlassCard>
           ))}
 
         </div>
+      </section>
 
-        {/* MARKETPLACE ENDING */}
+      {/* FOOD FLOW */}
 
-        <div className="mt-10">
+      <section className="mt-24">
+
+        <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+          Food Destination Flow
+        </div>
+
+        <h2 className="mt-5 text-5xl font-black leading-tight">
+          Grow → Harvest → Prepare → Marketplace → Schools → Community
+        </h2>
+
+        <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/82">
+          Youth and growers are not simply gardening.
+          Food grown through the ecosystem supports marketplaces,
+          schools, wellness initiatives, community events, and families.
+        </p>
+
+        <div className="mt-12 grid lg:grid-cols-6 gap-4">
+
+          {[
+            ["/SAM_0384.JPG", "Grow"],
+            ["/SAM_0393.JPG", "Harvest"],
+            ["/SAM_0412.JPG", "Prepare"],
+            ["/marketplace.jpg", "Marketplace"],
+            ["/community-school.jpg", "Schools"],
+            ["/community-family.jpg", "Families"],
+          ].map(([img, title]) => (
+            <GlassCard
+              key={title}
+              className="overflow-hidden"
+            >
+
+              <img
+                src={img}
+                className="h-[220px] w-full object-cover"
+              />
+
+              <div className="p-5">
+                <div className="text-2xl font-bold">
+                  {title}
+                </div>
+              </div>
+
+            </GlassCard>
+          ))}
+
+        </div>
+      </section>
+    </EcosystemShell>
+  );
+}
+
+function RolePathwaysScreen({
+  setScreen,
+}: {
+  setScreen: (screen: Screen) => void;
+}) {
+  return (
+    <EcosystemShell screen="roles" setScreen={setScreen}>
+
+      <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+        Ecosystem Role Pathways
+      </div>
+
+      <h1 className="mt-5 text-5xl md:text-6xl font-black leading-tight">
+        Every pathway moves through the ecosystem.
+      </h1>
+
+      <div className="mt-14 grid lg:grid-cols-2 gap-6">
+
+        {/* YOUTH */}
+
+        <GlassCard className="overflow-hidden">
+
+          <img
+            src="/SAM_0401.JPG"
+            className="h-[420px] w-full object-cover"
+          />
+
+          <div className="p-8">
+
+            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+              Youth Workforce Journey
+            </div>
+
+            <h2 className="mt-4 text-5xl font-black leading-tight">
+              Youth participate in a real food ecosystem.
+            </h2>
+
+            <p className="mt-6 text-lg leading-9 text-emerald-50/82">
+              Youth cultivate, harvest, prepare,
+              organize, reflect, lead, and help move food
+              toward marketplaces, schools, community destinations,
+              and families.
+            </p>
+
+            <div className="mt-8 grid md:grid-cols-2 gap-4">
+
+              {[
+                "Morning activation",
+                "Cultivation teams",
+                "Marketplace prep",
+                "Leadership challenges",
+                "Motivational activities",
+                "Reflection sessions",
+              ].map((item) => (
+                <GlassCard key={item} className="p-5">
+                  {item}
+                </GlassCard>
+              ))}
+
+            </div>
+
+            {/* ENDING */}
+
+            <div className="mt-10">
+
+              <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+                Ending Decision
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-3">
+
+                {[
+                  "Continue to Leadership",
+                  "Explore Marketplace",
+                  "Become Future Mentor",
+                  "Join Grower Pathway",
+                  "Return to Ecosystem",
+                ].map((item) => (
+                  <button
+                    key={item}
+                    className="rounded-full border border-white/10 bg-white/10 px-5 py-3 hover:bg-white/20"
+                  >
+                    {item}
+                  </button>
+                ))}
+
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* COMMAND CENTER */}
+
+        <div className="space-y-6">
+
+          <GlassCard className="p-7">
+
+            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+              Workforce Command Center
+            </div>
+
+            <h2 className="mt-4 text-4xl font-black">
+              Operational ecosystem activity
+            </h2>
+
+            <div className="mt-8 grid gap-4">
+
+              {[
+                ["50 Youth Active", "Summer workforce session active"],
+                ["PPE Verified", "Safety & readiness checks complete"],
+                ["Marketplace Prep", "Distribution preparation active"],
+                ["Leadership Challenge", "Team-based ecosystem activity"],
+                ["Reflection Submitted", "Daily participation tracking"],
+              ].map(([title, subtitle]) => (
+                <GlassCard key={title} className="p-5">
+
+                  <div className="text-2xl font-bold">
+                    {title}
+                  </div>
+
+                  <div className="mt-2 text-sm text-emerald-50/70">
+                    {subtitle}
+                  </div>
+
+                </GlassCard>
+              ))}
+
+            </div>
+          </GlassCard>
+
+          {/* LIVE FEED */}
+
+          <GlassCard className="p-7">
+
+            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+              Live Ecosystem Feed
+            </div>
+
+            <div className="mt-6 space-y-4">
+
+              {[
+                "Harvest Team active in Grow Zone 2",
+                "Marketplace inventory updated",
+                "Leadership challenge completed",
+                "Produce prepared for school destination",
+                "Community distribution preparing",
+              ].map((item) => (
+                <GlassCard key={item} className="p-4">
+                  {item}
+                </GlassCard>
+              ))}
+
+            </div>
+          </GlassCard>
+        </div>
+      </div>
+
+      {/* FEEDBACK */}
+
+      <section className="mt-24 grid lg:grid-cols-2 gap-6">
+
+        <GlassCard className="p-8">
 
           <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Ending Decision
+            Feedback & Reflection
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
+          <h2 className="mt-4 text-5xl font-black leading-tight">
+            The ecosystem listens and evolves.
+          </h2>
+
+          <textarea
+            className="mt-8 w-full h-44 rounded-2xl border border-white/10 bg-black/30 p-5 text-white outline-none resize-none"
+            placeholder="Share your feedback, reflections, and ideas..."
+          />
+
+          <button className="mt-6 rounded-full bg-emerald-400 text-black px-6 py-3 font-bold">
+            Submit Reflection
+          </button>
+        </GlassCard>
+
+        <GlassCard className="p-8">
+
+          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+            Continue Your Journey
+          </div>
+
+          <h2 className="mt-4 text-5xl font-black leading-tight">
+            Movement through the ecosystem never stops.
+          </h2>
+
+          <div className="mt-10 flex flex-wrap gap-4">
 
             {[
-              "Shop Marketplace",
-              "Become Vendor",
-              "Support Workforce",
-              "Explore Grower Pathway",
-              "Return to Ecosystem",
+              "Join Workforce",
+              "Become Grower",
+              "Explore Marketplace",
+              "Attend Event",
+              "Become Partner",
+              "Volunteer",
             ].map((item) => (
               <button
                 key={item}
-                className="rounded-full border border-white/10 bg-white/10 px-5 py-3 hover:bg-white/20"
+                className="rounded-full border border-white/10 bg-white/10 px-6 py-4 hover:bg-white/20"
               >
                 {item}
               </button>
             ))}
 
           </div>
+        </GlassCard>
+      </section>
+
+    </EcosystemShell>
+  );
+}
+
+function PlaceholderScreen({
+  title,
+  screen,
+  setScreen,
+}: {
+  title: string;
+  screen: Screen;
+  setScreen: (screen: Screen) => void;
+}) {
+  return (
+    <EcosystemShell screen={screen} setScreen={setScreen}>
+      <GlassCard className="p-12 text-center">
+
+        <div className="text-6xl font-black">
+          {title}
         </div>
 
-      </div>
-    </div>
+        <p className="mt-8 text-xl text-emerald-50/80">
+          Additional ecosystem expansion continues here.
+        </p>
 
-    {/* =========================================================
-       LIVE ECOSYSTEM FEED
-    ========================================================= */}
+      </GlassCard>
+    </EcosystemShell>
+  );
+}
 
-    <div className="mt-24 rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8">
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("home");
+  const [language, setLanguage] = useState<Language>("English");
 
-      <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-        Live Ecosystem Feed
-      </div>
+  if (screen === "home" || screen === "story") {
+    return (
+      <HomeScreen
+        language={language}
+        setLanguage={setLanguage}
+        setScreen={setScreen}
+      />
+    );
+  }
 
-      <h3 className="mt-4 text-5xl font-black">
-        Real ecosystem movement
-      </h3>
+  if (screen === "roles") {
+    return <RolePathwaysScreen setScreen={setScreen} />;
+  }
 
-      <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+  if (screen === "events") {
+    return (
+      <PlaceholderScreen
+        title="Events"
+        screen="events"
+        setScreen={setScreen}
+      />
+    );
+  }
 
-        {[
-          "Harvest Team active in Grow Zone 2",
-          "Marketplace inventory updated",
-          "Leadership challenge completed",
-          "Produce prepared for school destination",
-          "Reflection submissions active",
-          "Community distribution preparing",
-        ].map((item) => (
-          <div
-            key={item}
-            className="rounded-2xl border border-white/10 bg-white/10 p-5"
-          >
-            {item}
-          </div>
-        ))}
+  if (screen === "nutrition") {
+    return (
+      <PlaceholderScreen
+        title="Nutrition & Wellness"
+        screen="nutrition"
+        setScreen={setScreen}
+      />
+    );
+  }
 
-      </div>
-    </div>
+  if (screen === "marketplace") {
+    return (
+      <PlaceholderScreen
+        title="Marketplace"
+        screen="marketplace"
+        setScreen={setScreen}
+      />
+    );
+  }
 
-    {/* =========================================================
-       FEEDBACK / COMMUNITY VOICE
-    ========================================================= */}
-
-    <div className="mt-24 grid lg:grid-cols-2 gap-6">
-
-      <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8">
-
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Feedback & Reflection
-        </div>
-
-        <h3 className="mt-4 text-5xl font-black leading-tight">
-          The ecosystem listens and evolves.
-        </h3>
-
-        <div className="mt-8 space-y-5">
-
-          {[
-            "What inspired you today?",
-            "What pathway interests you most?",
-            "How could this ecosystem strengthen the community?",
-            "What role do you see yourself in?",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/10 p-5"
-            >
-              {item}
-            </div>
-          ))}
-
-        </div>
-
-      </div>
-
-      <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8">
-
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Continue Your Journey
-        </div>
-
-        <h3 className="mt-4 text-5xl font-black leading-tight">
-          Movement through the ecosystem never stops.
-        </h3>
-
-        <div className="mt-10 flex flex-wrap gap-4">
-
-          {[
-            "Join Workforce",
-            "Become Grower",
-            "Explore Marketplace",
-            "Attend Event",
-            "Become Partner",
-            "Volunteer",
-          ].map((item) => (
-            <button
-              key={item}
-              className="rounded-full border border-white/10 bg-white/10 px-6 py-4 hover:bg-white/20"
-            >
-              {item}
-            </button>
-          ))}
-
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-</section>
+  return null;
+}
