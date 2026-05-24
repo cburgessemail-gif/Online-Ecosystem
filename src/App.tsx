@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 type Screen = "home" | "roles" | "marketplace" | "events" | "nutrition";
