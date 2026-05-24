@@ -27,36 +27,48 @@ const LANGS: LangKey[] = [
   "Français",
 ];
 
-/* =========================
-   HERO IMAGE
-========================= */
+/* =========================================
+   REAL OPERATIONAL ECOSYSTEM IMAGES
+========================================= */
 
-const heroImage = "/images/GrowArea.jpg?v=2";
-
-/* =========================
-   PATHWAY IMAGES
-========================= */
+const heroImage =
+  "/images/SAM_0417.JPG?v=3";
 
 const pathwayImages: Record<PathwayKey, string> = {
-  orientation: "/images/GrowArea2.jpg?v=2",
-  supervisor: "/images/Fence_volunteers.png?v=2",
-  tasks: "/images/SAM_0410.JPG?v=2",
-  attendance: "/images/SAM_0405.JPG?v=2",
-  assessments: "/images/SAM_0420.JPG?v=2",
+  orientation:
+    "/images/SAM_0425.JPG?v=3",
+
+  supervisor:
+    "/images/Fence_volunteers.png?v=3",
+
+  tasks:
+    "/images/SAM_0410.JPG?v=3",
+
+  attendance:
+    "/images/SAM_0405.JPG?v=3",
+
+  assessments:
+    "/images/SAM_0420.JPG?v=3",
+
   marketplace:
-    "/images/ConnectFoodEcosystem_withimages.png?v=2",
-  parents: "/images/Seeds_Jubilee Gardens.png?v=2",
-  partners: "/images/Partners.png?v=2",
+    "/images/ConnectFoodEcosystem_withimages.png?v=3",
+
+  parents:
+    "/images/Seeds_Jubilee Gardens.png?v=3",
+
+  partners:
+    "/images/Partners.png?v=3",
 };
 
-/* =========================
+/* =========================================
    UI LANGUAGE
-========================= */
+========================================= */
 
 const ui = {
   English: {
     badge:
       "BRONSON FAMILY FARM YOUTH WORKFORCE PROGRAM",
+
     title:
       "Summer 2026 Digital Training & Supervisor Management System",
 
@@ -66,7 +78,8 @@ const ui = {
     subtitle:
       "A guided digital training and supervisor management system for youth growers, supervisors, parents, partners, attendance, daily tasks, assessments, marketplace harvest flow, and program outcomes.",
 
-    guided: "Begin Guided Tour",
+    guided:
+      "Begin Guided Tour",
 
     orientation:
       "Start Youth Orientation",
@@ -227,9 +240,9 @@ const ui = {
   },
 };
 
-/* =========================
+/* =========================================
    PATHWAYS
-========================= */
+========================================= */
 
 const pathways: Record<PathwayKey, any> = {
   orientation: {
@@ -369,9 +382,9 @@ const pathways: Record<PathwayKey, any> = {
   },
 };
 
-/* =========================
+/* =========================================
    INFO CARD
-========================= */
+========================================= */
 
 function InfoCard({
   label,
@@ -393,9 +406,9 @@ function InfoCard({
   );
 }
 
-/* =========================
+/* =========================================
    APP
-========================= */
+========================================= */
 
 export default function App() {
   const [lang, setLang] =
@@ -462,13 +475,13 @@ export default function App() {
           </div>
         </header>
 
-        {/* HERO */}
-
         {!selected && (
           <>
+            {/* HERO */}
+
             <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-2">
 
-              {/* LEFT */}
+              {/* LEFT PANEL */}
 
               <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
 
@@ -529,204 +542,29 @@ export default function App() {
                 </div>
               </div>
 
-              {/* RIGHT IMAGE */}
+              {/* HERO IMAGE */}
 
               <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
 
                 <img
                   src={heroImage}
-                  alt="Bronson Family Farm growing area"
+                  alt="Bronson Family Farm real operational youth workforce ecosystem"
                   className="h-[720px] w-full object-cover bg-[#dce8c8]"
                   onError={(e) => {
                     e.currentTarget.src =
-                      "/images/GrowArea2.jpg?v=2";
+                      "/images/SAM_0425.JPG?v=3";
                   }}
                 />
 
                 <div className="p-6">
 
                   <div className="rounded-2xl bg-black/35 px-6 py-5 text-xl font-black">
-                    Bronson Family Farm Youth Workforce growing area
+                    Bronson Family Farm real operational youth workforce ecosystem
                   </div>
                 </div>
-              </div>
-            </section>
-
-            {/* PATHWAYS */}
-
-            <section className="mx-auto mt-10 max-w-7xl">
-
-              <h2 className="mb-6 text-3xl font-black">
-                {copy.choose}
-              </h2>
-
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
-                {(Object.keys(pathways) as PathwayKey[]).map(
-                  (key) => (
-                    <button
-                      key={key}
-                      onClick={() =>
-                        setSelected(key)
-                      }
-                      className="rounded-[2rem] border border-white/15 bg-white/10 p-7 text-left shadow-2xl backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/15"
-                    >
-                      <div className="text-xs uppercase tracking-[0.3em] text-white/60">
-                        Workforce Pathway
-                      </div>
-
-                      <div className="mt-4 text-3xl font-black">
-                        {pathways[key].title}
-                      </div>
-
-                      <p className="mt-5 text-lg leading-relaxed text-white/80">
-                        {pathways[key].need}
-                      </p>
-                    </button>
-                  )
-                )}
               </div>
             </section>
           </>
-        )}
-
-        {/* PATHWAY DETAIL */}
-
-        {active && selected && (
-
-          <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-[1fr_420px]">
-
-            <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-10 shadow-2xl backdrop-blur-md">
-
-              <button
-                onClick={() =>
-                  setSelected(null)
-                }
-                className="mb-8 rounded-full bg-white px-6 py-3 text-lg font-black text-[#123018]"
-              >
-                ← {copy.back}
-              </button>
-
-              <div className="grid gap-8 xl:grid-cols-[1fr_420px]">
-
-                <div>
-
-                  <div className="text-sm uppercase tracking-[0.35em] text-white/60">
-                    Youth Workforce Pathway
-                  </div>
-
-                  <h1 className="mt-5 text-6xl font-black leading-tight">
-                    {active.title}
-                  </h1>
-
-                  <div className="mt-8 rounded-[2rem] bg-black/20 p-8">
-
-                    <h2 className="text-2xl font-black">
-                      Need Being Met
-                    </h2>
-
-                    <p className="mt-4 text-xl leading-relaxed text-white/85">
-                      {active.need}
-                    </p>
-                  </div>
-                </div>
-
-                {/* PATHWAY IMAGE */}
-
-                <div className="overflow-hidden rounded-[2rem] border border-white/15 bg-black/20">
-
-                  <img
-                    src={pathwayImages[selected]}
-                    alt={active.title}
-                    className="h-[360px] w-full object-cover"
-                  />
-
-                  <div className="p-4 text-lg font-black">
-                    {active.title}
-                  </div>
-                </div>
-              </div>
-
-              {/* STEPS */}
-
-              <div className="mt-8 grid gap-5">
-
-                {active.steps.map(
-                  (
-                    step: string,
-                    index: number
-                  ) => (
-                    <div
-                      key={index}
-                      className="rounded-[2rem] bg-white/10 p-7"
-                    >
-                      <div className="text-sm uppercase tracking-[0.3em] text-white/60">
-                        Step {index + 1}
-                      </div>
-
-                      <div className="mt-4 text-xl leading-relaxed">
-                        {step}
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-
-              {/* OUTCOME */}
-
-              <div className="mt-8 rounded-[2rem] bg-[#dce8c8] p-8 text-[#123018]">
-
-                <div className="text-sm uppercase tracking-[0.3em]">
-                  Outcome
-                </div>
-
-                <div className="mt-4 text-2xl font-black leading-relaxed">
-                  {active.outcome}
-                </div>
-              </div>
-            </div>
-
-            {/* SIDEBAR */}
-
-            <aside className="h-fit rounded-[2.5rem] border border-white/15 bg-black/20 p-8 shadow-2xl">
-
-              <h2 className="text-3xl font-black">
-                {copy.nextMoves}
-              </h2>
-
-              <div className="mt-6 grid gap-4">
-
-                {[
-                  "Prepare supervisor teams",
-                  "Finalize youth roster",
-                  "Complete orientation",
-                  "Prepare digital attendance",
-                  "Prepare assessments",
-                  "Prepare marketplace tracking",
-                  "Connect parent communication",
-                  "Prepare partner reporting",
-                ].map((move) => (
-                  <div
-                    key={move}
-                    className="rounded-2xl bg-white/10 p-5 text-lg font-semibold"
-                  >
-                    {move}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 rounded-[2rem] bg-white p-6 text-[#123018]">
-
-                <div className="text-sm uppercase tracking-[0.3em]">
-                  Feedback & Reflection
-                </div>
-
-                <p className="mt-4 text-lg font-semibold leading-relaxed">
-                  Youth, supervisors, parents, growers, and partners can contribute feedback to strengthen the ecosystem.
-                </p>
-              </div>
-            </aside>
-          </section>
         )}
       </section>
     </main>
