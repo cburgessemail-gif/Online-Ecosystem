@@ -3,53 +3,45 @@ import React, { useState } from "react";
 type Screen = "home" | "roles" | "marketplace" | "events" | "nutrition" | "partners";
 type Language = "English" | "Español" | "Tagalog" | "Italiano" | "Patwa" | "Hebrew";
 
+const ASSET_BASE = "https://online-ecosystem.vercel.app/images";
+
 const IMG = {
-  hero: "/images/GrowArea.jpg",
-  hero2: "/images/GrowArea2.jpg",
-  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
-  partners: "/images/Partners.png",
-  grower: "/images/SAM_0384.JPG",
-  field: "/images/SAM_0380.JPG",
-  harvest: "/images/SAM_0393.JPG",
-  youth: "/images/SAM_0401.JPG",
-  market: "/images/SAM_0407.JPG",
-  prep: "/images/SAM_0412.JPG",
-  community: "/images/SAM_0415.JPG",
-  family: "/images/SAM_0417.JPG",
-  event: "/images/SAM_0420.JPG",
-  fencing: "/images/Deer Fencing.png",
-  fenceVolunteers: "/images/Fence_volunteers.png",
-  seeds: "/images/Seeds_Jubilee Gardens.png",
-  compost: "/images/Compost_ElliottGarden.png",
-  csu: "/images/CSU_MParker.png",
-  queens: "/images/Queens Village.png",
-  wkbn: "/images/WKBN Interview.png",
+  hero: `${ASSET_BASE}/GrowArea.jpg`,
+  hero2: `${ASSET_BASE}/GrowArea2.jpg`,
+  ecosystem: `${ASSET_BASE}/ConnectFoodEcosystem_withimages.png`,
+  partners: `${ASSET_BASE}/Partners.png`,
+  grower: `${ASSET_BASE}/SAM_0384.JPG`,
+  field: `${ASSET_BASE}/SAM_0380.JPG`,
+  harvest: `${ASSET_BASE}/SAM_0393.JPG`,
+  youth: `${ASSET_BASE}/SAM_0401.JPG`,
+  market: `${ASSET_BASE}/SAM_0407.JPG`,
+  prep: `${ASSET_BASE}/SAM_0412.JPG`,
+  community: `${ASSET_BASE}/SAM_0415.JPG`,
+  family: `${ASSET_BASE}/SAM_0417.JPG`,
+  event: `${ASSET_BASE}/SAM_0420.JPG`,
+  fencing: `${ASSET_BASE}/Deer%20Fencing.png`,
+  fenceVolunteers: `${ASSET_BASE}/Fence_volunteers.png`,
+  seeds: `${ASSET_BASE}/Seeds_Jubilee%20Gardens.png`,
+  compost: `${ASSET_BASE}/Compost_ElliottGarden.png`,
+  csu: `${ASSET_BASE}/CSU_MParker.png`,
+  queens: `${ASSET_BASE}/Queens%20Village.png`,
+  wkbn: `${ASSET_BASE}/WKBN%20Interview.png`,
 };
 
-function imageStyle(image: string, position = "center") {
+function bg(image: string, position = "center") {
   return {
-    backgroundImage: `linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,.35), rgba(0,0,0,.08)), url("${image}")`,
+    backgroundImage: `linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.32), rgba(0,0,0,.08)), url("${image}")`,
     backgroundSize: "cover",
     backgroundPosition: position,
   } as React.CSSProperties;
 }
 
-function PillButton({
-  children,
-  active = false,
-  onClick,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-  onClick?: () => void;
-}) {
+function PillButton({ children, active = false, onClick }: { children: React.ReactNode; active?: boolean; onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
       className={`rounded-full border px-5 py-3 text-sm font-semibold transition ${
-        active
-          ? "border-emerald-300/40 bg-emerald-500/25 text-white"
-          : "border-white/15 bg-white/10 text-white hover:bg-white/20"
+        active ? "border-emerald-300/40 bg-emerald-500/25 text-white" : "border-white/15 bg-white/10 text-white hover:bg-white/20"
       }`}
     >
       {children}
@@ -65,24 +57,9 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
-function PhotoCard({
-  title,
-  subtitle,
-  image,
-  height = "260px",
-  position = "center",
-}: {
-  title: string;
-  subtitle?: string;
-  image: string;
-  height?: string;
-  position?: string;
-}) {
+function PhotoCard({ title, subtitle, image, height = "260px", position = "center" }: { title: string; subtitle?: string; image: string; height?: string; position?: string }) {
   return (
-    <div
-      className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-emerald-950 shadow-xl"
-      style={{ height, ...imageStyle(image, position) }}
-    >
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-emerald-950 shadow-xl" style={{ height, ...bg(image, position) }}>
       <div className="absolute bottom-0 left-0 right-0 p-6">
         <div className="text-2xl font-black leading-tight">{title}</div>
         {subtitle ? <div className="mt-2 text-sm leading-6 text-emerald-50/85">{subtitle}</div> : null}
@@ -107,8 +84,8 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
 function Shell({ children, screen, setScreen }: { children: React.ReactNode; screen: Screen; setScreen: (screen: Screen) => void }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <div className="fixed inset-0" style={{ ...imageStyle(IMG.hero), opacity: 0.55 }} />
-      <div className="fixed inset-0 bg-gradient-to-br from-black/85 via-emerald-950/70 to-black/95" />
+      <div className="fixed inset-0" style={{ ...bg(IMG.hero), opacity: 0.55 }} />
+      <div className="fixed inset-0 bg-gradient-to-br from-black/84 via-emerald-950/66 to-black/94" />
       <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
         <Navigation screen={screen} setScreen={setScreen} />
         {children}
@@ -124,7 +101,7 @@ function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen
     <Shell screen="home" setScreen={setScreen}>
       <section className="grid gap-6 lg:grid-cols-[1.45fr_0.95fr]">
         <div className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-black/30 shadow-2xl backdrop-blur-xl">
-          <div className="relative min-h-[620px]" style={imageStyle(IMG.hero)}>
+          <div className="relative min-h-[620px]" style={bg(IMG.hero)}>
             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
               <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Connected Food Ecosystem Experience</div>
               <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">Bronson Family Farm</h1>
@@ -155,17 +132,8 @@ function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen
             </p>
 
             <div className="mt-8 space-y-4">
-              {[
-                "Youth Workforce Development",
-                "Marketplace & Distribution",
-                "Schools & Community Food Access",
-                "Grower Ecosystem",
-                "Nutrition & Wellness",
-                "Family Legacy & Land Restoration",
-              ].map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-xl font-semibold">
-                  {item}
-                </div>
+              {["Youth Workforce Development", "Marketplace & Distribution", "Schools & Community Food Access", "Grower Ecosystem", "Nutrition & Wellness", "Family Legacy & Land Restoration"].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-xl font-semibold">{item}</div>
               ))}
             </div>
 
@@ -176,9 +144,7 @@ function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen
                   <button
                     key={lang}
                     onClick={() => setLanguage(lang)}
-                    className={`rounded-full px-4 py-2 text-sm transition ${
-                      language === lang ? "bg-white text-black" : "border border-white/10 bg-white/10 text-white"
-                    }`}
+                    className={`rounded-full px-4 py-2 text-sm transition ${language === lang ? "bg-white text-black" : "border border-white/10 bg-white/10 text-white"}`}
                   >
                     {lang}
                   </button>
@@ -188,12 +154,7 @@ function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen
           </Card>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {[
-              ["50 Youth Active", "Summer Workforce Active"],
-              ["Marketplace Preparing", "Distribution & Inventory"],
-              ["Warm Growing Conditions", "Weather & Irrigation Active"],
-              ["Schools Supported", "Community Destinations Active"],
-            ].map(([title, subtitle]) => (
+            {[["50 Youth Active", "Summer Workforce Active"], ["Marketplace Preparing", "Distribution & Inventory"], ["Warm Growing Conditions", "Weather & Irrigation Active"], ["Schools Supported", "Community Destinations Active"]].map(([title, subtitle]) => (
               <Card key={title} className="p-5">
                 <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/65">Live Ecosystem</div>
                 <div className="mt-3 text-2xl font-bold">{title}</div>
@@ -257,13 +218,7 @@ function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Workforce Command Center</div>
           <h2 className="mt-4 text-4xl font-black">Operational ecosystem activity</h2>
           <div className="mt-8 grid gap-4">
-            {[
-              ["50 Youth Active", "Summer workforce session active"],
-              ["PPE Verified", "Safety & readiness checks complete"],
-              ["Marketplace Prep", "Distribution preparation active"],
-              ["Leadership Challenge", "Team-based ecosystem activity"],
-              ["Reflection Submitted", "Daily participation tracking"],
-            ].map(([title, subtitle]) => (
+            {[["50 Youth Active", "Summer workforce session active"], ["PPE Verified", "Safety & readiness checks complete"], ["Marketplace Prep", "Distribution preparation active"], ["Leadership Challenge", "Team-based ecosystem activity"], ["Reflection Submitted", "Daily participation tracking"]].map(([title, subtitle]) => (
               <Card key={title} className="p-5">
                 <div className="text-2xl font-bold">{title}</div>
                 <div className="mt-2 text-sm text-emerald-50/70">{subtitle}</div>
@@ -280,18 +235,11 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <Shell screen="marketplace" setScreen={setScreen}>
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <PhotoCard
-          title="Marketplace & Distribution"
-          subtitle="Food moves from field production into customers, schools, events, and community destinations."
-          image={IMG.market}
-          height="620px"
-        />
+        <PhotoCard title="Marketplace & Distribution" subtitle="Food moves from field production into customers, schools, events, and community destinations." image={IMG.market} height="620px" />
         <Card className="p-8">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Marketplace Pathway</div>
           <h1 className="mt-5 text-5xl font-black leading-tight">The marketplace is the ecosystem’s movement center.</h1>
-          <p className="mt-6 text-xl leading-10 text-emerald-50/85">
-            Youth-grown produce, grower products, value-added education, nutrition, and local purchasing connect here.
-          </p>
+          <p className="mt-6 text-xl leading-10 text-emerald-50/85">Youth-grown produce, grower products, value-added education, nutrition, and local purchasing connect here.</p>
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {["Fresh produce", "School destinations", "Community events", "Grower products", "SNAP-ready planning", "Family wellness"].map((item) => (
               <Card key={item} className="p-5 text-xl font-semibold">{item}</Card>
@@ -312,9 +260,7 @@ function Partners({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Partner Pathway</div>
           <h1 className="mt-5 text-5xl font-black leading-tight">Partnership strengthens the whole ecosystem.</h1>
           <div className="mt-8 grid gap-4">
-            {["Youth workforce support", "Infrastructure", "Food access", "Events", "Education", "Community wellness"].map((item) => (
-              <Card key={item} className="p-5 text-xl font-semibold">{item}</Card>
-            ))}
+            {["Youth workforce support", "Infrastructure", "Food access", "Events", "Education", "Community wellness"].map((item) => <Card key={item} className="p-5 text-xl font-semibold">{item}</Card>)}
           </div>
         </Card>
       </div>
