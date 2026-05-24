@@ -27,28 +27,23 @@ const LANGS: LangKey[] = [
   "Français",
 ];
 
-/* =========================================
-   REAL OPERATIONAL ECOSYSTEM IMAGES
-========================================= */
+/* ==================================================
+   REAL ECOSYSTEM IMAGES
+================================================== */
 
-const heroImage =
-  "/images/SAM_0417.JPG";
+const ecosystemHero =
+  "/images/ConnectFoodEcosystem_withimages.png";
 
 const pathwayImages: Record<PathwayKey, string> = {
-  orientation:
-    "/images/SAM_0425.JPG",
+  orientation: "/images/SAM_0417.JPG",
 
-  supervisor:
-    "/images/Fence_volunteers.png",
+  supervisor: "/images/Fence_volunteers.png",
 
-  tasks:
-    "/images/SAM_0410.JPG",
+  tasks: "/images/SAM_0405.JPG",
 
-  attendance:
-    "/images/SAM_0405.JPG",
+  attendance: "/images/SAM_0410.JPG",
 
-  assessments:
-    "/images/SAM_0420.JPG",
+  assessments: "/images/SAM_0420.JPG",
 
   marketplace:
     "/images/ConnectFoodEcosystem_withimages.png",
@@ -56,351 +51,246 @@ const pathwayImages: Record<PathwayKey, string> = {
   parents:
     "/images/Seeds_Jubilee Gardens.png",
 
-  partners:
-    "/images/Partners.png",
+  partners: "/images/Partners.png",
 };
 
-/* =========================================
-   UI LANGUAGE
-========================================= */
+/* ==================================================
+   LANGUAGE
+================================================== */
 
 const ui = {
   English: {
-    badge:
-      "BRONSON FAMILY FARM YOUTH WORKFORCE PROGRAM",
-
     title:
       "Summer 2026 Digital Training & Supervisor Management System",
+
+    badge:
+      "BRONSON FAMILY FARM YOUTH WORKFORCE PROGRAM",
 
     hero:
       "Welcome to the Youth Workforce Program",
 
     subtitle:
-      "A guided digital training and supervisor management system for youth growers, supervisors, parents, partners, attendance, daily tasks, assessments, marketplace harvest flow, and program outcomes.",
+      "A guided digital training and supervisor management ecosystem for youth growers, supervisors, attendance, assessments, marketplace harvest flow, family connection, and regional food access.",
 
     guided:
       "Begin Guided Tour",
 
-    orientation:
-      "Start Youth Orientation",
-
-    choose:
-      "Choose a Workforce Pathway",
+    pathways:
+      "Workforce Pathways",
 
     back:
-      "Back to Pathways",
-
-    nextMoves:
-      "Next Strongest Moves",
+      "Back to Ecosystem",
   },
 
   Español: {
-    badge:
-      "PROGRAMA JUVENIL BRONSON FAMILY FARM",
-
     title:
-      "Sistema Digital de Supervisión Verano 2026",
+      "Sistema Digital de Supervisión 2026",
+
+    badge:
+      "PROGRAMA JUVENIL",
 
     hero:
-      "Bienvenidos al Programa Juvenil",
+      "Bienvenidos",
 
     subtitle:
-      "Sistema digital guiado para jóvenes, supervisores, padres, socios y resultados del programa.",
+      "Sistema digital para jóvenes, supervisores y familias.",
 
     guided:
-      "Iniciar Recorrido",
+      "Comenzar",
 
-    orientation:
-      "Comenzar Orientación",
-
-    choose:
-      "Seleccione una Ruta",
+    pathways:
+      "Rutas",
 
     back:
-      "Volver",
-
-    nextMoves:
-      "Próximos Pasos",
+      "Regresar",
   },
 
   Tagalog: {
-    badge:
-      "BRONSON FAMILY FARM YOUTH WORKFORCE PROGRAM",
-
     title:
-      "Digital Supervisor System Tag-init 2026",
+      "Digital Workforce System",
+
+    badge:
+      "YOUTH PROGRAM",
 
     hero:
       "Maligayang Pagdating",
 
     subtitle:
-      "Digital training at supervision system para sa kabataan, supervisors, pamilya, at partners.",
+      "Digital ecosystem para sa kabataan.",
 
     guided:
-      "Simulan Tour",
+      "Simulan",
 
-    orientation:
-      "Simulan Orientation",
-
-    choose:
-      "Pumili ng Pathway",
+    pathways:
+      "Pathways",
 
     back:
       "Bumalik",
-
-    nextMoves:
-      "Susunod na Hakbang",
   },
 
   Italiano: {
-    badge:
-      "PROGRAMMA GIOVANILE",
-
     title:
-      "Sistema Digitale Estate 2026",
+      "Sistema Digitale",
+
+    badge:
+      "PROGRAMMA",
 
     hero:
       "Benvenuti",
 
     subtitle:
-      "Sistema digitale guidato per giovani lavoratori, supervisori, famiglie e partner.",
+      "Sistema digitale per giovani.",
 
     guided:
-      "Inizia Tour",
+      "Inizia",
 
-    orientation:
-      "Avvia Orientamento",
-
-    choose:
-      "Scegli Percorso",
+    pathways:
+      "Percorsi",
 
     back:
       "Indietro",
-
-    nextMoves:
-      "Prossimi Passi",
   },
 
   עברית: {
-    badge:
-      "תוכנית נוער",
-
     title:
-      "מערכת דיגיטלית 2026",
+      "מערכת דיגיטלית",
+
+    badge:
+      "תוכנית",
 
     hero:
       "ברוכים הבאים",
 
     subtitle:
-      "מערכת דיגיטלית לנוער, מפקחים, משפחות ושותפים.",
+      "מערכת לנוער ומשפחות.",
 
     guided:
-      "התחל סיור",
+      "התחל",
 
-    orientation:
-      "התחל הדרכה",
-
-    choose:
-      "בחר מסלול",
+    pathways:
+      "מסלולים",
 
     back:
       "חזרה",
-
-    nextMoves:
-      "הצעדים הבאים",
   },
 
   Français: {
-    badge:
-      "PROGRAMME JEUNESSE",
-
     title:
-      "Système Numérique Été 2026",
+      "Système Numérique",
+
+    badge:
+      "PROGRAMME",
 
     hero:
       "Bienvenue",
 
     subtitle:
-      "Système numérique guidé pour les jeunes, superviseurs, familles et partenaires.",
+      "Système numérique jeunesse.",
 
     guided:
-      "Commencer Visite",
+      "Commencer",
 
-    orientation:
-      "Commencer Orientation",
-
-    choose:
-      "Choisir un Parcours",
+    pathways:
+      "Parcours",
 
     back:
       "Retour",
-
-    nextMoves:
-      "Prochaines Étapes",
   },
 };
 
-/* =========================================
+/* ==================================================
    PATHWAYS
-========================================= */
+================================================== */
 
-const pathways: Record<PathwayKey, any> = {
+const pathways = {
   orientation: {
     title:
       "Youth Orientation",
 
-    need:
-      "Youth need a safe, structured, and inspiring entry point before beginning work on the farm.",
-
-    steps: [
-      "Learn safety, PPE, hydration, respect, attendance, and field expectations.",
-      "Understand how the farm connects to food access, marketplace activity, schools, and community health.",
-      "Begin the summer with purpose, responsibility, teamwork, and pride.",
-    ],
+    description:
+      "Youth learn PPE, hydration, safety, teamwork, respect, field operations, marketplace purpose, and ecosystem responsibilities.",
 
     outcome:
-      "Youth begin the program ready to work, learn, grow, and contribute.",
+      "Youth begin the summer ready for structured participation.",
   },
 
   supervisor: {
     title:
       "Supervisor Dashboard",
 
-    need:
-      "Supervisors need a phone-friendly system to manage youth groups in real time.",
-
-    steps: [
-      "Track youth attendance, task completion, safety, teamwork, and behavior.",
-      "Document observations and progress for each youth.",
-      "Support daily accountability while keeping the farm day organized.",
-    ],
+    description:
+      "Supervisors track attendance, participation, assessments, teamwork, and field observations directly from mobile devices.",
 
     outcome:
-      "Supervisors become the operating leaders of the youth workforce ecosystem.",
+      "Supervisors become operational ecosystem leaders.",
   },
 
   tasks: {
     title:
       "Daily Farm Tasks",
 
-    need:
-      "Youth need daily assignments that connect real labor to real community outcomes.",
-
-    steps: [
-      "Complete watering, weeding, harvesting, sorting, labeling, composting, and cleanup.",
-      "Understand why each task matters to the farm and marketplace.",
-      "Build focus, responsibility, teamwork, and confidence away from social media distractions.",
-    ],
+    description:
+      "Youth complete planting, harvesting, composting, irrigation, cleanup, and distribution preparation.",
 
     outcome:
-      "Daily farm work becomes measurable youth skill development.",
+      "Youth connect labor to real food system outcomes.",
   },
 
   attendance: {
     title:
       "Attendance Tracking",
 
-    need:
-      "The program needs reliable daily records for participation, staffing, and reporting.",
-
-    steps: [
-      "Check youth in and out each day.",
-      "Track absences, late arrivals, early departures, and rotating participation.",
-      "Support workforce readiness through consistency and accountability.",
-    ],
+    description:
+      "Track check-in, participation, rotation, consistency, and workforce readiness.",
 
     outcome:
-      "Attendance becomes part of youth workforce discipline and program reporting.",
+      "Attendance becomes measurable accountability.",
   },
 
   assessments: {
     title:
       "Youth Assessments",
 
-    need:
-      "Youth growth must be observed, documented, and encouraged throughout the summer.",
-
-    steps: [
-      "Track safety habits, teamwork, leadership, reliability, and task skills.",
-      "Record supervisor notes and progress observations.",
-      "Use assessments to support youth, parents, partners, and final outcomes.",
-    ],
+    description:
+      "Measure growth in teamwork, leadership, safety, responsibility, and communication.",
 
     outcome:
-      "Youth leave with visible evidence of growth and workforce readiness.",
+      "Youth leave with visible growth and workforce readiness.",
   },
 
   marketplace: {
     title:
       "Marketplace Harvest Flow",
 
-    need:
-      "Food grown by youth must move toward real destinations and community value.",
-
-    steps: [
-      "Move harvest from growing area to sorting, washing, labeling, and storage.",
-      "Connect produce to marketplace customers, schools, partners, and community food access.",
-      "Show youth how food production becomes nutrition, learning, revenue, and sustainability.",
-    ],
+    description:
+      "Produce moves from field to washing, sorting, labeling, storage, schools, and marketplace destinations.",
 
     outcome:
-      "Youth see how their work feeds people and supports the regional food ecosystem.",
+      "Youth understand how food becomes community impact.",
   },
 
   parents: {
     title:
       "Parent / Guardian Connection",
 
-    need:
-      "Parents and guardians need visibility into youth participation and progress.",
-
-    steps: [
-      "Share updates, reminders, attendance notes, and progress highlights.",
-      "Help families understand the youth workforce experience.",
-      "Connect parents to the purpose, structure, and impact of the program.",
-    ],
+    description:
+      "Parents remain connected to attendance, progress, reminders, and youth development.",
 
     outcome:
-      "Families become connected stakeholders in youth growth.",
+      "Families become connected stakeholders.",
   },
 
   partners: {
     title:
-      "Partner Support",
+      "Partner Ecosystem",
 
-    need:
-      "Partners need to see where their support fits inside the operating system.",
-
-    steps: [
-      "Connect labor, supplies, education, food access, health, and funding to program outcomes.",
-      "Show how partner resources support youth, growers, marketplace flow, and community impact.",
-      "Identify next opportunities for contribution and collaboration.",
-    ],
+    description:
+      "Partners support workforce development, tools, seeds, fencing, health, food access, and operational sustainability.",
 
     outcome:
-      "Partners become active contributors to a living community food ecosystem.",
+      "Community resources become integrated ecosystem infrastructure.",
   },
 };
-
-function InfoCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/15 bg-black/20 p-5">
-      <div className="text-xs uppercase tracking-[0.25em] text-white/60 font-black">
-        {label}
-      </div>
-
-      <div className="mt-2 text-lg font-black text-white">
-        {value}
-      </div>
-    </div>
-  );
-}
 
 export default function App() {
   const [lang, setLang] =
@@ -419,7 +309,7 @@ export default function App() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#102414] text-white">
 
-      <section className="min-h-screen bg-[radial-gradient(circle_at_top_left,#6c7b42,transparent_30%),linear-gradient(135deg,#0e2213,#1f3d1d,#5b4a2d)] px-6 py-8">
+      <section className="min-h-screen bg-[radial-gradient(circle_at_top_left,#6d7f47,transparent_30%),linear-gradient(135deg,#0f2314,#18361b,#4b5b2d)] px-6 py-8">
 
         {/* HEADER */}
 
@@ -432,6 +322,7 @@ export default function App() {
             </div>
 
             <div>
+
               <div className="text-xs uppercase tracking-[0.35em] text-white/70">
                 {copy.badge}
               </div>
@@ -442,17 +333,19 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
 
             <select
               value={lang}
               onChange={(e) =>
                 setLang(e.target.value as LangKey)
               }
-              className="rounded-full bg-white px-6 py-4 text-lg font-black text-[#102414] shadow-xl"
+              className="rounded-full bg-white px-6 py-4 text-lg font-black text-[#102414]"
             >
               {LANGS.map((l) => (
-                <option key={l}>{l}</option>
+                <option key={l}>
+                  {l}
+                </option>
               ))}
             </select>
 
@@ -460,99 +353,130 @@ export default function App() {
               onClick={() =>
                 setSelected("orientation")
               }
-              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-black text-white backdrop-blur-md transition hover:bg-white/20"
+              className="rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-black text-white backdrop-blur-md"
             >
               {copy.guided}
             </button>
           </div>
         </header>
 
+        {/* HERO */}
+
         {!selected && (
-          <>
-            {/* HERO */}
+          <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-2">
 
-            <section className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-2">
+            {/* LEFT */}
 
-              {/* LEFT PANEL */}
+            <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
+
+              <div className="text-sm uppercase tracking-[0.4em] text-white/60 font-black">
+                Launch Ready
+              </div>
+
+              <h1 className="mt-8 text-7xl font-black leading-[0.92]">
+                {copy.hero}
+              </h1>
+
+              <p className="mt-8 text-2xl leading-relaxed text-white/85">
+                {copy.subtitle}
+              </p>
+
+              <div className="mt-10 grid gap-5 md:grid-cols-2">
+
+                {Object.entries(pathways).map(
+                  ([key, value]) => (
+                    <button
+                      key={key}
+                      onClick={() =>
+                        setSelected(
+                          key as PathwayKey
+                        )
+                      }
+                      className="rounded-2xl border border-white/15 bg-black/20 p-5 text-left transition hover:scale-[1.02] hover:bg-white/10"
+                    >
+                      <div className="text-xl font-black">
+                        {value.title}
+                      </div>
+
+                      <div className="mt-3 text-sm text-white/70">
+                        {value.outcome}
+                      </div>
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* RIGHT */}
+
+            <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
+
+              <img
+                src={ecosystemHero}
+                alt="Bronson Family Farm Ecosystem"
+                className="h-[760px] w-full object-cover"
+              />
+
+              <div className="p-6">
+
+                <div className="rounded-2xl bg-black/35 px-6 py-5 text-xl font-black">
+                  Bronson Family Farm real operational ecosystem
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* PATHWAY */}
+
+        {selected && active && (
+          <section className="mx-auto mt-8 max-w-7xl">
+
+            <div className="grid gap-6 lg:grid-cols-2">
 
               <div className="rounded-[2.5rem] border border-white/15 bg-white/10 p-12 shadow-2xl backdrop-blur-md">
 
-                <div className="text-sm uppercase tracking-[0.4em] text-white/60 font-black">
-                  Launch Ready
-                </div>
+                <button
+                  onClick={() =>
+                    setSelected(null)
+                  }
+                  className="rounded-full border border-white/20 bg-black/20 px-6 py-3 text-sm font-black"
+                >
+                  {copy.back}
+                </button>
 
-                <h1 className="mt-8 text-6xl font-black leading-[0.95] md:text-8xl">
-                  {copy.hero}
-                </h1>
+                <h2 className="mt-8 text-6xl font-black leading-[0.95]">
+                  {active.title}
+                </h2>
 
-                <p className="mt-8 max-w-2xl text-2xl leading-relaxed text-white/85">
-                  {copy.subtitle}
+                <p className="mt-8 text-2xl leading-relaxed text-white/85">
+                  {active.description}
                 </p>
 
-                <div className="mt-10 grid gap-5 md:grid-cols-2">
+                <div className="mt-10 rounded-3xl border border-white/15 bg-black/20 p-8">
 
-                  <InfoCard
-                    label="Program Dates"
-                    value="June 8 – August 28, 2026"
-                  />
+                  <div className="text-sm uppercase tracking-[0.35em] text-white/60">
+                    Ecosystem Outcome
+                  </div>
 
-                  <InfoCard
-                    label="Schedule"
-                    value="Monday–Friday • 8AM–2PM"
-                  />
-
-                  <InfoCard
-                    label="Orientation"
-                    value="June 5, 2026"
-                  />
-
-                  <InfoCard
-                    label="Youth Capacity"
-                    value="50 Participants"
-                  />
-                </div>
-
-                <div className="mt-10 flex flex-wrap gap-4">
-
-                  <button
-                    onClick={() =>
-                      setSelected("orientation")
-                    }
-                    className="rounded-full bg-white px-8 py-5 text-xl font-black text-[#123018] shadow-2xl transition hover:scale-[1.02]"
-                  >
-                    {copy.orientation}
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      setSelected("supervisor")
-                    }
-                    className="rounded-full border border-white/20 bg-[#dce8c8] px-8 py-5 text-xl font-black text-[#123018] shadow-2xl transition hover:scale-[1.02]"
-                  >
-                    Supervisor Dashboard
-                  </button>
+                  <div className="mt-4 text-3xl font-black">
+                    {active.outcome}
+                  </div>
                 </div>
               </div>
-
-              {/* HERO IMAGE */}
 
               <div className="overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/10 shadow-2xl">
 
                 <img
-                  src={heroImage}
-                  alt="Bronson Family Farm real operational ecosystem"
-                  className="h-[720px] w-full object-cover"
+                  src={
+                    pathwayImages[selected]
+                  }
+                  alt={active.title}
+                  className="h-[760px] w-full object-cover"
                 />
-
-                <div className="p-6">
-
-                  <div className="rounded-2xl bg-black/35 px-6 py-5 text-xl font-black">
-                    Bronson Family Farm real operational ecosystem
-                  </div>
-                </div>
               </div>
-            </section>
-          </>
+            </div>
+          </section>
         )}
       </section>
     </main>
