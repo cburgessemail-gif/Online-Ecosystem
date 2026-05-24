@@ -17,41 +17,36 @@ type Language =
   | "Hebrew";
 
 const IMG = {
-  hero: "https://online-ecosystem.vercel.app/images/GrowArea.jpg",
-  hero2: "https://online-ecosystem.vercel.app/images/GrowArea2.jpg",
-  ecosystem:
-    "https://online-ecosystem.vercel.app/images/ConnectFoodEcosystem_withimages.png",
-  partners: "https://online-ecosystem.vercel.app/images/Partners.png",
+  hero: "/images/GrowArea.jpg",
+  hero2: "/images/GrowArea2.jpg",
 
-  grower: "https://online-ecosystem.vercel.app/images/SAM_0384.JPG",
-  field: "https://online-ecosystem.vercel.app/images/SAM_0380.JPG",
-  harvest: "https://online-ecosystem.vercel.app/images/SAM_0393.JPG",
-  youth: "https://online-ecosystem.vercel.app/images/SAM_0401.JPG",
-  market: "https://online-ecosystem.vercel.app/images/SAM_0407.JPG",
-  prep: "https://online-ecosystem.vercel.app/images/SAM_0412.JPG",
-  community: "https://online-ecosystem.vercel.app/images/SAM_0415.JPG",
-  family: "https://online-ecosystem.vercel.app/images/SAM_0417.JPG",
-  event: "https://online-ecosystem.vercel.app/images/SAM_0420.JPG",
+  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
 
-  fencing:
-    "https://online-ecosystem.vercel.app/images/Deer%20Fencing.png",
+  partners: "/images/Partners.png",
 
-  volunteers:
-    "https://online-ecosystem.vercel.app/images/Fence_volunteers.png",
+  grower: "/images/SAM_0384.JPG",
+  field: "/images/SAM_0380.JPG",
+  harvest: "/images/SAM_0393.JPG",
+  youth: "/images/SAM_0401.JPG",
+  market: "/images/SAM_0407.JPG",
+  prep: "/images/SAM_0412.JPG",
+  community: "/images/SAM_0415.JPG",
+  family: "/images/SAM_0417.JPG",
+  event: "/images/SAM_0420.JPG",
 
-  compost:
-    "https://online-ecosystem.vercel.app/images/Compost_ElliottGarden.png",
+  fencing: "/images/Deer Fencing.png",
 
-  queens:
-    "https://online-ecosystem.vercel.app/images/Queens%20Village.png",
+  volunteers: "/images/Fence_volunteers.png",
 
-  seeds:
-    "https://online-ecosystem.vercel.app/images/Seeds_Jubilee%20Gardens.png",
+  compost: "/images/Compost_ElliottGarden.png",
 
-  csu: "https://online-ecosystem.vercel.app/images/CSU_MParker.png",
+  queens: "/images/Queens Village.png",
 
-  wkbn:
-    "https://online-ecosystem.vercel.app/images/WKBN%20Interview.png",
+  seeds: "/images/Seeds_Jubilee Gardens.png",
+
+  csu: "/images/CSU_MParker.png",
+
+  wkbn: "/images/WKBN Interview.png",
 };
 
 function PillButton({
@@ -117,7 +112,7 @@ function PhotoCard({
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/10" />
 
-      <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
         <div className="text-3xl font-black leading-tight">{title}</div>
 
         {subtitle ? (
@@ -393,247 +388,6 @@ function Home({
           />
         </div>
       </section>
-
-      <section className="mt-24">
-        <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-          Daily Ecosystem Rhythm
-        </div>
-
-        <h2 className="mt-5 text-5xl font-black">
-          The ecosystem moves with purpose and structure.
-        </h2>
-
-        <div className="mt-12 grid gap-5 lg:grid-cols-4">
-          <PhotoCard
-            title="Morning Activation"
-            image={IMG.hero2}
-          />
-
-          <PhotoCard
-            title="Team Deployment"
-            image={IMG.harvest}
-          />
-
-          <PhotoCard
-            title="Motivational Activity"
-            image={IMG.prep}
-          />
-
-          <PhotoCard
-            title="Marketplace Rotation"
-            image={IMG.market}
-          />
-        </div>
-      </section>
-
-      <section className="mt-24">
-        <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-          Food Destination Flow
-        </div>
-
-        <h2 className="mt-5 text-5xl font-black leading-tight">
-          Grow → Harvest → Prepare → Marketplace → Schools → Families
-        </h2>
-
-        <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/85">
-          Youth and growers are not simply gardening. Food grown
-          through the ecosystem supports marketplaces, schools,
-          wellness initiatives, community events, and families.
-        </p>
-
-        <div className="mt-12 grid gap-4 lg:grid-cols-6">
-          <PhotoCard title="Grow" image={IMG.grower} />
-          <PhotoCard title="Harvest" image={IMG.harvest} />
-          <PhotoCard title="Prepare" image={IMG.prep} />
-          <PhotoCard title="Marketplace" image={IMG.market} />
-          <PhotoCard title="Schools" image={IMG.community} />
-          <PhotoCard title="Families" image={IMG.family} />
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-function Roles({
-  setScreen,
-}: {
-  setScreen: (screen: Screen) => void;
-}) {
-  return (
-    <Shell screen="roles" setScreen={setScreen}>
-      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-        Ecosystem Role Pathways
-      </div>
-
-      <h1 className="mt-5 text-5xl font-black leading-tight md:text-6xl">
-        Every pathway moves through the ecosystem.
-      </h1>
-
-      <div className="mt-14 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <Card className="overflow-hidden">
-          <PhotoCard
-            title="Youth Workforce Journey"
-            subtitle="Youth participate in a real food ecosystem."
-            image={IMG.youth}
-            height="540px"
-          />
-
-          <div className="p-8">
-            <h2 className="text-5xl font-black leading-tight">
-              Youth participate in a real food ecosystem.
-            </h2>
-
-            <p className="mt-6 text-lg leading-9 text-emerald-50/82">
-              Youth cultivate, harvest, prepare, organize, reflect,
-              lead, and help move food toward marketplaces, schools,
-              community destinations, and families.
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-7">
-          <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
-            Workforce Command Center
-          </div>
-
-          <h2 className="mt-4 text-4xl font-black">
-            Operational ecosystem activity
-          </h2>
-
-          <div className="mt-8 grid gap-4">
-            {[
-              ["50 Youth Active", "Summer workforce session active"],
-              ["PPE Verified", "Safety & readiness checks complete"],
-              ["Marketplace Prep", "Distribution preparation active"],
-              ["Leadership Challenge", "Team-based ecosystem activity"],
-              ["Reflection Submitted", "Daily participation tracking"],
-            ].map(([title, subtitle]) => (
-              <Card key={title} className="p-5">
-                <div className="text-2xl font-bold">{title}</div>
-
-                <div className="mt-2 text-sm text-emerald-50/70">
-                  {subtitle}
-                </div>
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </Shell>
-  );
-}
-
-function Marketplace({
-  setScreen,
-}: {
-  setScreen: (screen: Screen) => void;
-}) {
-  return (
-    <Shell screen="marketplace" setScreen={setScreen}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <PhotoCard
-          title="Marketplace & Distribution"
-          subtitle="Food moves from field production into customers, schools, and community destinations."
-          image={IMG.market}
-          height="620px"
-        />
-
-        <Card className="p-8">
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-            Marketplace Pathway
-          </div>
-
-          <h1 className="mt-5 text-5xl font-black leading-tight">
-            The marketplace is the ecosystem’s movement center.
-          </h1>
-
-          <p className="mt-6 text-xl leading-10 text-emerald-50/85">
-            Youth-grown produce, grower products, value-added
-            education, nutrition, and local purchasing connect here.
-          </p>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {[
-              "Fresh produce",
-              "School destinations",
-              "Community events",
-              "Grower products",
-              "SNAP-ready planning",
-              "Family wellness",
-            ].map((item) => (
-              <Card key={item} className="p-5 text-xl font-semibold">
-                {item}
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </Shell>
-  );
-}
-
-function Partners({
-  setScreen,
-}: {
-  setScreen: (screen: Screen) => void;
-}) {
-  return (
-    <Shell screen="partners" setScreen={setScreen}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <PhotoCard
-          title="Partners & Community Support"
-          subtitle="Partnership strengthens the ecosystem."
-          image={IMG.partners}
-          height="620px"
-        />
-
-        <Card className="p-8">
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-            Partner Pathway
-          </div>
-
-          <h1 className="mt-5 text-5xl font-black leading-tight">
-            Partnership strengthens the whole ecosystem.
-          </h1>
-
-          <div className="mt-8 grid gap-4">
-            {[
-              "Youth workforce support",
-              "Infrastructure",
-              "Food access",
-              "Events",
-              "Education",
-              "Community wellness",
-            ].map((item) => (
-              <Card key={item} className="p-5 text-xl font-semibold">
-                {item}
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </Shell>
-  );
-}
-
-function Placeholder({
-  title,
-  screen,
-  setScreen,
-}: {
-  title: string;
-  screen: Screen;
-  setScreen: (screen: Screen) => void;
-}) {
-  return (
-    <Shell screen={screen} setScreen={setScreen}>
-      <Card className="p-12 text-center">
-        <div className="text-6xl font-black">{title}</div>
-
-        <p className="mt-8 text-xl text-emerald-50/80">
-          Additional ecosystem expansion continues here.
-        </p>
-      </Card>
     </Shell>
   );
 }
@@ -644,47 +398,11 @@ export default function App() {
   const [language, setLanguage] =
     useState<Language>("English");
 
-  if (screen === "home") {
-    return (
-      <Home
-        setScreen={setScreen}
-        language={language}
-        setLanguage={setLanguage}
-      />
-    );
-  }
-
-  if (screen === "roles") {
-    return <Roles setScreen={setScreen} />;
-  }
-
-  if (screen === "marketplace") {
-    return <Marketplace setScreen={setScreen} />;
-  }
-
-  if (screen === "partners") {
-    return <Partners setScreen={setScreen} />;
-  }
-
-  if (screen === "events") {
-    return (
-      <Placeholder
-        title="Events"
-        screen="events"
-        setScreen={setScreen}
-      />
-    );
-  }
-
-  if (screen === "nutrition") {
-    return (
-      <Placeholder
-        title="Nutrition & Wellness"
-        screen="nutrition"
-        setScreen={setScreen}
-      />
-    );
-  }
-
-  return null;
+  return (
+    <Home
+      setScreen={setScreen}
+      language={language}
+      setLanguage={setLanguage}
+    />
+  );
 }
