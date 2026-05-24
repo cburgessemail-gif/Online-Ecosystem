@@ -1,223 +1,211 @@
 {/* =========================================================
-   ECOSYSTEM VISUAL STORY SECTION
-   ADD DIRECTLY BELOW HERO SECTION
+   REPLACE THE ENTIRE HERO SECTION WITH THIS
 ========================================================= */}
 
-<section className="mt-24">
+<section className="grid gap-6 lg:grid-cols-[1.45fr_0.95fr]">
 
-  <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
-    Living Ecosystem Experience
-  </div>
+  {/* LEFT HERO */}
 
-  <h2 className="mt-5 text-5xl font-black leading-tight">
-    Experience the movement of the ecosystem.
-  </h2>
+  <div className="rounded-[2.25rem] overflow-hidden border border-white/10 bg-black/25 shadow-2xl backdrop-blur-xl">
 
-  <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/82">
-    Bronson Family Farm is a connected living system where youth,
-    growers, marketplace activity, food access, leadership,
-    and community participation work together every day.
-  </p>
+    {/* HERO IMAGE */}
 
-  <div className="mt-14 grid lg:grid-cols-3 gap-6">
-
-    {/* GROWERS */}
-
-    <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
+    <div className="relative h-[560px]">
 
       <img
-        src="/SAM_0384.JPG"
-        alt="Growers"
-        className="h-[360px] w-full object-cover"
+        src="/GrowArea.jpg"
+        alt="Bronson Family Farm"
+        className="absolute inset-0 h-full w-full object-cover"
       />
 
-      <div className="p-7">
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Grower Ecosystem
+      <div className="absolute bottom-0 left-0 right-0 p-10">
+
+        <div className="uppercase tracking-[0.35em] text-emerald-100/70 text-xs">
+          Connected Food Ecosystem Experience
         </div>
 
-        <h3 className="mt-4 text-3xl font-black">
-          Cultivation and food production
-        </h3>
+        <h1 className="mt-5 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight">
+          Bronson Family Farm
+        </h1>
 
-        <p className="mt-5 text-lg leading-8 text-emerald-50/80">
-          Growers prepare soil, cultivate crops,
-          expand production, and contribute
-          to regional food access systems.
+        <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/85">
+          A living ecosystem connecting youth workforce development,
+          growers, marketplace systems, schools, wellness,
+          agritourism, food access, leadership,
+          and community revitalization.
         </p>
 
-      </div>
-    </div>
+        <div className="mt-8 flex flex-wrap gap-3">
 
-    {/* MARKETPLACE */}
+          <button className="rounded-full bg-emerald-400 text-black px-6 py-3 font-bold">
+            Begin Guided Tour
+          </button>
 
-    <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
+          <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3">
+            Enter Ecosystem
+          </button>
 
-      <img
-        src="/SAM_0407.JPG"
-        alt="Marketplace"
-        className="h-[360px] w-full object-cover"
-      />
-
-      <div className="p-7">
-
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Marketplace Movement
-        </div>
-
-        <h3 className="mt-4 text-3xl font-black">
-          Food moving toward community destinations
-        </h3>
-
-        <p className="mt-5 text-lg leading-8 text-emerald-50/80">
-          The marketplace connects growers,
-          youth workforce activity,
-          schools, distribution systems,
-          and families seeking healthy food access.
-        </p>
-
-      </div>
-    </div>
-
-    {/* YOUTH */}
-
-    <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
-
-      <img
-        src="/SAM_0401.JPG"
-        alt="Youth Workforce"
-        className="h-[360px] w-full object-cover"
-      />
-
-      <div className="p-7">
-
-        <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-          Youth Workforce
-        </div>
-
-        <h3 className="mt-4 text-3xl font-black">
-          Leadership through participation
-        </h3>
-
-        <p className="mt-5 text-lg leading-8 text-emerald-50/80">
-          Youth develop leadership,
-          responsibility, teamwork,
-          marketplace readiness,
-          and ecosystem awareness through real participation.
-        </p>
-
-      </div>
-    </div>
-
-  </div>
-</section>
-
-{/* =========================================================
-   DAILY ACTIVITY VISUAL FLOW
-   ADD BELOW DAILY RHYTHM SECTION
-========================================================= */}
-
-<section className="mt-24">
-
-  <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
-    Daily Ecosystem Activity
-  </div>
-
-  <h2 className="mt-5 text-5xl font-black">
-    The ecosystem stays active throughout the day.
-  </h2>
-
-  <div className="mt-14 grid lg:grid-cols-4 gap-5">
-
-    {[
-      ["/SAM_0391.JPG", "Morning Activation"],
-      ["/SAM_0393.JPG", "Harvest Teams"],
-      ["/SAM_0410.JPG", "Marketplace Preparation"],
-      ["/SAM_0415.JPG", "Community Support"],
-    ].map(([img, title]) => (
-
-      <div
-        key={title}
-        className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl"
-      >
-
-        <img
-          src={img}
-          alt={title}
-          className="h-[260px] w-full object-cover"
-        />
-
-        <div className="p-6">
-
-          <div className="text-2xl font-bold">
-            {title}
-          </div>
+          <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3">
+            Marketplace
+          </button>
 
         </div>
-
       </div>
-
-    ))}
-
-  </div>
-</section>
-
-{/* =========================================================
-   MARKETPLACE DESTINATION EXPERIENCE
-   ADD TO MARKETPLACE SCREEN
-========================================================= */}
-
-<section className="mt-24 grid lg:grid-cols-[1fr_1fr] gap-6">
-
-  <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
-
-    <img
-      src="/SAM_0402.JPG"
-      alt="Marketplace Distribution"
-      className="h-full w-full object-cover"
-    />
-
-  </div>
-
-  <div className="rounded-[2rem] border border-white/10 bg-black/25 backdrop-blur-xl p-8">
-
-    <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-      Marketplace Destination System
     </div>
 
-    <h2 className="mt-4 text-5xl font-black leading-tight">
-      Food moving into the community.
-    </h2>
+    {/* LIVE IMAGE STRIP */}
 
-    <p className="mt-6 text-lg leading-9 text-emerald-50/82">
-      Bronson Family Farm connects production,
-      youth workforce activity,
-      growers, marketplace systems,
-      schools, wellness initiatives,
-      and food access into one operational ecosystem.
-    </p>
-
-    <div className="mt-10 grid md:grid-cols-2 gap-4">
+    <div className="grid md:grid-cols-3 gap-0 border-t border-white/10">
 
       {[
-        "Youth-grown produce",
-        "Community food access",
-        "Marketplace readiness",
-        "School destinations",
-        "Nutrition initiatives",
-        "Seasonal produce systems",
-      ].map((item) => (
+        ["/SAM_0384.JPG", "Grower Ecosystem"],
+        ["/SAM_0407.JPG", "Marketplace Movement"],
+        ["/SAM_0401.JPG", "Youth Workforce"],
+      ].map(([img, title]) => (
 
         <div
-          key={item}
-          className="rounded-2xl border border-white/10 bg-white/10 p-5"
+          key={title}
+          className="relative h-[220px] overflow-hidden border-r border-white/10"
         >
-          {item}
+
+          <img
+            src={img}
+            alt={title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+
+            <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+              Live Ecosystem
+            </div>
+
+            <div className="mt-2 text-2xl font-bold">
+              {title}
+            </div>
+
+          </div>
         </div>
 
       ))}
 
     </div>
+  </div>
+
+  {/* RIGHT COMMAND CENTER */}
+
+  <div className="space-y-6">
+
+    {/* OVERVIEW */}
+
+    <div className="rounded-[2rem] border border-white/10 bg-black/25 p-7 backdrop-blur-xl">
+
+      <div className="uppercase tracking-[0.3em] text-emerald-100/70 text-xs">
+        Living Ecosystem Overview
+      </div>
+
+      <h2 className="mt-5 text-4xl font-black leading-tight">
+        A place people want to return to.
+      </h2>
+
+      <p className="mt-6 text-lg leading-9 text-emerald-50/82">
+        Bronson Family Farm connects workforce,
+        agriculture, schools, wellness,
+        marketplace systems, growers,
+        leadership, and community participation
+        into one immersive ecosystem.
+      </p>
+
+      <div className="mt-8 space-y-4">
+
+        {[
+          "Youth Workforce Development",
+          "Marketplace & Distribution",
+          "Schools & Community Food Access",
+          "Grower Ecosystem",
+          "Nutrition & Wellness",
+          "Family Legacy & Land Restoration",
+        ].map((item) => (
+
+          <div
+            key={item}
+            className="rounded-2xl border border-white/10 bg-white/10 p-5"
+          >
+            <div className="text-xl font-semibold">
+              {item}
+            </div>
+          </div>
+
+        ))}
+
+      </div>
+    </div>
+
+    {/* LIVE STATUS */}
+
+    <div className="grid md:grid-cols-2 gap-4">
+
+      {[
+        ["50 Youth Active", "Summer Workforce Active"],
+        ["Marketplace Preparing", "Distribution & Inventory"],
+        ["Warm Growing Conditions", "Weather & Irrigation Active"],
+        ["Schools Supported", "Community Destinations Active"],
+      ].map(([title, subtitle]) => (
+
+        <div
+          key={title}
+          className="rounded-[2rem] border border-white/10 bg-black/25 p-5 backdrop-blur-xl"
+        >
+
+          <div className="uppercase tracking-[0.25em] text-emerald-100/65 text-xs">
+            Live Ecosystem
+          </div>
+
+          <div className="mt-3 text-2xl font-bold">
+            {title}
+          </div>
+
+          <div className="mt-2 text-sm text-emerald-50/70">
+            {subtitle}
+          </div>
+
+        </div>
+
+      ))}
+
+    </div>
+
+    {/* LIVE ACTIVITY IMAGE */}
+
+    <div className="rounded-[2rem] overflow-hidden border border-white/10 bg-black/25 backdrop-blur-xl">
+
+      <div className="relative h-[300px]">
+
+        <img
+          src="/SAM_0415.JPG"
+          alt="Community Support"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+
+          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
+            Ecosystem Movement
+          </div>
+
+          <div className="mt-3 text-3xl font-black">
+            Schools & Community Support Active
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
