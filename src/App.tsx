@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 type Screen =
   | "home"
-  | "story"
   | "roles"
   | "events"
   | "nutrition"
@@ -18,12 +17,12 @@ type Language =
 
 function PillButton({
   children,
-  onClick,
   active = false,
+  onClick,
 }: {
   children: React.ReactNode;
-  onClick?: () => void;
   active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
@@ -48,7 +47,7 @@ function GlassCard({
 }) {
   return (
     <div
-      className={`rounded-[2rem] border border-white/10 bg-black/20 shadow-2xl backdrop-blur-xl ${className}`}
+      className={`rounded-[2rem] border border-white/10 bg-black/25 shadow-2xl backdrop-blur-xl ${className}`}
     >
       {children}
     </div>
@@ -64,32 +63,37 @@ function Navigation({
 }) {
   return (
     <div className="mb-8 flex flex-wrap gap-3">
-      <PillButton onClick={() => setScreen("home")} active={screen === "home"}>
+      <PillButton
+        active={screen === "home"}
+        onClick={() => setScreen("home")}
+      >
         Entrance
       </PillButton>
 
-      <PillButton onClick={() => setScreen("story")} active={screen === "story"}>
-        Our Story
-      </PillButton>
-
-      <PillButton onClick={() => setScreen("roles")} active={screen === "roles"}>
+      <PillButton
+        active={screen === "roles"}
+        onClick={() => setScreen("roles")}
+      >
         Role Pathways
       </PillButton>
 
-      <PillButton onClick={() => setScreen("events")} active={screen === "events"}>
+      <PillButton
+        active={screen === "events"}
+        onClick={() => setScreen("events")}
+      >
         Events
       </PillButton>
 
       <PillButton
-        onClick={() => setScreen("nutrition")}
         active={screen === "nutrition"}
+        onClick={() => setScreen("nutrition")}
       >
         Nutrition
       </PillButton>
 
       <PillButton
-        onClick={() => setScreen("marketplace")}
         active={screen === "marketplace"}
+        onClick={() => setScreen("marketplace")}
       >
         Marketplace
       </PillButton>
@@ -107,7 +111,7 @@ function EcosystemShell({
   setScreen: (screen: Screen) => void;
 }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -115,7 +119,7 @@ function EcosystemShell({
         }}
       />
 
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-emerald-950/65 to-black/85" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-emerald-950/70 to-black/90" />
 
       <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
         <Navigation screen={screen} setScreen={setScreen} />
@@ -126,13 +130,13 @@ function EcosystemShell({
 }
 
 function HomeScreen({
+  setScreen,
   language,
   setLanguage,
-  setScreen,
 }: {
+  setScreen: (screen: Screen) => void;
   language: Language;
   setLanguage: (language: Language) => void;
-  setScreen: (screen: Screen) => void;
 }) {
   const languages: Language[] = [
     "English",
@@ -161,8 +165,9 @@ function HomeScreen({
 
           <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/85">
             A living ecosystem connecting youth workforce development,
-            growers, marketplace systems, schools, wellness, agritourism,
-            food access, leadership, and community revitalization.
+            growers, marketplace systems, schools, wellness,
+            agritourism, food access, leadership,
+            and community revitalization.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -172,11 +177,11 @@ function HomeScreen({
             </PillButton>
 
             <PillButton onClick={() => setScreen("roles")}>
-              Enter Pathways
+              Enter Ecosystem
             </PillButton>
 
             <PillButton onClick={() => setScreen("marketplace")}>
-              Open Marketplace
+              Marketplace
             </PillButton>
 
           </div>
@@ -187,11 +192,11 @@ function HomeScreen({
 
             {[
               ["50 Youth Active", "Summer Workforce Active"],
-              ["Marketplace Preparing", "Inventory & Distribution Active"],
-              ["Warm Growing Conditions", "Irrigation & Harvest Active"],
-              ["Schools Supported", "Community Food Destinations"],
+              ["Marketplace Preparing", "Distribution & Inventory"],
+              ["Warm Growing Conditions", "Weather & Irrigation Active"],
+              ["Schools Supported", "Community Destinations Active"],
               ["118 Acres Activated", "Operational Ecosystem"],
-              ["Harvest Teams Active", "Daily Rhythm In Motion"],
+              ["Harvest Teams Active", "Daily Rhythm Active"],
             ].map(([title, subtitle]) => (
               <GlassCard key={title} className="p-5">
 
@@ -226,9 +231,11 @@ function HomeScreen({
           </h2>
 
           <p className="mt-6 text-lg leading-9 text-emerald-50/82">
-            Bronson Family Farm connects workforce, agriculture,
-            schools, wellness, marketplace systems, growers,
-            leadership, and community participation into one immersive ecosystem.
+            Bronson Family Farm connects workforce,
+            agriculture, schools, wellness,
+            marketplace systems, growers,
+            leadership, and community participation
+            into one immersive ecosystem.
           </p>
 
           <div className="mt-8 space-y-4">
@@ -250,7 +257,7 @@ function HomeScreen({
 
           </div>
 
-          {/* LANGUAGES */}
+          {/* LANGUAGE */}
 
           <div className="mt-8">
 
@@ -322,13 +329,14 @@ function HomeScreen({
         </div>
 
         <h2 className="mt-5 text-5xl font-black leading-tight">
-          Grow → Harvest → Prepare → Marketplace → Schools → Community
+          Grow → Harvest → Prepare → Marketplace → Schools → Families
         </h2>
 
         <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/82">
           Youth and growers are not simply gardening.
           Food grown through the ecosystem supports marketplaces,
-          schools, wellness initiatives, community events, and families.
+          schools, wellness initiatives, community events,
+          and families.
         </p>
 
         <div className="mt-12 grid lg:grid-cols-6 gap-4">
@@ -337,9 +345,9 @@ function HomeScreen({
             ["/SAM_0384.JPG", "Grow"],
             ["/SAM_0393.JPG", "Harvest"],
             ["/SAM_0412.JPG", "Prepare"],
-            ["/marketplace.jpg", "Marketplace"],
-            ["/community-school.jpg", "Schools"],
-            ["/community-family.jpg", "Families"],
+            ["/SAM_0407.JPG", "Marketplace"],
+            ["/SAM_0415.JPG", "Schools"],
+            ["/SAM_0417.JPG", "Families"],
           ].map(([img, title]) => (
             <GlassCard
               key={title}
@@ -352,9 +360,11 @@ function HomeScreen({
               />
 
               <div className="p-5">
+
                 <div className="text-2xl font-bold">
                   {title}
                 </div>
+
               </div>
 
             </GlassCard>
@@ -382,7 +392,7 @@ function RolePathwaysScreen({
         Every pathway moves through the ecosystem.
       </h1>
 
-      <div className="mt-14 grid lg:grid-cols-2 gap-6">
+      <div className="mt-14 grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
 
         {/* YOUTH */}
 
@@ -390,7 +400,7 @@ function RolePathwaysScreen({
 
           <img
             src="/SAM_0401.JPG"
-            className="h-[420px] w-full object-cover"
+            className="h-[430px] w-full object-cover"
           />
 
           <div className="p-8">
@@ -405,8 +415,9 @@ function RolePathwaysScreen({
 
             <p className="mt-6 text-lg leading-9 text-emerald-50/82">
               Youth cultivate, harvest, prepare,
-              organize, reflect, lead, and help move food
-              toward marketplaces, schools, community destinations,
+              organize, reflect, lead,
+              and help move food toward marketplaces,
+              schools, community destinations,
               and families.
             </p>
 
@@ -415,9 +426,9 @@ function RolePathwaysScreen({
               {[
                 "Morning activation",
                 "Cultivation teams",
-                "Marketplace prep",
+                "Marketplace preparation",
                 "Leadership challenges",
-                "Motivational activities",
+                "Motivational activity blocks",
                 "Reflection sessions",
               ].map((item) => (
                 <GlassCard key={item} className="p-5">
@@ -522,63 +533,6 @@ function RolePathwaysScreen({
           </GlassCard>
         </div>
       </div>
-
-      {/* FEEDBACK */}
-
-      <section className="mt-24 grid lg:grid-cols-2 gap-6">
-
-        <GlassCard className="p-8">
-
-          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Feedback & Reflection
-          </div>
-
-          <h2 className="mt-4 text-5xl font-black leading-tight">
-            The ecosystem listens and evolves.
-          </h2>
-
-          <textarea
-            className="mt-8 w-full h-44 rounded-2xl border border-white/10 bg-black/30 p-5 text-white outline-none resize-none"
-            placeholder="Share your feedback, reflections, and ideas..."
-          />
-
-          <button className="mt-6 rounded-full bg-emerald-400 text-black px-6 py-3 font-bold">
-            Submit Reflection
-          </button>
-        </GlassCard>
-
-        <GlassCard className="p-8">
-
-          <div className="uppercase tracking-[0.25em] text-emerald-100/70 text-xs">
-            Continue Your Journey
-          </div>
-
-          <h2 className="mt-4 text-5xl font-black leading-tight">
-            Movement through the ecosystem never stops.
-          </h2>
-
-          <div className="mt-10 flex flex-wrap gap-4">
-
-            {[
-              "Join Workforce",
-              "Become Grower",
-              "Explore Marketplace",
-              "Attend Event",
-              "Become Partner",
-              "Volunteer",
-            ].map((item) => (
-              <button
-                key={item}
-                className="rounded-full border border-white/10 bg-white/10 px-6 py-4 hover:bg-white/20"
-              >
-                {item}
-              </button>
-            ))}
-
-          </div>
-        </GlassCard>
-      </section>
-
     </EcosystemShell>
   );
 }
@@ -594,6 +548,7 @@ function PlaceholderScreen({
 }) {
   return (
     <EcosystemShell screen={screen} setScreen={setScreen}>
+
       <GlassCard className="p-12 text-center">
 
         <div className="text-6xl font-black">
@@ -605,6 +560,7 @@ function PlaceholderScreen({
         </p>
 
       </GlassCard>
+
     </EcosystemShell>
   );
 }
@@ -613,18 +569,22 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [language, setLanguage] = useState<Language>("English");
 
-  if (screen === "home" || screen === "story") {
+  if (screen === "home") {
     return (
       <HomeScreen
+        setScreen={setScreen}
         language={language}
         setLanguage={setLanguage}
-        setScreen={setScreen}
       />
     );
   }
 
   if (screen === "roles") {
-    return <RolePathwaysScreen setScreen={setScreen} />;
+    return (
+      <RolePathwaysScreen
+        setScreen={setScreen}
+      />
+    );
   }
 
   if (screen === "events") {
