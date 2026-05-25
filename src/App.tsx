@@ -1,633 +1,415 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
-type LangKey =
-  | "English"
-  | "Español"
-  | "Tagalog"
-  | "Italiano"
-  | "Patwa"
-  | "Hebrew";
+type Screen = "home" | "roles" | "marketplace" | "partners" | "events" | "nutrition";
+type Language = "English" | "Español" | "Tagalog" | "Italiano" | "Patwa" | "Hebrew";
 
-type SectionKey =
-  | "entrance"
-  | "youth"
-  | "marketplace"
-  | "growers"
-  | "partners"
-  | "nutrition"
-  | "events";
-
-type JourneyStep = {
-  title: string;
-  body: string;
-  action: string;
+const IMG = {
+  hero: "/images/large (18).jpg",
+  heroAlt: "/images/large (2).jpg",
+  youth1: "/images/large (16).jpg",
+  youth2: "/images/large (15).jpg",
+  youth3: "/images/large (12).jpg",
+  market1: "/images/large (11).jpg",
+  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
+  culinaryFlowers: "/images/culniary_edibleflowers.jpeg",
+  culinaryFlowers2: "/images/culniary_edibleflowers2.jpeg",
+  culinaryMushrooms: "/images/culniary_mushrooms.jpeg",
+  growArea: "/images/GrowArea2.jpg",
+  growAreaAlt: "/images/Grow Area.png",
+  partners: "/images/Partners.png",
+  compost: "/images/Compost_ElliottGarden.png",
+  compost2: "/images/Compost_Elliott.png",
+  fencing: "/images/Deer Fencing.png",
+  volunteers: "/images/Fence_volunteers.png",
+  queens: "/images/Queens Village.png",
+  seeds: "/images/Seeds_Jubilee Gardens.png",
+  csu: "/images/CSU_MParker.png",
+  wkbn: "/images/WKBN Interview.png",
+  sameera2: "/images/Samaeera2.jpg",
+  sameera3: "/images/Sameera3.jpg",
+  sameera4: "/images/Samerra4.jpg",
+  sameera5: "/images/Samerra5.jpg",
 };
 
-type Section = {
-  key: SectionKey;
-  nav: string;
-  eyebrow: string;
-  description: string;
-  image: string;
-  imageLabel: string;
-  need: string;
-  benefit: string;
-  destination: string;
-  steps: JourneyStep[];
+const languages: Language[] = ["English", "Español", "Tagalog", "Italiano", "Patwa", "Hebrew"];
+
+const pathways = {
+  youth: {
+    image: IMG.youth1,
+    title: "Youth Workforce Journey",
+    subtitle: "Youth participate in a real food ecosystem.",
+    need: "Young people need meaningful work, structure, safety, belonging, and visible proof that their effort matters.",
+    benefit: "The farm turns summer work into skill evidence, responsibility, confidence, teamwork, reflection, and leadership.",
+    destination: "Youth complete the program with experience they can carry into work, school, entrepreneurship, agriculture, and service.",
+    steps: [
+      ["Orientation", "Youth begin with PPE, expectations, safety, schedule, purpose, and belonging."],
+      ["Daily Work", "Youth cultivate, move materials, prepare growing areas, support events, organize inventory, and work as teams."],
+      ["Supervisor Tracking", "Supervisors document participation, safety, communication, initiative, and growth from mobile phones."],
+      ["Reflection", "Youth connect farm work to food access, family wellness, leadership, and their future."],
+    ],
+  },
+  growers: {
+    image: IMG.growArea,
+    title: "Grower Pathway",
+    subtitle: "Tools, knowledge, and market access for growers.",
+    need: "Growers need practical support, supplies, demonstrations, soil knowledge, confidence, and visible market pathways.",
+    benefit: "The ecosystem increases local production capacity and helps gardeners, farmers, and producers participate together.",
+    destination: "Growers can grow at home, sell, teach, mentor youth, demonstrate, or become formal ecosystem partners.",
+    steps: [
+      ["Assess", "Identify land, containers, soil, water, tools, crop goals, and experience level."],
+      ["Learn", "Use demonstrations to understand compost, irrigation, fencing, pest prevention, planting, and harvest."],
+      ["Produce", "Move from interest into growing through seedlings, supplies, and hands-on support."],
+      ["Participate", "Bring food, skill, mentoring, or products back into the marketplace and events."],
+    ],
+  },
+  marketplace: {
+    image: IMG.market1,
+    title: "Marketplace Movement",
+    subtitle: "Food, seedlings, supplies, and community purchasing connect here.",
+    need: "Customers and growers need a simple way to find food, supplies, education, QR ordering, preorders, and pickup.",
+    benefit: "The marketplace creates revenue, repeat engagement, food access, grower visibility, and youth workforce learning.",
+    destination: "Visitors shop, preorder, return, become growers, support youth, or join the regional food ecosystem.",
+    steps: [
+      ["Discover", "Visitors see seedlings, produce, Bubble Babies™, supplies, demonstrations, and food access pathways."],
+      ["Order", "QR codes and online store links move interest into purchases and follow-up."],
+      ["Pickup", "Inventory, pickup windows, and event activity connect digital demand to real farm operations."],
+      ["Return", "Customers come back because the ecosystem feels useful, welcoming, and community-rooted."],
+    ],
+  },
+  partners: {
+    image: IMG.partners,
+    title: "Partner Pathway",
+    subtitle: "Partnership strengthens the whole ecosystem.",
+    need: "Partners need clear, credible lanes to support food access, youth workforce, infrastructure, wellness, and education.",
+    benefit: "Partnership turns goodwill into equipment, training, funding, health education, events, and measurable outcomes.",
+    destination: "Partners choose a support lane and help build infrastructure for long-term community transformation.",
+    steps: [
+      ["Align", "Understand how food, workforce, land, wellness, and marketplace activity connect."],
+      ["Choose", "Select a lane: equipment, funding, youth support, demonstrations, wellness, infrastructure, or volunteers."],
+      ["Activate", "Move support into operations, events, youth training, marketplace, or site development."],
+      ["Measure", "Show participation, learning, access, and visible community benefit."],
+    ],
+  },
+  nutrition: {
+    image: IMG.culinaryFlowers,
+    title: "Nutrition & Culinary Wellness",
+    subtitle: "Fresh food becomes practical, beautiful, local, and connected to family health.",
+    need: "Families need practical access to fresh food, edible beauty, culinary learning, growing knowledge, and wellness education they can use.",
+    benefit: "Nutrition becomes tied to local agriculture, family meals, diabetes prevention, energy, creativity, and healthier choices.",
+    destination: "Families grow, prepare, share, purchase, and return with others.",
+    steps: [
+      ["Access", "Families encounter produce, herbs, greens, mushrooms, edible flowers, seedlings, and seasonal food opportunities."],
+      ["Learn", "Food connects to wellness, blood pressure, diabetes, family meals, beauty, culture, and long-term health."],
+      ["Prepare", "Cooking, preservation, edible flower education, mushrooms, and value-added learning make produce usable at home."],
+      ["Share", "Healthier food habits move through households and community networks."],
+    ],
+  },
+  events: {
+    image: IMG.queens,
+    title: "Events & Community Experience",
+    subtitle: "Events let people feel the ecosystem before they join it.",
+    need: "The community needs welcoming entry points where people can experience the farm before deciding how to participate.",
+    benefit: "Events create trust, registrations, sales, volunteer interest, partner alignment, and repeat engagement.",
+    destination: "Visitors register, attend, volunteer, vend, sponsor, shop, join a pathway, or invite others.",
+    steps: [
+      ["Invite", "Flyers, QR codes, Eventbrite, partners, and word of mouth open the gate."],
+      ["Check In", "QR check-in identifies attendance, roles, interests, and follow-up needs."],
+      ["Experience", "Visitors encounter demonstrations, food, youth workforce, growers, wellness, music, and marketplace activity."],
+      ["Follow Up", "Participants choose next steps: shop, volunteer, partner, grow, sponsor, or return."],
+    ],
+  },
 };
 
-const LANGS: LangKey[] = [
-  "English",
-  "Español",
-  "Tagalog",
-  "Italiano",
-  "Patwa",
-  "Hebrew",
-];
-
-const img = (file: string) => `/images/${file}`;
-
-const sections: Section[] = [
-  {
-    key: "entrance",
-    nav: "Entrance",
-    eyebrow: "LIVING ECOSYSTEM",
-    description:
-      "Bronson Family Farm is a living ecosystem connecting youth workforce development, growers, food movement, wellness, marketplace systems, partnerships, education, and community transformation.",
-    image: img("SAM_0427.JPG"),
-    imageLabel: "Farm entrance ecosystem experience",
-    need:
-      "People need a welcoming and understandable way to experience the ecosystem before deciding how to participate.",
-    benefit:
-      "The ecosystem creates visible pathways into food access, workforce development, community wellness, and local opportunity.",
-    destination:
-      "Choose a pathway and move from observer into participant.",
-    steps: [
-      {
-        title: "The land introduces the story",
-        body:
-          "Visitors enter through a cinematic farm experience grounded in land, agriculture, youth development, and regional transformation.",
-        action: "Understand the ecosystem purpose.",
-      },
-      {
-        title: "The ecosystem becomes visible",
-        body:
-          "The visitor sees how growers, youth, wellness, markets, and community systems connect together.",
-        action: "Choose a pathway.",
-      },
-      {
-        title: "The visitor becomes part of the movement",
-        body:
-          "Every pathway leads toward participation, contribution, leadership, support, or continued engagement.",
-        action: "Begin the journey.",
-      },
-    ],
-  },
-
-  {
-    key: "youth",
-    nav: "Youth Workforce",
-    eyebrow: "8-WEEK CULTIVATOR PROGRAM",
-    description:
-      "The youth workforce pathway transforms agriculture into skill-building, responsibility, leadership, teamwork, and workforce readiness.",
-    image: img("SAM_0417.JPG"),
-    imageLabel: "Youth workforce development",
-    need:
-      "Youth need meaningful work that builds confidence, structure, discipline, and practical life skills.",
-    benefit:
-      "The ecosystem creates workforce development, leadership growth, and measurable progress through real-world experiences.",
-    destination:
-      "Youth complete the program and choose future roles as workers, growers, leaders, or entrepreneurs.",
-    steps: [
-      {
-        title: "Safety and belonging",
-        body:
-          "Youth begin with PPE, expectations, structure, and understanding the deeper purpose of the ecosystem.",
-        action: "Confirm readiness.",
-      },
-      {
-        title: "Daily structure creates growth",
-        body:
-          "Each day includes assignments, supervision, teamwork, growing support, cleanup, and reflection.",
-        action: "Build reliable habits.",
-      },
-      {
-        title: "Growth becomes visible",
-        body:
-          "Youth begin understanding leadership, responsibility, and the impact of food systems on community wellness.",
-        action: "Choose the next role.",
-      },
-    ],
-  },
-
-  {
-    key: "marketplace",
-    nav: "Marketplace",
-    eyebrow: "CONNECTED FOOD MOVEMENT",
-    description:
-      "The marketplace connects seedlings, produce, Bubble Babies™, demonstrations, growers supply systems, QR engagement, and repeat customer participation.",
-    image: img("ConnectFoodEcosystem_withimages.png"),
-    imageLabel: "Connected ecosystem marketplace",
-    need:
-      "Customers and growers need easy access to food, supplies, education, and local participation.",
-    benefit:
-      "The marketplace creates repeat engagement, stronger food access, grower visibility, and ecosystem sustainability.",
-    destination:
-      "Shop, preorder, grow, volunteer, support youth, or join the ecosystem.",
-    steps: [
-      {
-        title: "People encounter possibility",
-        body:
-          "Visitors experience seedlings, produce, demonstrations, wellness, and grower participation.",
-        action: "Explore opportunities.",
-      },
-      {
-        title: "Interest becomes participation",
-        body:
-          "QR systems and online ordering transform curiosity into purchasing and engagement.",
-        action: "Place an order.",
-      },
-      {
-        title: "The ecosystem grows through repetition",
-        body:
-          "Customers return because the ecosystem feels welcoming, educational, and community-centered.",
-        action: "Stay connected.",
-      },
-    ],
-  },
-
-  {
-    key: "growers",
-    nav: "Growers",
-    eyebrow: "GROWER SUPPORT PATHWAY",
-    description:
-      "The grower pathway supports home gardeners, new growers, small farms, and producers through practical demonstrations and market participation.",
-    image: img("GrowArea2.jpg"),
-    imageLabel: "Grow area ecosystem",
-    need:
-      "Growers need support, confidence, supplies, education, and pathways into local food systems.",
-    benefit:
-      "The ecosystem increases local production capacity and grower participation.",
-    destination:
-      "Growers evolve into educators, sellers, collaborators, and ecosystem partners.",
-    steps: [
-      {
-        title: "Practical agriculture becomes approachable",
-        body:
-          "Growers learn soil preparation, transplanting, fencing, watering, and seasonal production strategies.",
-        action: "Apply the lesson.",
-      },
-      {
-        title: "Production becomes visible",
-        body:
-          "Growers use seedlings, demonstrations, and guidance to strengthen growing capacity.",
-        action: "Increase production.",
-      },
-      {
-        title: "The grower enters the ecosystem",
-        body:
-          "Growers become part of the local food movement through events, demonstrations, sales, or mentorship.",
-        action: "Join the network.",
-      },
-    ],
-  },
-
-  {
-    key: "partners",
-    nav: "Partners",
-    eyebrow: "COMMUNITY PARTNERSHIPS",
-    description:
-      "The partner pathway helps businesses, schools, foundations, health systems, and community organizations align with ecosystem outcomes.",
-    image: img("Partners.png"),
-    imageLabel: "Community partnership ecosystem",
-    need:
-      "Partners need visible and meaningful ways to support community transformation.",
-    benefit:
-      "Partnerships convert goodwill into measurable outcomes, infrastructure, and opportunities.",
-    destination:
-      "Partners support youth workforce, food access, wellness, infrastructure, and regional growth.",
-    steps: [
-      {
-        title: "The mission becomes visible",
-        body:
-          "Partners understand how agriculture, workforce development, and wellness connect together.",
-        action: "Identify alignment.",
-      },
-      {
-        title: "Resources become operational",
-        body:
-          "Support turns into equipment, demonstrations, funding, education, wellness services, and infrastructure.",
-        action: "Activate support.",
-      },
-      {
-        title: "Community outcomes become visible",
-        body:
-          "The ecosystem demonstrates participation, education, wellness, and measurable transformation.",
-        action: "Expand engagement.",
-      },
-    ],
-  },
-
-  {
-    key: "nutrition",
-    nav: "Nutrition",
-    eyebrow: "HEALTH + WELLNESS",
-    description:
-      "Nutrition pathways connect fresh food, gardening, wellness education, family health, and community access.",
-    image: img("Compost_ElliottGarden.png"),
-    imageLabel: "Nutrition and wellness ecosystem",
-    need:
-      "Families need practical and affordable access to healthy food and wellness education.",
-    benefit:
-      "Nutrition becomes connected to local agriculture, family wellness, and healthier lifestyles.",
-    destination:
-      "Families grow, prepare, share, and experience healthier food choices together.",
-    steps: [
-      {
-        title: "Fresh food becomes visible",
-        body:
-          "Visitors encounter produce, herbs, seedlings, and educational experiences.",
-        action: "Choose healthier options.",
-      },
-      {
-        title: "Food connects to wellness",
-        body:
-          "Nutrition education connects food to long-term health and family wellness.",
-        action: "Apply the knowledge.",
-      },
-      {
-        title: "Wellness spreads through families",
-        body:
-          "Healthy food and practical knowledge move through households and communities.",
-        action: "Bring others into the ecosystem.",
-      },
-    ],
-  },
-
-  {
-    key: "events",
-    nav: "Events",
-    eyebrow: "COMMUNITY EXPERIENCE",
-    description:
-      "Events activate the ecosystem through demonstrations, wellness, growers, seed giveaways, education, and marketplace participation.",
-    image: img("Queens Village.png"),
-    imageLabel: "Community ecosystem event",
-    need:
-      "Communities need welcoming and memorable entry points into the ecosystem.",
-    benefit:
-      "Events create visibility, trust, participation, registration, partnerships, and long-term engagement.",
-    destination:
-      "Visitors become growers, volunteers, customers, partners, or ecosystem supporters.",
-    steps: [
-      {
-        title: "The invitation opens the gate",
-        body:
-          "Events create welcoming opportunities for the public to experience the ecosystem.",
-        action: "Register or attend.",
-      },
-      {
-        title: "The ecosystem becomes real",
-        body:
-          "Visitors encounter demonstrations, food, youth workforce, growers, wellness, and community participation.",
-        action: "Engage with the ecosystem.",
-      },
-      {
-        title: "The relationship continues",
-        body:
-          "Visitors return because the ecosystem creates belonging, purpose, and opportunity.",
-        action: "Stay connected.",
-      },
-    ],
-  },
-];
-
-export default function App() {
-  const [lang, setLang] = useState<LangKey>("English");
-  const [activeKey, setActiveKey] =
-    useState<SectionKey>("entrance");
-
-  const [stepIndex, setStepIndex] = useState(0);
-
-  const active = useMemo(
-    () =>
-      sections.find((section) => section.key === activeKey) ??
-      sections[0],
-    [activeKey]
-  );
-
-  const currentStep = active.steps[stepIndex];
-
-  const chooseSection = (key: SectionKey) => {
-    setActiveKey(key);
-    setStepIndex(0);
-  };
-
-  const next = () => {
-    if (stepIndex < active.steps.length - 1) {
-      setStepIndex(stepIndex + 1);
-      return;
-    }
-
-    const currentIndex = sections.findIndex(
-      (section) => section.key === active.key
-    );
-
-    const nextSection =
-      sections[(currentIndex + 1) % sections.length];
-
-    chooseSection(nextSection.key);
-  };
-
-  const back = () => {
-    if (stepIndex > 0) {
-      setStepIndex(stepIndex - 1);
-      return;
-    }
-
-    const currentIndex = sections.findIndex(
-      (section) => section.key === active.key
-    );
-
-    const previousSection =
-      sections[
-        (currentIndex - 1 + sections.length) %
-          sections.length
-      ];
-
-    chooseSection(previousSection.key);
-  };
-
+function PillButton({ children, active = false, onClick }: { children: React.ReactNode; active?: boolean; onClick?: () => void }) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#07140d] text-white">
-
-      {/* BACKGROUND IMAGE */}
-
-      <div className="fixed inset-0 overflow-hidden">
-        <img
-          src={active.image}
-          alt="Bronson Family Farm"
-          className="h-full w-full object-cover object-center scale-[1.02] opacity-[0.82] transition-all duration-[12000ms]"
-        />
-      </div>
-
-      {/* DARK OVERLAY */}
-
-      <div className="fixed inset-0 bg-black/18" />
-
-      {/* CINEMATIC DEPTH */}
-
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/18 pointer-events-none" />
-
-      {/* CONTENT */}
-
-      <section className="relative z-10 min-h-screen">
-
-        <div className="mx-auto flex w-full max-w-[1500px] flex-col px-5 py-6 md:px-8 lg:px-10">
-
-          {/* HEADER */}
-
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
-            <div>
-
-              <p className="text-xs uppercase tracking-[.55em] text-lime-100/80">
-                BRONSON FAMILY FARM
-              </p>
-
-              <h1 className="mt-5 max-w-5xl text-6xl font-black leading-[0.9] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-7xl xl:text-[7.2rem]">
-
-                Step Into The Farm.
-                <br />
-                Experience The Wonders Of Life.
-              </h1>
-
-              <div className="mt-5 text-2xl font-semibold text-emerald-100/90 md:text-3xl">
-                Connected Food Ecosystem Experience
-              </div>
-
-              <p className="mt-8 max-w-4xl text-xl leading-9 text-white/90 md:text-2xl">
-                {active.description}
-              </p>
-            </div>
-
-            {/* LANGUAGES */}
-
-            <div className="flex flex-wrap gap-2">
-
-              {LANGS.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setLang(item)}
-                  className={`rounded-full border px-4 py-2 text-xs font-bold transition ${
-                    lang === item
-                      ? "border-white bg-white text-[#092216]"
-                      : "border-white/20 bg-white/10 text-white/90 backdrop-blur hover:bg-white/20"
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* NAVIGATION */}
-
-          <nav className="mt-8 flex gap-2 overflow-x-auto pb-2">
-
-            {sections.map((section, index) => (
-              <button
-                key={section.key}
-                onClick={() => chooseSection(section.key)}
-                className={`shrink-0 rounded-full border px-5 py-3 text-sm font-bold transition ${
-                  active.key === section.key
-                    ? "border-lime-100 bg-lime-100 text-[#092216] shadow-[0_18px_45px_rgba(0,0,0,.28)]"
-                    : "border-white/20 bg-white/10 text-white backdrop-blur-xl hover:bg-white/20"
-                }`}
-              >
-                <span className="mr-2 opacity-60">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-
-                {section.nav}
-              </button>
-            ))}
-          </nav>
-
-          {/* EXPERIENCE GRID */}
-
-          <div className="mt-10 grid min-h-[820px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
-
-            {/* LEFT */}
-
-            <div className="flex flex-col justify-center">
-
-              <div className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-black/20 px-5 py-3 text-xs font-black uppercase tracking-[.34em] text-lime-100 backdrop-blur-xl w-fit">
-
-                <span className="h-2 w-2 rounded-full bg-lime-200 shadow-[0_0_18px_rgba(217,249,157,.85)]" />
-
-                {active.eyebrow}
-              </div>
-
-              <div className="mt-8 grid gap-5">
-
-                <InfoCard
-                  title="Need Being Met"
-                  value={active.need}
-                />
-
-                <InfoCard
-                  title="Ecosystem Benefit"
-                  value={active.benefit}
-                />
-
-                <InfoCard
-                  title="Final Destination / Decision"
-                  value={active.destination}
-                />
-              </div>
-            </div>
-
-            {/* RIGHT */}
-
-            <div className="relative min-h-[760px]">
-
-              {/* IMAGE CARD */}
-
-              <div
-                className="absolute right-0 top-0 h-[78%] w-[88%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
-                style={{
-                  backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.18)), url(${active.image})`,
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#04110b]/38 via-transparent to-white/5" />
-
-                <div className="absolute bottom-7 left-7 right-7">
-
-                  <p className="text-xs uppercase tracking-[.3em] text-white/75">
-                    {active.imageLabel}
-                  </p>
-
-                  <p className="mt-3 text-3xl font-black leading-tight">
-                    {active.nav}
-                  </p>
-                </div>
-              </div>
-
-              {/* JOURNEY CARD */}
-
-              <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#eef3dd]/94 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
-
-                <p className="text-xs font-black uppercase tracking-[.32em] text-emerald-900/65">
-                  Pathway Journey
-                </p>
-
-                <h3 className="mt-3 text-3xl font-black leading-tight md:text-4xl">
-                  {currentStep.title}
-                </h3>
-
-                <p className="mt-4 text-lg leading-8 text-[#244331]">
-                  {currentStep.body}
-                </p>
-
-                {/* ACTION */}
-
-                <div className="mt-5 rounded-[2rem] bg-[#0d3a26] p-5 text-white">
-
-                  <p className="text-xs font-black uppercase tracking-[.28em] text-lime-100/75">
-                    Next Action
-                  </p>
-
-                  <p className="mt-2 text-xl font-black">
-                    {currentStep.action}
-                  </p>
-                </div>
-
-                {/* DECISION */}
-
-                <div className="mt-6 rounded-[2rem] border border-emerald-900/10 bg-white p-5">
-
-                  <p className="text-xs font-black uppercase tracking-[.28em] text-emerald-900/60">
-                    Ecosystem Decision
-                  </p>
-
-                  <h3 className="mt-3 text-2xl font-black leading-tight">
-                    What happens next?
-                  </h3>
-
-                  <p className="mt-4 text-lg leading-8 text-[#244331]">
-                    Every participant eventually chooses whether to return,
-                    contribute, grow, mentor, support, purchase, volunteer,
-                    or become part of the long-term ecosystem.
-                  </p>
-
-                  <div className="mt-5 flex flex-wrap gap-3">
-
-                    <DecisionButton label="Become a Grower" />
-
-                    <DecisionButton label="Support Youth Workforce" />
-
-                    <DecisionButton label="Volunteer" />
-
-                    <DecisionButton label="Marketplace" />
-                  </div>
-                </div>
-
-                {/* NAVIGATION */}
-
-                <div className="mt-6 flex flex-wrap gap-3">
-
-                  <button
-                    onClick={back}
-                    className="rounded-full bg-[#0d3a26] px-6 py-3 font-black text-white shadow-lg"
-                  >
-                    Back
-                  </button>
-
-                  <button
-                    onClick={next}
-                    className="rounded-full bg-emerald-600 px-6 py-3 font-black text-white shadow-lg shadow-emerald-950/25"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+    <button
+      onClick={onClick}
+      className={`rounded-full border px-5 py-3 text-sm font-semibold transition ${
+        active
+          ? "border-emerald-200/40 bg-emerald-300/20 text-white shadow-[0_0_30px_rgba(110,231,183,.18)]"
+          : "border-white/15 bg-white/10 text-white hover:bg-white/20"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
-function InfoCard({
-  title,
-  value,
-}: {
-  title: string;
-  value: string;
-}) {
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`rounded-[2rem] border border-white/10 bg-black/35 shadow-2xl backdrop-blur-xl ${className}`}>{children}</div>;
+}
+
+function PhotoCard({ title, subtitle, image, height = "280px" }: { title: string; subtitle?: string; image: string; height?: string }) {
   return (
-    <div className="rounded-[2rem] border border-white/18 bg-white/12 p-6 shadow-xl backdrop-blur-2xl">
-
-      <p className="text-[10px] font-black uppercase tracking-[.28em] text-lime-100/70">
-        {title}
-      </p>
-
-      <p className="mt-3 text-lg leading-8 text-white/88">
-        {value}
-      </p>
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-xl" style={{ height }}>
+      <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/5" />
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
+        <div className="text-3xl font-black leading-tight">{title}</div>
+        {subtitle && <div className="mt-2 text-sm leading-6 text-emerald-50/85">{subtitle}</div>}
+      </div>
     </div>
   );
 }
 
-function DecisionButton({
-  label,
-}: {
-  label: string;
-}) {
+function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
   return (
-    <button className="rounded-full bg-[#0d3a26] px-5 py-3 font-black text-white">
-      {label}
-    </button>
+    <div className="mb-8 flex flex-wrap gap-3">
+      <PillButton active={screen === "home"} onClick={() => setScreen("home")}>Entrance</PillButton>
+      <PillButton active={screen === "roles"} onClick={() => setScreen("roles")}>Role Pathways</PillButton>
+      <PillButton active={screen === "marketplace"} onClick={() => setScreen("marketplace")}>Marketplace</PillButton>
+      <PillButton active={screen === "partners"} onClick={() => setScreen("partners")}>Partners</PillButton>
+      <PillButton active={screen === "events"} onClick={() => setScreen("events")}>Events</PillButton>
+      <PillButton active={screen === "nutrition"} onClick={() => setScreen("nutrition")}>Nutrition</PillButton>
+    </div>
   );
+}
+
+function Shell({ children, screen, setScreen, background = IMG.hero }: { children: React.ReactNode; screen: Screen; setScreen: (screen: Screen) => void; background?: string }) {
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div className="fixed inset-0">
+        <img src={background} alt="Bronson Family Farm background" className="h-full w-full object-cover opacity-55" />
+      </div>
+      <div className="fixed inset-0 bg-gradient-to-br from-black/68 via-emerald-950/34 to-black/72" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,.10),transparent_24%),radial-gradient(circle_at_82%_8%,rgba(255,232,170,.10),transparent_26%),radial-gradient(circle_at_48%_95%,rgba(16,185,129,.14),transparent_34%)]" />
+      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
+        <Navigation screen={screen} setScreen={setScreen} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Home({ setScreen, language, setLanguage }: { setScreen: (screen: Screen) => void; language: Language; setLanguage: (language: Language) => void }) {
+  const overviewItems = useMemo(
+    () => [
+      ["Family legacy", "The farm carries Bronson and Lorenzana legacy into a future-focused Youngstown vision."],
+      ["Land restoration", "The project restores land while creating food, education, youth workforce, and agritourism opportunity."],
+      ["Community future", "This is an ecosystem for long-term return, shared learning, and regional growth."],
+    ],
+    []
+  );
+
+  return (
+    <Shell screen="home" setScreen={setScreen} background={IMG.hero}>
+      <section className="grid gap-6 lg:grid-cols-[1.45fr_0.95fr]">
+        <div className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-black/25 shadow-2xl backdrop-blur-xl">
+          <div className="relative min-h-[650px]">
+            <img src={IMG.hero} alt="Bronson Family Farm" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/42 to-black/5" />
+            <div className="relative z-10 flex min-h-[650px] flex-col justify-end p-8 md:p-10">
+              <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Connected Food Ecosystem Experience</div>
+              <h1 className="mt-5 max-w-5xl text-5xl font-black leading-[0.92] tracking-tight md:text-7xl">
+                Step Into The Farm. Experience The Wonders Of Life.
+              </h1>
+              <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/90">
+                A living ecosystem connecting youth workforce development, growers, marketplace systems, schools, wellness, agritourism, food access, leadership, and community revitalization.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-bold text-black">Begin Guided Tour</button>
+                <button onClick={() => setScreen("roles")} className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold">Enter Ecosystem</button>
+                <button onClick={() => setScreen("marketplace")} className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold">Marketplace</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid border-t border-white/10 md:grid-cols-3">
+            <PhotoCard title="Grower Ecosystem" subtitle="Production, training, and local food access" image={IMG.growArea} height="260px" />
+            <PhotoCard title="Marketplace Movement" subtitle="Food moving toward families and destinations" image={IMG.market1} height="260px" />
+            <PhotoCard title="Youth Workforce" subtitle="Leadership through participation" image={IMG.youth1} height="260px" />
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <Card className="p-7">
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Living Ecosystem Overview</div>
+            <h2 className="mt-5 text-4xl font-black leading-tight">A place people want to return to.</h2>
+            <p className="mt-6 text-lg leading-9 text-emerald-50/85">
+              Bronson Family Farm connects workforce, agriculture, schools, wellness, marketplace systems, growers, leadership, and community participation into one immersive ecosystem.
+            </p>
+            <div className="mt-8 space-y-4">
+              {["Youth Workforce Development", "Marketplace & Distribution", "Schools & Community Food Access", "Grower Ecosystem", "Nutrition & Culinary Wellness", "Family Legacy & Land Restoration"].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-xl font-semibold">{item}</div>
+              ))}
+            </div>
+            <div className="mt-8">
+              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Language</div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {languages.map((lang) => (
+                  <button key={lang} onClick={() => setLanguage(lang)} className={`rounded-full px-4 py-2 text-sm transition ${language === lang ? "bg-white text-black" : "border border-white/10 bg-white/10 text-white"}`}>
+                    {lang}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ["50 Youth Active", "Summer workforce active"],
+              ["Marketplace Preparing", "Distribution and inventory"],
+              ["Seeds Donated", "Jubilee Gardens support"],
+              ["Partners Engaged", "Community support active"],
+            ].map(([title, subtitle]) => (
+              <Card key={title} className="p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/65">Live Ecosystem</div>
+                <div className="mt-3 text-2xl font-bold">{title}</div>
+                <div className="mt-2 text-sm text-emerald-50/70">{subtitle}</div>
+              </Card>
+            ))}
+          </div>
+
+          <PhotoCard title="Seeds, compost, partners, and people make the ecosystem real." subtitle="The work is operational, visible, and community-rooted." image={IMG.seeds} height="330px" />
+        </div>
+      </section>
+    </Shell>
+  );
+}
+
+function JourneyPanel({ data }: { data: typeof pathways.youth }) {
+  return (
+    <Card className="p-7">
+      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Pathway Journey</div>
+      <h2 className="mt-4 text-4xl font-black leading-tight">{data.title}</h2>
+      <p className="mt-5 text-lg leading-9 text-emerald-50/85">{data.benefit}</p>
+      <div className="mt-7 grid gap-4">
+        {data.steps.map(([title, body]) => (
+          <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+            <h3 className="text-2xl font-black">{title}</h3>
+            <p className="mt-3 text-base leading-7 text-emerald-50/78">{body}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 rounded-2xl bg-emerald-300 p-5 text-black">
+        <div className="text-xs uppercase tracking-[0.25em] font-black">Final Decision</div>
+        <p className="mt-3 text-xl font-black leading-tight">{data.destination}</p>
+      </div>
+    </Card>
+  );
+}
+
+function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const roleCards = [pathways.youth, pathways.growers, pathways.marketplace];
+
+  return (
+    <Shell screen="roles" setScreen={setScreen} background={IMG.youth2}>
+      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Ecosystem Role Pathways</div>
+      <h1 className="mt-5 max-w-5xl text-5xl font-black leading-tight md:text-6xl">Every pathway moves from arrival to participation to transformation.</h1>
+
+      <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        {roleCards.map((role) => (
+          <Card key={role.title} className="overflow-hidden">
+            <PhotoCard title={role.title} subtitle={role.subtitle} image={role.image} height="340px" />
+            <div className="p-6">
+              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Need</div>
+              <p className="mt-3 text-base leading-7 text-emerald-50/85">{role.need}</p>
+              <div className="mt-5 text-xs uppercase tracking-[0.25em] text-emerald-100/70">Destination</div>
+              <p className="mt-3 text-base leading-7 text-emerald-50/85">{role.destination}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <JourneyPanel data={pathways.youth} />
+        <Card className="p-7">
+          <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Supervisor Mobile Command Center</div>
+          <h2 className="mt-4 text-4xl font-black">Operational youth workforce activity</h2>
+          <div className="mt-8 grid gap-4">
+            {[
+              ["PPE Verified", "Safety and readiness checks"],
+              ["Attendance Tracked", "Daily participation record"],
+              ["Skill Observation", "Responsibility, communication, teamwork"],
+              ["Reflection Submitted", "Youth connect work to future goals"],
+              ["Parent Connection", "Progress can be shared with families"],
+            ].map(([title, subtitle]) => (
+              <Card key={title} className="p-5">
+                <div className="text-2xl font-bold">{title}</div>
+                <div className="mt-2 text-sm text-emerald-50/70">{subtitle}</div>
+              </Card>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </Shell>
+  );
+}
+
+function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Shell screen="marketplace" setScreen={setScreen} background={IMG.market1}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <PhotoCard title="Marketplace & Distribution" subtitle="Food moves from field production into customers, schools, and community destinations." image={IMG.market1} height="620px" />
+        <JourneyPanel data={pathways.marketplace} />
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <PhotoCard title="Connected Ecosystem" subtitle="Marketplace movement ties growers, youth, customers, and partners together." image={IMG.ecosystem} />
+        <PhotoCard title="Seed Support" subtitle="Jubilee Gardens seed donations help make community growing possible." image={IMG.seeds} />
+        <PhotoCard title="Media Visibility" subtitle="Storytelling helps the community understand and join the food movement." image={IMG.wkbn} />
+      </div>
+    </Shell>
+  );
+}
+
+function Partners({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Shell screen="partners" setScreen={setScreen} background={IMG.partners}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <PhotoCard title="Partners & Community Support" subtitle="Partnership strengthens the ecosystem." image={IMG.partners} height="620px" />
+        <JourneyPanel data={pathways.partners} />
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <PhotoCard title="Central State Representation" subtitle="Training, agriculture, and technical knowledge strengthen the model." image={IMG.csu} />
+        <PhotoCard title="Fence Support" subtitle="Infrastructure makes food production possible." image={IMG.fencing} />
+        <PhotoCard title="Volunteer Power" subtitle="Community effort turns plans into visible progress." image={IMG.volunteers} />
+      </div>
+    </Shell>
+  );
+}
+
+function Events({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Shell screen="events" setScreen={setScreen} background={IMG.queens}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <PhotoCard title="Events & Experiences" subtitle="People feel the ecosystem before they join it." image={IMG.queens} height="620px" />
+        <JourneyPanel data={pathways.events} />
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <PhotoCard title="Community Welcome" subtitle="Events create trust, participation, and follow-up." image={IMG.sameera3} />
+        <PhotoCard title="Farm Activity" subtitle="Visitors see work, learning, and land in motion." image={IMG.sameera4} />
+        <PhotoCard title="Shared Experience" subtitle="People return when the farm feels alive and welcoming." image={IMG.sameera5} />
+      </div>
+    </Shell>
+  );
+}
+
+function Nutrition({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Shell screen="nutrition" setScreen={setScreen} background={IMG.culinaryFlowers}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <PhotoCard title="Nutrition & Culinary Wellness" subtitle="Fresh food, edible flowers, mushrooms, soil, health, and family decisions connect here." image={IMG.culinaryFlowers} height="620px" />
+        <JourneyPanel data={pathways.nutrition} />
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <PhotoCard title="Edible Flowers" subtitle="Beauty, food, and education come together." image={IMG.culinaryFlowers2} />
+        <PhotoCard title="Mushrooms" subtitle="Culinary learning expands the farm’s food story." image={IMG.culinaryMushrooms} />
+        <PhotoCard title="Soil Health" subtitle="Healthy soil supports healthy food." image={IMG.compost} />
+      </div>
+    </Shell>
+  );
+}
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("home");
+  const [language, setLanguage] = useState<Language>("English");
+
+  if (screen === "home") return <Home setScreen={setScreen} language={language} setLanguage={setLanguage} />;
+  if (screen === "roles") return <Roles setScreen={setScreen} />;
+  if (screen === "marketplace") return <Marketplace setScreen={setScreen} />;
+  if (screen === "partners") return <Partners setScreen={setScreen} />;
+  if (screen === "events") return <Events setScreen={setScreen} />;
+  if (screen === "nutrition") return <Nutrition setScreen={setScreen} />;
+
+  return null;
 }
