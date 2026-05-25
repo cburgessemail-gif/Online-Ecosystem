@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Screen =
   | "home"
@@ -91,7 +91,7 @@ function Navigation({
   ];
 
   return (
-    <div className="mb-8 flex flex-wrap gap-3">
+    <div className="mb-5 flex flex-wrap gap-3">
       {items.map((item) => (
         <button
           key={item.key}
@@ -122,6 +122,7 @@ function Shell({
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      {/* BACKGROUND */}
       <div className="fixed inset-0">
         <img
           src={background}
@@ -133,11 +134,14 @@ function Shell({
         />
       </div>
 
-      <div className="fixed inset-0 bg-black/50" />
+      {/* FILM OVERLAY */}
+      <div className="fixed inset-0 bg-black/52" />
 
+      {/* CINEMATIC LIGHT */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,.10),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,220,120,.08),transparent_24%),radial-gradient(circle_at_bottom,rgba(16,185,129,.10),transparent_32%)]" />
 
-      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
+      {/* CONTENT */}
+      <div className="relative z-10 w-full px-4 py-4 md:px-6 lg:px-8">
         <Navigation screen={screen} setScreen={setScreen} />
         {children}
       </div>
@@ -201,10 +205,12 @@ function Home({
 }) {
   return (
     <Shell screen="home" setScreen={setScreen} background={IMG.hero}>
-      <section className="grid gap-6 lg:grid-cols-[1.45fr_0.95fr]">
-        <div className="overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/20 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl">
+      <section className="grid min-h-[calc(100vh-120px)] gap-6 xl:grid-cols-[1.5fr_0.9fr]">
+        {/* HERO */}
+        <div className="h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/20 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl">
 
-          <div className="relative min-h-[760px]">
+          <div className="relative h-[calc(100vh-170px)] min-h-[760px]">
+
             <img
               src={IMG.hero}
               alt="Bronson Family Farm"
@@ -216,7 +222,8 @@ function Home({
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/10" />
 
-            <div className="relative z-10 flex min-h-[760px] flex-col justify-end p-8 md:p-12">
+            <div className="relative z-10 flex h-full flex-col justify-end p-8 md:p-12">
+
               <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">
                 Connected Food Ecosystem Experience
               </div>
@@ -258,6 +265,7 @@ function Home({
             </div>
           </div>
 
+          {/* LOWER EXPERIENCE */}
           <div className="grid border-t border-white/10 md:grid-cols-3">
             <PhotoCard
               title="Grower Ecosystem"
@@ -285,8 +293,10 @@ function Home({
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-[2rem] border border-white/10 bg-black/38 p-7 shadow-[0_30px_80px_rgba(0,0,0,.45)] backdrop-blur-xl">
+        {/* RIGHT SIDE */}
+        <div className="flex h-full flex-col gap-6">
+
+          <div className="flex-1 overflow-auto rounded-[2rem] border border-white/10 bg-black/38 p-7 shadow-[0_30px_80px_rgba(0,0,0,.45)] backdrop-blur-xl">
 
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
               Living Ecosystem Overview
@@ -320,6 +330,7 @@ function Home({
               ))}
             </div>
 
+            {/* LANGUAGE */}
             <div className="mt-8">
               <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
                 Language
@@ -347,7 +358,7 @@ function Home({
             title="Seeds, compost, partners, and people make the ecosystem real."
             subtitle="The work is operational, visible, and community-rooted."
             image={IMG.seeds}
-            height="360px"
+            height="320px"
             onClick={() => setScreen("partners")}
           />
         </div>
@@ -437,247 +448,6 @@ function Roles({
   );
 }
 
-function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="guest" setScreen={setScreen} background={IMG.queens}>
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <div className="flex min-h-[760px] flex-col justify-end rounded-[2.5rem] border border-white/10 bg-black/25 p-10 backdrop-blur-xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Guest Journey
-          </div>
-
-          <h1 className="mt-5 text-6xl font-black leading-[0.9]">
-            Experience the ecosystem before becoming part of it.
-          </h1>
-
-          <p className="mt-8 max-w-3xl text-xl leading-10 text-emerald-50/90">
-            Guests explore the farm, wellness activities, marketplace,
-            food systems, partnerships, and community participation.
-          </p>
-
-          <div className="mt-10 flex flex-wrap gap-4">
-            <button
-              onClick={() => setScreen("marketplace")}
-              className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black"
-            >
-              Enter Marketplace
-            </button>
-
-            <button
-              onClick={() => setScreen("grower")}
-              className="rounded-full border border-white/10 bg-white/10 px-7 py-4 font-semibold"
-            >
-              Become A Grower
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <PhotoCard
-            title="Wellness & Reflection"
-            subtitle="People reconnecting through shared experiences."
-            image={IMG.queens}
-            height="360px"
-          />
-
-          <PhotoCard
-            title="Community Participation"
-            subtitle="The ecosystem grows through engagement."
-            image={IMG.sameera3}
-            height="360px"
-          />
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-function Grower({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="grower" setScreen={setScreen} background={IMG.growArea}>
-      <div className="space-y-8">
-        <div className="max-w-5xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Grower Ecosystem
-          </div>
-
-          <h1 className="mt-5 text-6xl font-black leading-[0.9]">
-            Grow food. Build opportunity.
-          </h1>
-
-          <p className="mt-8 text-xl leading-10 text-emerald-50/90">
-            Production, training, compost, fencing, tools,
-            seedlings, education, and marketplace participation all connect together.
-          </p>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <PhotoCard
-            title="Growing Systems"
-            subtitle="Food production and land restoration."
-            image={IMG.growArea}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Compost & Soil"
-            subtitle="Healthy soil supports healthy food."
-            image={IMG.compost}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Protection & Infrastructure"
-            subtitle="Fencing, labor, and ecosystem support."
-            image={IMG.fencing}
-            height="520px"
-          />
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function Youth({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="youth" setScreen={setScreen} background={IMG.youth1}>
-      <div className="space-y-8">
-        <div className="max-w-5xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Youth Workforce Development
-          </div>
-
-          <h1 className="mt-5 text-6xl font-black leading-[0.9]">
-            Leadership through participation.
-          </h1>
-
-          <p className="mt-8 text-xl leading-10 text-emerald-50/90">
-            Youth build responsibility, teamwork, confidence,
-            communication, and work readiness through real ecosystem participation.
-          </p>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <PhotoCard
-            title="Outdoor Learning"
-            subtitle="Hands-on participation and leadership."
-            image={IMG.youth1}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Supervisor Guidance"
-            subtitle="Observation, coaching, and growth."
-            image={IMG.volunteers}
-            height="520px"
-            onClick={() => setScreen("supervisor")}
-          />
-
-          <PhotoCard
-            title="Family Connection"
-            subtitle="Parents and guardians remain connected."
-            image={IMG.sameera5}
-            height="520px"
-            onClick={() => setScreen("parent")}
-          />
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="marketplace" setScreen={setScreen} background={IMG.marketplaceHero}>
-      <div className="space-y-8">
-        <div className="max-w-5xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Marketplace Ecosystem
-          </div>
-
-          <h1 className="mt-5 text-6xl font-black leading-[0.9]">
-            A growers supply market built for movement.
-          </h1>
-
-          <p className="mt-8 text-xl leading-10 text-emerald-50/90">
-            The marketplace connects growers, customers, seedlings,
-            food systems, wellness, and repeat participation.
-          </p>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <PhotoCard
-            title="Food Access"
-            subtitle="Fresh produce and healthy choices."
-            image={IMG.youth3}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Value Added Learning"
-            subtitle="Flowers, mushrooms, herbs, and culinary exploration."
-            image={IMG.culinaryFlowers}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Community Marketplace"
-            subtitle="Connecting neighborhoods and growers."
-            image={IMG.marketplaceHero}
-            height="520px"
-          />
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function Partners({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="partners" setScreen={setScreen} background={IMG.csu}>
-      <div className="space-y-8">
-        <div className="max-w-5xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Partner Ecosystem
-          </div>
-
-          <h1 className="mt-5 text-6xl font-black leading-[0.9]">
-            Community collaboration powers the ecosystem.
-          </h1>
-
-          <p className="mt-8 text-xl leading-10 text-emerald-50/90">
-            Schools, growers, universities, wellness organizations,
-            media, compost, fencing, and volunteers strengthen the system together.
-          </p>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <PhotoCard
-            title="Central State University"
-            subtitle="Agriculture and workforce collaboration."
-            image={IMG.csu}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Community Infrastructure"
-            subtitle="Compost, fencing, volunteers, and restoration."
-            image={IMG.compost2}
-            height="520px"
-          />
-
-          <PhotoCard
-            title="Media & Visibility"
-            subtitle="Sharing the ecosystem story."
-            image={IMG.wkbn}
-            height="520px"
-          />
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [language, setLanguage] = useState<Language>("English");
@@ -688,26 +458,6 @@ export default function App() {
 
   if (screen === "roles") {
     return <Roles setScreen={setScreen} />;
-  }
-
-  if (screen === "guest") {
-    return <Guest setScreen={setScreen} />;
-  }
-
-  if (screen === "grower") {
-    return <Grower setScreen={setScreen} />;
-  }
-
-  if (screen === "youth") {
-    return <Youth setScreen={setScreen} />;
-  }
-
-  if (screen === "marketplace") {
-    return <Marketplace setScreen={setScreen} />;
-  }
-
-  if (screen === "partners") {
-    return <Partners setScreen={setScreen} />;
   }
 
   return (
