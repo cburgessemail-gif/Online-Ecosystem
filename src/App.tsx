@@ -18,7 +18,6 @@ type SectionKey =
   | "events";
 
 type JourneyStep = {
-  label: string;
   title: string;
   body: string;
   action: string;
@@ -28,7 +27,6 @@ type Section = {
   key: SectionKey;
   nav: string;
   eyebrow: string;
-  title: string;
   description: string;
   image: string;
   imageLabel: string;
@@ -54,7 +52,6 @@ const sections: Section[] = [
     key: "entrance",
     nav: "Entrance",
     eyebrow: "LIVING ECOSYSTEM",
-    title: "Step Into The Farm. Experience The Wonders Of Life.",
     description:
       "Bronson Family Farm is a living ecosystem connecting youth workforce development, growers, food movement, wellness, marketplace systems, partnerships, education, and community transformation.",
     image: img("SAM_0427.JPG"),
@@ -67,21 +64,18 @@ const sections: Section[] = [
       "Choose a pathway and move from observer into participant.",
     steps: [
       {
-        label: "ARRIVE",
         title: "The land introduces the story",
         body:
           "Visitors enter through a cinematic farm experience grounded in land, agriculture, youth development, and regional transformation.",
         action: "Understand the ecosystem purpose.",
       },
       {
-        label: "DISCOVER",
         title: "The ecosystem becomes visible",
         body:
           "The visitor sees how growers, youth, wellness, markets, and community systems connect together.",
         action: "Choose a pathway.",
       },
       {
-        label: "ENTER",
         title: "The visitor becomes part of the movement",
         body:
           "Every pathway leads toward participation, contribution, leadership, support, or continued engagement.",
@@ -94,7 +88,6 @@ const sections: Section[] = [
     key: "youth",
     nav: "Youth Workforce",
     eyebrow: "8-WEEK CULTIVATOR PROGRAM",
-    title: "Young People Help Build The Future.",
     description:
       "The youth workforce pathway transforms agriculture into skill-building, responsibility, leadership, teamwork, and workforce readiness.",
     image: img("SAM_0417.JPG"),
@@ -107,21 +100,18 @@ const sections: Section[] = [
       "Youth complete the program and choose future roles as workers, growers, leaders, or entrepreneurs.",
     steps: [
       {
-        label: "ORIENTATION",
         title: "Safety and belonging",
         body:
           "Youth begin with PPE, expectations, structure, and understanding the deeper purpose of the ecosystem.",
         action: "Confirm readiness.",
       },
       {
-        label: "WORK",
         title: "Daily structure creates growth",
         body:
           "Each day includes assignments, supervision, teamwork, growing support, cleanup, and reflection.",
         action: "Build reliable habits.",
       },
       {
-        label: "REFLECTION",
         title: "Growth becomes visible",
         body:
           "Youth begin understanding leadership, responsibility, and the impact of food systems on community wellness.",
@@ -134,7 +124,6 @@ const sections: Section[] = [
     key: "marketplace",
     nav: "Marketplace",
     eyebrow: "CONNECTED FOOD MOVEMENT",
-    title: "Marketplace Turns Interest Into Community Food Power.",
     description:
       "The marketplace connects seedlings, produce, Bubble Babies™, demonstrations, growers supply systems, QR engagement, and repeat customer participation.",
     image: img("ConnectFoodEcosystem_withimages.png"),
@@ -147,21 +136,18 @@ const sections: Section[] = [
       "Shop, preorder, grow, volunteer, support youth, or join the ecosystem.",
     steps: [
       {
-        label: "DISCOVER",
         title: "People encounter possibility",
         body:
           "Visitors experience seedlings, produce, demonstrations, wellness, and grower participation.",
         action: "Explore opportunities.",
       },
       {
-        label: "PURCHASE",
         title: "Interest becomes participation",
         body:
           "QR systems and online ordering transform curiosity into purchasing and engagement.",
         action: "Place an order.",
       },
       {
-        label: "RETURN",
         title: "The ecosystem grows through repetition",
         body:
           "Customers return because the ecosystem feels welcoming, educational, and community-centered.",
@@ -174,7 +160,6 @@ const sections: Section[] = [
     key: "growers",
     nav: "Growers",
     eyebrow: "GROWER SUPPORT PATHWAY",
-    title: "Growers Need Tools, Knowledge, And Market Access.",
     description:
       "The grower pathway supports home gardeners, new growers, small farms, and producers through practical demonstrations and market participation.",
     image: img("GrowArea2.jpg"),
@@ -187,21 +172,18 @@ const sections: Section[] = [
       "Growers evolve into educators, sellers, collaborators, and ecosystem partners.",
     steps: [
       {
-        label: "LEARN",
         title: "Practical agriculture becomes approachable",
         body:
           "Growers learn soil preparation, transplanting, fencing, watering, and seasonal production strategies.",
         action: "Apply the lesson.",
       },
       {
-        label: "GROW",
         title: "Production becomes visible",
         body:
           "Growers use seedlings, demonstrations, and guidance to strengthen growing capacity.",
         action: "Increase production.",
       },
       {
-        label: "PARTICIPATE",
         title: "The grower enters the ecosystem",
         body:
           "Growers become part of the local food movement through events, demonstrations, sales, or mentorship.",
@@ -214,7 +196,6 @@ const sections: Section[] = [
     key: "partners",
     nav: "Partners",
     eyebrow: "COMMUNITY PARTNERSHIPS",
-    title: "Partnerships Transform Possibility Into Infrastructure.",
     description:
       "The partner pathway helps businesses, schools, foundations, health systems, and community organizations align with ecosystem outcomes.",
     image: img("Partners.png"),
@@ -227,21 +208,18 @@ const sections: Section[] = [
       "Partners support youth workforce, food access, wellness, infrastructure, and regional growth.",
     steps: [
       {
-        label: "ALIGN",
         title: "The mission becomes visible",
         body:
           "Partners understand how agriculture, workforce development, and wellness connect together.",
         action: "Identify alignment.",
       },
       {
-        label: "SUPPORT",
         title: "Resources become operational",
         body:
           "Support turns into equipment, demonstrations, funding, education, wellness services, and infrastructure.",
         action: "Activate support.",
       },
       {
-        label: "IMPACT",
         title: "Community outcomes become visible",
         body:
           "The ecosystem demonstrates participation, education, wellness, and measurable transformation.",
@@ -254,7 +232,6 @@ const sections: Section[] = [
     key: "nutrition",
     nav: "Nutrition",
     eyebrow: "HEALTH + WELLNESS",
-    title: "Fresh Food Becomes A Daily Community Experience.",
     description:
       "Nutrition pathways connect fresh food, gardening, wellness education, family health, and community access.",
     image: img("Compost_ElliottGarden.png"),
@@ -267,21 +244,18 @@ const sections: Section[] = [
       "Families grow, prepare, share, and experience healthier food choices together.",
     steps: [
       {
-        label: "ACCESS",
         title: "Fresh food becomes visible",
         body:
           "Visitors encounter produce, herbs, seedlings, and educational experiences.",
         action: "Choose healthier options.",
       },
       {
-        label: "LEARN",
         title: "Food connects to wellness",
         body:
           "Nutrition education connects food to long-term health and family wellness.",
         action: "Apply the knowledge.",
       },
       {
-        label: "SHARE",
         title: "Wellness spreads through families",
         body:
           "Healthy food and practical knowledge move through households and communities.",
@@ -294,7 +268,6 @@ const sections: Section[] = [
     key: "events",
     nav: "Events",
     eyebrow: "COMMUNITY EXPERIENCE",
-    title: "Events Turn Visitors Into Participants.",
     description:
       "Events activate the ecosystem through demonstrations, wellness, growers, seed giveaways, education, and marketplace participation.",
     image: img("Queens Village.png"),
@@ -307,21 +280,18 @@ const sections: Section[] = [
       "Visitors become growers, volunteers, customers, partners, or ecosystem supporters.",
     steps: [
       {
-        label: "INVITE",
         title: "The invitation opens the gate",
         body:
           "Events create welcoming opportunities for the public to experience the ecosystem.",
         action: "Register or attend.",
       },
       {
-        label: "EXPERIENCE",
         title: "The ecosystem becomes real",
         body:
           "Visitors encounter demonstrations, food, youth workforce, growers, wellness, and community participation.",
         action: "Engage with the ecosystem.",
       },
       {
-        label: "RETURN",
         title: "The relationship continues",
         body:
           "Visitors return because the ecosystem creates belonging, purpose, and opportunity.",
@@ -331,7 +301,7 @@ const sections: Section[] = [
   },
 ];
 
-function App() {
+export default function App() {
   const [lang, setLang] = useState<LangKey>("English");
   const [activeKey, setActiveKey] =
     useState<SectionKey>("entrance");
@@ -390,13 +360,13 @@ function App() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#07140d] text-white">
 
-      {/* HERO BACKGROUND */}
+      {/* BACKGROUND */}
 
       <div className="fixed inset-0 overflow-hidden">
         <img
           src={active.image}
           alt="Bronson Family Farm"
-          className="h-full w-full object-cover object-center scale-[1.04] opacity-[0.58] transition-all duration-[12000ms]"
+          className="h-full w-full object-cover object-center scale-[1.04] opacity-[0.72] transition-all duration-[12000ms]"
         />
       </div>
 
@@ -421,11 +391,13 @@ function App() {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
             <div>
+
               <p className="text-xs uppercase tracking-[.55em] text-lime-100/80">
                 BRONSON FAMILY FARM
               </p>
 
-              <h1 className="mt-5 max-w-6xl text-6xl font-black leading-[0.88] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-8xl xl:text-[8rem]">
+              <h1 className="mt-5 max-w-7xl text-7xl font-black leading-[0.88] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-8xl xl:text-[9rem]">
+
                 Step Into The Farm.
                 <br />
                 Experience The Wonders Of Life.
@@ -443,6 +415,7 @@ function App() {
             {/* LANGUAGES */}
 
             <div className="flex flex-wrap gap-2">
+
               {LANGS.map((item) => (
                 <button
                   key={item}
@@ -466,9 +439,7 @@ function App() {
             {sections.map((section, index) => (
               <button
                 key={section.key}
-                onClick={() =>
-                  chooseSection(section.key)
-                }
+                onClick={() => chooseSection(section.key)}
                 className={`shrink-0 rounded-full border px-5 py-3 text-sm font-bold transition ${
                   active.key === section.key
                     ? "border-lime-100 bg-lime-100 text-[#092216] shadow-[0_18px_45px_rgba(0,0,0,.28)]"
@@ -486,9 +457,9 @@ function App() {
 
           {/* MAIN EXPERIENCE */}
 
-          <div className="mt-10 grid min-h-[860px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
+          <div className="mt-10 grid min-h-[940px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
 
-            {/* LEFT */}
+            {/* LEFT PANEL */}
 
             <div className="flex flex-col justify-center">
 
@@ -518,19 +489,19 @@ function App() {
               </div>
             </div>
 
-            {/* RIGHT */}
+            {/* RIGHT PANEL */}
 
             <div className="relative min-h-[760px]">
 
-              {/* IMAGE PANEL */}
+              {/* IMAGE CARD */}
 
               <div
-                className="absolute right-0 top-0 h-[82%] w-[92%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
+                className="absolute right-0 top-0 h-[88%] w-[95%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
                 style={{
                   backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.18)), url(${active.image})`,
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#06140d]/55 via-transparent to-white/5" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#04110b]/38 via-transparent to-white/5" />
 
                 <div className="absolute bottom-7 left-7 right-7">
 
@@ -546,7 +517,7 @@ function App() {
 
               {/* JOURNEY CARD */}
 
-              <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#eef3dd]/92 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
+              <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#f3f5e8]/88 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
 
                 <p className="text-xs font-black uppercase tracking-[.32em] text-emerald-900/65">
                   Pathway Journey
@@ -573,7 +544,7 @@ function App() {
                   </p>
                 </div>
 
-                {/* DECISION */}
+                {/* ECOSYSTEM DECISION */}
 
                 <div className="mt-6 rounded-[2rem] border border-emerald-900/10 bg-white p-5">
 
@@ -603,7 +574,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* NAV */}
+                {/* NAVIGATION */}
 
                 <div className="mt-6 flex flex-wrap gap-3">
 
@@ -662,5 +633,4 @@ function DecisionButton({
     </button>
   );
 }
-
 export default App;
