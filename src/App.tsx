@@ -1,16 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 
-type Screen =
-  | "home"
-  | "roles"
-  | "guest"
-  | "grower"
-  | "youth"
-  | "customer"
-  | "marketplace"
-  | "partners"
-  | "supervisor"
-  | "parent";
+type Screen = "home" | "roles" | "journey" | "marketplace" | "partners" | "workforce" | "feedback";
 
 type Language =
   | "English"
@@ -19,6 +9,41 @@ type Language =
   | "Italiano"
   | "עברית"
   | "Français";
+
+type PathKey =
+  | "guest"
+  | "grower"
+  | "youth"
+  | "customer"
+  | "marketplace"
+  | "partner"
+  | "volunteer"
+  | "valueAdded"
+  | "supervisor"
+  | "parent";
+
+type JourneyStep = {
+  label: string;
+  title: string;
+  text: string;
+  points: string[];
+  decision: string;
+  action: string;
+};
+
+type Journey = {
+  key: PathKey;
+  nav: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  accent: string;
+  needMet: string;
+  benefit: string;
+  destination: string;
+  share: string;
+  steps: JourneyStep[];
+};
 
 const languages: Language[] = [
   "English",
@@ -65,818 +90,353 @@ const IMG = {
   sameera5: "/images/Samerra5.jpg",
 };
 
-function preloadAllImages() {
-  Object.values(IMG).forEach((src) => {
-    const img = new Image();
-    img.src = src;
-  });
-}
-
-const ROLE_CONTENT = {
-  guest: {
-    title: "Guest Pathway",
-    image: IMG.queens,
-    mission:
-      "Guests experience the ecosystem through exploration, wellness, food systems, agritourism, and community participation.",
-    purpose:
-      "The guest pathway introduces visitors to the full ecosystem and encourages repeat participation, volunteering, marketplace engagement, and community connection.",
-    resources: [
-      "Guided Ecosystem Experience",
-      "Marketplace Exploration",
-      "Community Wellness Activities",
-      "Food & Nutrition Education",
-      "Agritourism Experiences",
-      "Volunteer Participation",
-      "Family Engagement Activities",
-      "Community Events",
-      "Youth Workforce Visibility",
-      "Grower Demonstrations",
-    ],
-    journey: [
-      [
-        "Arrival Experience",
-        "Guests enter a cinematic ecosystem experience designed to create curiosity, inspiration, and connection.",
-      ],
-      [
-        "Explore The Farm",
-        "Visitors experience growers, youth workforce activities, marketplace systems, food production, and community participation.",
-      ],
-      [
-        "Engage With The Ecosystem",
-        "Guests interact with demonstrations, food systems, educational activities, wellness experiences, and marketplace participation.",
-      ],
-      [
-        "Discover Opportunities",
-        "Guests identify opportunities to volunteer, purchase, partner, return, or participate in future ecosystem activities.",
-      ],
-      [
-        "Return & Share",
-        "Guests become repeat participants who share the ecosystem with others and strengthen community visibility.",
-      ],
-    ],
+const t: Record<
+  Language,
+  {
+    home: string;
+    guided: string;
+    marketplace: string;
+    partners: string;
+    workforce: string;
+    feedback: string;
+    title: string;
+    subtitle: string;
+    start: string;
+    continue: string;
+    choose: string;
+    completed: string;
+    language: string;
+  }
+> = {
+  English: {
+    home: "Home",
+    guided: "Guided Tour",
+    marketplace: "Marketplace",
+    partners: "Partners",
+    workforce: "Workforce",
+    feedback: "Feedback",
+    title: "Step Into The Farm. Experience The Wonders Of Life.",
+    subtitle:
+      "A living ecosystem connecting youth workforce development, growers, marketplace systems, schools, wellness, agritourism, food access, leadership, and community revitalization.",
+    start: "Begin Guided Tour",
+    continue: "Continue Journey",
+    choose: "Choose Your Pathway",
+    completed: "Completed",
+    language: "Language",
   },
-
-  grower: {
-    title: "Grower Pathway",
-    image: IMG.growArea,
-    mission:
-      "Growers gain access to education, production systems, compost, protection systems, infrastructure, and marketplace participation.",
-    purpose:
-      "The grower pathway strengthens local food systems by helping growers produce successfully and connect to sustainable opportunities.",
-    resources: [
-      "Seeds & Seedlings",
-      "Grower Education",
-      "Compost & Soil Building",
-      "Production Systems",
-      "Infrastructure Support",
-      "Fencing & Protection",
-      "Marketplace Participation",
-      "Distribution Opportunities",
-      "Agricultural Collaboration",
-      "Food Access Systems",
-    ],
-    journey: [
-      [
-        "Learn Growing Systems",
-        "Growers learn production systems, composting, infrastructure, protection, and sustainable agricultural concepts.",
-      ],
-      [
-        "Prepare Production Areas",
-        "Land preparation, infrastructure support, fencing, irrigation concepts, and soil-building systems are introduced.",
-      ],
-      [
-        "Participate In Production",
-        "Growers actively engage in ecosystem food production and collaborative growing systems.",
-      ],
-      [
-        "Connect To Marketplace",
-        "Food systems connect growers to customers, food access systems, and marketplace participation.",
-      ],
-      [
-        "Expand Ecosystem Participation",
-        "Growers become long-term ecosystem contributors and support future community production.",
-      ],
-    ],
+  Español: {
+    home: "Inicio",
+    guided: "Recorrido",
+    marketplace: "Mercado",
+    partners: "Aliados",
+    workforce: "Jóvenes",
+    feedback: "Comentarios",
+    title: "Entre a la finca. Experimente las maravillas de la vida.",
+    subtitle:
+      "Un ecosistema vivo que conecta jóvenes, agricultores, mercado, escuelas, bienestar, acceso a alimentos y revitalización comunitaria.",
+    start: "Comenzar Recorrido",
+    continue: "Continuar",
+    choose: "Elija Su Camino",
+    completed: "Completado",
+    language: "Idioma",
   },
-
-  youth: {
-    title: "Youth Workforce Pathway",
-    image: IMG.youth1,
-    mission:
-      "Youth build leadership, responsibility, teamwork, confidence, and future readiness through ecosystem participation.",
-    purpose:
-      "The youth workforce pathway creates real-world participation that develops life skills, responsibility, leadership, and future opportunity.",
-    resources: [
-      "Supervisor Guidance",
-      "Outdoor Learning",
-      "Workforce Participation",
-      "Leadership Development",
-      "Team Building",
-      "Daily Participation Tracking",
-      "Safety Training",
-      "Communication Development",
-      "Parent / Guardian Connection",
-      "Future Readiness",
-    ],
-    journey: [
-      [
-        "Orientation & Expectations",
-        "Youth learn participation expectations, ecosystem standards, communication systems, and safety procedures.",
-      ],
-      [
-        "Hands-On Participation",
-        "Youth participate in production, marketplace systems, ecosystem support, teamwork, and operational activities.",
-      ],
-      [
-        "Leadership Development",
-        "Supervisors guide youth through teamwork, communication, leadership, responsibility, and workforce readiness.",
-      ],
-      [
-        "Growth & Reflection",
-        "Youth develop confidence, discipline, participation habits, and ecosystem understanding through structured engagement.",
-      ],
-      [
-        "Future Readiness",
-        "Youth complete the experience with stronger leadership, responsibility, and workforce confidence.",
-      ],
-    ],
+  Tagalog: {
+    home: "Home",
+    guided: "Gabay",
+    marketplace: "Pamilihan",
+    partners: "Kasosyo",
+    workforce: "Kabataan",
+    feedback: "Puna",
+    title: "Pumasok sa sakahan. Damhin ang hiwaga ng buhay.",
+    subtitle:
+      "Isang buhay na ekosistema na nag-uugnay sa kabataan, growers, pamilihan, paaralan, kalusugan, pagkain, pamumuno, at komunidad.",
+    start: "Simulan ang Gabay",
+    continue: "Magpatuloy",
+    choose: "Piliin ang Daan",
+    completed: "Tapos",
+    language: "Wika",
   },
-
-  customer: {
-    title: "Customer Pathway",
-    image: IMG.marketplaceHero,
-    mission:
-      "Customers gain access to fresh food, seedlings, nutrition education, marketplace systems, and healthy participation.",
-    purpose:
-      "The customer pathway strengthens repeat food access participation while supporting growers, marketplace systems, and community wellness.",
-    resources: [
-      "Fresh Produce",
-      "Seedlings",
-      "Marketplace Systems",
-      "Nutrition Education",
-      "Food Access",
-      "Value Added Products",
-      "Community Events",
-      "Agritourism Participation",
-      "Grower Support",
-      "Ecosystem Participation",
-    ],
-    journey: [
-      [
-        "Marketplace Entry",
-        "Customers enter a marketplace ecosystem designed around food access, participation, and community connection.",
-      ],
-      [
-        "Explore Products",
-        "Customers explore produce, seedlings, value-added products, and ecosystem participation opportunities.",
-      ],
-      [
-        "Learn & Participate",
-        "Nutrition education, demonstrations, and ecosystem engagement strengthen healthy participation.",
-      ],
-      [
-        "Support Ecosystem Growth",
-        "Marketplace participation supports growers, youth workforce systems, and local food movement.",
-      ],
-      [
-        "Return & Share",
-        "Customers become repeat ecosystem participants and expand community visibility.",
-      ],
-    ],
+  Italiano: {
+    home: "Home",
+    guided: "Tour",
+    marketplace: "Mercato",
+    partners: "Partner",
+    workforce: "Giovani",
+    feedback: "Riscontro",
+    title: "Entra nella fattoria. Vivi le meraviglie della vita.",
+    subtitle:
+      "Un ecosistema vivo che collega giovani, produttori, mercato, scuole, benessere, accesso al cibo, leadership e comunità.",
+    start: "Inizia il Tour",
+    continue: "Continua",
+    choose: "Scegli il Percorso",
+    completed: "Completato",
+    language: "Lingua",
   },
-
-  marketplace: {
-    title: "Marketplace Ecosystem",
-    image: IMG.marketplaceHero,
-    mission:
-      "The marketplace connects growers, customers, seedlings, food systems, wellness, and repeat participation.",
-    purpose:
-      "The marketplace pathway turns interest into food access, purchasing power, education, distribution, and long-term ecosystem sustainability.",
-    resources: [
-      "Growers Supply Market",
-      "Fresh Produce",
-      "Seedlings",
-      "Value Added Learning",
-      "Food Access Systems",
-      "Marketplace Tables",
-      "QR Engagement",
-      "Community Buyers",
-      "Grower Demonstrations",
-      "Repeat Customer Pathways",
-    ],
-    journey: [
-      [
-        "Enter The Market",
-        "Visitors enter the growers supply market and see the ecosystem in motion.",
-      ],
-      [
-        "Explore Food & Tools",
-        "Customers connect with produce, seedlings, supplies, demonstrations, and growers.",
-      ],
-      [
-        "Learn Through Experience",
-        "Marketplace participation includes food education, nutrition connection, and community learning.",
-      ],
-      [
-        "Support Local Production",
-        "Purchases and participation strengthen growers, youth workforce, and food access.",
-      ],
-      [
-        "Return Again",
-        "The marketplace becomes a repeat destination for families, growers, and partners.",
-      ],
-    ],
+  עברית: {
+    home: "בית",
+    guided: "סיור",
+    marketplace: "שוק",
+    partners: "שותפים",
+    workforce: "נוער",
+    feedback: "משוב",
+    title: "היכנסו לחווה. חוו את פלאי החיים.",
+    subtitle:
+      "מערכת חיה המחברת נוער, מגדלים, שוק, בתי ספר, בריאות, מזון, מנהיגות וקהילה.",
+    start: "התחל סיור",
+    continue: "המשך",
+    choose: "בחר מסלול",
+    completed: "הושלם",
+    language: "שפה",
   },
-
-  partners: {
-    title: "Partner Ecosystem",
-    image: IMG.partners,
-    mission:
-      "Partners strengthen the ecosystem through collaboration, education, infrastructure, wellness, workforce, and operational support.",
-    purpose:
-      "The partner pathway creates collaborative systems that strengthen long-term ecosystem sustainability and community outcomes.",
-    resources: [
-      "Educational Collaboration",
-      "Infrastructure Support",
-      "Media & Visibility",
-      "Workforce Collaboration",
-      "Food Access Support",
-      "Operational Partnerships",
-      "Community Collaboration",
-      "Agricultural Support",
-      "Wellness Integration",
-      "Ecosystem Investment",
-    ],
-    journey: [
-      [
-        "Connect To Mission",
-        "Partners explore ecosystem goals, community impact, and operational participation opportunities.",
-      ],
-      [
-        "Identify Collaboration",
-        "Educational systems, workforce collaboration, infrastructure, visibility, and operational opportunities are identified.",
-      ],
-      [
-        "Strengthen Ecosystem",
-        "Partners contribute resources, support, education, operational assistance, and ecosystem visibility.",
-      ],
-      [
-        "Expand Community Outcomes",
-        "Collaborative systems increase food access, visibility, participation, and ecosystem sustainability.",
-      ],
-      [
-        "Long-Term Participation",
-        "Partners continue strengthening the ecosystem through ongoing collaboration and visibility.",
-      ],
-    ],
-  },
-
-  supervisor: {
-    title: "Supervisor Pathway",
-    image: IMG.volunteers,
-    mission:
-      "Supervisors guide youth participation, leadership development, safety oversight, communication, and ecosystem engagement.",
-    purpose:
-      "The supervisor pathway supports youth workforce development through structured guidance, observation, and leadership support.",
-    resources: [
-      "Daily Participation Tracking",
-      "Observation Systems",
-      "Youth Communication",
-      "Safety Oversight",
-      "Leadership Support",
-      "Participation Documentation",
-      "Team Building",
-      "Ecosystem Coordination",
-      "Progress Monitoring",
-      "Workforce Support",
-    ],
-    journey: [
-      [
-        "Coordinate Daily Activities",
-        "Supervisors guide ecosystem participation, communication, assignments, and operational structure.",
-      ],
-      [
-        "Support Youth Development",
-        "Leadership, teamwork, responsibility, and communication development are actively supported.",
-      ],
-      [
-        "Monitor Participation",
-        "Participation, engagement, safety, communication, and operational involvement are monitored.",
-      ],
-      [
-        "Strengthen Ecosystem Structure",
-        "Supervisors maintain organization, workflow, participation quality, and operational consistency.",
-      ],
-      [
-        "Develop Future Readiness",
-        "Youth receive structured support that strengthens future leadership and workforce participation.",
-      ],
-    ],
-  },
-
-  parent: {
-    title: "Parent / Guardian Pathway",
-    image: IMG.sameera5,
-    mission:
-      "Parents and guardians remain connected to youth participation, communication, leadership, and development.",
-    purpose:
-      "The parent pathway strengthens family connection, communication, participation visibility, and youth support systems.",
-    resources: [
-      "Program Communication",
-      "Participation Visibility",
-      "Youth Progress Awareness",
-      "Supervisor Communication",
-      "Safety Communication",
-      "Program Updates",
-      "Family Engagement",
-      "Community Participation",
-      "Leadership Visibility",
-      "Youth Development Support",
-    ],
-    journey: [
-      [
-        "Receive Program Information",
-        "Parents receive orientation information, participation expectations, and ecosystem visibility.",
-      ],
-      [
-        "Stay Connected",
-        "Communication systems support awareness of youth participation and ecosystem involvement.",
-      ],
-      [
-        "Monitor Participation",
-        "Families remain connected to youth growth, participation, leadership, and communication.",
-      ],
-      [
-        "Support Development",
-        "Parents support leadership growth, participation habits, and future readiness.",
-      ],
-      [
-        "Strengthen Community Participation",
-        "Families become active ecosystem supporters and strengthen long-term participation.",
-      ],
-    ],
+  Français: {
+    home: "Accueil",
+    guided: "Visite",
+    marketplace: "Marché",
+    partners: "Partenaires",
+    workforce: "Jeunesse",
+    feedback: "Retour",
+    title: "Entrez dans la ferme. Découvrez les merveilles de la vie.",
+    subtitle:
+      "Un écosystème vivant reliant les jeunes, les producteurs, le marché, les écoles, le bien-être, l'accès alimentaire, le leadership et la communauté.",
+    start: "Commencer",
+    continue: "Continuer",
+    choose: "Choisir un Parcours",
+    completed: "Terminé",
+    language: "Langue",
   },
 };
 
-function Navigation({
-  screen,
-  setScreen,
-}: {
-  screen: Screen;
-  setScreen: (screen: Screen) => void;
-}) {
-  const items: { key: Screen; label: string }[] = [
-    { key: "home", label: "Home" },
-    { key: "roles", label: "Guided Tour" },
-    { key: "guest", label: "Guest" },
-    { key: "grower", label: "Grower" },
-    { key: "youth", label: "Youth" },
-    { key: "customer", label: "Customer" },
-    { key: "marketplace", label: "Marketplace" },
-    { key: "partners", label: "Partners" },
-  ];
-
-  return (
-    <div className="mb-5 flex flex-wrap gap-3">
-      {items.map((item) => (
-        <button
-          key={item.key}
-          onClick={() => setScreen(item.key)}
-          className={`rounded-full px-6 py-3 font-black transition duration-300 ${
-            screen === item.key
-              ? "bg-white text-black"
-              : "border border-white/10 bg-white/10 text-white hover:bg-white/20"
-          }`}
-        >
-          {item.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Shell({
-  children,
-  screen,
-  setScreen,
-  background = IMG.hero,
-}: {
-  children: React.ReactNode;
-  screen: Screen;
-  setScreen: (screen: Screen) => void;
-  background?: string;
-}) {
-  return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <div className="fixed inset-0">
-        <img
-          src={background}
-          alt="Bronson Family Farm"
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          className="h-full w-full object-cover scale-[1.02]"
-        />
-      </div>
-
-      <div className="fixed inset-0 bg-black/22" />
-
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,.05),transparent_24%),radial-gradient(circle_at_top_right,rgba(255,220,120,.05),transparent_20%),radial-gradient(circle_at_bottom,rgba(16,185,129,.06),transparent_28%)]" />
-
-      <div className="relative z-10 w-full px-4 py-4 md:px-6 lg:px-8">
-        <Navigation screen={screen} setScreen={setScreen} />
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function PhotoCard({
-  title,
-  subtitle,
-  image,
-  height = "320px",
-  onClick,
-}: {
-  title: string;
-  subtitle?: string;
-  image: string;
-  height?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_30px_80px_rgba(0,0,0,.45)] transition duration-700 hover:scale-[1.01]"
-      style={{ height }}
-    >
-      <img
-        src={image}
-        alt={title}
-        loading="eager"
-        decoding="async"
-        fetchPriority="high"
-        className="absolute inset-0 h-full w-full object-cover transition duration-[4000ms] group-hover:scale-105"
-      />
-
-      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/0" />
-
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-6 text-left">
-        <div className="text-3xl font-black leading-tight">{title}</div>
-
-        {subtitle && (
-          <div className="mt-3 max-w-xl text-sm leading-6 text-emerald-50/85">
-            {subtitle}
-          </div>
-        )}
-      </div>
-    </button>
-  );
-}
-
-function Home({
-  setScreen,
-  language,
-  setLanguage,
-}: {
-  setScreen: (screen: Screen) => void;
-  language: Language;
-  setLanguage: (language: Language) => void;
-}) {
-  return (
-    <Shell screen="home" setScreen={setScreen} background={IMG.hero}>
-      <section className="grid min-h-[calc(100vh-120px)] gap-6 xl:grid-cols-[1.5fr_0.9fr]">
-        <div className="h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/10 shadow-[0_40px_120px_rgba(0,0,0,.55)] backdrop-blur-md">
-          <div className="relative h-[calc(100vh-170px)] min-h-[760px]">
-            <img
-              src={IMG.hero}
-              alt="Bronson Family Farm"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/0" />
-
-            <div className="relative z-10 flex h-full flex-col justify-end p-8 md:p-12">
-              <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">
-                Connected Food Ecosystem Experience
-              </div>
-
-              <h1 className="mt-5 max-w-5xl text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">
-                Step Into The Farm.
-                <br />
-                Experience The Wonders Of Life.
-              </h1>
-
-              <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/90">
-                A living ecosystem connecting youth workforce development,
-                growers, marketplace systems, schools, wellness,
-                agritourism, food access, leadership, and community revitalization.
-              </p>
-
-              <div className="mt-10 flex flex-wrap gap-4">
-                <button
-                  onClick={() => setScreen("roles")}
-                  className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black shadow-2xl transition hover:scale-105"
-                >
-                  Begin Guided Tour
-                </button>
-
-                <button
-                  onClick={() => setScreen("marketplace")}
-                  className="rounded-full border border-white/10 bg-white/10 px-7 py-4 font-semibold backdrop-blur-md transition hover:bg-white/20"
-                >
-                  Marketplace
-                </button>
-
-                <button
-                  onClick={() => setScreen("partners")}
-                  className="rounded-full border border-white/10 bg-white/10 px-7 py-4 font-semibold backdrop-blur-md transition hover:bg-white/20"
-                >
-                  Partners
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid border-t border-white/10 md:grid-cols-3">
-            <PhotoCard
-              title="Grower Ecosystem"
-              subtitle="Production, training, and local food access"
-              image={IMG.growArea}
-              height="270px"
-              onClick={() => setScreen("grower")}
-            />
-
-            <PhotoCard
-              title="Marketplace Movement"
-              subtitle="Food moving toward families and destinations"
-              image={IMG.marketplaceHero}
-              height="270px"
-              onClick={() => setScreen("marketplace")}
-            />
-
-            <PhotoCard
-              title="Youth Workforce"
-              subtitle="Leadership through participation"
-              image={IMG.youth1}
-              height="270px"
-              onClick={() => setScreen("youth")}
-            />
-          </div>
-        </div>
-
-        <div className="flex h-full flex-col gap-6">
-          <div className="flex-1 overflow-auto rounded-[2rem] border border-white/10 bg-black/8 p-7 shadow-[0_30px_80px_rgba(0,0,0,.35)] backdrop-blur-md">
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-              Living Ecosystem Overview
-            </div>
-
-            <h2 className="mt-5 text-4xl font-black leading-tight">
-              A place people want to return to.
-            </h2>
-
-            <p className="mt-6 text-lg leading-9 text-emerald-50/85">
-              Bronson Family Farm connects workforce, agriculture, schools,
-              wellness, marketplace systems, growers, leadership, and community
-              participation into one immersive ecosystem.
-            </p>
-
-            <div className="mt-8 space-y-4">
-              {[
-                "Youth Workforce Development",
-                "Marketplace & Distribution",
-                "Schools & Community Food Access",
-                "Grower Ecosystem",
-                "Nutrition & Culinary Wellness",
-                "Family Legacy & Land Restoration",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-5 text-xl font-semibold backdrop-blur-md"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
-                Language
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {languages.map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setLanguage(lang)}
-                    className={`rounded-full px-4 py-2 text-sm transition ${
-                      language === lang
-                        ? "bg-white text-black"
-                        : "border border-white/10 bg-white/10 text-white hover:bg-white/20"
-                    }`}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <PhotoCard
-            title="Seeds, compost, partners, and people make the ecosystem real."
-            subtitle="The work is operational, visible, and community-rooted."
-            image={IMG.seeds}
-            height="320px"
-            onClick={() => setScreen("partners")}
-          />
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="roles" setScreen={setScreen} background={IMG.ecosystem}>
-      <section className="space-y-8">
-        <div className="max-w-5xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Guided Ecosystem Tour
-          </div>
-
-          <h1 className="mt-5 text-5xl font-black leading-[0.95] md:text-7xl">
-            Every pathway leads somewhere meaningful.
-          </h1>
-
-          <p className="mt-8 text-xl leading-10 text-emerald-50/90">
-            Guests, growers, youth, customers, partners, supervisors, and
-            families move through connected ecosystem experiences.
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {(
-            [
-              "guest",
-              "grower",
-              "youth",
-              "customer",
-              "marketplace",
-              "partners",
-              "supervisor",
-              "parent",
-            ] as Screen[]
-          ).map((key) => {
-            const role = ROLE_CONTENT[key as keyof typeof ROLE_CONTENT];
-
-            return (
-              <PhotoCard
-                key={key}
-                title={role.title}
-                subtitle={role.mission}
-                image={role.image}
-                height="420px"
-                onClick={() => setScreen(key)}
-              />
-            );
-          })}
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-function RoleExperience({
-  roleKey,
-  setScreen,
-}: {
-  roleKey: keyof typeof ROLE_CONTENT;
-  setScreen: (screen: Screen) => void;
-}) {
-  const role = ROLE_CONTENT[roleKey];
-
-  return (
-    <Shell
-      screen={roleKey as Screen}
-      setScreen={setScreen}
-      background={role.image}
-    >
-      <section className="space-y-10">
-        <div className="max-w-6xl">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/70">
-            Ecosystem Role Experience
-          </div>
-
-          <h1 className="mt-5 text-5xl font-black leading-[0.92] md:text-7xl">
-            {role.title}
-          </h1>
-
-          <p className="mt-8 max-w-5xl text-xl leading-10 text-emerald-50/90">
-            {role.mission}
-          </p>
-
-          <p className="mt-6 max-w-5xl text-lg leading-9 text-emerald-50/80">
-            {role.purpose}
-          </p>
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-black/8 p-8 backdrop-blur-md">
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-              Guided Journey
-            </div>
-
-            <div className="mt-8 space-y-5">
-              {role.journey.map(([step, detail], index) => (
-                <div
-                  key={step}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-md"
-                >
-                  <div className="text-xs uppercase tracking-[0.2em] text-emerald-100/60">
-                    Step {index + 1}
-                  </div>
-
-                  <div className="mt-3 text-2xl font-bold leading-tight">
-                    {step}
-                  </div>
-
-                  <div className="mt-4 text-base leading-8 text-emerald-50/80">
-                    {detail}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <PhotoCard
-              title={role.title}
-              subtitle={role.mission}
-              image={role.image}
-              height="320px"
-            />
-
-            <div className="rounded-[2rem] border border-white/10 bg-black/8 p-8 backdrop-blur-md">
-              <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">
-                Ecosystem Resources
-              </div>
-
-              <div className="mt-8 grid gap-4">
-                {role.resources.map((resource) => (
-                  <div
-                    key={resource}
-                    className="rounded-2xl border border-white/10 bg-white/10 p-5 text-lg font-semibold backdrop-blur-md"
-                  >
-                    {resource}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-export default function App() {
-  const [screen, setScreen] = useState<Screen>("home");
-  const [language, setLanguage] = useState<Language>("English");
-
-  useEffect(() => {
-    preloadAllImages();
-  }, []);
-
-  if (screen === "roles") {
-    return <Roles setScreen={setScreen} />;
-  }
-
-  if (
-    screen === "guest" ||
-    screen === "grower" ||
-    screen === "youth" ||
-    screen === "customer" ||
-    screen === "marketplace" ||
-    screen === "partners" ||
-    screen === "supervisor" ||
-    screen === "parent"
-  ) {
-    return (
-      <RoleExperience
-        roleKey={screen as keyof typeof ROLE_CONTENT}
-        setScreen={setScreen}
-      />
-    );
-  }
-
-  return (
-    <Home
-      setScreen={setScreen}
-      language={language}
-      setLanguage={setLanguage}
-    />
-  );
-}
+const journeys: Journey[] = [
+  {
+    key: "guest",
+    nav: "Guest",
+    title: "Guest Pathway",
+    subtitle: "Understand the vision, story, place, and purpose.",
+    image: IMG.queens,
+    accent: "from-emerald-200 to-lime-100",
+    needMet: "People need a clear first experience that explains why the farm matters.",
+    benefit: "Guests leave with language, context, and confidence to invite others.",
+    destination: "Decide whether to visit, share, volunteer, sponsor, or become part of the ecosystem.",
+    share: "Share the farm story with a family member, school, church, funder, or neighbor.",
+    steps: [
+      {
+        label: "Enter",
+        title: "Welcome Into The Living Farm",
+        text: "The guest begins with the land, the people, the food access need, and the promise of a community-centered destination.",
+        points: ["Legacy and land story", "Food access and wellness", "A real farm people can enter"],
+        decision: "Do I understand why Bronson Family Farm exists?",
+        action: "Continue to the role pathways.",
+      },
+      {
+        label: "Experience",
+        title: "See The Ecosystem In Motion",
+        text: "Guests see youth, growers, partners, marketplace, wellness, and family connection as one operating model.",
+        points: ["Youth workforce", "Grower supply market", "Community partnerships"],
+        decision: "Which part of the ecosystem connects with me?",
+        action: "Choose a pathway to explore deeper.",
+      },
+      {
+        label: "Decide",
+        title: "Choose A Meaningful Next Step",
+        text: "The guest is not left watching a presentation. The experience ends with a clear invitation to participate.",
+        points: ["Visit", "Share", "Volunteer", "Sponsor", "Partner"],
+        decision: "How do I want to support or participate?",
+        action: "Send feedback or select another pathway.",
+      },
+    ],
+  },
+  {
+    key: "grower",
+    nav: "Grower",
+    title: "Grower Pathway",
+    subtitle: "Move from interest to production support, market readiness, and regional food participation.",
+    image: IMG.growArea,
+    accent: "from-green-200 to-emerald-100",
+    needMet: "Small growers need tools, knowledge, market access, and support systems.",
+    benefit: "Growers can learn, produce, connect, and participate in a shared food system.",
+    destination: "Decide whether to become a grower, join market activity, request support, or collaborate.",
+    share: "Share with another backyard gardener, small farmer, school garden, or food producer.",
+    steps: [
+      {
+        label: "Assess",
+        title: "Start With What You Can Grow",
+        text: "The grower identifies land, containers, seedlings, season, labor, tools, and learning needs.",
+        points: ["Growing space", "Crop interests", "Tools and supplies", "Training needs"],
+        decision: "Do I want to grow for home, community, or market?",
+        action: "Select grower support resources.",
+      },
+      {
+        label: "Prepare",
+        title: "Connect To Supplies And Knowledge",
+        text: "The grower connects to seeds, seedlings, Bubble Babies, soil, compost, demonstrations, and peer learning.",
+        points: ["Seeds and seedlings", "Compost and soil building", "Demonstrations", "Mentorship"],
+        decision: "What do I need to become ready?",
+        action: "Build a grower readiness list.",
+      },
+      {
+        label: "Participate",
+        title: "Join The Food Movement",
+        text: "The grower can supply produce, attend market activity, teach others, or join cooperative production opportunities.",
+        points: ["Marketplace access", "Food distribution", "Community education", "Repeat growing cycles"],
+        decision: "Am I ready to become part of the ecosystem?",
+        action: "Request grower onboarding.",
+      },
+    ],
+  },
+  {
+    key: "youth",
+    nav: "Youth",
+    title: "Youth Workforce Pathway",
+    subtitle: "An 8-week summer journey of responsibility, outdoor work, life skills, and future readiness.",
+    image: IMG.youth2,
+    accent: "from-yellow-100 to-emerald-100",
+    needMet: "Youth need structured work, caring supervision, skill-building, and visible progress.",
+    benefit: "Youth build responsibility, confidence, teamwork, safety habits, and leadership.",
+    destination: "Complete the summer experience with documented skills, supervisor feedback, and growth evidence.",
+    share: "Youth can share progress with parents, guardians, supervisors, partners, and future employers.",
+    steps: [
+      {
+        label: "Orient",
+        title: "Enter With Safety And Purpose",
+        text: "Youth begin with orientation, PPE expectations, media releases, daily rhythm, and clear worksite rules.",
+        points: ["No PPE, no work", "Attendance expectations", "Team assignments", "Farm safety"],
+        decision: "Am I ready to work safely and show up consistently?",
+        action: "Complete orientation checklist.",
+      },
+      {
+        label: "Work",
+        title: "Learn By Doing Real Farm Tasks",
+        text: "Youth participate in growing, watering, weeding, compost, setup, marketplace support, cleanup, and reflection.",
+        points: ["Daily check-in", "Assigned tasks", "Skill practice", "Team communication"],
+        decision: "What skill am I improving today?",
+        action: "Log daily work and supervisor observation.",
+      },
+      {
+        label: "Grow",
+        title: "Build A Visible Record Of Progress",
+        text: "The supervisor tracks attendance, PPE, participation, teamwork, skills, reflection, and milestone growth.",
+        points: ["Badges", "Rubrics", "Life skills progression", "Parent connection"],
+        decision: "What evidence shows that I am growing?",
+        action: "Complete progress review.",
+      },
+    ],
+  },
+  {
+    key: "customer",
+    nav: "Customer",
+    title: "Customer Pathway",
+    subtitle: "Move from interest to healthy food choices, marketplace access, and repeat participation.",
+    image: IMG.marketplaceHero,
+    accent: "from-orange-100 to-emerald-100",
+    needMet: "Families need fresh food, nutrition education, and simple ways to return.",
+    benefit: "Customers can discover produce, seedlings, demonstrations, and food knowledge in one place.",
+    destination: "Decide what to buy, learn, pre-order, share, or return for next.",
+    share: "Share marketplace access with families, neighbors, and wellness partners.",
+    steps: [
+      {
+        label: "Discover",
+        title: "Find Food, Seedlings, And Support",
+        text: "Customers see fresh produce, seedlings, Bubble Babies, demonstrations, wellness education, and practical food options.",
+        points: ["Fresh produce", "Seedlings", "Nutrition", "Demonstrations"],
+        decision: "What do I want to take home or learn today?",
+        action: "Open marketplace options.",
+      },
+      {
+        label: "Choose",
+        title: "Make Healthy Repeat Choices",
+        text: "The system supports repeat food decisions, seasonal education, and connection to future market dates.",
+        points: ["Seasonal availability", "Pre-orders", "SNAP-aware shopping", "Cooking ideas"],
+        decision: "What healthy choice can I repeat?",
+        action: "Save or share marketplace access.",
+      },
+      {
+        label: "Return",
+        title: "Become Part Of The Customer Community",
+        text: "Customers can return as shoppers, volunteers, growers, family supporters, or event participants.",
+        points: ["Return visits", "Community events", "Feedback", "Family invitations"],
+        decision: "How will I stay connected?",
+        action: "Send feedback or join another pathway.",
+      },
+    ],
+  },
+  {
+    key: "marketplace",
+    nav: "Marketplace",
+    title: "Marketplace Pathway",
+    subtitle: "Convert interest into purchasing power, sustainability, and coordinated food movement.",
+    image: IMG.seeds,
+    accent: "from-lime-100 to-yellow-100",
+    needMet: "The ecosystem needs a visible place where food, tools, education, and relationships move together.",
+    benefit: "The marketplace becomes a destination for growers, customers, youth, partners, and community food access.",
+    destination: "Decide what moves through the market: produce, seedlings, supplies, learning, sponsorship, or distribution.",
+    share: "Share the marketplace with customers, vendors, growers, schools, and funders.",
+    steps: [
+      {
+        label: "Connect",
+        title: "Bring The Market Together",
+        text: "The market connects growers, seedlings, food, supplies, demonstrations, nutrition, and community partners.",
+        points: ["Vendors", "Growers", "Seedlings", "Food education"],
+        decision: "What belongs in this market experience?",
+        action: "Review marketplace categories.",
+      },
+      {
+        label: "Operate",
+        title: "Support Real Movement",
+        text: "The marketplace is not just a display. It supports ordering, pickup, demos, check-in, engagement, and follow-up.",
+        points: ["QR entry", "Orders", "Pickup", "Education", "Follow-up"],
+        decision: "How does this market become sustainable?",
+        action: "Select a marketplace action.",
+      },
+      {
+        label: "Sustain",
+        title: "Build Repeat Participation",
+        text: "The system invites customers and growers back into recurring cycles of growing, buying, learning, and sharing.",
+        points: ["Return customers", "Recurring growers", "Community data", "Sponsor visibility"],
+        decision: "What should continue after the event?",
+        action: "Share or sponsor the market.",
+      },
+    ],
+  },
+  {
+    key: "partner",
+    nav: "Partner",
+    title: "Partner Pathway",
+    subtitle: "Align resources, collaboration, visibility, and community benefit.",
+    image: IMG.partners,
+    accent: "from-sky-100 to-emerald-100",
+    needMet: "Partners need clarity on where their resources fit and what benefit they help create.",
+    benefit: "Partners see specific contribution lanes tied to outcomes, visibility, and community impact.",
+    destination: "Decide whether to support youth, tools, food access, infrastructure, education, wellness, or sponsorship.",
+    share: "Share the ecosystem with funders, agencies, churches, schools, businesses, and civic leaders.",
+    steps: [
+      {
+        label: "Align",
+        title: "Find The Right Contribution Lane",
+        text: "Partners identify whether they support workforce, infrastructure, education, wellness, supplies, outreach, or funding.",
+        points: ["Workforce", "Infrastructure", "Education", "Wellness", "Funding"],
+        decision: "Which contribution matches our mission?",
+        action: "Select a partner lane.",
+      },
+      {
+        label: "Activate",
+        title: "Make Support Visible And Useful",
+        text: "Partner support becomes practical: fencing, compost, seeds, volunteers, training, media, food education, or youth support.",
+        points: ["Donations", "Technical assistance", "In-kind support", "Program support"],
+        decision: "What can we provide now?",
+        action: "Submit partner interest.",
+      },
+      {
+        label: "Strengthen",
+        title: "Build A Mutually Beneficial Relationship",
+        text: "The partnership continues through shared outcomes, reports, visibility, referrals, and future planning.",
+        points: ["Reports", "Recognition", "Ongoing collaboration", "Shared outcomes"],
+        decision: "How do we continue together?",
+        action: "Schedule follow-up.",
+      },
+    ],
+  },
+  {
+    key: "volunteer",
+    nav: "Volunteer",
+    title: "Volunteer Pathway",
+    subtitle: "Turn willingness into useful work, community connection, and visible impact.",
