@@ -1,22 +1,21 @@
 {/* =========================
-   CINEMATIC HERO BACKGROUND
-   REPLACE YOUR CURRENT HERO
+   FINAL CINEMATIC HERO
 ========================= */}
 
 <div className="fixed inset-0 overflow-hidden">
   <img
     src={active.image}
     alt="Bronson Family Farm"
-    className="h-full w-full object-cover scale-[1.04] opacity-40 transition-all duration-[12000ms]"
+    className="h-full w-full object-cover object-center scale-[1.04] opacity-[0.58] transition-all duration-[12000ms]"
   />
 </div>
 
-<div className="fixed inset-0 bg-gradient-to-br from-black/78 via-emerald-950/52 to-black/82" />
+<div className="fixed inset-0 bg-gradient-to-br from-black/78 via-[#183222]/38 to-black/82" />
 
 <div className="fixed inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(255,255,255,.10),transparent_26%),radial-gradient(circle_at_78%_12%,rgba(255,233,168,.10),transparent_24%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,.14),transparent_32%)]" />
 
 {/* =========================
-   HERO CONTENT
+   MAIN EXPERIENCE
 ========================= */}
 
 <section className="relative z-10 min-h-screen">
@@ -31,8 +30,10 @@
           BRONSON FAMILY FARM
         </p>
 
-        <h1 className="mt-5 max-w-5xl text-6xl font-black leading-[0.88] tracking-[-0.05em] text-white drop-shadow-2xl md:text-8xl xl:text-[7rem]">
-          Step Into The Ecosystem.
+        <h1 className="mt-5 max-w-6xl text-6xl font-black leading-[0.88] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-8xl xl:text-[8rem]">
+          Step Into The Farm.
+          <br />
+          Experience The Wonders Of Life.
         </h1>
 
         <div className="mt-5 text-2xl font-semibold text-emerald-100/90 md:text-3xl">
@@ -87,9 +88,9 @@
       ))}
     </nav>
 
-    {/* MAIN CINEMATIC LAYOUT */}
+    {/* EXPERIENCE GRID */}
 
-    <div className="mt-10 grid min-h-[720px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
+    <div className="mt-10 grid min-h-[860px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
 
       {/* LEFT SIDE */}
 
@@ -135,12 +136,14 @@
         </div>
       </div>
 
-      {/* RIGHT SIDE IMAGE + JOURNEY */}
+      {/* RIGHT SIDE */}
 
-      <div className="relative min-h-[700px]">
+      <div className="relative min-h-[760px]">
+
+        {/* IMAGE PANEL */}
 
         <div
-          className="absolute right-0 top-0 h-[74%] w-[88%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
+          className="absolute right-0 top-0 h-[82%] w-[92%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
           style={{
             backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.18)), url(${active.image})`,
           }}
@@ -160,7 +163,7 @@
 
         {/* JOURNEY CARD */}
 
-        <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#f4f7df]/95 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
+        <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#eef3dd]/92 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
 
           <p className="text-xs font-black uppercase tracking-[.32em] text-emerald-900/65">
             Pathway Journey
@@ -174,6 +177,8 @@
             {currentStep.body}
           </p>
 
+          {/* NEXT ACTION */}
+
           <div className="mt-5 rounded-[2rem] bg-[#0d3a26] p-5 text-white">
 
             <p className="text-xs font-black uppercase tracking-[.28em] text-lime-100/75">
@@ -185,7 +190,7 @@
             </p>
           </div>
 
-          {/* FINAL ECOSYSTEM DECISION */}
+          {/* ECOSYSTEM DECISION */}
 
           <div className="mt-6 rounded-[2rem] border border-emerald-900/10 bg-white p-5">
 
