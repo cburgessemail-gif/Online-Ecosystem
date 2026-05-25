@@ -10,7 +10,7 @@ type Language =
   | "עברית"
   | "Français";
 
-type PathKey =
+type PathwayKey =
   | "guest"
   | "grower"
   | "youth"
@@ -22,28 +22,9 @@ type PathKey =
   | "supervisor"
   | "parent";
 
-type JourneyStep = {
-  label: string;
-  title: string;
-  text: string;
-  points: string[];
-  decision: string;
-  action: string;
-};
+type JourneyStage = "entry" | "experience" | "decision" | "action" | "share";
 
-type Journey = {
-  key: PathKey;
-  nav: string;
-  title: string;
-  subtitle: string;
-  image: string;
-  accent: string;
-  needMet: string;
-  benefit: string;
-  destination: string;
-  share: string;
-  steps: JourneyStep[];
-};
+type WorkforceTab = "checkin" | "attendance" | "ppe" | "skills" | "rubric" | "parent";
 
 const languages: Language[] = [
   "English",
@@ -90,353 +71,422 @@ const IMG = {
   sameera5: "/images/Samerra5.jpg",
 };
 
-const t: Record<
-  Language,
-  {
-    home: string;
-    guided: string;
-    marketplace: string;
-    partners: string;
-    workforce: string;
-    feedback: string;
-    title: string;
-    subtitle: string;
-    start: string;
-    continue: string;
-    choose: string;
-    completed: string;
-    language: string;
-  }
-> = {
+const ui: Record<Language, Record<string, string>> = {
   English: {
     home: "Home",
-    guided: "Guided Tour",
+    tour: "Guided Tour",
     marketplace: "Marketplace",
     partners: "Partners",
     workforce: "Workforce",
     feedback: "Feedback",
-    title: "Step Into The Farm. Experience The Wonders Of Life.",
-    subtitle:
-      "A living ecosystem connecting youth workforce development, growers, marketplace systems, schools, wellness, agritourism, food access, leadership, and community revitalization.",
-    start: "Begin Guided Tour",
+    begin: "Begin Guided Tour",
     continue: "Continue Journey",
-    choose: "Choose Your Pathway",
-    completed: "Completed",
-    language: "Language",
+    next: "Next",
+    back: "Back",
+    complete: "Complete Step",
+    explore: "Explore Pathway",
+    decision: "Make Decision",
+    share: "Share Feedback",
+    operational: "Open Workforce Tools",
   },
   Español: {
     home: "Inicio",
-    guided: "Recorrido",
+    tour: "Recorrido Guiado",
     marketplace: "Mercado",
-    partners: "Aliados",
-    workforce: "Jóvenes",
+    partners: "Socios",
+    workforce: "Fuerza Laboral",
     feedback: "Comentarios",
-    title: "Entre a la finca. Experimente las maravillas de la vida.",
-    subtitle:
-      "Un ecosistema vivo que conecta jóvenes, agricultores, mercado, escuelas, bienestar, acceso a alimentos y revitalización comunitaria.",
-    start: "Comenzar Recorrido",
-    continue: "Continuar",
-    choose: "Elija Su Camino",
-    completed: "Completado",
-    language: "Idioma",
+    begin: "Comenzar Recorrido",
+    continue: "Continuar Camino",
+    next: "Siguiente",
+    back: "Atrás",
+    complete: "Completar Paso",
+    explore: "Explorar Camino",
+    decision: "Tomar Decisión",
+    share: "Compartir Comentarios",
+    operational: "Abrir Herramientas",
   },
   Tagalog: {
     home: "Home",
-    guided: "Gabay",
-    marketplace: "Pamilihan",
-    partners: "Kasosyo",
-    workforce: "Kabataan",
-    feedback: "Puna",
-    title: "Pumasok sa sakahan. Damhin ang hiwaga ng buhay.",
-    subtitle:
-      "Isang buhay na ekosistema na nag-uugnay sa kabataan, growers, pamilihan, paaralan, kalusugan, pagkain, pamumuno, at komunidad.",
-    start: "Simulan ang Gabay",
-    continue: "Magpatuloy",
-    choose: "Piliin ang Daan",
-    completed: "Tapos",
-    language: "Wika",
+    tour: "Gabay na Tour",
+    marketplace: "Marketplace",
+    partners: "Partners",
+    workforce: "Workforce",
+    feedback: "Feedback",
+    begin: "Simulan ang Tour",
+    continue: "Ipagpatuloy",
+    next: "Susunod",
+    back: "Bumalik",
+    complete: "Kumpletuhin",
+    explore: "Tuklasin",
+    decision: "Magpasya",
+    share: "Magbigay ng Feedback",
+    operational: "Buksan ang Tools",
   },
   Italiano: {
     home: "Home",
-    guided: "Tour",
+    tour: "Tour Guidato",
     marketplace: "Mercato",
     partners: "Partner",
-    workforce: "Giovani",
-    feedback: "Riscontro",
-    title: "Entra nella fattoria. Vivi le meraviglie della vita.",
-    subtitle:
-      "Un ecosistema vivo che collega giovani, produttori, mercato, scuole, benessere, accesso al cibo, leadership e comunità.",
-    start: "Inizia il Tour",
-    continue: "Continua",
-    choose: "Scegli il Percorso",
-    completed: "Completato",
-    language: "Lingua",
+    workforce: "Forza Lavoro",
+    feedback: "Feedback",
+    begin: "Inizia Tour",
+    continue: "Continua Percorso",
+    next: "Avanti",
+    back: "Indietro",
+    complete: "Completa Passo",
+    explore: "Esplora Percorso",
+    decision: "Prendi Decisione",
+    share: "Condividi Feedback",
+    operational: "Apri Strumenti",
   },
   עברית: {
     home: "בית",
-    guided: "סיור",
+    tour: "סיור מודרך",
     marketplace: "שוק",
     partners: "שותפים",
-    workforce: "נוער",
+    workforce: "כוח עבודה",
     feedback: "משוב",
-    title: "היכנסו לחווה. חוו את פלאי החיים.",
-    subtitle:
-      "מערכת חיה המחברת נוער, מגדלים, שוק, בתי ספר, בריאות, מזון, מנהיגות וקהילה.",
-    start: "התחל סיור",
-    continue: "המשך",
-    choose: "בחר מסלול",
-    completed: "הושלם",
-    language: "שפה",
+    begin: "התחל סיור",
+    continue: "המשך מסלול",
+    next: "הבא",
+    back: "חזור",
+    complete: "השלם שלב",
+    explore: "חקור מסלול",
+    decision: "קבל החלטה",
+    share: "שתף משוב",
+    operational: "פתח כלים",
   },
   Français: {
     home: "Accueil",
-    guided: "Visite",
+    tour: "Visite Guidée",
     marketplace: "Marché",
     partners: "Partenaires",
-    workforce: "Jeunesse",
+    workforce: "Main-d’œuvre",
     feedback: "Retour",
-    title: "Entrez dans la ferme. Découvrez les merveilles de la vie.",
-    subtitle:
-      "Un écosystème vivant reliant les jeunes, les producteurs, le marché, les écoles, le bien-être, l'accès alimentaire, le leadership et la communauté.",
-    start: "Commencer",
+    begin: "Commencer",
     continue: "Continuer",
-    choose: "Choisir un Parcours",
-    completed: "Terminé",
-    language: "Langue",
+    next: "Suivant",
+    back: "Retour",
+    complete: "Compléter",
+    explore: "Explorer",
+    decision: "Décider",
+    share: "Partager",
+    operational: "Ouvrir Outils",
   },
 };
 
-const journeys: Journey[] = [
+const pathwayData: Record<
+  PathwayKey,
   {
-    key: "guest",
-    nav: "Guest",
-    title: "Guest Pathway",
-    subtitle: "Understand the vision, story, place, and purpose.",
+    label: string;
+    short: string;
+    image: string;
+    outcome: string;
+    destination: string;
+    stages: Record<JourneyStage, { title: string; body: string; bullets: string[] }>;
+    connections: PathwayKey[];
+  }
+> = {
+  guest: {
+    label: "Guest Pathway",
+    short: "Understand the vision, story, place, and purpose.",
     image: IMG.queens,
-    accent: "from-emerald-200 to-lime-100",
-    needMet: "People need a clear first experience that explains why the farm matters.",
-    benefit: "Guests leave with language, context, and confidence to invite others.",
-    destination: "Decide whether to visit, share, volunteer, sponsor, or become part of the ecosystem.",
-    share: "Share the farm story with a family member, school, church, funder, or neighbor.",
-    steps: [
-      {
-        label: "Enter",
-        title: "Welcome Into The Living Farm",
-        text: "The guest begins with the land, the people, the food access need, and the promise of a community-centered destination.",
-        points: ["Legacy and land story", "Food access and wellness", "A real farm people can enter"],
-        decision: "Do I understand why Bronson Family Farm exists?",
-        action: "Continue to the role pathways.",
+    outcome: "A guest leaves knowing why the farm matters and where they fit.",
+    destination: "Choose a next role: customer, volunteer, partner, or grower.",
+    connections: ["customer", "volunteer", "partner", "grower"],
+    stages: {
+      entry: {
+        title: "Arrive at the farm story.",
+        body: "The guest enters through legacy, land, food access, youth development, wellness, and community restoration.",
+        bullets: ["See the farm purpose", "Understand the location", "Meet the ecosystem roles"],
       },
-      {
-        label: "Experience",
-        title: "See The Ecosystem In Motion",
-        text: "Guests see youth, growers, partners, marketplace, wellness, and family connection as one operating model.",
-        points: ["Youth workforce", "Grower supply market", "Community partnerships"],
-        decision: "Which part of the ecosystem connects with me?",
-        action: "Choose a pathway to explore deeper.",
+      experience: {
+        title: "Experience the living model.",
+        body: "The guest sees that the farm is not only a place to visit. It is a system people can participate in.",
+        bullets: ["Walk through growers", "See youth workforce", "View marketplace movement"],
       },
-      {
-        label: "Decide",
-        title: "Choose A Meaningful Next Step",
-        text: "The guest is not left watching a presentation. The experience ends with a clear invitation to participate.",
-        points: ["Visit", "Share", "Volunteer", "Sponsor", "Partner"],
-        decision: "How do I want to support or participate?",
-        action: "Send feedback or select another pathway.",
+      decision: {
+        title: "Decide how to participate.",
+        body: "The guest is invited to move from observation into belonging.",
+        bullets: ["Visit marketplace", "Volunteer", "Become a partner", "Share feedback"],
       },
-    ],
+      action: {
+        title: "Take the first action.",
+        body: "The pathway leads to clear next steps instead of ending with information.",
+        bullets: ["Register interest", "Join an event", "Explore another pathway"],
+      },
+      share: {
+        title: "Share the experience.",
+        body: "The guest can invite others, offer feedback, and continue through the ecosystem.",
+        bullets: ["Share with family", "Send feedback", "Continue journey"],
+      },
+    },
   },
-  {
-    key: "grower",
-    nav: "Grower",
-    title: "Grower Pathway",
-    subtitle: "Move from interest to production support, market readiness, and regional food participation.",
+  grower: {
+    label: "Grower Pathway",
+    short: "Connect producers to tools, knowledge, market access, and support.",
     image: IMG.growArea,
-    accent: "from-green-200 to-emerald-100",
-    needMet: "Small growers need tools, knowledge, market access, and support systems.",
-    benefit: "Growers can learn, produce, connect, and participate in a shared food system.",
-    destination: "Decide whether to become a grower, join market activity, request support, or collaborate.",
-    share: "Share with another backyard gardener, small farmer, school garden, or food producer.",
-    steps: [
-      {
-        label: "Assess",
-        title: "Start With What You Can Grow",
-        text: "The grower identifies land, containers, seedlings, season, labor, tools, and learning needs.",
-        points: ["Growing space", "Crop interests", "Tools and supplies", "Training needs"],
-        decision: "Do I want to grow for home, community, or market?",
-        action: "Select grower support resources.",
+    outcome: "A grower understands how to produce, prepare, sell, and collaborate.",
+    destination: "Become a participating grower or join the Growers Supply Market.",
+    connections: ["marketplace", "valueAdded", "partner", "volunteer"],
+    stages: {
+      entry: {
+        title: "Enter through growing capacity.",
+        body: "The grower pathway begins with land, soil, seeds, water, tools, and practical knowledge.",
+        bullets: ["Assess growing needs", "Review supplies", "Understand production goals"],
       },
-      {
-        label: "Prepare",
-        title: "Connect To Supplies And Knowledge",
-        text: "The grower connects to seeds, seedlings, Bubble Babies, soil, compost, demonstrations, and peer learning.",
-        points: ["Seeds and seedlings", "Compost and soil building", "Demonstrations", "Mentorship"],
-        decision: "What do I need to become ready?",
-        action: "Build a grower readiness list.",
+      experience: {
+        title: "Move from growing to readiness.",
+        body: "Growers connect to training, demonstrations, product planning, harvesting, packaging, and marketplace access.",
+        bullets: ["Production planning", "Food safety basics", "Packaging and labeling"],
       },
-      {
-        label: "Participate",
-        title: "Join The Food Movement",
-        text: "The grower can supply produce, attend market activity, teach others, or join cooperative production opportunities.",
-        points: ["Marketplace access", "Food distribution", "Community education", "Repeat growing cycles"],
-        decision: "Am I ready to become part of the ecosystem?",
-        action: "Request grower onboarding.",
+      decision: {
+        title: "Choose market participation.",
+        body: "The grower decides whether to sell, demonstrate, collaborate, teach, or receive technical support.",
+        bullets: ["Sell products", "Host a demonstration", "Join shared distribution"],
       },
-    ],
+      action: {
+        title: "Activate the grower relationship.",
+        body: "The system turns interest into a concrete grower profile, product list, and market pathway.",
+        bullets: ["Create grower profile", "Add products", "Select market channel"],
+      },
+      share: {
+        title: "Growers strengthen the network.",
+        body: "Growers share what works, support new growers, and help build regional food access.",
+        bullets: ["Share lessons", "Refer another grower", "Continue to marketplace"],
+      },
+    },
   },
-  {
-    key: "youth",
-    nav: "Youth",
-    title: "Youth Workforce Pathway",
-    subtitle: "An 8-week summer journey of responsibility, outdoor work, life skills, and future readiness.",
-    image: IMG.youth2,
-    accent: "from-yellow-100 to-emerald-100",
-    needMet: "Youth need structured work, caring supervision, skill-building, and visible progress.",
-    benefit: "Youth build responsibility, confidence, teamwork, safety habits, and leadership.",
-    destination: "Complete the summer experience with documented skills, supervisor feedback, and growth evidence.",
-    share: "Youth can share progress with parents, guardians, supervisors, partners, and future employers.",
-    steps: [
-      {
-        label: "Orient",
-        title: "Enter With Safety And Purpose",
-        text: "Youth begin with orientation, PPE expectations, media releases, daily rhythm, and clear worksite rules.",
-        points: ["No PPE, no work", "Attendance expectations", "Team assignments", "Farm safety"],
-        decision: "Am I ready to work safely and show up consistently?",
-        action: "Complete orientation checklist.",
+  youth: {
+    label: "Youth Workforce",
+    short: "Build skills, responsibility, confidence, and future readiness.",
+    image: IMG.youth1,
+    outcome: "Youth complete real work, earn skills, and see progress.",
+    destination: "Join the 8-week youth workforce experience with supervisor tracking.",
+    connections: ["supervisor", "parent", "marketplace", "volunteer"],
+    stages: {
+      entry: {
+        title: "Begin with orientation and belonging.",
+        body: "Youth enter with structure, safety expectations, PPE, roles, and daily rhythm.",
+        bullets: ["Orientation", "PPE expectations", "Daily check-in"],
       },
-      {
-        label: "Work",
-        title: "Learn By Doing Real Farm Tasks",
-        text: "Youth participate in growing, watering, weeding, compost, setup, marketplace support, cleanup, and reflection.",
-        points: ["Daily check-in", "Assigned tasks", "Skill practice", "Team communication"],
-        decision: "What skill am I improving today?",
-        action: "Log daily work and supervisor observation.",
+      experience: {
+        title: "Practice real work in a real ecosystem.",
+        body: "Youth participate in growing, market preparation, site care, teamwork, service, and reflection.",
+        bullets: ["Farm tasks", "Team assignments", "Leadership habits"],
       },
-      {
-        label: "Grow",
-        title: "Build A Visible Record Of Progress",
-        text: "The supervisor tracks attendance, PPE, participation, teamwork, skills, reflection, and milestone growth.",
-        points: ["Badges", "Rubrics", "Life skills progression", "Parent connection"],
-        decision: "What evidence shows that I am growing?",
-        action: "Complete progress review.",
+      decision: {
+        title: "Choose growth goals.",
+        body: "Youth see their progress and choose which skills they want to strengthen.",
+        bullets: ["Attendance", "Responsibility", "Communication", "Work quality"],
       },
-    ],
+      action: {
+        title: "Track progress with supervisors.",
+        body: "Supervisors record participation, PPE, skills, rubrics, and milestones on mobile phones.",
+        bullets: ["Skill tracking", "Daily rubric", "Progress badges"],
+      },
+      share: {
+        title: "Connect family and future.",
+        body: "Parents and guardians can understand youth growth, milestones, and next steps.",
+        bullets: ["Parent updates", "Youth reflection", "Completion pathway"],
+      },
+    },
   },
-  {
-    key: "customer",
-    nav: "Customer",
-    title: "Customer Pathway",
-    subtitle: "Move from interest to healthy food choices, marketplace access, and repeat participation.",
-    image: IMG.marketplaceHero,
-    accent: "from-orange-100 to-emerald-100",
-    needMet: "Families need fresh food, nutrition education, and simple ways to return.",
-    benefit: "Customers can discover produce, seedlings, demonstrations, and food knowledge in one place.",
-    destination: "Decide what to buy, learn, pre-order, share, or return for next.",
-    share: "Share marketplace access with families, neighbors, and wellness partners.",
-    steps: [
-      {
-        label: "Discover",
-        title: "Find Food, Seedlings, And Support",
-        text: "Customers see fresh produce, seedlings, Bubble Babies, demonstrations, wellness education, and practical food options.",
-        points: ["Fresh produce", "Seedlings", "Nutrition", "Demonstrations"],
-        decision: "What do I want to take home or learn today?",
-        action: "Open marketplace options.",
-      },
-      {
-        label: "Choose",
-        title: "Make Healthy Repeat Choices",
-        text: "The system supports repeat food decisions, seasonal education, and connection to future market dates.",
-        points: ["Seasonal availability", "Pre-orders", "SNAP-aware shopping", "Cooking ideas"],
-        decision: "What healthy choice can I repeat?",
-        action: "Save or share marketplace access.",
-      },
-      {
-        label: "Return",
-        title: "Become Part Of The Customer Community",
-        text: "Customers can return as shoppers, volunteers, growers, family supporters, or event participants.",
-        points: ["Return visits", "Community events", "Feedback", "Family invitations"],
-        decision: "How will I stay connected?",
-        action: "Send feedback or join another pathway.",
-      },
-    ],
-  },
-  {
-    key: "marketplace",
-    nav: "Marketplace",
-    title: "Marketplace Pathway",
-    subtitle: "Convert interest into purchasing power, sustainability, and coordinated food movement.",
+  customer: {
+    label: "Customer Pathway",
+    short: "Connect families to fresh food, nutrition, seedlings, and repeat healthy choices.",
     image: IMG.seeds,
-    accent: "from-lime-100 to-yellow-100",
-    needMet: "The ecosystem needs a visible place where food, tools, education, and relationships move together.",
-    benefit: "The marketplace becomes a destination for growers, customers, youth, partners, and community food access.",
-    destination: "Decide what moves through the market: produce, seedlings, supplies, learning, sponsorship, or distribution.",
-    share: "Share the marketplace with customers, vendors, growers, schools, and funders.",
-    steps: [
-      {
-        label: "Connect",
-        title: "Bring The Market Together",
-        text: "The market connects growers, seedlings, food, supplies, demonstrations, nutrition, and community partners.",
-        points: ["Vendors", "Growers", "Seedlings", "Food education"],
-        decision: "What belongs in this market experience?",
-        action: "Review marketplace categories.",
+    outcome: "Customers understand what they can buy, grow, learn, and return for.",
+    destination: "Shop marketplace, pre-order seedlings, attend demos, or join nutrition education.",
+    connections: ["marketplace", "guest", "valueAdded", "grower"],
+    stages: {
+      entry: {
+        title: "Enter through food access.",
+        body: "Customers are welcomed through fresh food, seedlings, practical education, and community trust.",
+        bullets: ["Fresh produce", "Seedlings", "Nutrition education"],
       },
-      {
-        label: "Operate",
-        title: "Support Real Movement",
-        text: "The marketplace is not just a display. It supports ordering, pickup, demos, check-in, engagement, and follow-up.",
-        points: ["QR entry", "Orders", "Pickup", "Education", "Follow-up"],
-        decision: "How does this market become sustainable?",
-        action: "Select a marketplace action.",
+      experience: {
+        title: "Learn what supports the household.",
+        body: "The customer pathway connects purchases to cooking, growing, wellness, and repeat participation.",
+        bullets: ["Healthy choices", "Simple growing options", "Family-friendly learning"],
       },
-      {
-        label: "Sustain",
-        title: "Build Repeat Participation",
-        text: "The system invites customers and growers back into recurring cycles of growing, buying, learning, and sharing.",
-        points: ["Return customers", "Recurring growers", "Community data", "Sponsor visibility"],
-        decision: "What should continue after the event?",
-        action: "Share or sponsor the market.",
+      decision: {
+        title: "Decide how to use the marketplace.",
+        body: "Customers can shop, pre-order, attend demonstrations, or share what their household needs.",
+        bullets: ["Buy", "Pre-order", "Attend demo", "Request support"],
       },
-    ],
+      action: {
+        title: "Move into marketplace access.",
+        body: "The experience should lead to a store, pickup, event, or contact decision.",
+        bullets: ["Open marketplace", "Save pickup reminder", "Share needs"],
+      },
+      share: {
+        title: "Bring others into healthy choices.",
+        body: "Customers help expand community participation by sharing the farm with neighbors and family.",
+        bullets: ["Invite family", "Share feedback", "Return to marketplace"],
+      },
+    },
   },
-  {
-    key: "partner",
-    nav: "Partner",
-    title: "Partner Pathway",
-    subtitle: "Align resources, collaboration, visibility, and community benefit.",
+  marketplace: {
+    label: "Marketplace Pathway",
+    short: "Convert interest into purchasing power, distribution, and sustainability.",
+    image: IMG.marketplaceHero,
+    outcome: "The marketplace becomes the movement point for food, growers, customers, and partners.",
+    destination: "Access the marketplace system and connect products to people.",
+    connections: ["customer", "grower", "valueAdded", "partner"],
+    stages: {
+      entry: {
+        title: "Enter the growers supply market.",
+        body: "The marketplace brings together seedlings, produce, tools, education, demonstrations, and food access.",
+        bullets: ["Products", "Growers", "Education", "Community access"],
+      },
+      experience: {
+        title: "See food moving through the ecosystem.",
+        body: "Marketplace participation connects production, ordering, pickup, demonstrations, nutrition, and community learning.",
+        bullets: ["Pre-orders", "Pickup flow", "Product education"],
+      },
+      decision: {
+        title: "Choose a market action.",
+        body: "The user decides whether to shop, sell, demonstrate, sponsor, or refer others.",
+        bullets: ["Shop", "Sell", "Demonstrate", "Sponsor"],
+      },
+      action: {
+        title: "Activate marketplace movement.",
+        body: "The pathway should never dead-end. It should route the user to the next action.",
+        bullets: ["Open store", "Create product list", "Join event"],
+      },
+      share: {
+        title: "Share market opportunity.",
+        body: "The marketplace grows when customers, growers, and partners share the opportunity.",
+        bullets: ["Share product", "Invite grower", "Send feedback"],
+      },
+    },
+  },
+  partner: {
+    label: "Partner Pathway",
+    short: "Align resources, collaboration, education, wellness, and community benefit.",
     image: IMG.partners,
-    accent: "from-sky-100 to-emerald-100",
-    needMet: "Partners need clarity on where their resources fit and what benefit they help create.",
-    benefit: "Partners see specific contribution lanes tied to outcomes, visibility, and community impact.",
-    destination: "Decide whether to support youth, tools, food access, infrastructure, education, wellness, or sponsorship.",
-    share: "Share the ecosystem with funders, agencies, churches, schools, businesses, and civic leaders.",
-    steps: [
-      {
-        label: "Align",
-        title: "Find The Right Contribution Lane",
-        text: "Partners identify whether they support workforce, infrastructure, education, wellness, supplies, outreach, or funding.",
-        points: ["Workforce", "Infrastructure", "Education", "Wellness", "Funding"],
-        decision: "Which contribution matches our mission?",
-        action: "Select a partner lane.",
+    outcome: "Partners see clear roles, benefits, and next steps.",
+    destination: "Select partnership type and identify the next collaboration action.",
+    connections: ["workforce" as PathwayKey, "marketplace", "volunteer", "grower"].filter(Boolean) as PathwayKey[],
+    stages: {
+      entry: {
+        title: "Enter through shared purpose.",
+        body: "Partners connect through food access, workforce, wellness, education, infrastructure, and revitalization.",
+        bullets: ["Shared mission", "Community benefit", "Visible impact"],
       },
-      {
-        label: "Activate",
-        title: "Make Support Visible And Useful",
-        text: "Partner support becomes practical: fencing, compost, seeds, volunteers, training, media, food education, or youth support.",
-        points: ["Donations", "Technical assistance", "In-kind support", "Program support"],
-        decision: "What can we provide now?",
-        action: "Submit partner interest.",
+      experience: {
+        title: "Match resources to ecosystem needs.",
+        body: "The partner experience clarifies how each contribution strengthens operations.",
+        bullets: ["Tools", "Training", "Funding", "Promotion", "Volunteers"],
       },
-      {
-        label: "Strengthen",
-        title: "Build A Mutually Beneficial Relationship",
-        text: "The partnership continues through shared outcomes, reports, visibility, referrals, and future planning.",
-        points: ["Reports", "Recognition", "Ongoing collaboration", "Shared outcomes"],
-        decision: "How do we continue together?",
-        action: "Schedule follow-up.",
+      decision: {
+        title: "Choose a partnership lane.",
+        body: "Partners decide whether to sponsor, provide supplies, train youth, host demos, or support food access.",
+        bullets: ["Sponsor", "Donate supplies", "Train", "Refer", "Promote"],
       },
-    ],
+      action: {
+        title: "Move into a partner action plan.",
+        body: "The partner pathway converts goodwill into a specific ask, timeline, and next meeting.",
+        bullets: ["Define role", "Confirm support", "Schedule next step"],
+      },
+      share: {
+        title: "Tell the impact story.",
+        body: "Partners help show the community that the ecosystem is real and supported.",
+        bullets: ["Share report", "Invite collaborators", "Continue partnership"],
+      },
+    },
   },
-  {
-    key: "volunteer",
-    nav: "Volunteer",
-    title: "Volunteer Pathway",
-    subtitle: "Turn willingness into useful work, community connection, and visible impact.",
+  volunteer: {
+    label: "Volunteer Pathway",
+    short: "Turn community willingness into meaningful service.",
+    image: IMG.volunteers,
+    outcome: "Volunteers know where they are needed and how to serve safely.",
+    destination: "Sign up for a service role, event shift, or farm workday.",
+    connections: ["guest", "youth", "marketplace", "partner"],
+    stages: {
+      entry: {
+        title: "Enter through service.",
+        body: "Volunteers are welcomed into practical tasks that support the farm and community.",
+        bullets: ["Farm workdays", "Event support", "Youth support"],
+      },
+      experience: {
+        title: "Serve with structure.",
+        body: "Volunteers receive clear roles, safety expectations, tools, and a purpose for the day.",
+        bullets: ["Role assignment", "Safety", "Team support"],
+      },
+      decision: {
+        title: "Choose a service lane.",
+        body: "Volunteers can support growing, events, marketplace, youth, setup, cleanup, or outreach.",
+        bullets: ["Grow", "Build", "Teach", "Welcome", "Support"],
+      },
+      action: {
+        title: "Commit to a shift.",
+        body: "The volunteer pathway leads to scheduling and communication.",
+        bullets: ["Select shift", "Confirm availability", "Receive instructions"],
+      },
+      share: {
+        title: "Invite others to serve.",
+        body: "Volunteers expand capacity by bringing others into meaningful work.",
+        bullets: ["Invite a friend", "Share experience", "Return for next day"],
+      },
+    },
+  },
+  valueAdded: {
+    label: "Value-Added Producer",
+    short: "Connect culinary, herbs, mushrooms, flowers, and product development.",
+    image: IMG.culinaryFlowers,
+    outcome: "Value-added producers see how raw products become education, revenue, and wellness.",
+    destination: "Develop a product, demonstration, class, or market offering.",
+    connections: ["marketplace", "grower", "customer", "partner"],
+    stages: {
+      entry: {
+        title: "Enter through product possibility.",
+        body: "Value-added production connects growing to cooking, wellness, education, and small enterprise.",
+        bullets: ["Herbs", "Mushrooms", "Edible flowers", "Culinary learning"],
+      },
+      experience: {
+        title: "Turn farm output into learning and products.",
+        body: "The pathway links production to recipes, demonstrations, packaging, and sales.",
+        bullets: ["Recipe ideas", "Demo planning", "Packaging basics"],
+      },
+      decision: {
+        title: "Choose a product or learning format.",
+        body: "The user decides whether to demonstrate, sell, teach, or collaborate.",
+        bullets: ["Demo", "Product", "Workshop", "Collaboration"],
+      },
+      action: {
+        title: "Build a value-added offer.",
+        body: "The system turns the idea into a market-ready action.",
+        bullets: ["Define offer", "Set date", "Connect to marketplace"],
+      },
+      share: {
+        title: "Share knowledge and taste.",
+        body: "Value-added producers help families use fresh food in daily life.",
+        bullets: ["Share recipes", "Invite customers", "Support nutrition"],
+      },
+    },
+  },
+  supervisor: {
+    label: "Supervisor Pathway",
+    short: "Track youth attendance, PPE, skills, behavior, rubrics, and milestones by phone.",
+    image: IMG.sameera3,
+    outcome: "Supervisors can manage youth progress clearly and consistently.",
+    destination: "Open supervisor tools and record daily progress.",
+    connections: ["youth", "parent", "volunteer", "partner"],
+    stages: {
+      entry: {
+        title: "Enter through daily responsibility.",
+        body: "Supervisors begin with attendance, role assignments, PPE, safety, and the day’s work plan.",
+        bullets: ["Daily roster", "Check-in", "PPE verification"],
+      },
+      experience: {
+        title: "Observe work in real time.",
+        body: "Supervisors track participation, teamwork, communication, initiative, and skill development.",
+        bullets: ["Observe", "Coach", "Record", "Encourage"],
+      },
+      decision: {
+        title: "Identify youth support needs.",
+        body: "Supervisors decide when youth need coaching, recognition, redirection, or parent communication.",
+        bullets: ["Co
