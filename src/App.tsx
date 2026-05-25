@@ -1,453 +1,282 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
-type Screen =
-  | "entrance"
-  | "youth"
+type LangKey = "English" | "Español" | "Tagalog" | "Italiano" | "עברית" | "Français";
+
+type ScreenKey =
+  | "home"
+  | "ecosystem"
+  | "guest"
+  | "story"
+  | "customer"
   | "marketplace"
-  | "growers"
-  | "partners"
-  | "nutrition"
-  | "events";
+  | "grower"
+  | "planner"
+  | "valueAdded"
+  | "youth"
+  | "supervisor"
+  | "partner"
+  | "events"
+  | "wellness"
+  | "decision"
+  | "feedback";
 
-type Language =
-  | "English"
-  | "Español"
-  | "Tagalog"
-  | "Italiano"
-  | "Patwa"
-  | "Hebrew";
+type Action = { label: string; to?: ScreenKey; href?: string; modal?: keyof typeof IMAGES };
+type DetailBlock = { title: string; text: string };
 
-const IMG = {
-  entrance: "/images/SAM_0427.JPG",
-  entrance2: "/images/large (25).jpg",
-  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
-
-  youth: "/images/SAM_0412.JPG",
-  youth2: "/images/SAM_0401.JPG",
-
-  marketplace: "/images/SAM_0407.JPG",
-  marketplace2: "/images/SAM_0405.JPG",
-
-  growers: "/images/SAM_0415.JPG",
-  growers2: "/images/SAM_0393.JPG",
-
-  nutrition: "/images/culniary_edibleflowers.jpeg",
-
-  events: "/images/WKBN Interview.png",
-
-  partners: "/images/Partners.png",
-
-  field: "/images/Grow Area.png",
-  sunrise: "/images/GrowArea2.jpg",
-};
-
-const languages: Language[] = [
-  "English",
-  "Español",
-  "Tagalog",
-  "Italiano",
-  "Patwa",
-  "Hebrew",
-];
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-function AmbientBackground({
-  images,
-}: {
-  images: string[];
-}) {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 9000);
-
-    return () => clearInterval(timer);
-  }, [images.length]);
-
-  return (
-    <div className="fixed inset-0 overflow-hidden">
-      {images.map((img, i) => (
-        <img
-          key={img}
-          src={img}
-          alt=""
-          className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity duration-[4000ms] scale-105",
-            index === i ? "opacity-100" : "opacity-0"
-          )}
-        />
-      ))}
-
-      <div className="absolute inset-0 bg-black/60" />
-
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-emerald-950/40 to-black" />
-
-      <div className="absolute inset-0 backdrop-blur-[1px]" />
-
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute left-[10%] top-[20%] h-72 w-72 rounded-full bg-emerald-400 blur-[140px]" />
-        <div className="absolute right-[8%] top-[55%] h-96 w-96 rounded-full bg-emerald-600 blur-[160px]" />
-      </div>
-    </div>
-  );
-}
-
-function NavButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "rounded-full border px-5 py-3 text-sm tracking-wide transition-all duration-500",
-        active
-          ? "border-emerald-300/50 bg-emerald-400/20 text-white shadow-lg shadow-emerald-500/20"
-          : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
-      )}
-    >
-      {label}
-    </button>
-  );
-}
-
-function SectionTitle({
-  eyebrow,
-  title,
-  text,
-}: {
+type ScreenContent = {
   eyebrow: string;
   title: string;
-  text?: string;
-}) {
-  return (
-    <div className="max-w-5xl">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-200/70">
-        {eyebrow}
-      </div>
-
-      <h1 className="mt-5 text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">
-        {title}
-      </h1>
-
-      {text ? (
-        <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/85">
-          {text}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function CinematicPanel({
-  image,
-  title,
-  text,
-  height = "700px",
-}: {
+  subtitle: string;
   image: string;
-  title: string;
-  text: string;
-  height?: string;
-}) {
-  return (
-    <div
-      className="relative overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl"
-      style={{ height }}
-    >
-      <img
-        src={image}
-        alt={title}
-        className="absolute inset-0 h-full w-full object-cover scale-105"
-      />
+  imageAlt: string;
+  mission: string;
+  need: string;
+  destination: string;
+  details: DetailBlock[];
+  actions: Action[];
+};
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/5" />
+const LANGS: LangKey[] = ["English", "Español", "Tagalog", "Italiano", "עברית", "Français"];
 
-      <div className="relative z-10 flex h-full flex-col justify-end p-8 md:p-12">
-        <div className="max-w-4xl">
-          <h2 className="text-4xl font-black md:text-6xl">
-            {title}
-          </h2>
+const IMAGES = {
+  entrance: "/images/GrowArea.jpg",
+  ecosystem: "/images/GrowArea2.jpg",
+  guest: "/images/SAM_0377.JPG",
+  customer: "/images/SAM_0380.JPG",
+  grower: "/images/SAM_0384.JPG",
+  valueAdded: "/images/SAM_0391.JPG",
+  youth: "/images/SAM_0393.JPG",
+  supervisor: "/images/SAM_0396.JPG",
+  partner: "/images/SAM_0401.JPG",
+  story: "/images/SAM_0402.JPG",
+  marketplace: "/images/SAM_0405.JPG",
+  planner: "/images/SAM_0407.JPG",
+  events: "/images/SAM_0410.JPG",
+  wellness: "/images/SAM_0412.JPG",
+  decision: "/images/SAM_0415.JPG",
+  feedback: "/images/SAM_0417.JPG",
+  community: "/images/SAM_0420.JPG",
+  training: "/images/SAM_0423.JPG",
+  produce: "/images/SAM_0425.JPG",
+  nutrition: "/images/SAM_0427.JPG",
+  legacy: "/images/SAM_0430.JPG",
+};
 
-          <p className="mt-6 text-lg leading-9 text-emerald-50/85 md:text-xl">
-            {text}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+const UI: Record<LangKey, Record<string, string>> = {
+  English: {
+    demo: "BRONSON FAMILY FARM ECOSYSTEM",
+    mainTitle: "Connected Food Ecosystem Experience",
+    back: "Back",
+    next: "Next",
+    guided: "Begin Guided Tour",
+    pause: "Pause Tour",
+    roles: "Choose a pathway",
+    mission: "Mission",
+    need: "Need being met",
+    destination: "Destination / Decision",
+    strongest: "Next strongest moves",
+    gallery: "Image gallery",
+    return: "Return to Ecosystem",
+    feedback: "Feedback & Contact",
+  },
+  Español: {
+    demo: "ECOSISTEMA DE BRONSON FAMILY FARM",
+    mainTitle: "Experiencia de ecosistema alimentario conectado",
+    back: "Atrás",
+    next: "Siguiente",
+    guided: "Iniciar recorrido guiado",
+    pause: "Pausar recorrido",
+    roles: "Elija un camino",
+    mission: "Misión",
+    need: "Necesidad atendida",
+    destination: "Destino / Decisión",
+    strongest: "Próximos pasos",
+    gallery: "Galería de imágenes",
+    return: "Volver al ecosistema",
+    feedback: "Comentarios y contacto",
+  },
+  Tagalog: {
+    demo: "ECOSYSTEM NG BRONSON FAMILY FARM",
+    mainTitle: "Konektadong karanasan sa pagkain at komunidad",
+    back: "Bumalik",
+    next: "Susunod",
+    guided: "Simulan ang gabay na tour",
+    pause: "Ihinto muna ang tour",
+    roles: "Pumili ng landas",
+    mission: "Misyon",
+    need: "Pangangailangang tinutugunan",
+    destination: "Patutunguhan / Desisyon",
+    strongest: "Susunod na pinakamalakas na hakbang",
+    gallery: "Gallery ng larawan",
+    return: "Bumalik sa ecosystem",
+    feedback: "Feedback at contact",
+  },
+  Italiano: {
+    demo: "ECOSISTEMA BRONSON FAMILY FARM",
+    mainTitle: "Esperienza alimentare comunitaria connessa",
+    back: "Indietro",
+    next: "Avanti",
+    guided: "Avvia tour guidato",
+    pause: "Pausa tour",
+    roles: "Scegli un percorso",
+    mission: "Missione",
+    need: "Bisogno servito",
+    destination: "Destinazione / Decisione",
+    strongest: "Prossime mosse",
+    gallery: "Galleria immagini",
+    return: "Ritorna all'ecosistema",
+    feedback: "Feedback e contatto",
+  },
+  עברית: {
+    demo: "המערכת של חוות משפחת ברונסון",
+    mainTitle: "חוויה קהילתית מחוברת סביב מזון",
+    back: "חזרה",
+    next: "הבא",
+    guided: "התחל סיור מודרך",
+    pause: "השהה סיור",
+    roles: "בחר מסלול",
+    mission: "משימה",
+    need: "הצורך שנענה",
+    destination: "יעד / החלטה",
+    strongest: "הצעדים הבאים",
+    gallery: "גלריית תמונות",
+    return: "חזרה למערכת",
+    feedback: "משוב ויצירת קשר",
+  },
+  Français: {
+    demo: "ÉCOSYSTÈME BRONSON FAMILY FARM",
+    mainTitle: "Expérience alimentaire communautaire connectée",
+    back: "Retour",
+    next: "Suivant",
+    guided: "Démarrer la visite guidée",
+    pause: "Pause",
+    roles: "Choisir un parcours",
+    mission: "Mission",
+    need: "Besoin comblé",
+    destination: "Destination / Décision",
+    strongest: "Prochaines étapes",
+    gallery: "Galerie d'images",
+    return: "Retour à l'écosystème",
+    feedback: "Commentaires et contact",
+  },
+};
 
-export default function App() {
-  const [screen, setScreen] =
-    useState<Screen>("entrance");
+const SCREEN_ORDER: ScreenKey[] = [
+  "home",
+  "ecosystem",
+  "guest",
+  "story",
+  "customer",
+  "marketplace",
+  "grower",
+  "planner",
+  "valueAdded",
+  "youth",
+  "supervisor",
+  "partner",
+  "events",
+  "wellness",
+  "decision",
+  "feedback",
+];
 
-  const [language, setLanguage] =
-    useState<Language>("English");
+const ROLE_TILES: { key: ScreenKey; title: string; text: string; next: string[]; image: string }[] = [
+  { key: "guest", title: "Guest", text: "Discover the farm, the story, events, and the airport-connected grow areas.", next: ["Story", "Events", "Gallery"], image: IMAGES.guest },
+  { key: "customer", title: "Customer", text: "Move quickly to GrownBy, then return for recipes, nutrition, and fresh food guidance.", next: ["Marketplace", "Recipes", "Nutrition"], image: IMAGES.customer },
+  { key: "grower", title: "Grower", text: "Access planning, seasonal guidance, training, and ecosystem coordination.", next: ["Planner", "Seasonal Guidance", "Coordination"], image: IMAGES.grower },
+  { key: "valueAdded", title: "Value-Added Producer", text: "Explore branding, packaging, demonstrations, and local market opportunity.", next: ["Branding", "Packaging", "Market Access"], image: IMAGES.valueAdded },
+  { key: "youth", title: "Youth Workforce", text: "Experience the farm as a living classroom for agriculture, STEAM, teamwork, and enterprise.", next: ["Learning", "STEAM", "Responsibilities"], image: IMAGES.youth },
+  { key: "supervisor", title: "Supervisor", text: "Support youth workforce through scheduling, check-ins, wellness support, and accountability.", next: ["Scheduling", "Check-In", "Support"], image: IMAGES.supervisor },
+  { key: "partner", title: "Partner / Investor", text: "See where resources, funding, sponsorship, and collaboration strengthen the ecosystem.", next: ["Support", "Investment", "Impact"], image: IMAGES.partner },
+];
 
-  const backgroundImages = useMemo(() => {
-    switch (screen) {
-      case "youth":
-        return [IMG.youth, IMG.youth2];
-
-      case "marketplace":
-        return [IMG.marketplace, IMG.marketplace2];
-
-      case "growers":
-        return [IMG.growers, IMG.growers2];
-
-      default:
-        return [IMG.entrance, IMG.entrance2];
-    }
-  }, [screen]);
-
-  return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <AmbientBackground images={backgroundImages} />
-
-      <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-8 md:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-200/70">
-              Bronson Family Farm
-            </div>
-
-            <div className="mt-2 text-2xl font-black md:text-3xl">
-              Connected Ecosystem Experience
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <NavButton
-              label="Entrance"
-              active={screen === "entrance"}
-              onClick={() => setScreen("entrance")}
-            />
-
-            <NavButton
-              label="Youth Workforce"
-              active={screen === "youth"}
-              onClick={() => setScreen("youth")}
-            />
-
-            <NavButton
-              label="Marketplace"
-              active={screen === "marketplace"}
-              onClick={() => setScreen("marketplace")}
-            />
-
-            <NavButton
-              label="Growers"
-              active={screen === "growers"}
-              onClick={() => setScreen("growers")}
-            />
-
-            <NavButton
-              label="Partners"
-              active={screen === "partners"}
-              onClick={() => setScreen("partners")}
-            />
-
-            <NavButton
-              label="Nutrition"
-              active={screen === "nutrition"}
-              onClick={() => setScreen("nutrition")}
-            />
-
-            <NavButton
-              label="Events"
-              active={screen === "events"}
-              onClick={() => setScreen("events")}
-            />
-          </div>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {languages.map((lang) => (
-            <button
-              key={lang}
-              onClick={() => setLanguage(lang)}
-              className={cn(
-                "rounded-full px-4 py-2 text-xs transition-all",
-                language === lang
-                  ? "bg-white text-black"
-                  : "border border-white/10 bg-white/5 text-white/80"
-              )}
-            >
-              {lang}
-            </button>
-          ))}
-        </div>
-
-        {screen === "entrance" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Living Ecosystem"
-              title="Step Into The Ecosystem."
-              text="Bronson Family Farm is not a presentation. It is a living environment connecting youth workforce development, growers, food movement, schools, wellness, leadership, marketplace systems, and community transformation."
-            />
-
-            <CinematicPanel
-              image={IMG.entrance}
-              title="A Living Food Ecosystem"
-              text="The ecosystem connects workforce, agriculture, health, distribution, family engagement, grower participation, education, and community revitalization into one immersive experience."
-            />
-
-            <div className="grid gap-8 lg:grid-cols-3">
-              <CinematicPanel
-                image={IMG.youth}
-                title="Youth Workforce"
-                text="Youth move through real responsibilities, teamwork, leadership, and ecosystem participation."
-                height="500px"
-              />
-
-              <CinematicPanel
-                image={IMG.marketplace}
-                title="Marketplace"
-                text="Food moves from the field toward schools, families, wellness initiatives, and community destinations."
-                height="500px"
-              />
-
-              <CinematicPanel
-                image={IMG.growers}
-                title="Grower Ecosystem"
-                text="Growers connect to tools, infrastructure, education, and marketplace participation."
-                height="500px"
-              />
-            </div>
-          </div>
-        )}
-
-        {screen === "youth" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Youth Workforce Journey"
-              title="Youth Enter The Ecosystem."
-              text="The youth workforce pathway is not simply employment. It is participation in a living ecosystem built around responsibility, leadership, agriculture, teamwork, wellness, and future readiness."
-            />
-
-            <CinematicPanel
-              image={IMG.youth}
-              title="Arrival & Orientation"
-              text="Youth enter the environment through check-in, team formation, safety preparation, ecosystem expectations, and participation structure."
-            />
-
-            <CinematicPanel
-              image={IMG.youth2}
-              title="Field Participation"
-              text="Youth cultivate, organize, harvest, prepare, move inventory, support the marketplace, and contribute to community food systems."
-            />
-
-            <CinematicPanel
-              image={IMG.marketplace}
-              title="Food Movement & Community Impact"
-              text="The work produced through the ecosystem supports marketplaces, schools, families, and community wellness initiatives."
-            />
-          </div>
-        )}
-
-        {screen === "marketplace" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Marketplace Movement"
-              title="Food In Motion."
-              text="The marketplace is the movement center of the ecosystem where production, distribution, wellness, and community connection meet."
-            />
-
-            <CinematicPanel
-              image={IMG.marketplace}
-              title="Marketplace Activation"
-              text="Produce, value-added products, grower participation, and food distribution move together through one connected environment."
-            />
-
-            <CinematicPanel
-              image={IMG.marketplace2}
-              title="Distribution & Community Access"
-              text="The ecosystem supports schools, families, wellness initiatives, and food accessibility through coordinated marketplace systems."
-            />
-          </div>
-        )}
-
-        {screen === "growers" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Grower Ecosystem"
-              title="Growers Build The Ecosystem."
-              text="The ecosystem supports growers through education, participation, infrastructure, collaboration, marketplace access, and food movement."
-            />
-
-            <CinematicPanel
-              image={IMG.growers}
-              title="Production & Participation"
-              text="Growers participate in collaborative production, ecosystem support, and local food movement."
-            />
-
-            <CinematicPanel
-              image={IMG.growers2}
-              title="Food System Infrastructure"
-              text="The ecosystem creates pathways for local growers to participate in a larger connected food environment."
-            />
-          </div>
-        )}
-
-        {screen === "partners" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Partnership"
-              title="Partnership Expands The Ecosystem."
-              text="Partnerships strengthen infrastructure, workforce development, wellness, education, and long-term community impact."
-            />
-
-            <CinematicPanel
-              image={IMG.partners}
-              title="Community Collaboration"
-              text="Organizations, growers, educators, and supporters strengthen the ecosystem together."
-            />
-          </div>
-        )}
-
-        {screen === "nutrition" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Nutrition & Wellness"
-              title="Food Supports Wellness."
-              text="Nutrition, wellness, education, and fresh food access are integrated directly into the ecosystem experience."
-            />
-
-            <CinematicPanel
-              image={IMG.nutrition}
-              title="Nutrition Pathway"
-              text="Fresh food, culinary exploration, edible education, and wellness participation move together through the ecosystem."
-            />
-          </div>
-        )}
-
-        {screen === "events" && (
-          <div className="mt-10 space-y-20">
-            <SectionTitle
-              eyebrow="Events & Storytelling"
-              title="The Ecosystem Is Experienced Publicly."
-              text="Events create participation, visibility, storytelling, marketplace activation, and community engagement."
-            />
-
-            <CinematicPanel
-              image={IMG.events}
-              title="Community Activation"
-              text="The ecosystem becomes visible through events, demonstrations, education, media engagement, and marketplace participation."
-            />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+const CONTENT: Record<ScreenKey, ScreenContent> = {
+  home: {
+    eyebrow: "Welcome",
+    title: "Step into the Farm. Experience the wonders of life.",
+    subtitle: "A guided ecosystem for food access, growers, youth workforce, marketplace activity, health education, and community return.",
+    image: IMAGES.entrance,
+    imageAlt: "Bronson Family Farm entrance and growing area",
+    mission: "Invite people into the farm through a warm, visual, intuitive entry point.",
+    need: "People need to understand the story before they are asked to participate.",
+    destination: "Begin the guided tour or choose a pathway.",
+    details: [
+      { title: "One connected system", text: "The farm is not a single event or slide. It is a living ecosystem connecting people, food, land, learning, and opportunity." },
+      { title: "Built for action", text: "Every button leads somewhere specific: shop, learn, participate, supervise, volunteer, sponsor, or give feedback." },
+      { title: "Youth launch ready", text: "The structure supports the June 8 through August 28, 2026 Youth Workforce Program with supervisor and pathway logic." },
+    ],
+    actions: [{ label: "Enter Ecosystem", to: "ecosystem" }, { label: "Begin Guided Tour", to: "ecosystem" }],
+  },
+  ecosystem: {
+    eyebrow: "The Model",
+    title: "Connected Food Ecosystem",
+    subtitle: "Bronson Family Farm brings together growers, customers, youth, supervisors, partners, and community resources in one operational pathway system.",
+    image: IMAGES.ecosystem,
+    imageAlt: "Bronson Family Farm growing system",
+    mission: "Show how the whole model works before a person chooses their role.",
+    need: "The community needs more than food distribution. It needs tools, knowledge, people, training, and return pathways.",
+    destination: "Choose a role pathway and move from interest to decision.",
+    details: [
+      { title: "Food access", text: "Fresh food moves toward families, marketplace customers, schools, and community destinations." },
+      { title: "Grower supply market", text: "Tools, training, demonstrations, seeds, seedlings, planning, and sales channels support local growers." },
+      { title: "Wraparound ecosystem", text: "Youth, families, growers, vendors, partners, and supervisors are connected instead of operating separately." },
+    ],
+    actions: [{ label: "Choose Guest Path", to: "guest" }, { label: "Go to Youth Workforce", to: "youth" }, { label: "Partner / Investor View", to: "partner" }],
+  },
+  guest: {
+    eyebrow: "Guest Pathway",
+    title: "Come experience the farm first.",
+    subtitle: "Guests enter through story, place, events, beauty, and discovery before deciding how they want to participate.",
+    image: IMAGES.guest,
+    imageAlt: "Guest pathway farm image",
+    mission: "Help visitors understand why Bronson Family Farm exists and why the land matters.",
+    need: "Guests need a welcoming entry before they become customers, volunteers, donors, or advocates.",
+    destination: "Decide whether to attend, share, volunteer, shop, or bring others.",
+    details: [
+      { title: "Story and place", text: "The airport-connected farm, the growing areas, and the family legacy create a memorable first experience." },
+      { title: "Events as entry points", text: "Growers Supply Market and community events create natural reasons to return." },
+      { title: "Share the invitation", text: "Guests should leave with a simple story they can tell someone else." },
+    ],
+    actions: [{ label: "Open Story", to: "story" }, { label: "See Events", to: "events" }, { label: "Open Gallery", modal: "community" }],
+  },
+  story: {
+    eyebrow: "Story / Legacy",
+    title: "The farm carries family, land, culture, and future opportunity.",
+    subtitle: "The ecosystem honors the Bronson and Lorenzana legacy while building a practical food and workforce destination in Youngstown.",
+    image: IMAGES.story,
+    imageAlt: "Legacy pathway image",
+    mission: "Ground the demo in purpose before asking people to act.",
+    need: "People need meaning, trust, and context to understand why this work matters.",
+    destination: "Return to a role pathway with a stronger reason to participate.",
+    details: [
+      { title: "Legacy", text: "Family history, faith, education, agriculture, and community responsibility shape the farm's purpose." },
+      { title: "Place-based work", text: "The farm is rooted in Youngstown and speaks to food access, land use, workforce, and community revitalization." },
+      { title: "Future-building", text: "The story points forward: youth, growers, marketplace systems, and regional collaboration." },
+    ],
+    actions: [{ label: "Enter as Guest", to: "guest" }, { label: "Choose a Pathway", to: "ecosystem" }, { label: "Leave Feedback", to: "feedback" }],
+  },
+  customer: {
+    eyebrow: "Customer Pathway",
+    title: "Fresh food, nutrition, recipes, and return visits.",
+    subtitle: "Customers move quickly to the marketplace, then return for food guidance, nutrition education, and healthier choices.",
+    image: IMAGES.customer,
+    imageAlt: "Customer pathway image",
+    mission: "Convert interest into fresh food access and repeat participation.",
+    need: "Families need easier access to locally grown food and simple guidance for using it well.",
+    destination: "Shop, learn how to use the food, return, and share with others.",
+    details: [
+      { title: "Marketplace first", text: "The customer path should make the store easy to find without burying the action." },
+      { title: "Food guidance", text: "Recipes, nutrition notes, and produce education help customers feel confident." },
+      { title: "Healthy return loop", text: "Customers come back for seasonal produce, events, demonstrations, and wellness education." },
+    ],
+    actions: [{ label: "Go to Marketplace", to: "marketplace" }, { label: "Recipes & Nutrition", to: "wellness" }, { label: "Open GrownBy Store", href: "https://grownby.com/farms/bronson-family-farm/shop" }],
+  },
+  marketplace: {
+    eyebrow: "Marketplace",
+    title: "Move food from farm to families, schools, and community destinations.",
+    subtitle: "The marketplace connects products, preorders, SNAP-aware shopping logic, grower supply activity, and community-facing sales.",
+    image: IMAGES.marketplace,
+    imageAlt: "Marketplace pathway image",
+    mission: "Turn growing activity into economic, nutritional, and community value.",
+    need: "The ecosystem needs a sales channel so food, seedlings, and value-added products can move beyond the field.",
+    destination: "Shop, preorder, become a
