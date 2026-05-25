@@ -360,25 +360,23 @@ export default function App() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#07140d] text-white">
 
-      {/* BACKGROUND */}
+      {/* BACKGROUND IMAGE */}
 
       <div className="fixed inset-0 overflow-hidden">
         <img
           src={active.image}
           alt="Bronson Family Farm"
-          className="h-full w-full object-cover object-center scale-[1.04] opacity-[0.72] transition-all duration-[12000ms]"
+          className="h-full w-full object-cover object-center scale-[1.02] opacity-[0.82] transition-all duration-[12000ms]"
         />
       </div>
 
-      <div
-        className="fixed inset-0"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(0,0,0,.78) 0%, rgba(24,50,34,.38) 52%, rgba(0,0,0,.82) 100%)",
-        }}
-      />
+      {/* DARK OVERLAY */}
 
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(255,255,255,.10),transparent_26%),radial-gradient(circle_at_78%_12%,rgba(255,233,168,.10),transparent_24%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,.14),transparent_32%)]" />
+      <div className="fixed inset-0 bg-black/18" />
+
+      {/* CINEMATIC DEPTH */}
+
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/18 pointer-events-none" />
 
       {/* CONTENT */}
 
@@ -396,7 +394,7 @@ export default function App() {
                 BRONSON FAMILY FARM
               </p>
 
-              <h1 className="mt-5 max-w-7xl text-7xl font-black leading-[0.88] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-8xl xl:text-[9rem]">
+              <h1 className="mt-5 max-w-5xl text-6xl font-black leading-[0.9] tracking-[-0.05em] text-white drop-shadow-2xl [text-shadow:0_8px_45px_rgba(0,0,0,.45)] md:text-7xl xl:text-[7.2rem]">
 
                 Step Into The Farm.
                 <br />
@@ -407,7 +405,7 @@ export default function App() {
                 Connected Food Ecosystem Experience
               </div>
 
-              <p className="mt-8 max-w-4xl text-xl leading-9 text-white/84 md:text-2xl">
+              <p className="mt-8 max-w-4xl text-xl leading-9 text-white/90 md:text-2xl">
                 {active.description}
               </p>
             </div>
@@ -423,7 +421,7 @@ export default function App() {
                   className={`rounded-full border px-4 py-2 text-xs font-bold transition ${
                     lang === item
                       ? "border-white bg-white text-[#092216]"
-                      : "border-white/20 bg-white/10 text-white/80 backdrop-blur hover:bg-white/20"
+                      : "border-white/20 bg-white/10 text-white/90 backdrop-blur hover:bg-white/20"
                   }`}
                 >
                   {item}
@@ -455,11 +453,11 @@ export default function App() {
             ))}
           </nav>
 
-          {/* MAIN EXPERIENCE */}
+          {/* EXPERIENCE GRID */}
 
-          <div className="mt-10 grid min-h-[940px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
+          <div className="mt-10 grid min-h-[820px] gap-8 lg:grid-cols-[1.02fr_.98fr]">
 
-            {/* LEFT PANEL */}
+            {/* LEFT */}
 
             <div className="flex flex-col justify-center">
 
@@ -489,14 +487,14 @@ export default function App() {
               </div>
             </div>
 
-            {/* RIGHT PANEL */}
+            {/* RIGHT */}
 
             <div className="relative min-h-[760px]">
 
               {/* IMAGE CARD */}
 
               <div
-                className="absolute right-0 top-0 h-[88%] w-[95%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
+                className="absolute right-0 top-0 h-[78%] w-[88%] overflow-hidden rounded-[4rem] border border-white/25 bg-cover bg-center shadow-[0_34px_90px_rgba(0,0,0,.45)]"
                 style={{
                   backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.18)), url(${active.image})`,
                 }}
@@ -517,7 +515,7 @@ export default function App() {
 
               {/* JOURNEY CARD */}
 
-              <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#f3f5e8]/88 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
+              <div className="absolute bottom-0 left-0 w-[92%] rounded-[3rem] border border-white/20 bg-[#eef3dd]/94 p-6 text-[#092216] shadow-[0_30px_80px_rgba(0,0,0,.45)] md:p-8">
 
                 <p className="text-xs font-black uppercase tracking-[.32em] text-emerald-900/65">
                   Pathway Journey
@@ -544,7 +542,7 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* ECOSYSTEM DECISION */}
+                {/* DECISION */}
 
                 <div className="mt-6 rounded-[2rem] border border-emerald-900/10 bg-white p-5">
 
@@ -633,4 +631,3 @@ function DecisionButton({
     </button>
   );
 }
-export default App;
