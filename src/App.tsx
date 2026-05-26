@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type Language = "English" | "Español" | "Tagalog" | "Italiano" | "עברית" | "Français";
 
@@ -206,6 +206,136 @@ function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string
   );
 }
 
+
+
+const fieldStations = [
+  { station: "Grow Area", focus: "Planting, watering, scouting, harvest", pathway: "Youth + Grower", status: "Active" },
+  { station: "Compost & Soil", focus: "Compost movement, soil health, circular inputs", pathway: "Youth + Volunteer", status: "Active" },
+  { station: "Marketplace Prep", focus: "Sorting, labeling, QR/product readiness", pathway: "Marketplace", status: "Ready" },
+  { station: "Culinary / Wellness", focus: "Edible flowers, mushrooms, nutrition education", pathway: "Value-Added", status: "Learning" },
+  { station: "Fencing & Site Safety", focus: "Deer fencing, tool safety, perimeter checks", pathway: "Operations", status: "Priority" },
+  { station: "Media & Reflection", focus: "Story capture, youth reflection, proverbs", pathway: "Parent + Partner", status: "Daily" },
+];
+
+const pathwayDecisions: { label: string; target: Screen; note: string }[] = [
+  { label: "I am a youth worker", target: "youth", note: "Check in, receive assignment, reflect, and build skills." },
+  { label: "I supervise youth", target: "supervisor", note: "Use attendance, PPE, scoring, support notes, and incident tools." },
+  { label: "I am a parent/guardian", target: "parent", note: "Review attendance, alerts, badges, messages, and growth." },
+  { label: "I grow food", target: "grower", note: "Plan crops, watch weather, track inventory, and move harvest." },
+  { label: "I want food or seedlings", target: "marketplace", note: "Browse, learn, order, scan QR, and return." },
+  { label: "I can help", target: "volunteer", note: "Choose a work area and connect to the next farm need." },
+];
+
+const weatherFallback = {
+  temp: "--",
+  wind: "--",
+  rain: "Check live",
+  summary: "Live Youngstown weather will load here when the browser can reach the weather service.",
+};
+
+function LiveWeatherCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [weather, setWeather] = useState(weatherFallback);
+  const [status, setStatus] = useState("Connecting to live Youngstown field conditions...");
+
+  useEffect(() => {
+    let alive = true;
+    async function loadWeather() {
+      try {
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=41.0998&longitude=-80.6495&current=temperature_2m,precipitation,wind_speed_10m&daily=sunrise,sunset,precipitation_probability_max,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York";
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Weather service unavailable");
+        const data = await res.json();
+        if (!alive) return;
+        const current = data.current || {};
+        const daily = data.daily || {};
+        setWeather({
+          temp: `${Math.round(current.temperature_2m ?? 0)}°F`,
+          wind: `${Math.round(current.wind_speed_10m ?? 0)} mph`,
+          rain: `${current.precipitation ?? 0} in now / ${daily.precipitation_probability_max?.[0] ?? "--"}% chance`,
+          summary: `Sunrise ${daily.sunrise?.[0]?.slice(11) ?? "--"} · Sunset ${daily.sunset?.[0]?.slice(11) ?? "--"}`,
+        });
+        setStatus("Live field conditions loaded for Youngstown, Ohio.");
+      } catch {
+        if (!alive) return;
+        setWeather(weatherFallback);
+        setStatus("Weather fallback is showing. Live data can attach when deployed online.");
+      }
+    }
+    loadWeather();
+    const id = window.setInterval(loadWeather, 1000 * 60 * 20);
+    return () => { alive = false; window.clearInterval(id); };
+  }, []);
+
+  return (
+    <GlassCard className="!p-6">
+      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Live Weather</div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Temp</div><div className="text-3xl font-black">{weather.temp}</div></div>
+        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Wind</div><div className="text-3xl font-black">{weather.wind}</div></div>
+        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Rain</div><div className="text-lg font-black">{weather.rain}</div></div>
+      </div>
+      <p className="mt-4 text-sm leading-7 text-emerald-50/85">{weather.summary}</p>
+      <p className="mt-2 text-xs uppercase tracking-[0.22em] text-emerald-100/60">{status}</p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <PillButton strong onClick={() => setScreen("weather")}>Open Weather Room</PillButton>
+        <PillButton onClick={() => setScreen("cropplanner")}>Apply to Grow Plan</PillButton>
+      </div>
+    </GlassCard>
+  );
+}
+
+function ProverbsTicker({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setIndex((current) => (current + 1) % proverbBank.length), 7000);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <GlassCard className="!p-6">
+      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Proverb of the Moment</div>
+      <div className="mt-4 text-2xl font-black leading-tight">“{proverbBank[index]}”</div>
+      <button onClick={() => setScreen("reflection")} className="mt-5 rounded-full border border-white/10 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">Open Reflection Room</button>
+    </GlassCard>
+  );
+}
+
+function FieldStationGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {fieldStations.map((item) => (
+        <button key={item.station} onClick={() => setScreen(item.pathway.includes("Grower") ? "grower" : item.pathway.includes("Marketplace") ? "marketplace" : item.pathway.includes("Value") ? "valueadded" : item.pathway.includes("Parent") ? "parent" : "operations")} className="rounded-[2rem] border border-white/10 bg-black/38 p-6 text-left shadow-[0_30px_80px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:bg-white/10">
+          <div className="flex items-start justify-between gap-3"><div className="text-2xl font-black">{item.station}</div><div className="rounded-full bg-emerald-300 px-3 py-1 text-xs font-black text-black">{item.status}</div></div>
+          <p className="mt-4 text-sm leading-7 text-emerald-50/85">{item.focus}</p>
+          <div className="mt-4 text-xs uppercase tracking-[0.24em] text-emerald-100/60">{item.pathway}</div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function DecisionGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {pathwayDecisions.map((item) => (
+        <button key={item.label} onClick={() => setScreen(item.target)} className="rounded-[2rem] border border-white/10 bg-white/10 p-6 text-left backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black">
+          <div className="text-2xl font-black">{item.label}</div>
+          <p className="mt-3 text-sm leading-7 opacity-85">{item.note}</p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TextAreaBlock({ label, placeholder }: { label: string; placeholder: string }) {
+  const [value, setValue] = useState("");
+  return (
+    <label className="block rounded-2xl border border-white/10 bg-white/10 p-5">
+      <div className="text-lg font-black">{label}</div>
+      <textarea value={value} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-white outline-none placeholder:text-white/40" />
+    </label>
+  );
+}
+
 function Home({
   setScreen,
   language,
@@ -294,7 +424,9 @@ function Home({
               </div>
             </div>
           </GlassCard>
-          <PhotoCard title="Seeds, compost, partners, and people make the ecosystem real." subtitle="The work is operational, visible, and community-rooted." image={IMG.seeds} height="360px" onClick={() => setScreen("operations")} />
+          <PhotoCard title="Seeds, compost, partners, and people make the ecosystem real." subtitle="The work is operational, visible, and community-rooted." image={IMG.seeds} height="300px" onClick={() => setScreen("operations")} />
+          <LiveWeatherCard setScreen={setScreen} />
+          <ProverbsTicker setScreen={setScreen} />
         </div>
       </section>
     </Shell>
@@ -328,10 +460,13 @@ function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <PillButton onClick={() => setScreen("weather")}>Open Weather & Alerts</PillButton>
           </div>
         </GlassCard>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="space-y-6">
+          <GlassCard><div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Decision Point</div><div className="mt-5"><DecisionGrid setScreen={setScreen} /></div></GlassCard>
+          <div className="grid gap-5 md:grid-cols-2">
           {roles.map((role) => (
             <PhotoCard key={role.title} title={role.title} subtitle={role.text} image={role.image} height="280px" onClick={() => setScreen(role.screen)} />
           ))}
+          </div>
         </div>
       </div>
     </Shell>
@@ -425,6 +560,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
           ))}
         </div>
       </div>
+      <div className="mt-6"><FieldStationGrid setScreen={setScreen} /></div>
     </Shell>
   );
 }
@@ -492,6 +628,10 @@ function Assessment({ setScreen }: { setScreen: (screen: Screen) => void }) {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <TextAreaBlock label="Supervisor Observation" placeholder="What did you observe today?" />
+          <TextAreaBlock label="Support / Follow-Up Needed" placeholder="Note any concern, encouragement, incident, or parent message." />
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <PillButton strong onClick={() => setScreen("supervisor")}>Save & Return to Supervisor</PillButton>
@@ -577,13 +717,16 @@ function WeatherAlerts({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <PillButton onClick={() => setScreen("announcements")}>Post Weather Notice</PillButton>
           </div>
         </GlassCard>
-        <div className="grid gap-4 md:grid-cols-2">
-          {["Rain Watch", "Heat Safety", "Irrigation Need", "Field Access", "Sunrise / Sunset", "Severe Weather"].map((item, i) => (
-            <GlassCard key={item} className="!p-6">
-              <div className="text-2xl font-black">{item}</div>
-              <p className="mt-4 text-sm leading-7 text-emerald-50/85">{i % 2 === 0 ? "Review before crews enter the field." : "Use supervisor alerts and youth safety reminders."}</p>
-            </GlassCard>
-          ))}
+        <div className="space-y-4">
+          <LiveWeatherCard setScreen={setScreen} />
+          <div className="grid gap-4 md:grid-cols-2">
+            {["Rain Watch", "Heat Safety", "Irrigation Need", "Field Access", "Sunrise / Sunset", "Severe Weather"].map((item, i) => (
+              <GlassCard key={item} className="!p-6">
+                <div className="text-2xl font-black">{item}</div>
+                <p className="mt-4 text-sm leading-7 text-emerald-50/85">{i % 2 === 0 ? "Review before crews enter the field." : "Use supervisor alerts and youth safety reminders."}</p>
+              </GlassCard>
+            ))}
+          </div>
         </div>
       </div>
     </Shell>
@@ -615,6 +758,10 @@ function Reflection({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <SectionTitle eyebrow="Reflection & Motivation" title="The work has a heart, not just a checklist." body="Youth and supervisors can use this space for daily reflection, proverbs, encouragement, wellness notes, and next-step commitments." />
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {proverbBank.map((p) => <div key={p} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-lg font-semibold leading-7">{p}</div>)}
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <TextAreaBlock label="Youth Reflection" placeholder="Today I learned... Today I helped... Tomorrow I will..." />
+          <TextAreaBlock label="Supervisor Encouragement" placeholder="A short note to help the youth see progress and next steps." />
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <PillButton strong onClick={() => setScreen("youth")}>Return to Youth Journey</PillButton>
