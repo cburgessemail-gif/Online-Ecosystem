@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 type LangKey = "English" | "Español" | "Tagalog" | "Italiano" | "עברית" | "Français";
-type ViewKey =
-  | "home"
-  | "tour"
+type RoleKey =
   | "guest"
   | "customer"
   | "marketplace"
@@ -12,560 +10,667 @@ type ViewKey =
   | "supervisor"
   | "parent"
   | "partner"
+  | "volunteer"
   | "valueAdded"
+  | "admin";
+
+type PanelKey =
+  | "home"
+  | "journey"
+  | "weather"
   | "cropPlanner"
   | "growPlan"
   | "assessments"
-  | "live"
+  | "parentConnect"
   | "data"
+  | "channels"
+  | "proverbs"
   | "contact";
-
-type Role = {
-  id: ViewKey;
-  title: string;
-  subtitle: string;
-  image: string;
-  steps: string[];
-  benefits: string[];
-  resources: { label: string; view: ViewKey }[];
-  decision: string;
-  share: string;
-};
 
 const LANGS: LangKey[] = ["English", "Español", "Tagalog", "Italiano", "עברית", "Français"];
 
-const image = (name: string) => `/images/${name}`;
-
-const IMG = {
-  hero: image("ConnectFoodEcosystem_withimages.png"),
-  growArea: image("Grow Area.png"),
-  growArea2: image("GrowArea2.jpg"),
-  fencing: image("Deer Fencing.png"),
-  volunteers: image("Fence_volunteers.png"),
-  compost: image("Compost_ElliottGarden.png"),
-  seeds: image("Seeds_Jubilee Gardens.png"),
-  parker: image("CSU_MParker.png"),
-  queens: image("Queens Village.png"),
-  market: image("large (12).jpg"),
-  culinary: image("culniary_edibleflowers.jpeg"),
-  mushrooms: image("culniary_mushrooms.jpeg"),
-  wkbn: image("WKBN Interview.png"),
+const roleLabels: Record<RoleKey, string> = {
+  guest: "Guest",
+  customer: "Customer",
+  marketplace: "Marketplace",
+  grower: "Grower",
+  youth: "Youth Workforce",
+  supervisor: "Supervisor",
+  parent: "Parent / Guardian",
+  partner: "Partner",
+  volunteer: "Volunteer",
+  valueAdded: "Value-Added Producer",
+  admin: "Admin / Operations",
 };
 
-const ui: Record<LangKey, Record<string, string>> = {
+const translations: Record<LangKey, any> = {
   English: {
     title: "Bronson Family Farm Online Ecosystem",
-    subtitle: "A living farm management system for food, youth workforce, growers, partners, and community health.",
+    subtitle: "A live operating system for growers, youth workforce, families, partners, and community food access.",
     start: "Enter Ecosystem",
-    tour: "Guided Tour",
-    live: "Live Channels",
-    data: "Data Dashboard",
-    crop: "Crop Planner",
-    grow: "Grow Plan",
-    assess: "Assessments",
-    back: "Back Home",
+    guided: "Guided Tour",
+    back: "Back",
     next: "Next",
-    contact: "Contact / Feedback",
+    home: "Home",
+    chooseRole: "Choose Your Pathway",
+    tools: "Live Tools",
+    decision: "Final Decision",
+    share: "Share / Invite",
+    feedback: "Feedback",
+    contact: "Contact Us",
   },
   Español: {
     title: "Ecosistema Digital de Bronson Family Farm",
-    subtitle: "Sistema de gestión agrícola para alimentos, jóvenes, productores, socios y salud comunitaria.",
+    subtitle: "Un sistema operativo vivo para agricultores, jóvenes, familias, socios y acceso comunitario a alimentos.",
     start: "Entrar",
-    tour: "Recorrido Guiado",
-    live: "Canales en Vivo",
-    data: "Datos",
-    crop: "Planificador",
-    grow: "Plan de Cultivo",
-    assess: "Evaluaciones",
-    back: "Inicio",
+    guided: "Recorrido Guiado",
+    back: "Atrás",
     next: "Siguiente",
-    contact: "Contacto",
+    home: "Inicio",
+    chooseRole: "Elija su camino",
+    tools: "Herramientas",
+    decision: "Decisión Final",
+    share: "Compartir",
+    feedback: "Comentarios",
+    contact: "Contáctenos",
   },
   Tagalog: {
     title: "Bronson Family Farm Online Ecosystem",
-    subtitle: "Sistema para sa pagkain, kabataan, growers, partners, at kalusugan ng komunidad.",
+    subtitle: "Isang buhay na sistema para sa growers, kabataan, pamilya, partners, at access sa pagkain.",
     start: "Pumasok",
-    tour: "Gabay na Tour",
-    live: "Live Channels",
-    data: "Dashboard",
-    crop: "Crop Planner",
-    grow: "Grow Plan",
-    assess: "Assessments",
-    back: "Home",
-    next: "Next",
-    contact: "Contact",
+    guided: "Gabay na Tour",
+    back: "Bumalik",
+    next: "Susunod",
+    home: "Home",
+    chooseRole: "Piliin ang Pathway",
+    tools: "Live Tools",
+    decision: "Final Decision",
+    share: "Ibahagi",
+    feedback: "Feedback",
+    contact: "Contact Us",
   },
   Italiano: {
-    title: "Ecosistema Online Bronson Family Farm",
-    subtitle: "Sistema agricolo per cibo, giovani, coltivatori, partner e salute comunitaria.",
+    title: "Ecosistema Online di Bronson Family Farm",
+    subtitle: "Un sistema operativo vivo per coltivatori, giovani, famiglie, partner e accesso al cibo.",
     start: "Entra",
-    tour: "Tour Guidato",
-    live: "Canali Live",
-    data: "Dati",
-    crop: "Pianificatore",
-    grow: "Piano di Coltivazione",
-    assess: "Valutazioni",
-    back: "Home",
+    guided: "Tour Guidato",
+    back: "Indietro",
     next: "Avanti",
-    contact: "Contatto",
+    home: "Home",
+    chooseRole: "Scegli il percorso",
+    tools: "Strumenti",
+    decision: "Decisione Finale",
+    share: "Condividi",
+    feedback: "Feedback",
+    contact: "Contattaci",
   },
   עברית: {
-    title: "המערכת המקוונת של Bronson Family Farm",
-    subtitle: "מערכת לניהול מזון, נוער, מגדלים, שותפים ובריאות קהילתית.",
+    title: "המערכת הדיגיטלית של Bronson Family Farm",
+    subtitle: "מערכת חיה למגדלים, נוער, משפחות, שותפים וגישה קהילתית למזון.",
     start: "כניסה",
-    tour: "סיור מודרך",
-    live: "ערוצים חיים",
-    data: "נתונים",
-    crop: "תכנון גידולים",
-    grow: "תוכנית גידול",
-    assess: "הערכות",
-    back: "בית",
+    guided: "סיור מודרך",
+    back: "חזור",
     next: "הבא",
-    contact: "יצירת קשר",
+    home: "בית",
+    chooseRole: "בחר מסלול",
+    tools: "כלים חיים",
+    decision: "החלטה סופית",
+    share: "שתף",
+    feedback: "משוב",
+    contact: "צור קשר",
   },
   Français: {
-    title: "Écosystème en ligne Bronson Family Farm",
-    subtitle: "Système agricole pour l’alimentation, les jeunes, les producteurs, les partenaires et la santé communautaire.",
+    title: "Écosystème numérique de Bronson Family Farm",
+    subtitle: "Un système vivant pour producteurs, jeunes, familles, partenaires et accès alimentaire.",
     start: "Entrer",
-    tour: "Visite guidée",
-    live: "Canaux en direct",
-    data: "Données",
-    crop: "Planificateur",
-    grow: "Plan de culture",
-    assess: "Évaluations",
-    back: "Accueil",
+    guided: "Visite guidée",
+    back: "Retour",
     next: "Suivant",
-    contact: "Contact",
+    home: "Accueil",
+    chooseRole: "Choisir votre parcours",
+    tools: "Outils",
+    decision: "Décision finale",
+    share: "Partager",
+    feedback: "Retour",
+    contact: "Nous contacter",
   },
 };
 
-const roles: Role[] = [
-  {
-    id: "guest",
-    title: "Guest Pathway",
-    subtitle: "Experience the farm, understand the mission, and decide how to stay connected.",
-    image: IMG.hero,
+const images = {
+  hero: "/images/ConnectFoodEcosystem_withimages.png",
+  grow: "/images/GrowArea2.jpg",
+  growAlt: "/images/Grow Area.png",
+  fence: "/images/Fence_volunteers.png",
+  deer: "/images/Deer Fencing.png",
+  compost: "/images/Compost_Elliott.png",
+  seeds: "/images/Seeds_Jubilee Gardens.png",
+  queen: "/images/Queens Village.png",
+  csu: "/images/CSU_MParker.png",
+  market: "/images/large (1).jpg",
+  culinary: "/images/culniary_edibleflowers.jpeg",
+  mushrooms: "/images/culniary_mushrooms.jpeg",
+  wkbn: "/images/WKBN Interview.png",
+  sam1: "/images/SAM_0384.JPG",
+  sam2: "/images/SAM_0391.JPG",
+  sam3: "/images/SAM_0401.JPG",
+};
+
+const roleJourneys: Record<RoleKey, any> = {
+  guest: {
+    image: images.hero,
+    purpose: "Understand the vision, story, land, food access mission, and community invitation.",
+    need: "Guests need a clear first experience that explains why the farm exists and how they can participate.",
     steps: [
-      "Arrive through the welcome screen and learn why the farm exists.",
-      "Explore the land, history, community need, and food access mission.",
-      "Visit live channels, marketplace, growers, youth workforce, and partner areas.",
-      "Choose whether to attend, volunteer, donate, share, or request a tour.",
+      "Arrive through the welcome screen.",
+      "Learn the farm story and place-based purpose.",
+      "Explore pathways without pressure.",
+      "Choose whether to visit, volunteer, donate, shop, or share.",
     ],
-    benefits: ["Clear first impression", "Easy navigation", "Mission-based engagement", "Invitation to act"],
-    resources: [
-      { label: "Live Channels", view: "live" },
-      { label: "Contact / Feedback", view: "contact" },
-      { label: "Data Dashboard", view: "data" },
-    ],
-    decision: "Do I want to visit, share, volunteer, or support this ecosystem?",
-    share: "Share the farm story, event link, or invitation with family, neighbors, churches, schools, and partners.",
+    tools: ["Event check-in", "Farm map", "Language access", "Feedback form"],
+    decision: "Do I want to return, invite someone, volunteer, or support the farm?",
   },
-  {
-    id: "customer",
-    title: "Customer Pathway",
-    subtitle: "Move from interest to healthy food choices and repeat participation.",
-    image: IMG.market,
+  customer: {
+    image: images.market,
+    purpose: "Connect families to fresh food, nutrition, seedlings, seed rolls, and repeat healthy choices.",
+    need: "Customers need easy access to food, pricing, ordering, pickup, nutrition education, and SNAP-aware options.",
     steps: [
-      "Learn what is fresh, seasonal, SNAP-aware, and community-centered.",
-      "Explore produce, seedlings, Bubble Babies™, herbs, and value-added items.",
-      "Use QR codes or marketplace links to order, reserve, or request pickup.",
-      "Receive education about nutrition, preparation, and healthy choices.",
+      "View seasonal products.",
+      "Learn what is fresh and available.",
+      "Check SNAP-eligible items.",
+      "Place or plan an order.",
+      "Receive reminders and nutrition tips.",
     ],
-    benefits: ["Fresh local food", "Nutrition education", "Repeat access", "Community trust"],
-    resources: [
-      { label: "Marketplace", view: "marketplace" },
-      { label: "Crop Planner", view: "cropPlanner" },
-      { label: "Live Channels", view: "live" },
-    ],
-    decision: "Do I want to buy, pre-order, subscribe, or return as a customer?",
-    share: "Share produce availability, QR store links, recipes, and nutrition information.",
+    tools: ["Marketplace", "GrownBy link", "SNAP filter", "Pickup reminders"],
+    decision: "What do I want to buy, grow, cook, or share with my household?",
   },
-  {
-    id: "grower",
-    title: "Grower Pathway",
-    subtitle: "Connect growers to tools, planning, market opportunity, and shared knowledge.",
-    image: IMG.growArea2,
+  marketplace: {
+    image: images.market,
+    purpose: "Convert interest into purchasing power and sustainable local food activity.",
+    need: "The marketplace needs product visibility, inventory awareness, vendor coordination, and simple checkout direction.",
     steps: [
-      "Identify what the grower wants to produce, sell, learn, or demonstrate.",
-      "Use crop planning, seed tracking, soil notes, weather, and task lists.",
-      "Connect to supply resources, compost, fencing, irrigation, seed starts, and training.",
-      "Move toward market participation, shared distribution, or farm collaboration.",
+      "Browse produce, seedlings, seeds, and value-added items.",
+      "Compare availability.",
+      "Select pickup or event purchase.",
+      "Invite others to shop.",
     ],
-    benefits: ["Planning support", "Market readiness", "Shared tools", "Regional grower network"],
-    resources: [
-      { label: "Crop Planner", view: "cropPlanner" },
-      { label: "Grow Plan", view: "growPlan" },
-      { label: "Data Dashboard", view: "data" },
-    ],
-    decision: "Do I want to become a participating grower, vendor, trainer, or supplier?",
-    share: "Share crop plans, availability, needs, harvest timing, and market opportunities.",
+    tools: ["Inventory board", "Vendor list", "QR ordering", "Product labels"],
+    decision: "Am I ready to buy, sell, reserve, or become a market participant?",
   },
-  {
-    id: "youth",
-    title: "Youth Workforce Pathway",
-    subtitle: "An 8-week farm-based workforce experience: June 8 – August 28, 2026, 8:00 AM – 2:00 PM.",
-    image: IMG.volunteers,
+  grower: {
+    image: images.grow,
+    purpose: "Connect growers to tools, knowledge, planning, supplies, mentorship, and market opportunity.",
+    need: "Growers need planning tools, growing calendars, crop records, weather awareness, pest notes, and access to buyers.",
     steps: [
-      "Complete orientation, safety expectations, media release, and role assignment.",
-      "Begin daily check-in: PPE, attendance, task assignment, hydration, and team placement.",
-      "Complete skill-building activities in planting, composting, harvesting, market prep, and stewardship.",
-      "Receive supervisor observations, badges, daily reflections, and progress tracking.",
-      "End with a portfolio of skills, participation record, and next-step recommendation.",
+      "Identify growing space.",
+      "Select crops.",
+      "Create a grow plan.",
+      "Track tasks and weather.",
+      "Prepare for market participation.",
     ],
-    benefits: ["Work readiness", "Responsibility", "Outdoor learning", "Life skills", "Career exposure"],
-    resources: [
-      { label: "Assessments", view: "assessments" },
-      { label: "Grow Plan", view: "growPlan" },
-      { label: "Parent Connection", view: "parent" },
-    ],
-    decision: "What skills did I build, and what pathway should I pursue next?",
-    share: "Youth can share reflections, completed badges, pictures, produce work, and end-of-program progress.",
+    tools: ["Crop planner", "Grow plan", "Weather panel", "Task journal", "Market readiness checklist"],
+    decision: "Do I want to become a grower, vendor, partner grower, or learner?",
   },
-  {
-    id: "supervisor",
-    title: "Supervisor Mobile Pathway",
-    subtitle: "Designed for phone-based daily tracking of youth, safety, tasks, and progress.",
-    image: IMG.fencing,
+  youth: {
+    image: images.fence,
+    purpose: "Build skills, responsibility, teamwork, safety, food knowledge, confidence, and future readiness.",
+    need: "Youth need clear daily expectations, meaningful work, encouragement, badges, progress tracking, and adult guidance.",
     steps: [
-      "Check assigned youth group and daily attendance.",
-      "Confirm PPE, safety, hydration, and work readiness.",
-      "Assign tasks by team: planting, watering, compost, market, cleanup, harvest, records.",
-      "Complete quick observations using life skills, participation, teamwork, and task completion.",
-      "Flag concerns, recognize progress, and prepare parent/program updates.",
+      "Complete orientation.",
+      "Check in daily.",
+      "Review PPE and safety.",
+      "Receive daily assignment.",
+      "Complete activity and reflection.",
+      "Earn badges and supervisor feedback.",
     ],
-    benefits: ["Mobile-first tracking", "Consistent documentation", "Safety visibility", "Progress evidence"],
-    resources: [
-      { label: "Assessments", view: "assessments" },
-      { label: "Data Dashboard", view: "data" },
-      { label: "Youth Pathway", view: "youth" },
-    ],
-    decision: "Is each youth safe, engaged, progressing, and ready for the next responsibility?",
-    share: "Supervisors share daily notes, alerts, completed rubrics, youth strengths, and support needs.",
+    tools: ["Daily checklist", "Skills checklist", "Attendance", "Reflection", "Badges"],
+    decision: "What skill did I build today, and what responsibility am I ready for next?",
   },
-  {
-    id: "parent",
-    title: "Parent / Guardian Connection",
-    subtitle: "Keeps families informed, respected, and connected to youth progress.",
-    image: IMG.queens,
+  supervisor: {
+    image: images.deer,
+    purpose: "Give aides and supervisors a phone-friendly system to track youth progress and safety.",
+    need: "Supervisors need fast tools for attendance, assignments, observations, incidents, scoring, and daily notes.",
     steps: [
-      "View program schedule, expectations, clothing/PPE reminders, and attendance notes.",
-      "Receive youth progress summaries, strengths, and growth areas.",
-      "Access parent messages, emergency updates, and celebration moments.",
-      "Provide feedback and consent updates when needed.",
+      "Open supervisor dashboard.",
+      "Take attendance.",
+      "Assign crews.",
+      "Complete safety check.",
+      "Score participation.",
+      "Submit daily notes.",
     ],
-    benefits: ["Trust", "Transparency", "Family engagement", "Youth encouragement"],
-    resources: [
-      { label: "Youth Pathway", view: "youth" },
-      { label: "Assessments", view: "assessments" },
-      { label: "Contact / Feedback", view: "contact" },
-    ],
-    decision: "How can I support my youth’s growth, attendance, and confidence?",
-    share: "Parents can share encouragement, concerns, availability, and permission-related updates.",
+    tools: ["Mobile assessment", "Attendance", "Crew assignments", "Incident log", "Progress dashboard"],
+    decision: "Which youth needs support, recognition, redirection, or advancement?",
   },
-  {
-    id: "partner",
-    title: "Partner Pathway",
-    subtitle: "Align resources, education, sponsorship, workforce, tools, and community outcomes.",
-    image: IMG.parker,
+  parent: {
+    image: images.queen,
+    purpose: "Keep parents and guardians connected to youth growth, schedules, expectations, and accomplishments.",
+    need: "Families need trust, communication, visibility, reminders, and proof that youth are learning real skills.",
     steps: [
-      "Understand the ecosystem need: food access, training, health, growers, youth, and land stewardship.",
-      "Identify the partner role: sponsor, educator, donor, volunteer, workforce, health, media, or technical support.",
-      "Connect partner support to measurable outcomes and visible community benefit.",
-      "Decide on next action: meeting, donation, demonstration, grant support, or formal collaboration.",
+      "View program schedule.",
+      "Review youth expectations.",
+      "Receive updates.",
+      "See badges and progress.",
+      "Send questions or concerns.",
     ],
-    benefits: ["Clear role alignment", "Measurable outcomes", "Community visibility", "Mutual benefit"],
-    resources: [
-      { label: "Data Dashboard", view: "data" },
-      { label: "Live Channels", view: "live" },
-      { label: "Contact / Feedback", view: "contact" },
-    ],
-    decision: "What resource can we contribute, and what outcome will it support?",
-    share: "Partners can share logos, commitments, resources, referrals, sponsorships, and impact stories.",
+    tools: ["Parent portal", "Progress summary", "Message form", "Schedule reminders"],
+    decision: "How can I support my youth’s growth and celebrate their progress?",
   },
-  {
-    id: "valueAdded",
-    title: "Value-Added Producer Pathway",
-    subtitle: "Move produce into education, culinary products, demonstrations, and enterprise opportunities.",
-    image: IMG.culinary,
+  partner: {
+    image: images.csu,
+    purpose: "Align resources, education, funding, demonstrations, workforce, and community benefit.",
+    need: "Partners need clarity on what is needed, where they fit, and what outcomes their support creates.",
     steps: [
-      "Identify available crops, herbs, edible flowers, mushrooms, or seasonal surplus.",
-      "Explore food safety, packaging, labeling, recipe, and demonstration needs.",
-      "Connect culinary education to marketplace opportunity.",
-      "Decide whether to demonstrate, sell, train, or co-create a value-added product.",
+      "Review mission and current needs.",
+      "Choose support area.",
+      "Connect to event, workforce, food, or infrastructure needs.",
+      "Track partnership outcomes.",
     ],
-    benefits: ["Less waste", "More revenue", "Culinary education", "Small business pathway"],
-    resources: [
-      { label: "Marketplace", view: "marketplace" },
-      { label: "Crop Planner", view: "cropPlanner" },
-      { label: "Grow Plan", view: "growPlan" },
-    ],
-    decision: "Can this crop become a product, class, tasting, recipe, or market item?",
-    share: "Share recipes, demos, labels, product ideas, food safety notes, and pricing feedback.",
+    tools: ["Partner menu", "Needs list", "Impact report", "Contact form"],
+    decision: "What can my organization contribute, sponsor, teach, donate, or help build?",
   },
-];
+  volunteer: {
+    image: images.fence,
+    purpose: "Match willing community members to useful tasks without confusion.",
+    need: "Volunteers need simple sign-up, clear workdays, task expectations, safety notes, and appreciation.",
+    steps: [
+      "Choose volunteer interest.",
+      "Review safety and clothing needs.",
+      "Select workday.",
+      "Check in on arrival.",
+      "Log contribution.",
+    ],
+    tools: ["Volunteer sign-up", "Workday calendar", "Task list", "Safety notes"],
+    decision: "When can I serve, and what task am I prepared to do?",
+  },
+  valueAdded: {
+    image: images.culinary,
+    purpose: "Help producers transform farm products into food, education, demonstrations, and marketable goods.",
+    need: "Value-added producers need product ideas, food safety awareness, kitchen planning, labels, and sales pathways.",
+    steps: [
+      "Explore available crops.",
+      "Choose a product idea.",
+      "Review safety and labeling needs.",
+      "Plan a demo or product launch.",
+      "Connect to the marketplace.",
+    ],
+    tools: ["Recipe planner", "Product worksheet", "Label checklist", "Market booth planner"],
+    decision: "What can I create from farm produce that serves families and builds revenue?",
+  },
+  admin: {
+    image: images.wkbn,
+    purpose: "Operate the ecosystem with data, scheduling, reporting, communications, and accountability.",
+    need: "Admin needs one place for program visibility, inventory, youth metrics, partner follow-up, and reports.",
+    steps: [
+      "Review dashboard.",
+      "Check attendance and tasks.",
+      "Monitor inventory and crop status.",
+      "Review partner actions.",
+      "Export reports.",
+    ],
+    tools: ["Operations dashboard", "Inventory", "Reports", "Partner tracker", "Program metrics"],
+    decision: "What must be handled today to keep the ecosystem moving?",
+  },
+};
 
 const proverbs = [
-  "A garden is grown one faithful task at a time.",
-  "Teach the seed, feed the family, strengthen the future.",
-  "Many hands make the harvest visible.",
-  "The farm is not only land; it is a classroom, marketplace, and promise.",
-  "What we plant in youth becomes the strength of the community.",
+  "Where there is no vision, the people perish — Proverbs 29:18",
+  "The plans of the diligent lead surely to abundance — Proverbs 21:5",
+  "Let us not grow weary in doing good — Galatians 6:9",
+  "By wisdom a house is built, and by understanding it is established — Proverbs 24:3",
+  "Whatever your hand finds to do, do it with your might — Ecclesiastes 9:10",
 ];
 
 const cropRows = [
-  ["Tomatoes", "Seedling / transplant", "May–June", "70–85 days", "Customer + market crop"],
-  ["Collards", "Seedling / direct", "Spring + late summer", "60–80 days", "Nutrition education"],
-  ["Mustard Greens", "Direct / seedling", "Spring + fall", "35–50 days", "Quick harvest"],
-  ["Peppers", "Transplant", "May–June", "70–90 days", "High-value crop"],
-  ["Cilantro", "Direct / seedling", "Cool season", "30–45 days", "Herb bundles"],
-  ["Broccoli", "Transplant", "Spring + fall", "60–75 days", "Youth training crop"],
-  ["Spinach", "Direct", "Cool season", "35–45 days", "SNAP-aware fresh food"],
-  ["Lettuce", "Direct / seedling", "Succession", "30–55 days", "Fast market crop"],
-  ["Watermelon", "Direct / transplant", "Late spring", "80–100 days", "Summer family crop"],
-  ["Corn", "Direct", "Late spring", "70–100 days", "Community food crop"],
+  ["Tomatoes", "Start seedlings / transplant", "Warm season", "Stake, prune, monitor water"],
+  ["Collards", "Direct or transplant", "Cool + warm tolerant", "Harvest outer leaves"],
+  ["Peppers", "Transplant", "Warm season", "Needs warmth and steady moisture"],
+  ["Cabbage", "Transplant", "Cool season", "Watch pests and spacing"],
+  ["Corn", "Direct seed", "Warm season", "Plant in blocks for pollination"],
+  ["Cucumbers", "Direct or transplant", "Warm season", "Trellis if possible"],
+  ["Melons", "Direct or transplant", "Warm season", "Needs space, heat, and water"],
+  ["Herbs", "Seed or transplant", "Flexible", "Great for bundles and value-added"],
 ];
 
 function App() {
   const [lang, setLang] = useState<LangKey>("English");
-  const [view, setView] = useState<ViewKey>("home");
-  const [tourIndex, setTourIndex] = useState(0);
-  const [selectedYouth, setSelectedYouth] = useState("Youth 001");
-  const [toast, setToast] = useState("");
+  const [panel, setPanel] = useState<PanelKey>("home");
+  const [role, setRole] = useState<RoleKey>("guest");
+  const [journeyStep, setJourneyStep] = useState(0);
+  const [guided, setGuided] = useState(false);
 
-  const t = ui[lang];
-  const activeRole = roles.find((r) => r.id === view);
-  const tourRole = roles[tourIndex % roles.length];
+  const t = translations[lang];
+  const current = roleJourneys[role];
+  const isRTL = lang === "עברית";
+
+  const guidePanels: PanelKey[] = ["home", "journey", "weather", "cropPlanner", "growPlan", "assessments", "parentConnect", "data", "channels", "proverbs", "contact"];
 
   useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 1800);
-    return () => clearTimeout(timer);
-  }, [toast]);
+    if (!guided) return;
+    const timer = window.setInterval(() => {
+      setPanel((p) => {
+        const index = guidePanels.indexOf(p);
+        return guidePanels[(index + 1) % guidePanels.length];
+      });
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [guided]);
 
-  const dir = lang === "עברית" ? "rtl" : "ltr";
-
-  const go = (target: ViewKey) => {
-    setView(target);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const nextStep = () => setJourneyStep((s) => Math.min(s + 1, current.steps.length - 1));
+  const prevStep = () => setJourneyStep((s) => Math.max(s - 1, 0));
 
   return (
-    <main dir={dir} className="min-h-screen bg-[#f5f1e8] text-[#1f2d1f]">
-      <style>{`
-        .forest {
-          background:
-            linear-gradient(135deg, rgba(20,45,26,.92), rgba(90,113,57,.78)),
-            url("${IMG.growArea2}") center/cover no-repeat;
-        }
-        .glass { background: rgba(255,255,255,.84); backdrop-filter: blur(12px); }
-        .btn { border-radius: 999px; padding: .78rem 1.05rem; font-weight: 800; transition: .2s; }
-        .btn:hover { transform: translateY(-1px); }
-        .panel { border-radius: 1.5rem; box-shadow: 0 20px 60px rgba(30,45,25,.14); }
-        .scrollbox { max-height: 54vh; overflow-y: auto; padding-right: .35rem; }
-      `}</style>
+    <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-[#f5f1e8] text-[#20351f]">
+      <div className="min-h-screen bg-gradient-to-br from-[#eef3df] via-[#f7eddc] to-[#dce8cf]">
+        <header className="sticky top-0 z-30 border-b border-[#d8c8a8] bg-[#f8f3e9]/95 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-[0.25em] text-[#6b7d3f]">Bronson Family Farm</div>
+              <h1 className="text-xl font-black md:text-2xl">{t.title}</h1>
+            </div>
 
-      {toast && (
-        <div className="fixed top-4 right-4 z-50 rounded-full bg-[#23351f] px-5 py-3 text-sm font-bold text-white shadow-xl">
-          {toast}
-        </div>
-      )}
+            <div className="flex flex-wrap items-center gap-2">
+              <select value={lang} onChange={(e) => setLang(e.target.value as LangKey)} className="rounded-full border border-[#c8b98d] bg-white px-3 py-2 text-sm font-semibold">
+                {LANGS.map((l) => (
+                  <option key={l}>{l}</option>
+                ))}
+              </select>
 
-      <header className="sticky top-0 z-40 border-b border-[#d8ccb5] bg-[#f5f1e8]/95 px-4 py-3 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
-          <button onClick={() => go("home")} className="text-left">
-            <div className="text-xs font-black tracking-[.25em] text-[#6f7f38]">BRONSON FAMILY FARM</div>
-            <div className="text-lg font-black">Online Ecosystem</div>
-          </button>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value as LangKey)}
-              className="rounded-full border border-[#bcae91] bg-white px-3 py-2 text-sm font-bold"
-            >
-              {LANGS.map((l) => (
-                <option key={l}>{l}</option>
-              ))}
-            </select>
-
-            {[
-              ["tour", t.tour],
-              ["live", t.live],
-              ["cropPlanner", t.crop],
-              ["growPlan", t.grow],
-              ["assessments", t.assess],
-              ["data", t.data],
-            ].map(([key, label]) => (
-              <button key={key} onClick={() => go(key as ViewKey)} className="btn bg-[#e8ddc7] text-[#26351f]">
-                {label}
+              <button onClick={() => setGuided(!guided)} className="rounded-full bg-[#20351f] px-4 py-2 text-sm font-bold text-white shadow">
+                {guided ? "Pause Tour" : t.guided}
               </button>
-            ))}
-          </div>
-        </div>
-      </header>
-
-      {view === "home" && (
-        <section className="forest min-h-[calc(100vh-72px)] px-4 py-10">
-          <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
-            <div className="glass panel p-6 md:p-8">
-              <div className="mb-4 inline-flex rounded-full bg-[#f3c95b] px-4 py-2 text-xs font-black tracking-[.18em]">
-                REAL OPERATIONAL ECOSYSTEM
-              </div>
-              <h1 className="text-4xl font-black leading-tight md:text-6xl">{t.title}</h1>
-              <p className="mt-5 max-w-3xl text-lg font-semibold leading-relaxed text-[#41513a]">{t.subtitle}</p>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <button onClick={() => go("tour")} className="btn bg-[#23351f] text-white">
-                  {t.start}
-                </button>
-                <button onClick={() => go("live")} className="btn bg-white text-[#23351f]">
-                  Weather + Live Channels
-                </button>
-                <button onClick={() => go("contact")} className="btn bg-[#f3c95b] text-[#23351f]">
-                  {t.contact}
-                </button>
-              </div>
-
-              <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                {roles.map((r) => (
-                  <button
-                    key={r.id}
-                    onClick={() => go(r.id)}
-                    className="rounded-2xl border border-[#d8ccb5] bg-white/85 p-4 text-left hover:bg-[#fff8e8]"
-                  >
-                    <div className="text-sm font-black text-[#6f7f38]">PATHWAY</div>
-                    <div className="text-xl font-black">{r.title}</div>
-                    <p className="mt-1 text-sm font-semibold text-[#54604a]">{r.subtitle}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="panel overflow-hidden bg-white">
-              <img src={IMG.hero} className="h-[360px] w-full object-cover" />
-              <div className="p-6">
-                <h2 className="text-2xl font-black">Step into the Farm. Experience the wonders of life.</h2>
-                <p className="mt-3 font-semibold text-[#52604b]">
-                  This system connects guests, customers, growers, youth, supervisors, parents, value-added producers,
-                  partners, live farm channels, crop planning, assessments, and measurable outcomes.
-                </p>
-                <div className="mt-5 rounded-2xl bg-[#edf3dc] p-4 font-bold">
-                  Today’s proverb: {proverbs[new Date().getDate() % proverbs.length]}
-                </div>
-              </div>
             </div>
           </div>
-        </section>
-      )}
+        </header>
 
-      {view === "tour" && (
-        <PageShell title="Guided Ecosystem Tour" image={tourRole.image} go={go}>
-          <div className="grid gap-5 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="panel bg-white p-5">
-              <img src={tourRole.image} className="h-72 w-full rounded-3xl object-cover" />
-              <div className="mt-4 flex items-center justify-between">
+        <main className="mx-auto grid max-w-7xl gap-4 px-4 py-5 lg:grid-cols-[280px_1fr]">
+          <aside className="rounded-[2rem] border border-[#d8c8a8] bg-white/70 p-4 shadow-sm">
+            <button onClick={() => setPanel("home")} className="mb-3 w-full rounded-2xl bg-[#314d2d] px-4 py-3 text-left font-black text-white">
+              {t.home}
+            </button>
+
+            <div className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#7b6a40]">{t.chooseRole}</div>
+            <div className="grid gap-2">
+              {(Object.keys(roleLabels) as RoleKey[]).map((r) => (
                 <button
-                  onClick={() => setTourIndex((i) => Math.max(0, i - 1))}
-                  className="btn bg-[#e8ddc7]"
+                  key={r}
+                  onClick={() => {
+                    setRole(r);
+                    setPanel("journey");
+                    setJourneyStep(0);
+                  }}
+                  className={`rounded-2xl px-3 py-2 text-left text-sm font-bold transition ${
+                    role === r ? "bg-[#e4b95b] text-[#1f2d1d] shadow" : "bg-[#f5efe2] hover:bg-[#eadcbd]"
+                  }`}
                 >
-                  Back
+                  {roleLabels[r]}
                 </button>
-                <div className="font-black">
-                  {tourIndex + 1} / {roles.length}
-                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#7b6a40]">{t.tools}</div>
+            <div className="grid gap-2">
+              {[
+                ["weather", "Weather / Field Conditions"],
+                ["cropPlanner", "Crop Planner"],
+                ["growPlan", "Grow Plan"],
+                ["assessments", "Assessments"],
+                ["parentConnect", "Parent Connection"],
+                ["data", "Data Dashboard"],
+                ["channels", "Live Channels"],
+                ["proverbs", "Proverbs"],
+                ["contact", "Contact / Feedback"],
+              ].map(([key, label]) => (
                 <button
-                  onClick={() => setTourIndex((i) => (i + 1) % roles.length)}
-                  className="btn bg-[#23351f] text-white"
+                  key={key}
+                  onClick={() => setPanel(key as PanelKey)}
+                  className={`rounded-2xl px-3 py-2 text-left text-sm font-bold transition ${
+                    panel === key ? "bg-[#314d2d] text-white" : "bg-white hover:bg-[#f5efe2]"
+                  }`}
                 >
-                  Next
+                  {label}
                 </button>
-              </div>
+              ))}
             </div>
+          </aside>
 
-            <RoleContent role={tourRole} go={go} />
-          </div>
-        </PageShell>
-      )}
+          <section className="min-h-[720px] rounded-[2rem] border border-[#d8c8a8] bg-white/80 p-4 shadow-sm md:p-6">
+            {panel === "home" && (
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="flex flex-col justify-center">
+                  <div className="mb-3 rounded-full bg-[#e4b95b] px-4 py-2 text-sm font-black uppercase tracking-[0.18em] w-fit">Operating Ecosystem</div>
+                  <h2 className="text-4xl font-black leading-tight md:text-6xl">{t.title}</h2>
+                  <p className="mt-5 max-w-2xl text-lg leading-8 text-[#4a5a37]">{t.subtitle}</p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button onClick={() => setPanel("journey")} className="rounded-full bg-[#20351f] px-6 py-3 font-black text-white shadow">
+                      {t.start}
+                    </button>
+                    <button onClick={() => setPanel("cropPlanner")} className="rounded-full bg-[#e4b95b] px-6 py-3 font-black text-[#1f2d1d] shadow">
+                      Open Crop Planner
+                    </button>
+                    <button onClick={() => setPanel("assessments")} className="rounded-full bg-white px-6 py-3 font-black text-[#20351f] shadow">
+                      Open Supervisor Tools
+                    </button>
+                  </div>
+                </div>
 
-      {activeRole && (
-        <PageShell title={activeRole.title} image={activeRole.image} go={go}>
-          <div className="grid gap-5 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="panel overflow-hidden bg-white">
-              <img src={activeRole.image} className="h-[430px] w-full object-cover" />
-              <div className="p-5">
-                <div className="rounded-2xl bg-[#edf3dc] p-4">
-                  <div className="text-xs font-black tracking-[.18em] text-[#6f7f38]">FINAL DECISION</div>
-                  <div className="mt-2 text-xl font-black">{activeRole.decision}</div>
+                <ImageCard src={images.hero} title="Connected Food Ecosystem" />
+              </div>
+            )}
+
+            {panel === "journey" && (
+              <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                <ImageCard src={current.image} title={roleLabels[role]} />
+                <div>
+                  <div className="rounded-full bg-[#e4b95b] px-4 py-2 text-sm font-black uppercase tracking-[0.18em] w-fit">Pathway Journey</div>
+                  <h2 className="mt-4 text-4xl font-black">{roleLabels[role]}</h2>
+
+                  <InfoBlock title="Purpose" body={current.purpose} />
+                  <InfoBlock title="Need Being Met" body={current.need} />
+
+                  <div className="mt-4 rounded-[1.5rem] bg-[#f4ead7] p-5">
+                    <div className="text-sm font-black uppercase tracking-[0.16em] text-[#7b6a40]">Current Step</div>
+                    <div className="mt-2 text-2xl font-black">{journeyStep + 1}. {current.steps[journeyStep]}</div>
+                    <div className="mt-4 flex gap-2">
+                      <button onClick={prevStep} className="rounded-full bg-white px-4 py-2 font-bold">{t.back}</button>
+                      <button onClick={nextStep} className="rounded-full bg-[#20351f] px-4 py-2 font-bold text-white">{t.next}</button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <InfoList title="Tools Used" items={current.tools} />
+                    <InfoBlock title={t.decision} body={current.decision} />
+                  </div>
                 </div>
               </div>
-            </div>
-            <RoleContent role={activeRole} go={go} />
-          </div>
-        </PageShell>
-      )}
+            )}
 
-      {view === "live" && (
-        <PageShell title="Weather, Live Channels, Alerts & Proverbs" image={IMG.growArea2} go={go}>
-          <div className="grid gap-5 lg:grid-cols-3">
-            <InfoCard title="Farm Weather Channel" items={["Youngstown, OH 44505", "Check heat, rain, wind, and lightning before work begins.", "Supervisor action: adjust tasks, hydration, shade, and PPE."]} />
-            <InfoCard title="Daily Safety Channel" items={["No PPE, no work.", "Hydration check every work block.", "Lightning or unsafe weather moves youth to safe area."]} />
-            <InfoCard title="Marketplace Channel" items={["Post available produce.", "Post seedlings and Bubble Babies™.", "Update pickup windows and sold-out items."]} />
-          </div>
+            {panel === "weather" && (
+              <Dashboard title="Weather / Field Conditions" subtitle="Field readiness view for off-grid farm operations in Youngstown.">
+                <Metric label="Current Condition" value="51°F" detail="Partly sunny" />
+                <Metric label="Field Status" value="Check soil" detail="Clay-heavy soil requires moisture review before equipment." />
+                <Metric label="Water Priority" value="High" detail="Review totes, irrigation, and youth hydration plan." />
+                <Metric label="Safety Note" value="PPE first" detail="No PPE, no work. Gloves, closed shoes, weather-ready clothing." />
+              </Dashboard>
+            )}
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            <div className="panel bg-white p-6">
-              <h3 className="text-2xl font-black">Daily Proverbs</h3>
-              <div className="mt-4 grid gap-3">
-                {proverbs.map((p) => (
-                  <div key={p} className="rounded-2xl bg-[#f5f1e8] p-4 font-bold">{p}</div>
-                ))}
+            {panel === "cropPlanner" && (
+              <div>
+                <h2 className="text-4xl font-black">Crop Planner</h2>
+                <p className="mt-2 text-[#4a5a37]">Plan what to grow, when to plant, what to monitor, and how each crop connects to market, youth learning, and food access.</p>
+                <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-[#d8c8a8]">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-[#314d2d] text-white">
+                      <tr>
+                        <th className="p-3">Crop</th>
+                        <th className="p-3">Action</th>
+                        <th className="p-3">Season</th>
+                        <th className="p-3">Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cropRows.map((row, i) => (
+                        <tr key={row[0]} className={i % 2 ? "bg-[#f8f3e9]" : "bg-white"}>
+                          {row.map((cell) => <td key={cell} className="p-3 font-semibold">{cell}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-            <div className="panel bg-white p-6">
-              <h3 className="text-2xl font-black">Live Channel Buttons</h3>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {["Weather", "Soil", "Tasks", "Market", "Youth", "Partners", "Health", "Media"].map((x) => (
-                  <button key={x} onClick={() => setToast(`${x} channel opened`)} className="btn bg-[#23351f] text-white">
-                    Open {x}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </PageShell>
-      )}
+            )}
 
-      {view === "cropPlanner" && (
-        <PageShell title="Crop Planner" image={IMG.seeds} go={go}>
-          <div className="panel overflow-hidden bg-white">
-            <div className="grid gap-4 p-5 md:grid-cols-4">
-              <input className="rounded-2xl border p-3" placeholder="Crop search" />
-              <select className="rounded-2xl border p-3"><option>Season</option><option>Spring</option><option>Summer</option><option>Fall</option></select>
-              <select className="rounded-2xl border p-3"><option>Use</option><option>Market</option><option>Youth Training</option><option>SNAP-aware</option></select>
-              <button onClick={() => setToast("Crop plan filter applied")} className="btn bg-[#23351f] text-white">Apply</button>
-            </div>
-            <div className="overflow-auto">
-              <table className="w-full min-w-[760px] text-left">
-                <thead className="bg-[#23351f] text-white">
-                  <tr>{["Crop", "Method", "Planting Window", "Maturity", "Purpose"].map((h) => <th key={h} className="p-4">{h}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {cropRows.map((r) => (
-                    <tr key={r[0]} className="border-b">
-                      {r.map((c) => <td key={c} className="p-4 font-semibold">{c}</td>)}
-                    </tr>
+            {panel === "growPlan" && (
+              <Dashboard title="Grow Plan" subtitle="Daily rhythm for growers, youth workforce, supervisors, and operations.">
+                <Metric label="Morning" value="8:00 AM" detail="Check-in, PPE, hydration, daily assignments." />
+                <Metric label="Field Work" value="Crew Tasks" detail="Planting, watering, weeding, mulching, harvesting, pest checks." />
+                <Metric label="Learning" value="Skill Block" detail="Crop knowledge, food safety, tool safety, teamwork, reflection." />
+                <Metric label="Closeout" value="Daily Log" detail="Supervisor notes, youth reflection, inventory update, tomorrow’s needs." />
+              </Dashboard>
+            )}
+
+            {panel === "assessments" && (
+              <Dashboard title="Supervisor Assessments" subtitle="Phone-friendly tracking for the youth workforce program.">
+                <Metric label="Attendance" value="Daily" detail="Present, late, absent, early departure, reason." />
+                <Metric label="Safety" value="Required" detail="PPE, tool use, hydration, listening, site awareness." />
+                <Metric label="Participation" value="1–5" detail="Effort, teamwork, focus, responsibility, completion." />
+                <Metric label="Skills" value="Badges" detail="Planting, watering, harvesting, compost, market prep, leadership." />
+                <Metric label="Incidents" value="Log" detail="Document safety, behavior, injury, redirection, parent contact." />
+                <Metric label="Progress" value="Weekly" detail="Growth summary for youth, supervisor, admin, and parent connection." />
+              </Dashboard>
+            )}
+
+            {panel === "parentConnect" && (
+              <Dashboard title="Parent / Guardian Connection" subtitle="Keeps families connected to safety, schedule, progress, and celebration.">
+                <Metric label="Schedule" value="June 8 – Aug 28, 2026" detail="Monday–Friday, 8:00 AM–2:00 PM." />
+                <Metric label="Updates" value="Weekly" detail="Youth progress, badges, reminders, and program notes." />
+                <Metric label="Support" value="Message" detail="Parents can send questions, concerns, or availability updates." />
+                <Metric label="Celebration" value="Growth" detail="Share accomplishments, photos when approved, and end-of-program recognition." />
+              </Dashboard>
+            )}
+
+            {panel === "data" && (
+              <Dashboard title="Ecosystem Data Dashboard" subtitle="Operational visibility for farm, youth workforce, marketplace, and partners.">
+                <Metric label="Youth Capacity" value="50" detail="Initial program size, with ability to track a larger database over time." />
+                <Metric label="Supervisor Ratio" value="15:1" detail="Aides/supervisors support youth crews and daily progress." />
+                <Metric label="Inventory" value="Live" detail="Produce, seedlings, Bubble Babies™, seeds, supplies, and market items." />
+                <Metric label="Partners" value="Active" detail="Track donations, demonstrations, sponsorships, and follow-up." />
+                <Metric label="Reports" value="Export" detail="Attendance, skills, outcomes, market activity, volunteer hours." />
+                <Metric label="Decisions" value="Daily" detail="What needs water, labor, harvest, communication, repair, or funding?" />
+              </Dashboard>
+            )}
+
+            {panel === "channels" && (
+              <Dashboard title="Live Channels" subtitle="Connections that keep the ecosystem moving.">
+                <Metric label="Marketplace" value="GrownBy" detail="Online ordering, product visibility, SNAP-aware customer pathway." />
+                <Metric label="Events" value="Eventbrite" detail="QR registration, gate check-in, visitor tracking, event communication." />
+                <Metric label="Website" value="BronsonFamilyFarm.com" detail="Main portal entry for the farm experience." />
+                <Metric label="Media" value="Stories" detail="Press, WKBN, farm updates, partner visibility, community education." />
+                <Metric label="Weather" value="Field Check" detail="Weather-informed work plans and safety decisions." />
+                <Metric label="Feedback" value="Forms" detail="Guests, growers, youth, partners, and parents can respond." />
+              </Dashboard>
+            )}
+
+            {panel === "proverbs" && (
+              <div>
+                <h2 className="text-4xl font-black">Proverbs & Encouragement</h2>
+                <p className="mt-2 text-[#4a5a37]">Spiritual grounding for youth, families, growers, and the work of building together.</p>
+                <div className="mt-5 grid gap-4">
+                  {proverbs.map((p) => (
+                    <div key={p} className="rounded-[1.5rem] bg-[#f4ead7] p-5 text-xl font-black shadow-sm">{p}</div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </PageShell>
-      )}
+                </div>
+              </div>
+            )}
 
-      {view === "growPlan" && (
-        <PageShell title="Grow Plan" image={IMG.growArea} go={go}>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <InfoCard title="Weekly Grow Rhythm" items={["Monday: safety, planning, watering, task teams.", "Tuesday–Thursday: field work, crop care, youth skill development.", "Friday: harvest, reflection, data entry, cleanup, supervisor notes."]} />
-            <InfoCard title="Farm Systems" items={["Water: totes, irrigation planning, hydration schedule.", "Soil: compost, mulch, leaves, wood ash, soil testing.", "Protection: deer fencing, chicken wire, pest monitoring."]} />
-            <InfoCard title="Youth Teams" items={["Planting Team", "Compost Team", "Harvest Team", "Market Prep Team", "Data & Media Team"]} />
-            <InfoCard title="
+            {panel === "contact" && (
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div>
+                  <h2 className="text-4xl font-black">Contact / Feedback</h2>
+                  <p className="mt-3 text-[#4a5a37]">Use this pathway to invite support, ask questions, share feedback, or request partnership discussion.</p>
+                  <div className="mt-5 grid gap-3">
+                    <InfoBlock title="Bronson Family Farm" body="2350 Lansdowne Blvd., Youngstown, OH 44505" />
+                    <InfoBlock title="Website" body="www.bronsonfamilyfarm.com" />
+                    <InfoBlock title="Email" body="cburgess@bronsonfamilyfarm.com" />
+                    <InfoBlock title="Phone" body="330-275-1604" />
+                  </div>
+                </div>
+
+                <form className="rounded-[1.5rem] bg-[#f4ead7] p-5">
+                  <label className="block text-sm font-black">Name</label>
+                  <input className="mt-1 mb-3 w-full rounded-xl border border-[#c8b98d] p-3" placeholder="Your name" />
+                  <label className="block text-sm font-black">Role / Interest</label>
+                  <input className="mt-1 mb-3 w-full rounded-xl border border-[#c8b98d] p-3" placeholder="Grower, parent, partner, volunteer..." />
+                  <label className="block text-sm font-black">Message</label>
+                  <textarea className="mt-1 mb-3 h-32 w-full rounded-xl border border-[#c8b98d] p-3" placeholder="How would you like to connect?" />
+                  <button type="button" className="rounded-full bg-[#20351f] px-6 py-3 font-black text-white">Prepare Message</button>
+                </form>
+              </div>
+            )}
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function ImageCard({ src, title }: { src: string; title: string }) {
+  return (
+    <div className="overflow-hidden rounded-[2rem] border border-[#d8c8a8] bg-[#eadcbd] shadow-sm">
+      <img
+        src={src}
+        alt={title}
+        className="h-[420px] w-full object-cover"
+        onError={(e) => {
+          const img = e.currentTarget;
+          if (!img.src.includes("GrowArea2.jpg")) img.src = "/images/GrowArea2.jpg";
+        }}
+      />
+      <div className="p-4">
+        <div className="text-sm font-black uppercase tracking-[0.18em] text-[#7b6a40]">{title}</div>
+      </div>
+    </div>
+  );
+}
+
+function InfoBlock({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="mt-4 rounded-[1.5rem] bg-white p-5 shadow-sm">
+      <div className="text-sm font-black uppercase tracking-[0.16em] text-[#7b6a40]">{title}</div>
+      <p className="mt-2 text-base font-semibold leading-7 text-[#3f4d31]">{body}</p>
+    </div>
+  );
+}
+
+function InfoList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-[1.5rem] bg-white p-5 shadow-sm">
+      <div className="text-sm font-black uppercase tracking-[0.16em] text-[#7b6a40]">{title}</div>
+      <ul className="mt-2 space-y-2">
+        {items.map((item) => (
+          <li key={item} className="rounded-xl bg-[#f8f3e9] px-3 py-2 font-bold">{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Dashboard({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h2 className="text-4xl font-black">{title}</h2>
+      <p className="mt-2 text-[#4a5a37]">{subtitle}</p>
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{children}</div>
+    </div>
+  );
+}
+
+function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="rounded-[1.5rem] border border-[#d8c8a8] bg-white p-5 shadow-sm">
+      <div className="text-sm font-black uppercase tracking-[0.16em] text-[#7b6a40]">{label}</div>
+      <div className="mt-2 text-3xl font-black text-[#20351f]">{value}</div>
+      <p className="mt-2 text-sm font-semibold leading-6 text-[#4a5a37]">{detail}</p>
+    </div>
+  );
+}
+
+export default App;
