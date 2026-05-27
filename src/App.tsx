@@ -215,8 +215,8 @@ export default function App() {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.78;
-    utterance.pitch = 0.95;
+    utterance.rate = 0.76;
+    utterance.pitch = 0.92;
     utterance.volume = 1;
     window.speechSynthesis.speak(utterance);
   };
@@ -232,7 +232,7 @@ export default function App() {
         }
         return prev + 1;
       });
-    }, 16000);
+    }, 17000);
     return () => window.clearTimeout(timer);
   }, [tourOpen, tourRunning, tourIndex]);
 
@@ -247,6 +247,9 @@ export default function App() {
     setTourOpen(true);
     setTourRunning(true);
     setTourIndex(0);
+    speak(
+      "Welcome to Bronson Family Farm. You are entering a living ecosystem. Please take your time. Look around. Listen carefully. This is more than a farm."
+    );
   };
 
   const pauseTour = () => {
@@ -276,7 +279,22 @@ export default function App() {
         button, select { font-family: inherit; }
         button { cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030503; }
-        .forest-bg { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(90deg, rgba(0,0,0,.76), rgba(0,0,0,.42), rgba(0,0,0,.84)), url('/images/GrowArea2.jpg'); background-size: cover; background-position: center; filter: saturate(1.05) contrast(1.08); }
+
+        .forest-bg {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          background-image:
+            linear-gradient(90deg, rgba(0,0,0,.88), rgba(0,0,0,.72), rgba(0,0,0,.90)),
+            url('/images/GrowArea2.jpg');
+          background-size: cover;
+          background-position: center;
+          transform: scale(1.08);
+          filter: blur(10px) brightness(.42) saturate(.78) contrast(.92);
+          opacity: 1;
+          transition: filter 2s ease, transform 6s ease;
+        }
+
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; padding: 18px 0 32px; }
         .topbar { position: sticky; top: 12px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 28px; background: rgba(16,22,17,.82); backdrop-filter: blur(22px); box-shadow: 0 20px 55px rgba(0,0,0,.32); }
         .brand { min-width: 205px; }
@@ -288,20 +306,85 @@ export default function App() {
         .nav button.active, .pill-button.active { background: linear-gradient(135deg, #53e28e, #27c875); color: #031005; border-color: rgba(255,255,255,.28); box-shadow: 0 0 20px rgba(63,226,139,.25); }
         .language { min-width: 130px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: white; border-radius: 999px; padding: 12px 15px; outline: none; font-weight: 800; }
         .language option { color: #111; }
-        .portal { min-height: calc(100vh - 126px); display: grid; place-items: center; padding: 32px 0; }
-        .portal-card { width: min(920px, 100%); border: 1px solid rgba(255,255,255,.13); border-radius: 36px; background: rgba(6,9,7,.66); backdrop-filter: blur(18px); box-shadow: 0 30px 95px rgba(0,0,0,.55); padding: clamp(28px, 5vw, 64px); text-align: center; }
-        .portal-kicker, .eyebrow { color: #b7dc75; font-size: 12px; letter-spacing: .38em; font-weight: 950; text-transform: uppercase; margin-bottom: 15px; }
-        .portal h1 { margin: 0; font-size: clamp(48px, 6vw, 92px); line-height: .9; letter-spacing: -2px; font-weight: 950; }
-        .portal p { margin: 24px auto 0; max-width: 720px; font-size: clamp(18px, 1.45vw, 25px); line-height: 1.45; color: rgba(255,255,255,.82); }
-        .portal-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 13px; margin-top: 32px; }
+
+        .portal {
+          min-height: calc(100vh - 126px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 20px;
+          position: relative;
+        }
+
+        .portal-card {
+          width: min(820px, 100%);
+          border-radius: 38px;
+          padding: clamp(36px, 5vw, 74px);
+          background: rgba(5,8,6,.58);
+          backdrop-filter: blur(18px);
+          border: 1px solid rgba(255,255,255,.12);
+          box-shadow: 0 30px 100px rgba(0,0,0,.58);
+          text-align: center;
+          animation: portalFloat 7s ease-in-out infinite;
+        }
+
+        @keyframes portalFloat {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+          100% { transform: translateY(0px); }
+        }
+
+        .portal-kicker {
+          color: #b7dc75;
+          font-size: 12px;
+          letter-spacing: .42em;
+          font-weight: 900;
+          margin-bottom: 22px;
+          text-transform: uppercase;
+        }
+
+        .portal h1 {
+          margin: 0;
+          font-size: clamp(58px, 7vw, 104px);
+          line-height: .92;
+          letter-spacing: -2px;
+          font-weight: 950;
+        }
+
+        .portal p {
+          margin: 28px auto 0;
+          max-width: 640px;
+          color: rgba(255,255,255,.82);
+          font-size: clamp(18px, 1.4vw, 24px);
+          line-height: 1.55;
+        }
+
+        .portal-actions {
+          display: flex;
+          justify-content: center;
+          margin-top: 38px;
+        }
+
+        .portal-tag {
+          padding: 12px 18px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.08);
+          border: 1px solid rgba(255,255,255,.12);
+          font-size: 14px;
+          font-weight: 700;
+          backdrop-filter: blur(10px);
+        }
+
         .primary-button, .secondary-button { border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 15px 24px; color: white; font-weight: 950; background: rgba(255,255,255,.12); }
         .primary-button { background: linear-gradient(135deg, #83b63d, #4f8d25); box-shadow: 0 12px 30px rgba(87,144,42,.32); }
         .secondary-button { background: rgba(0,0,0,.34); }
+
         .tour-panel, .section { margin-top: 24px; border: 1px solid rgba(255,255,255,.12); background: rgba(7,10,8,.74); backdrop-filter: blur(18px); border-radius: 34px; padding: 28px; box-shadow: 0 25px 70px rgba(0,0,0,.34); }
         .tour-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 26px; align-items: stretch; }
         .tour-copy { display: flex; flex-direction: column; justify-content: space-between; gap: 22px; }
         .tour-copy h2, .section-title { margin: 0 0 12px; font-size: clamp(34px, 4vw, 62px); line-height: .95; font-weight: 950; letter-spacing: -1px; }
         .tour-copy p, .section-lead { margin: 0; color: rgba(255,255,255,.78); font-size: 18px; line-height: 1.5; }
+        .eyebrow { color: #b7dc75; font-size: 12px; letter-spacing: .38em; font-weight: 950; text-transform: uppercase; margin-bottom: 15px; }
         .tour-bullets { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 22px; }
         .tour-bullet { border: 1px solid rgba(255,255,255,.12); border-radius: 20px; background: rgba(255,255,255,.07); padding: 15px; font-weight: 850; color: rgba(255,255,255,.86); }
         .progress-track { height: 8px; width: 100%; border-radius: 999px; background: rgba(255,255,255,.15); overflow: hidden; margin: 20px 0 0; }
@@ -326,7 +409,7 @@ export default function App() {
         .control-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
         .control-item { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.08); border-radius: 20px; padding: 18px; font-weight: 850; }
         @media (max-width: 1200px) { .tour-layout { grid-template-columns: 1fr; } .role-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .journey-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-        @media (max-width: 760px) { .screen { width: min(100vw - 20px, 1540px); padding-top: 10px; } .topbar { position: relative; top: 0; align-items: flex-start; flex-direction: column; } .nav { justify-content: flex-start; } .nav button { padding: 10px 13px; font-size: 13px; } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .tour-bullets, .tour-step-buttons, .role-grid, .journey-grid, .control-list { grid-template-columns: 1fr; } .tour-image, .tour-image .smart-image { min-height: 330px; } }
+        @media (max-width: 760px) { .screen { width: min(100vw - 20px, 1540px); padding-top: 10px; } .topbar { position: relative; top: 0; align-items: flex-start; flex-direction: column; } .nav { justify-content: flex-start; } .nav button { padding: 10px 13px; font-size: 13px; } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 54px; } .tour-bullets, .tour-step-buttons, .role-grid, .journey-grid, .control-list { grid-template-columns: 1fr; } .tour-image, .tour-image .smart-image { min-height: 330px; } }
       `}</style>
 
       <div className="forest-bg" />
@@ -355,14 +438,24 @@ export default function App() {
           <section className="portal">
             <div className="portal-card">
               <div className="portal-kicker">FOREST GATE PORTAL</div>
-              <h1>Step Into the Farm</h1>
+              <h1>
+                Step Into
+                <br />
+                the Ecosystem
+              </h1>
               <p>
-                Enter slowly. This is the doorway into Bronson Family Farm’s living food, youth workforce, grower, marketplace, wellness, and community ecosystem.
+                Bronson Family Farm is a living ecosystem where food, learning, healing, growers, families, youth, and community opportunity come together.
               </p>
+
               <div className="portal-actions">
-                <button className="primary-button" onClick={startTour}>Begin Guided Tour</button>
-                <button className="secondary-button" onClick={() => openTab("guest")}>Enter Guest Demo</button>
-                <button className="secondary-button" onClick={() => openTab("roles")}>View Pathways</button>
+                <button className="primary-button" onClick={startTour}>Enter The Ecosystem</button>
+              </div>
+
+              <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 18, flexWrap: "wrap", opacity: 0.78 }}>
+                <div className="portal-tag">Food Access</div>
+                <div className="portal-tag">Youth Workforce</div>
+                <div className="portal-tag">Grower Opportunity</div>
+                <div className="portal-tag">Community Healing</div>
               </div>
             </div>
           </section>
