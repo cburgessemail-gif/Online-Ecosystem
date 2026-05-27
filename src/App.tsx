@@ -381,7 +381,20 @@ export default function App() {
         .portal h1 { margin: 0; font-size: clamp(46px, 5.8vw, 82px); line-height: .92; letter-spacing: -2px; font-weight: 950; text-shadow: 0 4px 22px rgba(0,0,0,.72); }
         .portal p { margin: 22px auto 0; max-width: 640px; color: rgba(255,255,255,.90); font-size: clamp(16px, 1.25vw, 21px); line-height: 1.45; text-shadow: 0 2px 14px rgba(0,0,0,.65); }
         .portal-actions { display: flex; justify-content: center; margin-top: 26px; }
-        .portal-tag { padding: 12px 18px; border-radius: 999px; background: rgba(0,0,0,.34); border: 1px solid rgba(255,255,255,.16); font-size: 14px; font-weight: 700; backdrop-filter: blur(8px); }
+        .portal-tag {
+          padding: 10px 16px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.06);
+          border: 1px solid rgba(255,255,255,.08);
+          font-size: 13px;
+          font-weight: 700;
+          color: rgba(255,255,255,.68);
+          letter-spacing: .02em;
+          backdrop-filter: blur(4px);
+          cursor: default;
+          pointer-events: none;
+          box-shadow: none;
+        }
 
         .primary-button, .secondary-button { border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 15px 24px; color: white; font-weight: 950; background: rgba(255,255,255,.12); }
         .primary-button { background: linear-gradient(135deg, #83b63d, #4f8d25); box-shadow: 0 12px 30px rgba(87,144,42,.32); }
