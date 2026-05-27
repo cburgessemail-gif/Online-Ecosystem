@@ -88,23 +88,42 @@ function NavButton({
   return (
     <button
       onClick={onClick}
-      className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-semibold backdrop-blur-xl transition hover:bg-white/20"e: string;
+      className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-semibold backdrop-blur-xl transition hover:bg-white/20"
+    >
+      {label}
+    </button>
+  );
+}
+
+function Card({
+  title,
+  subtitle,
+  image,
+}: {
+  title: string;
+  subtitle: string;
+  image: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_30px_80px_rgba(0,0,0,.55)] min-h-[320px]">
+    <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_30px_80px_rgba(0,0,0,.55)] min-h-[250px]">
       <img
         src={image}
         alt={title}
-        className="absolute inset-0 h-full w-full object-cover transitmin-h-[250px][4000ms] group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover transition duration-[4000ms] group-hover:scale-105"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
 
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
-        <h2 className="text-3xl font-black">{title}</h2>
-        <p className="mt-className="absolute bottom-0 left-0 right-0 z-10 p-5"</div>
-   <h2 className="text-2xl font-black">ion App() {
-  const [scrclassName="mt-2 text-sm text-emerald-50/85 leading-6"
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-5">
+        <h2 className="text-2xl font-black">{title}</h2>
+        <p className="mt-2 text-sm text-emerald-50/85 leading-6">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("portal");
 
   const proverb = useMemo(() => {
     return dailyProverbs[new Date().getDate() % dailyProverbs.length];
@@ -373,12 +392,8 @@ function NavButton({
 
   return (
     <Shell background={IMG.hero}>
-      <div className="sticky top-3 z-30 mb-4 rounded-[1.75rem] border border-white/10 bg-black/45 p-3 shadow-[0_20px_70px_rgba(0,0,0,.45)] back<div className="sticky top-3 z-30 mb-4 rounded-[1.75rem] border border-white/10 bg-black/45 p-3 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
-        <div className="flex flex-wrap items-center gap-2">x flex-wrap items-center gap-2">
-          <div className="mr-3 min-w-[190px] px-2">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-emerald-100/70">Bronson Family Farm</div>
-            <div className="text-lg font-black leading-tight">Online Ecosystem</div>
-          </div>
+      <div className="sticky top-3 z-30 mb-4 rounded-[1.75rem] border border-white/10 bg-black/45 p-3 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+        <div className="flex flex-wrap items-center gap-2">
         <NavButton label="Home" onClick={() => setScreen("home")} />
         <NavButton label="Roles" onClick={() => setScreen("roles")} />
         <NavButton label="Youth" onClick={() => setScreen("youth")} />
@@ -387,24 +402,26 @@ function NavButton({
         <NavButton label="Grower" onClick={() => setScreen("grower")} />
         <NavButton label="Crop Planning" onClick={() => setScreen("crop")} />
         <NavButton label="Marketplace" onClick={() => setScreen("marketplace")} />
-        <NavButton </div>
-      </div>
-
-      {screen === "home"etScreen("weat<div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">Click={() => setScreen("encouragement")} />
+        <NavButton label="Weather" onClick={() => setScreen("weather")} />
+        <NavButton label="Encouragement" onClick={() => setScreen("encouragement")} />
         <NavButton label="Reports" onClick={() => setScreen("reports")} />
         <NavButton label="Partners" onClick={() => setScreen("partners")} />
       </div>
+      </div>
 
       {screen === "home" && (
-        <div className="grid gap-6 lg:grid-cols-[1.<div className="space-y-4">            title="Step Into The Farm"
+        <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+          <Card
+            title="Step Into The Farm"
             subtitle="A living operational ecosystem connecting youth workforce, agriculture, wellness, crop planning, marketplace systems, education, and community revitalization."
             image={IMG.hero}
           />
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <Card
               title="Daily Proverb"
- <div className="grid gap-4 md:grid-cols-3">eeds}
+              subtitle={proverb}
+              image={IMG.seeds}
             />
 
             <Card
@@ -417,7 +434,7 @@ function NavButton({
       )}
 
       {screen === "roles" && (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card title="Youth Workforce" subtitle="Leadership through participation." image={IMG.youth} />
           <Card title="Growers" subtitle="Production and food access systems." image={IMG.growArea} />
           <Card title="Marketplace" subtitle="Harvest connected to community." image={IMG.marketplace} />
@@ -490,12 +507,13 @@ function NavButton({
             </div>
 
             <Card
-            title="Parent <h2 className="text-2xl font-black">tle="Connected visibility into attendance, progress, encouragement, reflections, badges, and notifications."
+            title="Parent / Guardian Portal"
+            subtitle="Connected visibility into attendance, progress, encouragement, reflections, badges, and notifications."
             image={IMG.queens}
           />
 
           <div className="rounded-[2rem] border border-white/10 bg-black/40 p-8 backdrop-blur-xl">
-            <h2 className="text-3xl font-black">Connected Ecosystem Flow</h2>
+            <h2 className="text-2xl font-black">Connected Ecosystem Flow</h2>
 
             <div className="mt-8 space-y-4 text-lg leading-8 text-emerald-50/90">
               <div>Youth completes assignment →</div>
@@ -518,7 +536,10 @@ function NavButton({
             <Card
             title="Grower Ecosystem"
             subtitle="Production planning, irrigation, composting, harvest forecasting, and grow zone management."
-            image={IMG.<div className="space-y-4">       <Card
+            image={IMG.growArea}
+          />
+
+          <Card
             title="Value Added Agriculture"
             subtitle="Edible flowers, mushrooms, culinary education, preservation, nutrition, and wellness."
             image={IMG.flowers}
@@ -527,7 +548,7 @@ function NavButton({
       )}
 
       {screen === "crop" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <Card
             title="Crop Planning System"
             subtitle="Visual crop planning connected to youth assignments, weather, irrigation, inventory, and marketplace forecasting."
@@ -600,14 +621,14 @@ function NavButton({
 
       {screen === "encouragement" && (
         <div className="grid gap-6 lg:grid-cols-3">
-          <Card title="Daily Proverbs" sub<div className="space-y-4">seeds} />
+          <Card title="Daily Proverbs" subtitle={proverb} image={IMG.seeds} />
           <Card title="Positive Messages" subtitle={positive} image={IMG.compost} />
           <Card title="Youth Reflection" subtitle="What did I learn today? Who did I help?" image={IMG.youth} />
         </div>
       )}
 
       {screen === "reports" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="absolute top-8 right-8 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-cyan-100 backdrop-blur-xl">
               LIVE OPERATIONS ACTIVE
             </div>
