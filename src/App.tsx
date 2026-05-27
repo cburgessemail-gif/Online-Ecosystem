@@ -253,8 +253,8 @@ export default function App() {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.76;
-    utterance.pitch = 0.92;
+    utterance.rate = 0.82;
+    utterance.pitch = 0.96;
     utterance.volume = 1;
     window.speechSynthesis.speak(utterance);
   };
@@ -270,7 +270,7 @@ export default function App() {
         }
         return prev + 1;
       });
-    }, 17000);
+    }, 26000);
     return () => window.clearTimeout(timer);
   }, [tourOpen, tourRunning, tourIndex]);
 
@@ -283,11 +283,16 @@ export default function App() {
 
   const startTour = () => {
     setTourOpen(true);
-    setTourRunning(true);
     setTourIndex(0);
-    setTimeout(() => {
-      speak("Welcome to Bronson Family Farm. You are entering a living ecosystem. Please take your time. Look around. Listen carefully. This is more than a farm.");
-    }, 400);
+    setTourRunning(false);
+
+    speak(
+      "Welcome to Bronson Family Farm. You are entering a living ecosystem. Take your time. Look around. Let the vision open slowly. This is more than a farm."
+    );
+
+    window.setTimeout(() => {
+      setTourRunning(true);
+    }, 9000);
   };
 
   const pauseTour = () => {
