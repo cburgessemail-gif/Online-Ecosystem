@@ -231,11 +231,174 @@ export default function App() {
   };
 
   // =========================================================
+  // FINAL OPERATIONAL ECOSYSTEM ENGINE
+  // =========================================================
+
+  const ecosystemStatus = {
+    activeTeams: 4,
+    activeGrowZones: 7,
+    weatherStatus: "Cloud movement expected at 3PM",
+    harvestWindow: "Tomatoes approaching harvest",
+    marketplaceStatus: "Marketplace inventory updated",
+    reflectionsSubmitted: 18,
+    supervisorsActive: 5,
+  };
+
+  const operationalTimeline = {
+    morning: {
+      atmosphere: "Preparation + anticipation",
+      focus: [
+        "Weather review",
+        "Assignments",
+        "PPE checks",
+        "Morning proverb",
+      ],
+    },
+    midday: {
+      atmosphere: "Movement + participation",
+      focus: [
+        "Crop activity",
+        "Assessments",
+        "Marketplace prep",
+        "Supervisor observations",
+      ],
+    },
+    evening: {
+      atmosphere: "Reflection + reporting",
+      focus: [
+        "Youth reflections",
+        "Parent summaries",
+        "Badge progression",
+        "Operational reporting",
+      ],
+    },
+  };
+
+  const activeAssignments = [
+    "Tomato irrigation support",
+    "Compost distribution",
+    "Marketplace wash station",
+    "Pollinator zone cleanup",
+    "Raised bed maintenance",
+    "Seed preparation",
+  ];
+
+  const operationalAlerts = [
+    "Rain expected this afternoon",
+    "Marketplace inventory updated",
+    "Youth Team 2 active in Grow Zone B",
+    "Harvest window approaching for collards",
+  ];
+
+  // =========================================================
+  // HOME EXPERIENCEAL ECOSYSTEM ENGINE
+  // =========================================================
+
+  const ecosystemStatus = {
+    activeTeams: 4,
+    activeGrowZones: 7,
+    weatherStatus: "Cloud movement expected at 3PM",
+    harvestWindow: "Tomatoes approaching harvest",
+    marketplaceStatus: "Marketplace inventory updated",
+    reflectionsSubmitted: 18,
+    supervisorsActive: 5,
+  };
+
+  const operationalTimeline = {
+    morning: {
+      atmosphere: "Preparation + anticipation",
+      focus: [
+        "Weather review",
+        "Assignments",
+        "PPE checks",
+        "Morning proverb",
+      ],
+    },
+    midday: {
+      atmosphere: "Movement + participation",
+      focus: [
+        "Crop activity",
+        "Assessments",
+        "Marketplace prep",
+        "Supervisor observations",
+      ],
+    },
+    evening: {
+      atmosphere: "Reflection + reporting",
+      focus: [
+        "Youth reflections",
+        "Parent summaries",
+        "Badge progression",
+        "Operational reporting",
+      ],
+    },
+  };
+
+  const activeAssignments = [
+    "Tomato irrigation support",
+    "Compost distribution",
+    "Marketplace wash station",
+    "Pollinator zone cleanup",
+    "Raised bed maintenance",
+    "Seed preparation",
+  ];
+
+  const operationalAlerts = [
+    "Rain expected this afternoon",
+    "Marketplace inventory updated",
+    "Youth Team 2 active in Grow Zone B",
+    "Harvest window approaching for collards",
+  ];
+
+  // =========================================================
   // HOME EXPERIENCE
   // =========================================================
 
   return (
     <Shell background={IMG.hero}>
+      <div className="mb-6 rounded-[2rem] border border-white/10 bg-black/35 p-4 backdrop-blur-xl">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
+              Ecosystem Status
+            </div>
+            <div className="mt-3 text-2xl font-black">
+              {ecosystemStatus.activeTeams} Active Teams
+            </div>
+            <div className="mt-2 text-sm text-emerald-50/80">
+              {ecosystemStatus.activeGrowZones} Grow Zones Active
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-xs uppercase tracking-[0.25em] text-sky-100/70">
+              Weather Layer
+            </div>
+            <div className="mt-3 text-lg font-black">
+              {ecosystemStatus.weatherStatus}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-xs uppercase tracking-[0.25em] text-amber-100/70">
+              Harvest Window
+            </div>
+            <div className="mt-3 text-lg font-black">
+              {ecosystemStatus.harvestWindow}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-xs uppercase tracking-[0.25em] text-cyan-100/70">
+              Marketplace
+            </div>
+            <div className="mt-3 text-lg font-black">
+              {ecosystemStatus.marketplaceStatus}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-3 pb-6">
         <NavButton label="Home" onClick={() => setScreen("home")} />
         <NavButton label="Roles" onClick={() => setScreen("roles")} />
@@ -252,7 +415,42 @@ export default function App() {
       </div>
 
       {screen === "home" && (
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.25em] text-orange-100/70">
+                Morning Rhythm
+              </div>
+              <div className="mt-4 space-y-2 text-sm text-emerald-50/85">
+                {operationalTimeline.morning.focus.map((item) => (
+                  <div key={item}>• {item}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.25em] text-amber-100/70">
+                Midday Operations
+              </div>
+              <div className="mt-4 space-y-2 text-sm text-emerald-50/85">
+                {operationalTimeline.midday.focus.map((item) => (
+                  <div key={item}>• {item}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.25em] text-sky-100/70">
+                Evening Reflection
+              </div>
+              <div className="mt-4 space-y-2 text-sm text-emerald-50/85">
+                {operationalTimeline.evening.focus.map((item) => (
+                  <div key={item}>• {item}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg
           <Card
             title="Step Into The Farm"
             subtitle="A living operational ecosystem connecting youth workforce, agriculture, wellness, crop planning, marketplace systems, education, and community revitalization."
