@@ -297,7 +297,7 @@ export default function App() {
           background-image:
             radial-gradient(circle at center, rgba(45,73,28,.08), rgba(0,0,0,.34) 48%, rgba(0,0,0,.78) 100%),
             linear-gradient(90deg, rgba(0,0,0,.56), rgba(34,64,28,.10), rgba(0,0,0,.64)),
-            url('/images/GrowArea2.jpg');
+            url('/images/SAM_0396.JPG');
           filter: blur(2px) brightness(.70) saturate(1.28) contrast(1.08);
           transform: scale(1.025);
         }
