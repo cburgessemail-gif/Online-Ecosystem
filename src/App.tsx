@@ -285,12 +285,13 @@ export default function App() {
           inset: 0;
           z-index: 0;
           background-image:
-            linear-gradient(90deg, rgba(0,0,0,.88), rgba(0,0,0,.72), rgba(0,0,0,.90)),
+            radial-gradient(circle at center, rgba(0,0,0,.18), rgba(0,0,0,.68) 58%, rgba(0,0,0,.88) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.58), rgba(0,0,0,.32), rgba(0,0,0,.66)),
             url('/images/GrowArea2.jpg');
           background-size: cover;
-          background-position: center;
-          transform: scale(1.08);
-          filter: blur(10px) brightness(.42) saturate(.78) contrast(.92);
+          background-position: center center;
+          transform: scale(1.04);
+          filter: blur(4px) brightness(.72) saturate(.9) contrast(.96);
           opacity: 1;
           transition: filter 2s ease, transform 6s ease;
         }
@@ -312,18 +313,18 @@ export default function App() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 40px 20px;
+          padding: 24px 20px;
           position: relative;
         }
 
         .portal-card {
-          width: min(820px, 100%);
+          width: min(760px, 100%);
           border-radius: 38px;
-          padding: clamp(36px, 5vw, 74px);
-          background: rgba(5,8,6,.58);
-          backdrop-filter: blur(18px);
-          border: 1px solid rgba(255,255,255,.12);
-          box-shadow: 0 30px 100px rgba(0,0,0,.58);
+          padding: clamp(28px, 4vw, 52px);
+          background: rgba(5,8,6,.46);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,.14);
+          box-shadow: 0 30px 100px rgba(0,0,0,.48);
           text-align: center;
           animation: portalFloat 7s ease-in-out infinite;
         }
@@ -345,24 +346,24 @@ export default function App() {
 
         .portal h1 {
           margin: 0;
-          font-size: clamp(58px, 7vw, 104px);
+          font-size: clamp(46px, 5.8vw, 82px);
           line-height: .92;
           letter-spacing: -2px;
           font-weight: 950;
         }
 
         .portal p {
-          margin: 28px auto 0;
+          margin: 22px auto 0;
           max-width: 640px;
-          color: rgba(255,255,255,.82);
-          font-size: clamp(18px, 1.4vw, 24px);
-          line-height: 1.55;
+          color: rgba(255,255,255,.84);
+          font-size: clamp(16px, 1.25vw, 21px);
+          line-height: 1.45;
         }
 
         .portal-actions {
           display: flex;
           justify-content: center;
-          margin-top: 38px;
+          margin-top: 26px;
         }
 
         .portal-tag {
@@ -451,7 +452,7 @@ export default function App() {
                 <button className="primary-button" onClick={startTour}>Enter The Ecosystem</button>
               </div>
 
-              <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 18, flexWrap: "wrap", opacity: 0.78 }}>
+              <div style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", opacity: 0.82 }}>
                 <div className="portal-tag">Food Access</div>
                 <div className="portal-tag">Youth Workforce</div>
                 <div className="portal-tag">Grower Opportunity</div>
