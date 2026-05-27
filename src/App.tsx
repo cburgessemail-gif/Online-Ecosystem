@@ -284,16 +284,27 @@ export default function App() {
           position: fixed;
           inset: 0;
           z-index: 0;
-          background-image:
-            radial-gradient(circle at center, rgba(0,0,0,.18), rgba(0,0,0,.68) 58%, rgba(0,0,0,.88) 100%),
-            linear-gradient(90deg, rgba(0,0,0,.58), rgba(0,0,0,.32), rgba(0,0,0,.66)),
-            url('/images/GrowArea2.jpg');
           background-size: cover;
           background-position: center center;
           transform: scale(1.04);
-          filter: blur(4px) brightness(.72) saturate(.9) contrast(.96);
           opacity: 1;
-          transition: filter 2s ease, transform 6s ease;
+          transition: filter 2s ease, transform 6s ease, background-image 1.2s ease;
+        }
+
+        .portal-forest {
+          background-image:
+            radial-gradient(circle at center, rgba(86,128,46,.10), rgba(0,0,0,.56) 54%, rgba(0,0,0,.84) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.54), rgba(65,96,35,.22), rgba(0,0,0,.62)),
+            url('/images/Grow%20Area.png');
+          filter: blur(5px) brightness(.82) saturate(1.22) contrast(.98);
+        }
+
+        .ecosystem-forest {
+          background-image:
+            radial-gradient(circle at center, rgba(122,166,70,.16), rgba(0,0,0,.52) 58%, rgba(0,0,0,.86) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.62), rgba(62,111,45,.20), rgba(0,0,0,.68)),
+            url('/images/GrowArea2.jpg');
+          filter: blur(4px) brightness(.78) saturate(1.18) contrast(.98);
         }
 
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; padding: 18px 0 32px; }
@@ -413,7 +424,7 @@ export default function App() {
         @media (max-width: 760px) { .screen { width: min(100vw - 20px, 1540px); padding-top: 10px; } .topbar { position: relative; top: 0; align-items: flex-start; flex-direction: column; } .nav { justify-content: flex-start; } .nav button { padding: 10px 13px; font-size: 13px; } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 54px; } .tour-bullets, .tour-step-buttons, .role-grid, .journey-grid, .control-list { grid-template-columns: 1fr; } .tour-image, .tour-image .smart-image { min-height: 330px; } }
       `}</style>
 
-      <div className="forest-bg" />
+      <div className={`forest-bg ${tab === "portal" ? "portal-forest" : "ecosystem-forest"}`} />
 
       <div className="screen">
         <header className="topbar">
