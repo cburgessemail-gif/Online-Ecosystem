@@ -247,9 +247,11 @@ export default function App() {
     setTourOpen(true);
     setTourRunning(true);
     setTourIndex(0);
-    speak(
-      "Welcome to Bronson Family Farm. You are entering a living ecosystem. Please take your time. Look around. Listen carefully. This is more than a farm."
-    );
+    setTimeout(() => {
+      speak(
+        "Welcome to Bronson Family Farm. You are entering a living ecosystem. Please take your time. Look around. Listen carefully. This is more than a farm."
+      );
+    }, 400);
   };
 
   const pauseTour = () => {
@@ -286,17 +288,18 @@ export default function App() {
           z-index: 0;
           background-size: cover;
           background-position: center center;
-          transform: scale(1.04);
+          transform: scale(1.025);
           opacity: 1;
           transition: filter 2s ease, transform 6s ease, background-image 1.2s ease;
         }
 
         .portal-forest {
           background-image:
-            radial-gradient(circle at center, rgba(86,128,46,.10), rgba(0,0,0,.56) 54%, rgba(0,0,0,.84) 100%),
-            linear-gradient(90deg, rgba(0,0,0,.54), rgba(65,96,35,.22), rgba(0,0,0,.62)),
-            url('/images/Grow%20Area.png');
-          filter: blur(5px) brightness(.82) saturate(1.22) contrast(.98);
+            radial-gradient(circle at center, rgba(45,73,28,.08), rgba(0,0,0,.34) 48%, rgba(0,0,0,.78) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.56), rgba(34,64,28,.10), rgba(0,0,0,.64)),
+            url('/images/GrowArea2.jpg');
+          filter: blur(2px) brightness(.70) saturate(1.28) contrast(1.08);
+          transform: scale(1.025);
         }
 
         .ecosystem-forest {
@@ -308,6 +311,7 @@ export default function App() {
         }
 
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; padding: 18px 0 32px; }
+        .screen:has(.portal) { padding-top: 0; }
         .topbar { position: sticky; top: 12px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 28px; background: rgba(16,22,17,.82); backdrop-filter: blur(22px); box-shadow: 0 20px 55px rgba(0,0,0,.32); }
         .brand { min-width: 205px; }
         .brand-kicker { font-size: 12px; letter-spacing: .32em; color: #bcd2a0; font-weight: 900; }
@@ -320,22 +324,22 @@ export default function App() {
         .language option { color: #111; }
 
         .portal {
-          min-height: calc(100vh - 126px);
+          min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 24px 20px;
+          padding: 28px 20px;
           position: relative;
         }
 
         .portal-card {
           width: min(760px, 100%);
           border-radius: 38px;
-          padding: clamp(28px, 4vw, 52px);
-          background: rgba(5,8,6,.46);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,.14);
-          box-shadow: 0 30px 100px rgba(0,0,0,.48);
+          padding: clamp(30px, 4vw, 56px);
+          background: rgba(5,8,6,.50);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,.15);
+          box-shadow: 0 30px 100px rgba(0,0,0,.55);
           text-align: center;
           animation: portalFloat 7s ease-in-out infinite;
         }
@@ -427,24 +431,26 @@ export default function App() {
       <div className={`forest-bg ${tab === "portal" ? "portal-forest" : "ecosystem-forest"}`} />
 
       <div className="screen">
-        <header className="topbar">
-          <div className="brand">
-            <div className="brand-kicker">BRONSON FAMILY FARM</div>
-            <div className="brand-title">Online Ecosystem</div>
-          </div>
+        {tab !== "portal" && (
+          <header className="topbar">
+            <div className="brand">
+              <div className="brand-kicker">BRONSON FAMILY FARM</div>
+              <div className="brand-title">Online Ecosystem</div>
+            </div>
 
-          <nav className="nav" aria-label="Ecosystem navigation">
-            {navItems.map((item) => (
-              <button key={item.key} className={tab === item.key ? "active" : ""} onClick={() => openTab(item.key)}>
-                {item.label}
-              </button>
-            ))}
-          </nav>
+            <nav className="nav" aria-label="Ecosystem navigation">
+              {navItems.map((item) => (
+                <button key={item.key} className={tab === item.key ? "active" : ""} onClick={() => openTab(item.key)}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
 
-          <select className="language" value={language} onChange={(event) => setLanguage(event.target.value as LangKey)}>
-            {LANGS.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
-          </select>
-        </header>
+            <select className="language" value={language} onChange={(event) => setLanguage(event.target.value as LangKey)}>
+              {LANGS.map((lang) => <option key={lang} value={lang}>{lang}</option>)}
+            </select>
+          </header>
+        )}
 
         {tab === "portal" && !tourOpen && (
           <section className="portal">
