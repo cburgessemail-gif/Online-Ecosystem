@@ -295,11 +295,13 @@ export default function App() {
 
         .portal-forest {
           background-image:
-            radial-gradient(circle at center, rgba(45,73,28,.08), rgba(0,0,0,.34) 48%, rgba(0,0,0,.78) 100%),
-            linear-gradient(90deg, rgba(0,0,0,.56), rgba(34,64,28,.10), rgba(0,0,0,.64)),
+            radial-gradient(circle at center, rgba(255,255,255,.06), rgba(0,0,0,.18) 48%, rgba(0,0,0,.48) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.28), rgba(31,64,28,.08), rgba(0,0,0,.34)),
             url('/images/SAM_0396.JPG');
-          filter: blur(2px) brightness(.70) saturate(1.28) contrast(1.08);
-          transform: scale(1.025);
+          background-size: cover;
+          background-position: center center;
+          filter: blur(1.5px) brightness(1.05) saturate(1.32) contrast(1.05);
+          transform: scale(1.015);
         }
 
         .ecosystem-forest {
@@ -336,10 +338,10 @@ export default function App() {
           width: min(760px, 100%);
           border-radius: 38px;
           padding: clamp(30px, 4vw, 56px);
-          background: rgba(5,8,6,.50);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,.15);
-          box-shadow: 0 30px 100px rgba(0,0,0,.55);
+          background: rgba(5,8,6,.38);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,.16);
+          box-shadow: 0 30px 100px rgba(0,0,0,.45);
           text-align: center;
           animation: portalFloat 7s ease-in-out infinite;
         }
@@ -365,14 +367,16 @@ export default function App() {
           line-height: .92;
           letter-spacing: -2px;
           font-weight: 950;
+          text-shadow: 0 4px 22px rgba(0,0,0,.72);
         }
 
         .portal p {
           margin: 22px auto 0;
           max-width: 640px;
-          color: rgba(255,255,255,.84);
+          color: rgba(255,255,255,.90);
           font-size: clamp(16px, 1.25vw, 21px);
           line-height: 1.45;
+          text-shadow: 0 2px 14px rgba(0,0,0,.65);
         }
 
         .portal-actions {
