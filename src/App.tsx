@@ -201,6 +201,42 @@ function JourneyPanel({ type }: { type: string }) {
   );
 }
 
+function BackgroundImage({ portal }: { portal: boolean }) {
+  const portalImages = [
+    "/images/SAM_0396.JPG",
+    "/SAM_0396.JPG",
+    "/images/SAM_0391.JPG",
+    "/SAM_0391.JPG",
+    "/images/Grow Area.png",
+    "/Grow Area.png",
+    "/images/GrowArea2.jpg",
+    "/GrowArea2.jpg",
+  ];
+
+  const ecosystemImages = [
+    "/images/GrowArea2.jpg",
+    "/GrowArea2.jpg",
+    "/images/Grow Area.png",
+    "/Grow Area.png",
+  ];
+
+  const images = portal ? portalImages : ecosystemImages;
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => setIndex(0), [portal]);
+
+  return (
+    <div className={`forest-bg ${portal ? "portal-forest" : "ecosystem-forest"}`}>
+      <img
+        src={images[index]}
+        alt="Bronson Family Farm forest background"
+        className="forest-bg-image"
+        onError={() => setIndex((value) => Math.min(value + 1, images.length - 1))}
+      />
+    </div>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState<TabKey>("portal");
   const [language, setLanguage] = useState<LangKey>("English");
@@ -283,26 +319,45 @@ export default function App() {
           position: fixed;
           inset: 0;
           z-index: 0;
-          background-size: cover;
-          background-position: center center;
-          transform: scale(1.01);
+          overflow: hidden;
+          background: #071006;
+        }
+
+        .forest-bg-image {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center center;
           opacity: 1;
-          transition: filter 2s ease, transform 6s ease, background-image 1.2s ease;
         }
 
-        .portal-forest {
-          background-image:
-            linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.38)),
-            url('/images/SAM_0396.JPG');
+        .forest-bg::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .portal-forest .forest-bg-image {
           filter: brightness(.95) saturate(1.25) contrast(1.05);
+          transform: scale(1.01);
         }
 
-        .ecosystem-forest {
-          background-image:
-            radial-gradient(circle at center, rgba(122,166,70,.14), rgba(0,0,0,.40) 58%, rgba(0,0,0,.78) 100%),
-            linear-gradient(90deg, rgba(0,0,0,.48), rgba(62,111,45,.16), rgba(0,0,0,.58)),
-            url('/images/GrowArea2.jpg');
+        .portal-forest::after {
+          background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.38));
+        }
+
+        .ecosystem-forest .forest-bg-image {
           filter: blur(3px) brightness(.82) saturate(1.18) contrast(1.02);
+          transform: scale(1.04);
+        }
+
+        .ecosystem-forest::after {
+          background:
+            radial-gradient(circle at center, rgba(122,166,70,.14), rgba(0,0,0,.40) 58%, rgba(0,0,0,.78) 100%),
+            linear-gradient(90deg, rgba(0,0,0,.48), rgba(62,111,45,.16), rgba(0,0,0,.58));
         }
 
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; padding: 18px 0 32px; }
@@ -365,7 +420,7 @@ export default function App() {
         @media (max-width: 760px) { .screen { width: min(100vw - 20px, 1540px); padding-top: 10px; } .topbar { position: relative; top: 0; align-items: flex-start; flex-direction: column; } .nav { justify-content: flex-start; } .nav button { padding: 10px 13px; font-size: 13px; } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 54px; } .tour-bullets, .tour-step-buttons, .role-grid, .journey-grid, .control-list { grid-template-columns: 1fr; } .tour-image, .tour-image .smart-image { min-height: 330px; } }
       `}</style>
 
-      <div className={`forest-bg ${tab === "portal" ? "portal-forest" : "ecosystem-forest"}`} />
+      <BackgroundImage portal={tab === "portal"} />
 
       <div className={tab === "portal" ? "screen portal-screen" : "screen"}>
         {tab !== "portal" && (
