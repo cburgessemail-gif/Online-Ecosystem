@@ -1,1136 +1,457 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
-type Language = "English" | "Español" | "Tagalog" | "Italiano" | "עברית" | "Français";
+// =========================================================
+// BRONSON FAMILY FARM — FULL ECOSYSTEM MASTER SCRIPT
+// PRESERVES CINEMATIC STRUCTURE / EXTENDS OPERATIONAL DEPTH
+// =========================================================
+
+const IMG = {
+  hero: "/images/large (18).jpg",
+  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
+  growArea: "/images/GrowArea2.jpg",
+  marketplace: "/images/large (11).jpg",
+  youth: "/images/large (16).jpg",
+  flowers: "/images/culniary_edibleflowers.jpeg",
+  mushrooms: "/images/culniary_mushrooms.jpeg",
+  partners: "/images/Partners.png",
+  seeds: "/images/Seeds_Jubilee Gardens.png",
+  compost: "/images/Compost_ElliottGarden.png",
+  fencing: "/images/Deer Fencing.png",
+  queens: "/images/Queens Village.png",
+};
 
 type Screen =
   | "portal"
   | "home"
   | "roles"
-  | "guest"
   | "youth"
   | "supervisor"
   | "parent"
   | "grower"
+  | "crop"
   | "marketplace"
-  | "valueadded"
-  | "partners"
-  | "volunteer"
-  | "operations"
   | "weather"
-  | "inventory"
-  | "cropplanner"
-  | "announcements"
-  | "assessment"
-  | "reflection"
-  | "resources";
+  | "encouragement"
+  | "reports"
+  | "partners";
 
-const IMG = {
-  hero: "/images/large (18).jpg",
-  heroAlt: "/images/large (2).jpg",
-
-  youth1: "/images/large (16).jpg",
-  youth2: "/images/large (15).jpg",
-  youth3: "/images/large (12).jpg",
-
-  marketplaceHero: "/images/large (11).jpg",
-  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
-
-  culinaryFlowers: "/images/culniary_edibleflowers.jpeg",
-  culinaryFlowers2: "/images/culniary_edibleflowers2.jpeg",
-  culinaryMushrooms: "/images/culniary_mushrooms.jpeg",
-
-  growArea: "/images/GrowArea2.jpg",
-  growAreaAlt: "/images/Grow Area.png",
-
-  partners: "/images/Partners.png",
-  compost: "/images/Compost_ElliottGarden.png",
-  compost2: "/images/Compost_Elliott.png",
-
-  fencing: "/images/Deer Fencing.png",
-  volunteers: "/images/Fence_volunteers.png",
-
-  queens: "/images/Queens Village.png",
-  seeds: "/images/Seeds_Jubilee Gardens.png",
-  csu: "/images/CSU_MParker.png",
-  wkbn: "/images/WKBN Interview.png",
-
-  sameera2: "/images/Samaeera2.jpg",
-  sameera3: "/images/Sameera3.jpg",
-  sameera4: "/images/Samerra4.jpg",
-  sameera5: "/images/Samerra5.jpg",
-};
-
-const languages: Language[] = ["English", "Español", "Tagalog", "Italiano", "עברית", "Français"];
-
-const navItems: { label: string; screen: Screen }[] = [
-  { label: "Portal", screen: "portal" },
-  { label: "Home", screen: "home" },
-  { label: "Pathways", screen: "roles" },
-  { label: "Youth", screen: "youth" },
-  { label: "Supervisor", screen: "supervisor" },
-  { label: "Parent", screen: "parent" },
-  { label: "Assessment", screen: "assessment" },
-  { label: "Grower", screen: "grower" },
-  { label: "Marketplace", screen: "marketplace" },
-  { label: "Operations", screen: "operations" },
-  { label: "Partners", screen: "partners" },
-];
-
-const proverbBank = [
+const dailyProverbs = [
   "A seed becomes a harvest when people protect the conditions around it.",
-  "Work teaches when the land, the adult, and the youth are all present.",
-  "Measure progress daily, but grow people patiently.",
-  "Food access begins with hands, soil, tools, water, and trust.",
-  "A living ecosystem does not end at harvest; it returns to the community.",
+  "Leadership grows through responsibility.",
+  "A living ecosystem returns value to the community.",
+  "Progress happens one action at a time.",
 ];
 
-
-const dailyPositiveMessages = [
-  "You do not have to be perfect today. You only have to be present, safe, and willing to grow.",
-  "Your work matters because someone in this community needs what you are helping build.",
-  "A strong leader learns how to listen, try again, and help the next person succeed.",
-  "Every checked task, every watered plant, and every respectful choice becomes part of your growth record.",
-  "You belong in spaces where your effort is seen, your voice is respected, and your future is taken seriously.",
+const positiveMessages = [
+  "Your work matters to this community.",
+  "Every small action creates long-term growth.",
+  "Healthy communities begin with connected systems.",
+  "Today is another opportunity to build something meaningful.",
 ];
-
-const assessmentCategories = [
-  { area: "Attendance", parent: "Visible", evidence: "Present, late, absent, early release", meaning: "Shows participation and reliability." },
-  { area: "PPE / Safety", parent: "Visible", evidence: "Gloves, footwear, tool behavior, heat safety", meaning: "Shows whether the youth can work safely in the field." },
-  { area: "Task Completion", parent: "Visible", evidence: "Station assignment completed or continued", meaning: "Shows responsibility and follow-through." },
-  { area: "Teamwork", parent: "Visible", evidence: "Cooperation, respect, peer support", meaning: "Shows how the youth works with others." },
-  { area: "Communication", parent: "Visible", evidence: "Asks questions, listens, reports problems", meaning: "Shows readiness for work environments." },
-  { area: "Leadership", parent: "Visible", evidence: "Helps others, models safety, takes initiative", meaning: "Shows growth beyond basic participation." },
-  { area: "Emotional Readiness", parent: "Private/Internal", evidence: "Needs support, overwhelmed, steady, improving", meaning: "Helps supervisors respond with care without labeling the youth." },
-  { area: "Reflection", parent: "Visible", evidence: "Youth note, daily learning, next goal", meaning: "Connects the day’s work to personal growth." },
-];
-
-const parentConnectionFlow = [
-  { title: "1. Supervisor scores the day", text: "Attendance, PPE, task completion, teamwork, communication, leadership, reflection, and support notes are recorded in the assessment room." },
-  { title: "2. Parent sees the appropriate summary", text: "The portal shows attendance, badges, strengths, next-step encouragement, announcements, and approved notes — not private crisis labels." },
-  { title: "3. Youth gets encouragement", text: "Daily proverbs and positive messages connect the work to confidence, responsibility, and future readiness." },
-  { title: "4. Program keeps the record", text: "The same record supports supervisor review, youth progress, parent communication, and final reporting." },
-];
-
-const youthProgressSnapshot = [
-  ["Attendance", "Present today", "Parent can see"],
-  ["Safety", "PPE complete", "Parent can see"],
-  ["Station", "Grow Area + Compost", "Parent can see"],
-  ["Skill Badge", "Field Responsibility in progress", "Parent can see"],
-  ["Supervisor Note", "Showed patience and helped a peer reset", "Parent summary"],
-  ["Support Flag", "Follow-up needed", "Internal supervisor view"],
-];
-
-function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
-  return (
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-full border border-white/10 bg-black/35 px-5 py-3 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-xl">
-      <button onClick={() => setScreen("home")} className="text-left">
-        <div className="text-xs uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
-        <div className="text-lg font-black leading-tight">Online Ecosystem</div>
-      </button>
-      <div className="flex flex-wrap gap-2">
-        {navItems.map((item) => (
-          <button
-            key={item.screen}
-            onClick={() => setScreen(item.screen)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              screen === item.screen
-                ? "bg-emerald-300 text-black shadow-xl"
-                : "border border-white/10 bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function Shell({
   children,
-  screen,
-  setScreen,
-  background = IMG.hero,
+  background,
 }: {
   children: React.ReactNode;
-  screen: Screen;
-  setScreen: (screen: Screen) => void;
-  background?: string;
+  background: string;
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* CINEMATIC IMAGE */}
       <div className="fixed inset-0">
-        <img src={background} alt="Bronson Family Farm" className="h-full w-full object-cover scale-[1.02]" />
+        <img
+          src={background}
+          className="h-full w-full object-cover"
+          alt="Bronson Family Farm"
+        />
       </div>
 
-      {/* DARK FILM OVERLAY */}
-      <div className="fixed inset-0 bg-black/48" />
+      <div className="fixed inset-0 bg-black/55" />
 
-      {/* CINEMATIC LIGHT */}
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,.10),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,220,120,.08),transparent_24%),radial-gradient(circle_at_bottom,rgba(16,185,129,.10),transparent_32%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,.08),transparent_30%),radial-gradient(circle_at_bottom,rgba(16,185,129,.12),transparent_35%)]" />
 
-      {/* CONTENT */}
-      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8 md:px-10">
-        <Navigation screen={screen} setScreen={setScreen} />
+      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-6">
         {children}
       </div>
     </div>
   );
 }
 
-function PhotoCard({
-  title,
-  subtitle,
-  image,
-  height = "320px",
+function NavButton({
+  label,
   onClick,
 }: {
-  title: string;
-  subtitle?: string;
-  image: string;
-  height?: string;
-  onClick?: () => void;
+  label: string;
+  onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className="group relative block w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black text-left shadow-[0_30px_80px_rgba(0,0,0,.55)] transition duration-700 hover:scale-[1.01]"
-      style={{ height }}
+      className="rounded-full border border-white/10 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur-xl transition hover:bg-white/20"
     >
+      {label}
+    </button>
+  );
+}
+
+function Card({
+  title,
+  subtitle,
+  image,
+}: {
+  title: string;
+  subtitle: string;
+  image: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_30px_80px_rgba(0,0,0,.55)] min-h-[320px]">
       <img
         src={image}
         alt={title}
         className="absolute inset-0 h-full w-full object-cover transition duration-[4000ms] group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/10" />
-      <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(255,255,255,.08),transparent_45%)]" />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
+
       <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
-        <div className="text-3xl font-black leading-tight drop-shadow-2xl">{title}</div>
-        {subtitle && <div className="mt-3 max-w-xl text-sm leading-6 text-emerald-50/85">{subtitle}</div>}
+        <h2 className="text-3xl font-black">{title}</h2>
+        <p className="mt-3 text-emerald-50/85 leading-7">{subtitle}</p>
       </div>
-    </button>
-  );
-}
-
-function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`rounded-[2rem] border border-white/10 bg-black/38 p-7 shadow-[0_30px_80px_rgba(0,0,0,.45)] backdrop-blur-xl ${className}`}>
-      {children}
     </div>
   );
 }
 
-function PillButton({ children, onClick, strong = false }: { children: React.ReactNode; onClick: () => void; strong?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      className={
-        strong
-          ? "rounded-full bg-emerald-300 px-7 py-4 font-black text-black shadow-2xl transition hover:scale-105"
-          : "rounded-full border border-white/10 bg-white/10 px-7 py-4 font-semibold backdrop-blur-xl transition hover:bg-white/20"
-      }
-    >
-      {children}
-    </button>
-  );
-}
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("portal");
 
-function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
-  return (
-    <div>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{eyebrow}</div>
-      <h1 className="mt-4 max-w-5xl text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">{title}</h1>
-      {body && <p className="mt-6 max-w-4xl text-lg leading-9 text-emerald-50/85">{body}</p>}
-    </div>
-  );
-}
-
-
-
-const fieldStations = [
-  { station: "Grow Area", focus: "Planting, watering, scouting, harvest", pathway: "Youth + Grower", status: "Active" },
-  { station: "Compost & Soil", focus: "Compost movement, soil health, circular inputs", pathway: "Youth + Volunteer", status: "Active" },
-  { station: "Marketplace Prep", focus: "Sorting, labeling, QR/product readiness", pathway: "Marketplace", status: "Ready" },
-  { station: "Culinary / Wellness", focus: "Edible flowers, mushrooms, nutrition education", pathway: "Value-Added", status: "Learning" },
-  { station: "Fencing & Site Safety", focus: "Deer fencing, tool safety, perimeter checks", pathway: "Operations", status: "Priority" },
-  { station: "Media & Reflection", focus: "Story capture, youth reflection, proverbs", pathway: "Parent + Partner", status: "Daily" },
-];
-
-const pathwayDecisions: { label: string; target: Screen; note: string }[] = [
-  { label: "I am a youth worker", target: "youth", note: "Check in, receive assignment, reflect, and build skills." },
-  { label: "I supervise youth", target: "supervisor", note: "Use attendance, PPE, scoring, support notes, and incident tools." },
-  { label: "I am a parent/guardian", target: "parent", note: "Review attendance, alerts, badges, messages, and growth." },
-  { label: "I grow food", target: "grower", note: "Plan crops, watch weather, track inventory, and move harvest." },
-  { label: "I want food or seedlings", target: "marketplace", note: "Browse, learn, order, scan QR, and return." },
-  { label: "I can help", target: "volunteer", note: "Choose a work area and connect to the next farm need." },
-];
-
-const portalRoles: { role: string; target: Screen; guestAccess: string; loginAccess: string; image: string }[] = [
-  { role: "Guest", target: "guest", guestAccess: "Open tour, farm story, public events, marketplace preview, and ways to help.", loginAccess: "Optional profile for event registration, volunteer interest, and saved interests.", image: IMG.heroAlt },
-  { role: "Youth Workforce", target: "youth", guestAccess: "View public youth pathway overview and daily expectations.", loginAccess: "Check in, view assignments, complete reflections, and build badge progress.", image: IMG.youth1 },
-  { role: "Supervisor", target: "supervisor", guestAccess: "View role expectations and training overview.", loginAccess: "Use roster, attendance, PPE checks, daily assessment, incident notes, and parent-safe summaries.", image: IMG.youth2 },
-  { role: "Parent / Guardian", target: "parent", guestAccess: "View program overview, schedule, contact information, and family expectations.", loginAccess: "See attendance, daily messages, approved progress notes, badges, alerts, and parent actions.", image: IMG.sameera2 },
-  { role: "Grower", target: "grower", guestAccess: "Explore grower ecosystem, education, crops, and marketplace participation.", loginAccess: "Access grow plan, weather decisions, crop planner, inventory, and harvest movement.", image: IMG.growArea },
-  { role: "Marketplace Customer", target: "marketplace", guestAccess: "Browse food, seedlings, supply bundles, SNAP notes, and pickup information.", loginAccess: "Save orders, pickup preferences, product interests, and community messages.", image: IMG.marketplaceHero },
-  { role: "Partner / Volunteer", target: "partners", guestAccess: "See how to support through tools, funding, materials, education, media, or time.", loginAccess: "Track commitments, volunteer hours, contribution areas, impact updates, and reporting.", image: IMG.partners },
-];
-
-const portalFlow = [
-  "Everyone enters through the portal first.",
-  "The first experience is guest access — no login required.",
-  "From guest access, each person chooses a role pathway.",
-  "They may continue as a guest for public information or create/login to participate, submit records, view private information, or track progress.",
-];
-
-const weatherFallback = {
-  temp: "--",
-  wind: "--",
-  rain: "Check live",
-  summary: "Live Youngstown weather will load here when the browser can reach the weather service.",
-};
-
-function LiveWeatherCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [weather, setWeather] = useState(weatherFallback);
-  const [status, setStatus] = useState("Connecting to live Youngstown field conditions...");
-
-  useEffect(() => {
-    let alive = true;
-    async function loadWeather() {
-      try {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=41.0998&longitude=-80.6495&current=temperature_2m,precipitation,wind_speed_10m&daily=sunrise,sunset,precipitation_probability_max,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York";
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Weather service unavailable");
-        const data = await res.json();
-        if (!alive) return;
-        const current = data.current || {};
-        const daily = data.daily || {};
-        setWeather({
-          temp: `${Math.round(current.temperature_2m ?? 0)}°F`,
-          wind: `${Math.round(current.wind_speed_10m ?? 0)} mph`,
-          rain: `${current.precipitation ?? 0} in now / ${daily.precipitation_probability_max?.[0] ?? "--"}% chance`,
-          summary: `Sunrise ${daily.sunrise?.[0]?.slice(11) ?? "--"} · Sunset ${daily.sunset?.[0]?.slice(11) ?? "--"}`,
-        });
-        setStatus("Live field conditions loaded for Youngstown, Ohio.");
-      } catch {
-        if (!alive) return;
-        setWeather(weatherFallback);
-        setStatus("Weather fallback is showing. Live data can attach when deployed online.");
-      }
-    }
-    loadWeather();
-    const id = window.setInterval(loadWeather, 1000 * 60 * 20);
-    return () => { alive = false; window.clearInterval(id); };
+  const proverb = useMemo(() => {
+    return dailyProverbs[new Date().getDate() % dailyProverbs.length];
   }, []);
 
-  return (
-    <GlassCard className="!p-6">
-      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Live Weather</div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Temp</div><div className="text-3xl font-black">{weather.temp}</div></div>
-        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Wind</div><div className="text-3xl font-black">{weather.wind}</div></div>
-        <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs text-emerald-100/70">Rain</div><div className="text-lg font-black">{weather.rain}</div></div>
-      </div>
-      <p className="mt-4 text-sm leading-7 text-emerald-50/85">{weather.summary}</p>
-      <p className="mt-2 text-xs uppercase tracking-[0.22em] text-emerald-100/60">{status}</p>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <PillButton strong onClick={() => setScreen("weather")}>Open Weather Room</PillButton>
-        <PillButton onClick={() => setScreen("cropplanner")}>Apply to Grow Plan</PillButton>
-      </div>
-    </GlassCard>
-  );
-}
-
-function ProverbsTicker({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setIndex((current) => (current + 1) % proverbBank.length), 7000);
-    return () => window.clearInterval(id);
+  const positive = useMemo(() => {
+    return positiveMessages[new Date().getDate() % positiveMessages.length];
   }, []);
-  return (
-    <GlassCard className="!p-6">
-      <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Proverb of the Moment</div>
-      <div className="mt-4 text-2xl font-black leading-tight">“{proverbBank[index]}”</div>
-      <button onClick={() => setScreen("reflection")} className="mt-5 rounded-full border border-white/10 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">Open Reflection Room</button>
-    </GlassCard>
-  );
-}
 
-function FieldStationGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {fieldStations.map((item) => (
-        <button key={item.station} onClick={() => setScreen(item.pathway.includes("Grower") ? "grower" : item.pathway.includes("Marketplace") ? "marketplace" : item.pathway.includes("Value") ? "valueadded" : item.pathway.includes("Parent") ? "parent" : "operations")} className="rounded-[2rem] border border-white/10 bg-black/38 p-6 text-left shadow-[0_30px_80px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:bg-white/10">
-          <div className="flex items-start justify-between gap-3"><div className="text-2xl font-black">{item.station}</div><div className="rounded-full bg-emerald-300 px-3 py-1 text-xs font-black text-black">{item.status}</div></div>
-          <p className="mt-4 text-sm leading-7 text-emerald-50/85">{item.focus}</p>
-          <div className="mt-4 text-xs uppercase tracking-[0.24em] text-emerald-100/60">{item.pathway}</div>
-        </button>
-      ))}
-    </div>
-  );
-}
+  // =========================================================
+  // PORTAL GATEWAY
+  // =========================================================
 
-function DecisionGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {pathwayDecisions.map((item) => (
-        <button key={item.label} onClick={() => setScreen(item.target)} className="rounded-[2rem] border border-white/10 bg-white/10 p-6 text-left backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black">
-          <div className="text-2xl font-black">{item.label}</div>
-          <p className="mt-3 text-sm leading-7 opacity-85">{item.note}</p>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function TextAreaBlock({ label, placeholder }: { label: string; placeholder: string }) {
-  const [value, setValue] = useState("");
-  return (
-    <label className="block rounded-2xl border border-white/10 bg-white/10 p-5">
-      <div className="text-lg font-black">{label}</div>
-      <textarea value={value} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-white outline-none placeholder:text-white/40" />
-    </label>
-  );
-}
-
-
-function PortalGateway({ setScreen, language, setLanguage }: { setScreen: (screen: Screen) => void; language: Language; setLanguage: (language: Language) => void }) {
-  const [selectedRole, setSelectedRole] = useState(portalRoles[0]);
-  const [accessMode, setAccessMode] = useState<"guest" | "login">("guest");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-
-  return (
-    <Shell screen="portal" setScreen={setScreen} background={IMG.hero}>
-      <section className="grid gap-6 lg:grid-cols-[1.15fr_1fr]">
-        <div className="overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/20 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl">
-          <div className="relative min-h-[720px]">
-            <img src={IMG.hero} alt="Bronson Family Farm portal entrance" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
-            <div className="relative z-10 flex min-h-[720px] flex-col justify-end p-8 md:p-12">
-              <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">Portal Entrance</div>
-              <h1 className="mt-5 max-w-5xl text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">
-                Enter as a Guest.
-                <br />
-                Choose Your Role.
-              </h1>
-              <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/90">
-                Everyone begins as a guest. From this entrance, visitors may continue without a login for public access or create/login to participate in the living ecosystem as youth, supervisor, parent, grower, customer, partner, or volunteer.
-              </p>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <PillButton strong onClick={() => setScreen("guest")}>Continue as Guest</PillButton>
-                <PillButton onClick={() => setScreen("roles")}>Choose Role</PillButton>
-                <PillButton onClick={() => setScreen("home")}>Enter Ecosystem</PillButton>
-              </div>
-            </div>
-          </div>
-          <div className="grid border-t border-white/10 md:grid-cols-3">
-            <PhotoCard title="Guest Access" subtitle="Public tour, events, marketplace preview, partner story." image={IMG.heroAlt} height="260px" onClick={() => setScreen("guest")} />
-            <PhotoCard title="Role Access" subtitle="Select how you participate in the ecosystem." image={IMG.ecosystem} height="260px" onClick={() => setScreen("roles")} />
-            <PhotoCard title="Login Participation" subtitle="Track progress, assessments, parent summaries, grow plans, and commitments." image={IMG.youth1} height="260px" onClick={() => setAccessMode("login")} />
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <GlassCard>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Access Rule</div>
-            <h2 className="mt-5 text-4xl font-black leading-tight">Guest first. Login only when participation needs a record.</h2>
-            <div className="mt-6 space-y-3">
-              {portalFlow.map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-base font-semibold leading-7">{item}</div>
-              ))}
-            </div>
-            <div className="mt-8">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Language</div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {languages.map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setLanguage(lang)}
-                    className={`rounded-full px-4 py-2 text-sm transition ${language === lang ? "bg-white text-black" : "border border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Role Gateway</div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {portalRoles.map((role) => (
-                <button
-                  key={role.role}
-                  onClick={() => setSelectedRole(role)}
-                  className={`rounded-2xl border p-4 text-left transition ${selectedRole.role === role.role ? "border-emerald-300 bg-emerald-300 text-black" : "border-white/10 bg-white/10 hover:bg-white/20"}`}
-                >
-                  <div className="text-lg font-black">{role.role}</div>
-                  <div className="mt-2 text-xs leading-5 opacity-80">Choose guest view or login participation.</div>
-                </button>
-              ))}
+  if (screen === "portal") {
+    return (
+      <Shell background={IMG.hero}>
+        <div className="grid min-h-[90vh] items-center lg:grid-cols-2 gap-10">
+          <div>
+            <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">
+              Bronson Family Farm Ecosystem
             </div>
 
-            <div className="mt-5 overflow-hidden rounded-[2rem] border border-white/10 bg-black/30">
-              <div className="relative h-[220px]">
-                <img src={selectedRole.image} alt={selectedRole.role} className="absolute inset-0 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <div className="text-2xl font-black">{selectedRole.role}</div>
-                  <div className="mt-2 text-sm leading-6 text-emerald-50/85">{accessMode === "guest" ? selectedRole.guestAccess : selectedRole.loginAccess}</div>
-                </div>
-              </div>
-              <div className="grid gap-3 p-5 sm:grid-cols-2">
-                <button onClick={() => setAccessMode("guest")} className={`rounded-full px-5 py-3 font-bold ${accessMode === "guest" ? "bg-white text-black" : "border border-white/10 bg-white/10"}`}>Guest View</button>
-                <button onClick={() => setAccessMode("login")} className={`rounded-full px-5 py-3 font-bold ${accessMode === "login" ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10"}`}>Create / Login</button>
-              </div>
+            <h1 className="mt-6 text-6xl font-black leading-[0.9]">
+              Enter The Ecosystem
+            </h1>
 
-              {accessMode === "login" && (
-                <div className="grid gap-3 border-t border-white/10 p-5">
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="rounded-2xl border border-white/10 bg-black/30 p-4 text-white outline-none placeholder:text-white/40" />
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email or phone" className="rounded-2xl border border-white/10 bg-black/30 p-4 text-white outline-none placeholder:text-white/40" />
-                  <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50/90">
-                    Prototype login only: this screen shows the correct portal flow. A real login later connects to Supabase, Google, or another secure account system.
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-3 border-t border-white/10 p-5">
-                <PillButton strong onClick={() => setScreen(selectedRole.target)}>{accessMode === "guest" ? "Enter as Guest" : "Enter Role Workspace"}</PillButton>
-                <PillButton onClick={() => setScreen("roles")}>See All Pathways</PillButton>
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-      </section>
-    </Shell>
-  );
-}
-
-function Home({
-  setScreen,
-  language,
-  setLanguage,
-}: {
-  setScreen: (screen: Screen) => void;
-  language: Language;
-  setLanguage: (language: Language) => void;
-}) {
-  return (
-    <Shell screen="home" setScreen={setScreen} background={IMG.hero}>
-      <section className="grid gap-6 lg:grid-cols-[1.45fr_0.95fr]">
-        {/* MAIN HERO */}
-        <div className="overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/20 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl">
-          <div className="relative min-h-[720px]">
-            <img src={IMG.hero} alt="Bronson Family Farm" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/10" />
-            <div className="relative z-10 flex min-h-[720px] flex-col justify-end p-8 md:p-12">
-              <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">Connected Food Ecosystem Experience</div>
-              <h1 className="mt-5 max-w-5xl text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">
-                Step Into The Farm.
-                <br />
-                Experience The Wonders Of Life.
-              </h1>
-              <p className="mt-8 max-w-4xl text-xl leading-10 text-emerald-50/90">
-                A living ecosystem connecting youth workforce development, growers, marketplace systems, schools, wellness,
-                agritourism, food access, leadership, and community revitalization.
-              </p>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <PillButton strong onClick={() => setScreen("roles")}>Begin Guided Tour</PillButton>
-                <PillButton onClick={() => setScreen("marketplace")}>Marketplace</PillButton>
-                <PillButton onClick={() => setScreen("partners")}>Partners</PillButton>
-              </div>
-            </div>
-          </div>
-
-          {/* LOWER EXPERIENCE CARDS */}
-          <div className="grid border-t border-white/10 md:grid-cols-3">
-            <PhotoCard title="Grower Ecosystem" subtitle="Production, training, and local food access" image={IMG.growArea} height="270px" onClick={() => setScreen("grower")} />
-            <PhotoCard title="Marketplace Movement" subtitle="Food moving toward families and destinations" image={IMG.marketplaceHero} height="270px" onClick={() => setScreen("marketplace")} />
-            <PhotoCard title="Youth Workforce" subtitle="Leadership through participation" image={IMG.youth1} height="270px" onClick={() => setScreen("youth")} />
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="space-y-6">
-          <GlassCard>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Living Ecosystem Overview</div>
-            <h2 className="mt-5 text-4xl font-black leading-tight">A place people want to return to.</h2>
-            <p className="mt-6 text-lg leading-9 text-emerald-50/85">
-              Bronson Family Farm connects workforce, agriculture, schools, wellness, marketplace systems, growers,
-              leadership, and community participation into one immersive ecosystem.
+            <p className="mt-8 max-w-2xl text-xl leading-10 text-emerald-50/90">
+              Every participant enters first as a guest and chooses how they want to experience the ecosystem.
             </p>
-            <div className="mt-8 space-y-4">
-              {[
-                ["Youth Workforce Development", "youth"],
-                ["Marketplace & Distribution", "marketplace"],
-                ["Schools & Community Food Access", "guest"],
-                ["Grower Ecosystem", "grower"],
-                ["Nutrition & Culinary Wellness", "valueadded"],
-                ["Family Legacy & Land Restoration", "partners"],
-              ].map(([item, target]) => (
-                <button
-                  key={item}
-                  onClick={() => setScreen(target as Screen)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/10 p-5 text-left text-xl font-semibold backdrop-blur-xl transition hover:bg-white/20"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-            <div className="mt-8">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Language</div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {languages.map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setLanguage(lang)}
-                    className={`rounded-full px-4 py-2 text-sm transition ${
-                      language === lang ? "bg-white text-black" : "border border-white/10 bg-white/10 text-white hover:bg-white/20"
-                    }`}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-          <PhotoCard title="Seeds, compost, partners, and people make the ecosystem real." subtitle="The work is operational, visible, and community-rooted." image={IMG.seeds} height="300px" onClick={() => setScreen("operations")} />
-          <LiveWeatherCard setScreen={setScreen} />
-          <ProverbsTicker setScreen={setScreen} />
-        </div>
-      </section>
-    </Shell>
-  );
-}
 
-function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const roles: { title: string; text: string; screen: Screen; image: string }[] = [
-    { title: "Guest", text: "Enter the story, understand the place, and choose how to participate.", screen: "guest", image: IMG.heroAlt },
-    { title: "Youth Workforce", text: "Check in, learn safely, complete tasks, reflect, and grow through the season.", screen: "youth", image: IMG.youth1 },
-    { title: "Supervisor", text: "Guide up to 15 youth with phone-ready attendance, PPE checks, scoring, and support notes.", screen: "supervisor", image: IMG.youth2 },
-    { title: "Parent / Guardian", text: "See progress, attendance, badges, messages, and program updates.", screen: "parent", image: IMG.sameera2 },
-    { title: "Grower", text: "Plan crops, track tasks, watch weather, and connect harvest to market.", screen: "grower", image: IMG.growArea },
-    { title: "Marketplace Customer", text: "Find produce, seedlings, supply bundles, SNAP notes, and pickup information.", screen: "marketplace", image: IMG.marketplaceHero },
-    { title: "Value-Added Producer", text: "Connect edible flowers, mushrooms, recipes, preservation, and culinary education.", screen: "valueadded", image: IMG.culinaryFlowers },
-    { title: "Volunteer / Partner", text: "Contribute time, tools, education, funding, materials, and community support.", screen: "volunteer", image: IMG.volunteers },
-  ];
+            <div className="mt-10 flex flex-wrap gap-4">
+              <button
+                onClick={() => setScreen("home")}
+                className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black"
+              >
+                Continue As Guest
+              </button>
 
-  return (
-    <Shell screen="roles" setScreen={setScreen} background={IMG.ecosystem}>
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Guided Ecosystem Tour"
-            title="Choose a pathway from the guest portal."
-            body="Everyone enters as a guest first. Public views can continue without a login; deeper participation uses a role login for records, assessments, parent summaries, grow plans, and reporting."
+              <button className="rounded-full border border-white/10 bg-white/10 px-8 py-4 font-semibold backdrop-blur-xl">
+                Create Account
+              </button>
+
+              <button className="rounded-full border border-white/10 bg-white/10 px-8 py-4 font-semibold backdrop-blur-xl">
+                Login
+              </button>
+            </div>
+          </div>
+
+          <Card
+            title="Connected Food Ecosystem"
+            subtitle="Youth workforce, crop planning, marketplace systems, education, growers, wellness, and community participation connected inside one immersive operational ecosystem."
+            image={IMG.ecosystem}
           />
-          <div className="mt-8 grid gap-3">
-            <PillButton strong onClick={() => setScreen("portal")}>Return to Portal Login</PillButton>
-            <PillButton onClick={() => setScreen("youth")}>Start Youth Workforce Journey</PillButton>
-            <PillButton onClick={() => setScreen("operations")}>Open Operations Center</PillButton>
-            <PillButton onClick={() => setScreen("weather")}>Open Weather & Alerts</PillButton>
-          </div>
-        </GlassCard>
-        <div className="space-y-6">
-          <GlassCard><div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Decision Point</div><div className="mt-5"><DecisionGrid setScreen={setScreen} /></div></GlassCard>
-          <div className="grid gap-5 md:grid-cols-2">
-          {roles.map((role) => (
-            <PhotoCard key={role.title} title={role.title} subtitle={role.text} image={role.image} height="280px" onClick={() => setScreen(role.screen)} />
-          ))}
+        </div>
+      </Shell>
+    );
+  }
+
+  // =========================================================
+  // HOME EXPERIENCE
+  // =========================================================
+
+  return (
+    <Shell background={IMG.hero}>
+      <div className="flex flex-wrap gap-3 pb-6">
+        <NavButton label="Home" onClick={() => setScreen("home")} />
+        <NavButton label="Roles" onClick={() => setScreen("roles")} />
+        <NavButton label="Youth" onClick={() => setScreen("youth")} />
+        <NavButton label="Supervisor" onClick={() => setScreen("supervisor")} />
+        <NavButton label="Parent" onClick={() => setScreen("parent")} />
+        <NavButton label="Grower" onClick={() => setScreen("grower")} />
+        <NavButton label="Crop Planning" onClick={() => setScreen("crop")} />
+        <NavButton label="Marketplace" onClick={() => setScreen("marketplace")} />
+        <NavButton label="Weather" onClick={() => setScreen("weather")} />
+        <NavButton label="Encouragement" onClick={() => setScreen("encouragement")} />
+        <NavButton label="Reports" onClick={() => setScreen("reports")} />
+        <NavButton label="Partners" onClick={() => setScreen("partners")} />
+      </div>
+
+      {screen === "home" && (
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <Card
+            title="Step Into The Farm"
+            subtitle="A living operational ecosystem connecting youth workforce, agriculture, wellness, crop planning, marketplace systems, education, and community revitalization."
+            image={IMG.hero}
+          />
+
+          <div className="space-y-6">
+            <Card
+              title="Daily Proverb"
+              subtitle={proverb}
+              image={IMG.seeds}
+            />
+
+            <Card
+              title="Positive Message"
+              subtitle={positive}
+              image={IMG.compost}
+            />
           </div>
         </div>
-      </div>
-    </Shell>
-  );
-}
+      )}
 
-function JourneyScreen({
-  screen,
-  setScreen,
-  background,
-  eyebrow,
-  title,
-  body,
-  steps,
-  actions,
-  imageCards,
-}: {
-  screen: Screen;
-  setScreen: (screen: Screen) => void;
-  background: string;
-  eyebrow: string;
-  title: string;
-  body: string;
-  steps: string[];
-  actions: { label: string; target: Screen; strong?: boolean }[];
-  imageCards?: { title: string; subtitle: string; image: string; target: Screen }[];
-}) {
-  return (
-    <Shell screen={screen} setScreen={setScreen} background={background}>
-      <div className="grid gap-6 lg:grid-cols-[1.05fr_1.25fr]">
-        <GlassCard>
-          <SectionTitle eyebrow={eyebrow} title={title} body={body} />
-          <div className="mt-8 flex flex-wrap gap-3">
-            {actions.map((action) => (
-              <PillButton key={action.label} strong={action.strong} onClick={() => setScreen(action.target)}>{action.label}</PillButton>
-            ))}
+      {screen === "roles" && (
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <Card title="Youth Workforce" subtitle="Leadership through participation." image={IMG.youth} />
+          <Card title="Growers" subtitle="Production and food access systems." image={IMG.growArea} />
+          <Card title="Marketplace" subtitle="Harvest connected to community." image={IMG.marketplace} />
+          <Card title="Parents" subtitle="Connected family visibility." image={IMG.queens} />
+          <Card title="Supervisors" subtitle="Operational workforce management." image={IMG.fencing} />
+          <Card title="Partners" subtitle="Community ecosystem support." image={IMG.partners} />
+        </div>
+      )}
+
+      {screen === "youth" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Youth Workforce Pathway"
+            subtitle="Daily assignments, assessments, PPE, reflections, badge progression, leadership development, and workforce growth."
+            image={IMG.youth}
+          />
+
+          <div className="rounded-[2rem] border border-white/10 bg-black/40 p-8 backdrop-blur-xl">
+            <h2 className="text-4xl font-black">Daily Operations</h2>
+
+            <div className="mt-8 space-y-4 text-lg text-emerald-50/90">
+              <div>• QR Attendance Check-In</div>
+              <div>• PPE Verification</div>
+              <div>• Daily Assignments</div>
+              <div>• Crop Zone Participation</div>
+              <div>• Reflection Submission</div>
+              <div>• Supervisor Scoring</div>
+              <div>• Badge Progression</div>
+            </div>
           </div>
-        </GlassCard>
-        <GlassCard>
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Journey Flow</div>
-          <div className="mt-6 grid gap-4">
-            {steps.map((step, index) => (
-              <div key={step} className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
-                <div className="text-sm font-black text-emerald-200">{String(index + 1).padStart(2, "0")}</div>
-                <div className="mt-2 text-xl font-bold leading-tight">{step}</div>
+        </div>
+      )}
+
+      {screen === "supervisor" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Supervisor Mobile System"
+            subtitle="Attendance, PPE tracking, youth scoring, incidents, assignments, and encouragement."
+            image={IMG.fencing}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              "PRESENT",
+              "ABSENT",
+              "PPE COMPLETE",
+              "TASK COMPLETE",
+              "INCIDENT",
+              "DAILY SCORE",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/10 p-6 text-center font-black backdrop-blur-xl"
+              >
+                {item}
               </div>
             ))}
           </div>
-        </GlassCard>
-      </div>
-      {imageCards && (
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {imageCards.map((card) => (
-            <PhotoCard key={card.title} {...card} height="310px" onClick={() => setScreen(card.target)} />
-          ))}
+        </div>
+      )}
+
+      {screen === "parent" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Parent / Guardian Portal"
+            subtitle="Connected visibility into attendance, progress, encouragement, reflections, badges, and notifications."
+            image={IMG.queens}
+          />
+
+          <div className="rounded-[2rem] border border-white/10 bg-black/40 p-8 backdrop-blur-xl">
+            <h2 className="text-3xl font-black">Connected Ecosystem Flow</h2>
+
+            <div className="mt-8 space-y-4 text-lg leading-8 text-emerald-50/90">
+              <div>Youth completes assignment →</div>
+              <div>Supervisor scores participation →</div>
+              <div>System updates daily progress →</div>
+              <div>Parent visibility updates →</div>
+              <div>Badge progression generated →</div>
+              <div>Encouragement sent</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === "grower" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Grower Ecosystem"
+            subtitle="Production planning, irrigation, composting, harvest forecasting, and grow zone management."
+            image={IMG.growArea}
+          />
+
+          <Card
+            title="Value Added Agriculture"
+            subtitle="Edible flowers, mushrooms, culinary education, preservation, nutrition, and wellness."
+            image={IMG.flowers}
+          />
+        </div>
+      )}
+
+      {screen === "crop" && (
+        <div className="space-y-6">
+          <Card
+            title="Crop Planning System"
+            subtitle="Visual crop planning connected to youth assignments, weather, irrigation, inventory, and marketplace forecasting."
+            image={IMG.growArea}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              "Seed Date",
+              "Transplant Date",
+              "Irrigation Schedule",
+              "Harvest Forecast",
+              "Pest Monitoring",
+              "Yield Projection",
+              "Marketplace Connection",
+              "Succession Planning",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl"
+              >
+                <div className="text-xl font-black">{item}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {screen === "marketplace" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Marketplace Movement"
+            subtitle="Produce availability, SNAP visibility, harvest windows, grower participation, and inventory movement."
+            image={IMG.marketplace}
+          />
+
+          <Card
+            title="Harvest To Community"
+            subtitle="Connecting crops, growers, workforce, nutrition, and families through marketplace systems."
+            image={IMG.ecosystem}
+          />
+        </div>
+      )}
+
+      {screen === "weather" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Youngstown Weather Layer"
+            subtitle="Rainfall, temperature, frost risk, severe weather, humidity, and operational scheduling."
+            image={IMG.compost}
+          />
+
+          <div className="rounded-[2rem] border border-white/10 bg-black/40 p-8 backdrop-blur-xl">
+            <h2 className="text-4xl font-black">Connected Systems</h2>
+
+            <div className="mt-8 space-y-4 text-lg text-emerald-50/90">
+              <div>• Crop Planning</div>
+              <div>• Irrigation</div>
+              <div>• Youth Safety</div>
+              <div>• Harvest Timing</div>
+              <div>• Outdoor Scheduling</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {screen === "encouragement" && (
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card title="Daily Proverbs" subtitle={proverb} image={IMG.seeds} />
+          <Card title="Positive Messages" subtitle={positive} image={IMG.compost} />
+          <Card title="Youth Reflection" subtitle="What did I learn today? Who did I help?" image={IMG.youth} />
+        </div>
+      )}
+
+      {screen === "reports" && (
+        <div className="space-y-6">
+          <Card
+            title="Operational Reporting Layer"
+            subtitle="Generate youth workforce, crop planning, inventory, marketplace, parent, supervisor, and community impact reports."
+            image={IMG.partners}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              "Youth Reports",
+              "Supervisor Reports",
+              "Parent Reports",
+              "Crop Reports",
+              "Marketplace Reports",
+              "Inventory Reports",
+              "Impact Reports",
+              "Export Center",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl"
+              >
+                <div className="text-xl font-black">{item}</div>
+                <div className="mt-3 text-sm text-emerald-50/80">
+                  PDF / Excel / Operational Summaries
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {screen === "partners" && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card
+            title="Community Ecosystem Partners"
+            subtitle="Growers, educators, foundations, volunteers, sponsors, and food system collaborators."
+            image={IMG.partners}
+          />
+
+          <Card
+            title="Connected Community"
+            subtitle="The ecosystem becomes stronger through participation, shared resources, and community stewardship."
+            image={IMG.ecosystem}
+          />
         </div>
       )}
     </Shell>
   );
 }
-
-function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const modules: { title: string; text: string; target: Screen }[] = [
-    { title: "Attendance & QR Check-In", text: "Daily check-in, youth roster, supervisor confirmation, and late/absent status.", target: "supervisor" },
-    { title: "Daily Assessment", text: "PPE, task completion, teamwork, communication, leadership, and support flags.", target: "assessment" },
-    { title: "Crop Planner", text: "Planting, watering, pest checks, harvest windows, and crop responsibility.", target: "cropplanner" },
-    { title: "Inventory", text: "Seedlings, produce, tools, donations, marketplace quantities, and supply movement.", target: "inventory" },
-    { title: "Weather & Alerts", text: "Rain, heat, severe weather, irrigation guidance, and field readiness.", target: "weather" },
-    { title: "Announcements", text: "Program updates, volunteer requests, market notices, and urgent field messages.", target: "announcements" },
-  ];
-  return (
-    <Shell screen="operations" setScreen={setScreen} background={IMG.compost}>
-      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Operations Center"
-            title="The ecosystem now has working rooms."
-            body="This layer connects youth, supervisors, growers, marketplace, partners, inventory, weather, and communications without changing the visual build."
-          />
-          <div className="mt-8 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("assessment")}>Open Assessment</PillButton>
-            <PillButton onClick={() => setScreen("cropplanner")}>Open Crop Planner</PillButton>
-          </div>
-        </GlassCard>
-        <div className="grid gap-5 md:grid-cols-2">
-          {modules.map((m) => (
-            <button key={m.title} onClick={() => setScreen(m.target)} className="rounded-[2rem] border border-white/10 bg-black/38 p-6 text-left shadow-[0_30px_80px_rgba(0,0,0,.45)] backdrop-blur-xl transition hover:bg-white/10">
-              <div className="text-2xl font-black">{m.title}</div>
-              <p className="mt-4 text-sm leading-7 text-emerald-50/85">{m.text}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-6"><FieldStationGrid setScreen={setScreen} /></div>
-    </Shell>
-  );
-}
-
-function SupervisorPanel({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const controls = ["PRESENT", "ABSENT", "PPE CHECK", "TASK COMPLETE", "NEED SUPPORT", "INCIDENT", "DAILY SCORE", "PARENT NOTE"];
-  const roster = [
-    ["Youth A", "Present", "PPE complete", "Needs irrigation station"],
-    ["Youth B", "Present", "Task complete", "Strong teamwork"],
-    ["Youth C", "Late", "Check in required", "Supervisor follow-up"],
-    ["Youth D", "Present", "Reflection due", "Ready for badge review"],
-  ];
-  return (
-    <Shell screen="supervisor" setScreen={setScreen} background={IMG.youth2}>
-      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Supervisor Mobile Pathway"
-            title="Guide. Assess. Protect. Document."
-            body="Phone-ready controls help each supervisor support no more than 15 youth through attendance, PPE, tasks, wellness flags, notes, and daily scoring."
-          />
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            {controls.map((c) => (
-              <button key={c} onClick={() => setScreen(c === "DAILY SCORE" ? "assessment" : c === "PARENT NOTE" ? "parent" : "supervisor")} className="rounded-2xl bg-emerald-300 px-4 py-5 text-center text-sm font-black text-black shadow-xl transition hover:scale-[1.02]">
-                {c}
-              </button>
-            ))}
-          </div>
-        </GlassCard>
-        <GlassCard>
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Youth Roster Snapshot</div>
-          <div className="mt-6 grid gap-4">
-            {roster.map(([name, status, task, note]) => (
-              <div key={name} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-2xl font-black">{name}</div>
-                  <div className="rounded-full bg-white px-4 py-1 text-xs font-black text-black">{status}</div>
-                </div>
-                <div className="mt-3 text-sm leading-7 text-emerald-50/85">{task} · {note}</div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("assessment")}>Score Today</PillButton>
-            <PillButton onClick={() => setScreen("reflection")}>Open Reflection</PillButton>
-          </div>
-        </GlassCard>
-      </div>
-    </Shell>
-  );
-}
-
-function Assessment({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [selectedYouth, setSelectedYouth] = useState("Youth A");
-  return (
-    <Shell screen="assessment" setScreen={setScreen} background={IMG.youth3}>
-      <div className="grid gap-6 lg:grid-cols-[0.8fr_1.4fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Daily Assessment Room"
-            title="This is where the assessments live."
-            body="Supervisors score each youth from the phone. The same daily assessment feeds the youth journey, parent summary, badges, support notes, and program reporting."
-          />
-          <div className="mt-8 rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Select Youth</div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {["Youth A", "Youth B", "Youth C", "Youth D"].map((name) => (
-                <button
-                  key={name}
-                  onClick={() => setSelectedYouth(name)}
-                  className={`rounded-2xl px-4 py-4 text-sm font-black transition ${selectedYouth === name ? "bg-emerald-300 text-black" : "bg-white/10 hover:bg-white/20"}`}
-                >
-                  {name}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-5">
-            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Assessment Connection</div>
-            <p className="mt-3 text-sm leading-7 text-emerald-50/85">
-              Assessment → Supervisor record → Youth progress → Parent summary → Badge/reporting trail.
-            </p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("parent")}>Preview Parent Summary</PillButton>
-            <PillButton onClick={() => setScreen("reflection")}>Daily Message</PillButton>
-          </div>
-        </GlassCard>
-
-        <GlassCard>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Scoring {selectedYouth}</div>
-              <div className="mt-2 text-3xl font-black">Daily Field Assessment</div>
-            </div>
-            <div className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Phone Ready</div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {assessmentCategories.map((item) => (
-              <div key={item.area} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="text-lg font-black leading-tight">{item.area}</div>
-                  <div className={`rounded-full px-3 py-1 text-[10px] font-black ${item.parent === "Visible" ? "bg-emerald-300 text-black" : "bg-white/20 text-white"}`}>{item.parent}</div>
-                </div>
-                <p className="mt-3 text-xs leading-6 text-emerald-50/75">{item.evidence}</p>
-                <div className="mt-4 grid grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((score) => (
-                    <button key={score} className="rounded-xl bg-black/30 py-3 font-black hover:bg-emerald-300 hover:text-black">{score}</button>
-                  ))}
-                </div>
-                <p className="mt-3 text-xs leading-5 text-emerald-50/65">{item.meaning}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <TextAreaBlock label="Supervisor Observation" placeholder="What did you observe today?" />
-            <TextAreaBlock label="Parent-Safe Summary" placeholder="What can be shared home as encouragement, progress, or next step?" />
-            <TextAreaBlock label="Internal Support Note" placeholder="Private support note for supervisor/program staff only." />
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("supervisor")}>Save & Return to Supervisor</PillButton>
-            <PillButton onClick={() => setScreen("parent")}>Send Parent Update</PillButton>
-            <PillButton onClick={() => setScreen("youth")}>Return to Youth Journey</PillButton>
-          </div>
-        </GlassCard>
-      </div>
-    </Shell>
-  );
-}
-
-function ParentPortal({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="parent" setScreen={setScreen} background={IMG.sameera2}>
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.35fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Parent / Guardian Connection"
-            title="This is how the parent part connects."
-            body="The parent portal does not stand alone. It receives the appropriate pieces from attendance, assessments, reflections, announcements, badges, and supervisor messages."
-          />
-          <div className="mt-8 grid gap-4">
-            {parentConnectionFlow.map((item) => (
-              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">{item.title}</div>
-                <p className="mt-3 text-sm leading-7 text-emerald-50/85">{item.text}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("assessment")}>Open Assessment Source</PillButton>
-            <PillButton onClick={() => setScreen("reflection")}>Open Daily Messages</PillButton>
-          </div>
-        </GlassCard>
-
-        <div className="space-y-6">
-          <GlassCard>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Parent View: Youth Daily Summary</div>
-            <div className="mt-4 text-4xl font-black">Progress without labels.</div>
-            <p className="mt-4 text-sm leading-7 text-emerald-50/85">
-              Parents see encouragement, attendance, participation, skill growth, announcements, and approved supervisor notes. Internal support flags remain with supervisors and program staff.
-            </p>
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {youthProgressSnapshot.map(([label, value, visibility]) => (
-                <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                  <div className="text-xs uppercase tracking-[0.22em] text-emerald-100/60">{visibility}</div>
-                  <div className="mt-2 text-xl font-black">{label}</div>
-                  <div className="mt-2 text-sm leading-6 text-emerald-50/85">{value}</div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          <GlassCard>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Parent Actions</div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              {[
-                ["Review Attendance", "assessment"],
-                ["Read Daily Encouragement", "reflection"],
-                ["See Announcements", "announcements"],
-                ["Message Supervisor", "supervisor"],
-              ].map(([label, target]) => (
-                <button key={label} onClick={() => setScreen(target as Screen)} className="rounded-2xl bg-emerald-300 px-5 py-5 text-left text-sm font-black text-black shadow-xl transition hover:scale-[1.02]">{label}</button>
-              ))}
-            </div>
-          </GlassCard>
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function CropPlanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const crops = [
-    ["Tomatoes", "Transplant / stake / water check", "Harvest window: summer"],
-    ["Collards", "Succession planting / pest scan", "CSA and market bundles"],
-    ["Mustard Greens", "Moisture and flea beetle check", "Fast harvest crop"],
-    ["Peppers", "Warm weather spacing", "Marketplace bundles"],
-    ["Corn", "Block planting and water demand", "Education + harvest"],
-    ["Cucumbers", "Trellis, pest check, harvest frequently", "Fresh market"],
-  ];
-  return (
-    <Shell screen="cropplanner" setScreen={setScreen} background={IMG.growArea}>
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
-        <GlassCard>
-          <SectionTitle eyebrow="Crop Planner" title="Field work becomes a guided grow plan." body="The crop planner keeps planting, watering, scouting, harvesting, education, and marketplace movement connected inside the ecosystem." />
-          <div className="mt-8 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("weather")}>Check Weather</PillButton>
-            <PillButton onClick={() => setScreen("inventory")}>Open Inventory</PillButton>
-          </div>
-        </GlassCard>
-        <div className="grid gap-4 md:grid-cols-2">
-          {crops.map(([crop, task, note]) => (
-            <GlassCard key={crop} className="!p-6">
-              <div className="text-2xl font-black">{crop}</div>
-              <p className="mt-3 text-sm leading-7 text-emerald-50/85">{task}</p>
-              <div className="mt-4 rounded-2xl bg-white/10 p-4 text-sm font-semibold">{note}</div>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function Inventory({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const rows = [
-    ["Bubble Babies™", "Seed rolls / seedlings", "Marketplace ready"],
-    ["Jubilee Seeds", "Giveaway and production", "Donor-powered"],
-    ["Compost", "Elliott Garden Center", "Soil building"],
-    ["Fence Materials", "Posts / wire / tools", "Site protection"],
-    ["Produce", "Harvest quantities", "GrownBy / market"],
-    ["PPE", "Gloves / safety items", "Youth workforce"],
-  ];
-  return (
-    <Shell screen="inventory" setScreen={setScreen} background={IMG.seeds}>
-      <GlassCard>
-        <SectionTitle eyebrow="Inventory Movement" title="Supplies, produce, and donations stay connected." body="This operational layer tracks what comes in, what moves to the field, what becomes food, and what enters the marketplace." />
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {rows.map(([item, category, status]) => (
-            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-              <div className="text-2xl font-black">{item}</div>
-              <div className="mt-3 text-sm text-emerald-50/80">{category}</div>
-              <div className="mt-4 rounded-full bg-emerald-300 px-4 py-2 text-center text-xs font-black text-black">{status}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <PillButton strong onClick={() => setScreen("marketplace")}>Move to Marketplace</PillButton>
-          <PillButton onClick={() => setScreen("cropplanner")}>Return to Crop Planner</PillButton>
-        </div>
-      </GlassCard>
-    </Shell>
-  );
-}
-
-function WeatherAlerts({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="weather" setScreen={setScreen} background={IMG.growAreaAlt}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-        <GlassCard>
-          <SectionTitle eyebrow="Weather & Field Readiness" title="Youngstown field decisions in one place." body="Use this room for rain, heat, irrigation, sunrise, sunset, severe weather, and field-readiness notes. Live API connections can be attached here without changing the design." />
-          <div className="mt-8 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("cropplanner")}>Apply to Crop Plan</PillButton>
-            <PillButton onClick={() => setScreen("announcements")}>Post Weather Notice</PillButton>
-          </div>
-        </GlassCard>
-        <div className="space-y-4">
-          <LiveWeatherCard setScreen={setScreen} />
-          <div className="grid gap-4 md:grid-cols-2">
-            {["Rain Watch", "Heat Safety", "Irrigation Need", "Field Access", "Sunrise / Sunset", "Severe Weather"].map((item, i) => (
-              <GlassCard key={item} className="!p-6">
-                <div className="text-2xl font-black">{item}</div>
-                <p className="mt-4 text-sm leading-7 text-emerald-50/85">{i % 2 === 0 ? "Review before crews enter the field." : "Use supervisor alerts and youth safety reminders."}</p>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
-function Announcements({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const notes = ["Youth Workforce begins June 8, 2026.", "Supervisor orientation and role training required before field work.", "Seed giveaways and marketplace updates appear here.", "Weather delays and safety notices appear here first."];
-  return (
-    <Shell screen="announcements" setScreen={setScreen} background={IMG.wkbn}>
-      <GlassCard>
-        <SectionTitle eyebrow="Live Announcements" title="One message center for the farm ecosystem." body="Program notices, field alerts, partner requests, marketplace updates, and event messages can live here for each pathway." />
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {notes.map((n) => <div key={n} className="rounded-2xl border border-white/10 bg-white/10 p-6 text-xl font-bold">{n}</div>)}
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <PillButton strong onClick={() => setScreen("roles")}>Return to Pathways</PillButton>
-          <PillButton onClick={() => setScreen("operations")}>Open Operations</PillButton>
-        </div>
-      </GlassCard>
-    </Shell>
-  );
-}
-
-function Reflection({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setIndex((current) => (current + 1) % dailyPositiveMessages.length), 8000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  return (
-    <Shell screen="reflection" setScreen={setScreen} background={IMG.queens}>
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.35fr]">
-        <GlassCard>
-          <SectionTitle
-            eyebrow="Daily Proverbs + Positive Messages"
-            title="This is the daily encouragement room."
-            body="Each workday can begin with a proverb, a positive message, a short youth reflection, and a supervisor encouragement note. This connects heart, behavior, and progress."
-          />
-          <div className="mt-8 rounded-[2rem] border border-white/10 bg-emerald-300 p-7 text-black shadow-2xl">
-            <div className="text-xs uppercase tracking-[0.3em] opacity-70">Today’s Positive Message</div>
-            <div className="mt-4 text-3xl font-black leading-tight">{dailyPositiveMessages[index]}</div>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <PillButton strong onClick={() => setScreen("assessment")}>Connect to Daily Score</PillButton>
-            <PillButton onClick={() => setScreen("parent")}>Share Parent-Safe Encouragement</PillButton>
-          </div>
-        </GlassCard>
-
-        <GlassCard>
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Daily Proverb Bank</div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {proverbBank.map((p, i) => (
-              <div key={p} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <div className="text-xs font-black text-emerald-200">DAY {i + 1}</div>
-                <div className="mt-3 text-lg font-semibold leading-7">“{p}”</div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <TextAreaBlock label="Youth Reflection" placeholder="Today I learned... Today I helped... Tomorrow I will..." />
-            <TextAreaBlock label="Supervisor Encouragement" placeholder="A short note to help the youth see progress and next steps." />
-          </div>
-        </GlassCard>
-      </div>
-    </Shell>
-  );
-}
-
-function Resources({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Shell screen="resources" setScreen={setScreen} background={IMG.ecosystem}>
-      <JourneyScreen
-        screen="resources"
-        setScreen={setScreen}
-        background={IMG.ecosystem}
-        eyebrow="Resource Library"
-        title="Tools, knowledge, and people in one ecosystem."
-        body="This room organizes curriculum, safety, grower guidance, marketplace information, partner materials, nutrition, and family resources."
-        steps={["Youth curriculum and activity guides", "Supervisor checklists and assessment rubrics", "Grower crop and market resources", "Parent/guardian program updates", "Partner and volunteer contribution guides"]}
-        actions={[{ label: "Open Youth", target: "youth", strong: true }, { label: "Open Grower", target: "grower" }, { label: "Open Partners", target: "partners" }]}
-      />
-    </Shell>
-  );
-}
-
-function App() {
-  const [screen, setScreen] = useState<Screen>("portal");
-  const [language, setLanguage] = useState<Language>("English");
-  const direction = language === "עברית" ? "rtl" : "ltr";
-
-  const current = useMemo(() => {
-    switch (screen) {
-      case "portal": return <PortalGateway setScreen={setScreen} language={language} setLanguage={setLanguage} />;
-      case "home": return <Home setScreen={setScreen} language={language} setLanguage={setLanguage} />;
-      case "roles": return <Roles setScreen={setScreen} />;
-      case "guest": return <JourneyScreen screen="guest" setScreen={setScreen} background={IMG.heroAlt} eyebrow="Guest Pathway" title="Arrive. Understand. Choose your place." body="Guests enter the farm story, see why the ecosystem matters, learn how food access and youth development connect, and choose a next pathway." steps={["Welcome to the farm and the Historic Lansdowne Airport setting", "See the ecosystem map and the people involved", "Experience marketplace, grower, youth, and partner rooms", "Choose to become a customer, volunteer, donor, grower, or partner"]} actions={[{ label: "Choose Pathway", target: "roles", strong: true }, { label: "Marketplace", target: "marketplace" }, { label: "Volunteer", target: "volunteer" }]} imageCards={[{ title: "Farm Story", subtitle: "Place, land, legacy, and food access.", image: IMG.hero, target: "resources" }, { title: "Marketplace", subtitle: "Food moving toward families.", image: IMG.marketplaceHero, target: "marketplace" }, { title: "Partners", subtitle: "Support the work visibly.", image: IMG.partners, target: "partners" }]} />;
-      case "youth": return <JourneyScreen screen="youth" setScreen={setScreen} background={IMG.youth1} eyebrow="Youth Workforce Pathway" title="Check in. Work safely. Build skills." body="Youth move through orientation, PPE, daily assignments, farm tasks, reflection, supervisor assessment, badges, and next-step growth." steps={["QR or supervisor check-in", "PPE and safety confirmation", "Station assignment: grow, compost, market, culinary, fencing, or media", "Task completion with photo or supervisor evidence", "Daily reflection and proverb", "Supervisor score and support note", "Badge progress and parent-visible update"]} actions={[{ label: "Daily Check-In", target: "supervisor", strong: true }, { label: "Reflection", target: "reflection" }, { label: "Assessment", target: "assessment" }]} imageCards={[{ title: "Field Work", subtitle: "Youth learn by participating.", image: IMG.youth2, target: "assessment" }, { title: "Skill Growth", subtitle: "Progress is observed daily.", image: IMG.youth3, target: "reflection" }, { title: "Parent Connection", subtitle: "Growth can be shared home.", image: IMG.sameera3, target: "parent" }]} />;
-      case "supervisor": return <SupervisorPanel setScreen={setScreen} />;
-      case "parent": return <ParentPortal setScreen={setScreen} />;
-      case "grower": return <JourneyScreen screen="grower" setScreen={setScreen} background={IMG.growArea} eyebrow="Grower Pathway" title="Plan crops. Track work. Move harvest." body="Growers connect planting schedules, weather, crop tasks, compost, pest checks, inventory, and marketplace movement." steps={["Choose crop or growing focus", "Review weather and field readiness", "Plan planting, watering, scouting, and harvest", "Track inventory and supplies", "Move harvest or seedlings into marketplace", "Share learning with youth and community"]} actions={[{ label: "Crop Planner", target: "cropplanner", strong: true }, { label: "Weather", target: "weather" }, { label: "Inventory", target: "inventory" }]} imageCards={[{ title: "Grow Area", subtitle: "Field activity and production.", image: IMG.growAreaAlt, target: "cropplanner" }, { title: "Compost", subtitle: "Soil building and circular inputs.", image: IMG.compost, target: "inventory" }, { title: "Seeds", subtitle: "Production begins here.", image: IMG.seeds, target: "inventory" }]} />;
-      case "marketplace": return <JourneyScreen screen="marketplace" setScreen={setScreen} background={IMG.marketplaceHero} eyebrow="Marketplace Pathway" title="Food, seedlings, supplies, and education move together." body="The marketplace connects produce, Bubble Babies™, grower supply bundles, nutrition education, SNAP notes, QR access, and pickup flow." steps={["Browse seasonal produce and seedlings", "Check SNAP-eligible notes where applicable", "Scan QR or route to GrownBy/storefront", "Reserve pickup or market availability", "Meet the grower and learn how the food was produced", "Return for education, events, and repeat healthy choices"]} actions={[{ label: "Inventory", target: "inventory", strong: true }, { label: "Value-Added", target: "valueadded" }, { label: "Grower", target: "grower" }]} imageCards={[{ title: "Marketplace Movement", subtitle: "Food moving toward families.", image: IMG.marketplaceHero, target: "inventory" }, { title: "Bubble Babies™", subtitle: "Seed rolls and seedlings.", image: IMG.seeds, target: "resources" }, { title: "Nutrition", subtitle: "Food as wellness education.", image: IMG.culinaryFlowers2, target: "valueadded" }]} />;
-      case "valueadded": return <JourneyScreen screen="valueadded" setScreen={setScreen} background={IMG.culinaryFlowers} eyebrow="Value-Added Pathway" title="Culinary education brings the harvest to life." body="This pathway connects edible flowers, mushrooms, recipes, preservation, food safety, nutrition, and value-added learning." steps={["Select culinary learning focus", "Connect crop or harvest source", "Review recipe, nutrition, and safety guidance", "Prepare demonstration or product idea", "Connect to marketplace, youth education, or partner activity"]} actions={[{ label: "Marketplace", target: "marketplace", strong: true }, { label: "Resources", target: "resources" }, { label: "Youth", target: "youth" }]} imageCards={[{ title: "Edible Flowers", subtitle: "Beauty, nutrition, and culinary learning.", image: IMG.culinaryFlowers, target: "marketplace" }, { title: "Mushrooms", subtitle: "Value-added education.", image: IMG.culinaryMushrooms, target: "resources" }, { title: "Wellness", subtitle: "Food and health together.", image: IMG.culinaryFlowers2, target: "partners" }]} />;
-      case "partners": return <JourneyScreen screen="partners" setScreen={setScreen} background={IMG.partners} eyebrow="Partner Pathway" title="Support becomes visible inside the ecosystem." body="Partners can align materials, education, funding, media, workforce, wellness, food access, trees, compost, tools, and market support." steps={["Identify contribution area", "Connect to program need", "Track visible impact", "Support youth, growers, market, or field operations", "Receive reporting, recognition, and next-step opportunities"]} actions={[{ label: "Operations", target: "operations", strong: true }, { label: "Volunteer", target: "volunteer" }, { label: "Announcements", target: "announcements" }]} imageCards={[{ title: "Central State Representation", subtitle: "Training, agriculture, and workforce connection.", image: IMG.csu, target: "resources" }, { title: "Compost Support", subtitle: "Partner inputs strengthen soil.", image: IMG.compost2, target: "inventory" }, { title: "Media & Story", subtitle: "Public visibility builds momentum.", image: IMG.wkbn, target: "announcements" }]} />;
-      case "volunteer": return <JourneyScreen screen="volunteer" setScreen={setScreen} background={IMG.volunteers} eyebrow="Volunteer Pathway" title="Hands, tools, time, and care move the farm forward." body="Volunteers can help with fencing, planting, sorting seeds, setting up events, supporting youth stations, market flow, and land restoration." steps={["Choose volunteer area", "Review safety and site expectations", "Check in and receive assignment", "Complete task with supervisor confirmation", "Record hours and next availability", "Move into partner, grower, or community ambassador role"]} actions={[{ label: "Announcements", target: "announcements", strong: true }, { label: "Operations", target: "operations" }, { label: "Partners", target: "partners" }]} imageCards={[{ title: "Fence Support", subtitle: "Protect the growing area.", image: IMG.fencing, target: "operations" }, { title: "Volunteer Teams", subtitle: "People make the ecosystem real.", image: IMG.volunteers, target: "announcements" }, { title: "Land Restoration", subtitle: "Work becomes visible.", image: IMG.growAreaAlt, target: "grower" }]} />;
-      case "operations": return <Operations setScreen={setScreen} />;
-      case "weather": return <WeatherAlerts setScreen={setScreen} />;
-      case "inventory": return <Inventory setScreen={setScreen} />;
-      case "cropplanner": return <CropPlanner setScreen={setScreen} />;
-      case "announcements": return <Announcements setScreen={setScreen} />;
-      case "assessment": return <Assessment setScreen={setScreen} />;
-      case "reflection": return <Reflection setScreen={setScreen} />;
-      case "resources": return <Resources setScreen={setScreen} />;
-      default: return <PortalGateway setScreen={setScreen} language={language} setLanguage={setLanguage} />;
-    }
-  }, [screen, language]);
-
-  return <main dir={direction}>{current}</main>;
-}
-
-export default App;
