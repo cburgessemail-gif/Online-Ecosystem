@@ -176,9 +176,9 @@ export default function App() {
           </div>
 
           <Card
-            title="Connected Food Ecosystem"
-            subtitle="Youth workforce, crop planning, marketplace systems, education, growers, wellness, and community participation connected inside one immersive operational ecosystem."
-            image={IMG.ecosystem}
+            title="The Farm Is Open"
+            subtitle="Step through the entrance first. The connected ecosystem is explained after the person is invited into the place."
+            image={IMG.growArea}
           />
         </div>
       </Shell>
@@ -302,21 +302,21 @@ export default function App() {
   if (screen === "account") {
     return (
       <Shell background={IMG.hero}>
-        <div className="grid min-h-[90vh] items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-[2.5rem] border border-white/10 bg-black/45 p-8 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-10">
+        <div className="grid min-h-[calc(100vh-2rem)] items-center gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[2rem] border border-white/10 bg-black/50 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
             <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">
               Create Your Ecosystem Account
             </div>
 
-            <h1 className="mt-6 text-5xl font-black leading-[0.95] md:text-6xl">
+            <h1 className="mt-4 text-4xl font-black leading-[0.95] md:text-5xl">
               Choose how you want to participate.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 drop-shadow-xl">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 drop-shadow-xl">
               Start as a guest, then create a role-based account when you are ready to participate more deeply in the farm ecosystem.
             </p>
 
-            <div className="mt-8 grid gap-3">
+            <div className="mt-5 grid gap-2 md:grid-cols-2">
               {[
                 "Youth Workforce Participant",
                 "Parent / Guardian",
@@ -328,44 +328,44 @@ export default function App() {
               ].map((role) => (
                 <button
                   key={role}
-                  className="rounded-2xl border border-white/10 bg-white/10 px-5 py-4 text-left font-black text-white shadow-xl backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black"
+                  className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black text-white shadow-xl backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black"
                 >
                   {role}
                 </button>
               ))}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <button
                 onClick={() => setScreen("home")}
-                className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black shadow-2xl transition hover:scale-105"
+                className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105"
               >
                 Continue Account Setup
               </button>
 
               <button
                 onClick={() => setScreen("portal")}
-                className="rounded-full border border-white/10 bg-white/10 px-7 py-4 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20"
+                className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20"
               >
                 Back To Portal
               </button>
             </div>
           </div>
 
-          <div className="rounded-[2.5rem] border border-white/10 bg-black/35 p-8 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-2xl">
+          <div className="rounded-[2rem] border border-white/10 bg-black/40 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">
               Account Purpose
             </div>
 
-            <h2 className="mt-5 text-4xl font-black leading-tight">
+            <h2 className="mt-4 text-3xl font-black leading-tight">
               One account. One role. Clear next step.
             </h2>
 
-            <p className="mt-6 text-lg leading-8 text-white/88">
+            <p className="mt-4 text-base leading-7 text-white/88">
               This screen is intentionally quiet. It keeps the farm atmosphere while focusing only on account creation and role selection.
             </p>
 
-            <div className="mt-8 grid gap-4">
+            <div className="mt-5 grid gap-3">
               {[
                 ["Guest First", "Explore without pressure before committing."],
                 ["Role-Based Access", "Each role opens the right pathway and tools."],
@@ -373,10 +373,10 @@ export default function App() {
               ].map(([title, text]) => (
                 <div
                   key={title}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl"
+                  className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl"
                 >
-                  <div className="text-xl font-black">{title}</div>
-                  <div className="mt-2 text-sm leading-6 text-white/80">{text}</div>
+                  <div className="text-lg font-black">{title}</div>
+                  <div className="mt-1 text-sm leading-5 text-white/80">{text}</div>
                 </div>
               ))}
             </div>
