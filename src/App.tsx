@@ -182,9 +182,41 @@ function imageFallback(src: string) {
 }
 
 function SmartImage({ src, alt, contain = false }: { src: string; alt: string; contain?: boolean }) {
-  const [current, setCurrent] = useState(src);
-  useEffect(() => setCurrent(src), [src]);
-  return <img src={current} alt={alt} onError={() => setCurrent(imageFallback(src))} className={contain ? "smart-image contain" : "smart-image"} />;
+  const candidates = useMemo(() => {
+    const clean = src.replace(/^\//, "");
+    const fileOnly = clean.split("/").pop() || clean;
+    const encodedFile = encodeURIComponent(fileOnly).replace(/%20/g, "%20");
+
+    return Array.from(
+      new Set([
+        src,
+        src.startsWith("/images/") ? src : `/images/${fileOnly}`,
+        src.startsWith("/") ? src : `/${src}`,
+        `/${fileOnly}`,
+        `/images/${encodedFile}`,
+        `/${encodedFile}`,
+        "/images/GrowArea2.jpg",
+        "/GrowArea2.jpg",
+        "/images/Grow Area.png",
+        "/Grow Area.png",
+      ])
+    );
+  }, [src]);
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => setIndex(0), [src]);
+
+  return (
+    <img
+      src={candidates[index]}
+      alt={alt}
+      loading="eager"
+      decoding="async"
+      onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
+      className={contain ? "smart-image contain" : "smart-image"}
+    />
+  );
 }
 
 function JourneyPanel({ type }: { type: string }) {
