@@ -182,6 +182,55 @@ export default function App() {
   }
 
   // =========================================================
+  // ATMOSPHERIC DIFFERENTIATION ENGINE
+  // Each pathway must feel like a different place
+  // on the same living ecosystem.
+  // =========================================================
+
+  const atmosphere = {
+    home: {
+      background: IMG.hero,
+      overlay: "bg-black/50",
+      mood: "arrival",
+    },
+    youth: {
+      background: IMG.youth,
+      overlay: "bg-orange-950/40",
+      mood: "energy",
+    },
+    grower: {
+      background: IMG.growArea,
+      overlay: "bg-emerald-950/40",
+      mood: "field",
+    },
+    marketplace: {
+      background: IMG.marketplace,
+      overlay: "bg-amber-950/40",
+      mood: "circulation",
+    },
+    parent: {
+      background: IMG.queens,
+      overlay: "bg-slate-950/40",
+      mood: "support",
+    },
+    supervisor: {
+      background: IMG.fencing,
+      overlay: "bg-zinc-950/45",
+      mood: "coordination",
+    },
+    operations: {
+      background: IMG.ecosystem,
+      overlay: "bg-cyan-950/40",
+      mood: "control-room",
+    },
+    encouragement: {
+      background: IMG.seeds,
+      overlay: "bg-stone-950/35",
+      mood: "reflection",
+    },
+  };
+
+  // =========================================================
   // HOME EXPERIENCE
   // =========================================================
 
@@ -239,7 +288,11 @@ export default function App() {
 
       {screen === "youth" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card
+          <div className="absolute top-8 right-8 rounded-full border border-orange-300/30 bg-orange-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-orange-100 backdrop-blur-xl">
+              ACTIVE YOUTH TEAMS
+            </div>
+
+            <Card
             title="Youth Workforce Pathway"
             subtitle="Daily assignments, assessments, PPE, reflections, badge progression, leadership development, and workforce growth."
             image={IMG.youth}
@@ -291,7 +344,11 @@ export default function App() {
 
       {screen === "parent" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card
+          <div className="absolute top-8 right-8 rounded-full border border-sky-300/30 bg-sky-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-sky-100 backdrop-blur-xl">
+              FAMILY SUPPORT CONNECTED
+            </div>
+
+            <Card
             title="Parent / Guardian Portal"
             subtitle="Connected visibility into attendance, progress, encouragement, reflections, badges, and notifications."
             image={IMG.queens}
@@ -314,7 +371,11 @@ export default function App() {
 
       {screen === "grower" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card
+          <div className="absolute top-8 right-8 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-emerald-100 backdrop-blur-xl">
+              FIELD CONDITIONS ACTIVE
+            </div>
+
+            <Card
             title="Grower Ecosystem"
             subtitle="Production planning, irrigation, composting, harvest forecasting, and grow zone management."
             image={IMG.growArea}
@@ -360,7 +421,11 @@ export default function App() {
 
       {screen === "marketplace" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card
+          <div className="absolute top-8 right-8 rounded-full border border-amber-300/30 bg-amber-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-amber-100 backdrop-blur-xl">
+              COMMUNITY CIRCULATION ACTIVE
+            </div>
+
+            <Card
             title="Marketplace Movement"
             subtitle="Produce availability, SNAP visibility, harvest windows, grower participation, and inventory movement."
             image={IMG.marketplace}
@@ -406,7 +471,11 @@ export default function App() {
 
       {screen === "reports" && (
         <div className="space-y-6">
-          <Card
+          <div className="absolute top-8 right-8 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-cyan-100 backdrop-blur-xl">
+              LIVE OPERATIONS ACTIVE
+            </div>
+
+            <Card
             title="Operational Reporting Layer"
             subtitle="Generate youth workforce, crop planning, inventory, marketplace, parent, supervisor, and community impact reports."
             image={IMG.partners}
