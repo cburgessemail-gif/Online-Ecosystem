@@ -94,9 +94,9 @@ const tourSteps: TourStep[] = [
   {
     id: "operations",
     eyebrow: "Step 5 · Live Operations",
-    title: "Now the Control Room Makes Sense",
+    title: "The Living Control Room"
     narration:
-      "Only after the visitor understands the people, purpose, and movement should they see the living control room. This is where weather, teams, crop planning, marketplace inventory, assessments, and reports come together.",
+      "As your guided tour reaches the living control room, you are no longer just looking at the farm. You are seeing how the ecosystem is coordinated. Weather, teams, youth safety, crop planning, marketplace readiness, assessments, and reports begin to connect in one place.",
     bullets: ["Weather awareness", "Supervisor access", "Assessment tracking", "Marketplace readiness"],
     image: "/images/ConnectFoodEcosystem_withimages.png",
     imageAlt: "Connected ecosystem operations overview",
@@ -286,7 +286,7 @@ export default function App() {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.82;
-    utterance.pitch = 0.96;
+    utterance.pitch = 1.0;
     utterance.volume = 1;
     window.speechSynthesis.speak(utterance);
   };
@@ -611,7 +611,7 @@ export default function App() {
                       <div>Reports</div>
                     </div>
                     <p>
-                      The control room appears after the visitor understands the farm, the people, and the pathways.
+                      As a guest on the tour, this is where you begin to see how the farm stays coordinated day by day.
                     </p>
                   </div>
                 ) : (
