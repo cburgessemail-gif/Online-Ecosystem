@@ -805,7 +805,7 @@ const guestSteps: GuestStep[] = [
     id: "operations",
     eyebrow: "Explaining The Whole System",
     title: "Now the connected food ecosystem can be explained.",
-    subtitle: "This is where the system image belongs: after the guest understands why the parts matter.",
+    subtitle: "The connected food ecosystem comes into view after the journey has revealed how the parts move together.",
     image: IMG.ecosystem,
     why: "The full system appears after the guest has already experienced its movement, making the connections easier to understand because they have been discovered step by step.",
     experience: [
@@ -1108,7 +1108,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         >
           <PhotoCard
             title="The Forest Gate Is Open"
-            subtitle="This is the threshold. The farm appears after entry. The explanation comes through the guided guest journey."
+            subtitle="Step forward into the forest entrance. The journey opens through movement, place, and discovery."
             image={IMG.forestAlt}
             height="440px"
             label="Arrival"
@@ -1129,8 +1129,8 @@ function AccessCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         <Panel
           eyebrow="Live Multi-User Access"
-          title="One ecosystem link. Many users. Role-protected movement."
-          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators can enter the same online ecosystem at the same time. Each role moves through the experience differently, while protected youth tools remain limited to approved staff and administrators."
+          title="One ecosystem link. Many users. Protected role movement."
+          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators enter the same online ecosystem through role-appropriate pathways. Protected youth tools remain limited to approved staff and administrators."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-[0_35px_100px_rgba(0,0,0,.55)] backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Current Access State</div>
@@ -1327,7 +1327,7 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
 
         <div className="rounded-[2rem] border border-white/10 bg-black/40 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Account Purpose</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Access Path</div>
           <h2 className="mt-4 text-3xl font-black leading-tight">One ecosystem. Many users. Clear permissions.</h2>
           <div className="mt-5 grid gap-3">
             {[
@@ -1366,15 +1366,11 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <h1 className="mt-4 text-4xl font-black leading-[0.95] md:text-5xl">{step.title}</h1>
           <p className="mt-5 text-base leading-7 text-white/90 md:text-lg md:leading-8">{step.subtitle}</p>
 
-          <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl">
-            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Why this is part of the ecosystem</div>
-            <p className="mt-3 text-sm leading-6 text-white/85">{step.why}</p>
-          </div>
 
           <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
             <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Narration Control Panel</div>
             <div className="mt-3 flex flex-wrap gap-3">
-              <button onClick={() => speak(`${step.title}. ${step.subtitle}. ${step.why}`)} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black shadow-xl transition hover:scale-105">
+              <button onClick={() => speak(`${step.title}. ${step.subtitle}`)} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black shadow-xl transition hover:scale-105">
                 Play Guided Voice
               </button>
               <button onClick={() => window.speechSynthesis?.cancel()} className="rounded-full border border-white/10 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/20">
@@ -1410,7 +1406,7 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="space-y-4">
           <PhotoCard title={step.title} subtitle={step.subtitle} image={step.image} height="360px" label={`Step ${stepIndex + 1} of ${guestSteps.length}`} cta="Active" />
           <div className="rounded-[2rem] border border-white/10 bg-black/46 p-5 backdrop-blur-2xl">
-            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">What the guest experiences</div>
+            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Pathway Movement</div>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               {step.experience.map((item) => (
                 <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/85">
@@ -1474,8 +1470,8 @@ function Encouragement({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <Shell screen="encouragement" setScreen={setScreen} background={IMG.seeds}>
       <StatusBar />
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel eyebrow="Daily Proverb" title={proverb} body="This is the grounding message that connects work, responsibility, and personal growth before the day begins." />
-        <Panel eyebrow="Positive Message" title={message} body="This gives youth, volunteers, and staff a reason to connect their daily actions to purpose." />
+        <Panel eyebrow="Daily Proverb" title={proverb} body="A daily grounding message for work, responsibility, and growth." />
+        <Panel eyebrow="Positive Message" title={message} body="A daily encouragement that keeps actions connected to purpose." />
       </div>
       <div className="mt-4">
         <ActionGrid
@@ -1540,7 +1536,7 @@ function Supervisor({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Supervisor / Staff Protected Access"
           title="Supervisors are the youth access layer."
-          body="Staff support, guide, counsel, assess, and protect youth through their daily journey. Public guests, customers, partners, and marketplace users do not enter youth records."
+          body="Staff guide the daily youth journey, protect records, document growth, and keep public users outside private youth tools."
         />
 
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
@@ -1579,7 +1575,7 @@ function Safety({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Youth Protection"
           title="Access is separated by role."
-          body="Guests can explore. Customers can shop. Partners can review impact. Parents can see approved summaries. Supervisors/staff are the only users with youth observation, assessment, and support-note access."
+          body="Public, family, staff, and admin access remain separated so youth records stay protected while the ecosystem remains open for appropriate participation."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Protected Rules</div>
@@ -1620,7 +1616,7 @@ function Parent({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Parent / Guardian Portal"
           title="Parents see support, progress, and next steps."
-          body="The parent view builds trust by showing attendance, safety, badges, strengths, encouragement, announcements, and approved reflections without exposing internal crisis labels or private supervisor notes."
+          body="Parents receive approved progress, attendance, safety, badges, strengths, encouragement, announcements, and reflections while private staff notes remain protected."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Youth Progress Snapshot</div>
@@ -1748,7 +1744,7 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Marketplace Circulation"
           title="Inventory connects to crop planning and community access."
-          body="The marketplace pathway shows what is available, what is forecasted, what is SNAP-visible, and how products move from grow plan to customer access."
+          body="The marketplace shows availability, forecasts, SNAP-visible products, and the movement from grow plan to customer access."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Marketplace Inventory</div>
@@ -1799,7 +1795,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         <PhotoCard
           title="Connected Food Ecosystem"
-          subtitle="This is the explaining screen. The system graphic appears here because the user has already moved through the experience."
+          subtitle="The connected system comes into view here, showing how the pathways move together."
           image={IMG.ecosystem}
           height="430px"
           label="System View"
@@ -1941,7 +1937,7 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <Panel
         eyebrow="Training"
         title="Supervisor and participant training connects the work to safety, skill, and growth."
-        body="Training includes PPE, youth protection, assessment language, role-based access, field station expectations, emergency procedures, daily reflection, crop planning, marketplace preparation, and reporting."
+        body="Training guides PPE, youth protection, assessment language, role-based access, field stations, emergency procedures, reflection, crop planning, marketplace preparation, and reporting."
       />
       <div className="mt-4">
         <ActionGrid
