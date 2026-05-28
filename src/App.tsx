@@ -1,10 +1,4 @@
-// Use this as the next full App.tsx replacement.
-// It preserves the current one-file React structure and updates:
-// Guest Journey images, visible languages, 15-second guided pacing,
-// Stay Here / Go Forward behavior, youth-accessible airport history,
-// and regenerative farming education.
-
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 type LangKey = "English" | "Español" | "Tagalog" | "Italiano" | "עברית" | "Français";
 
@@ -33,12 +27,6 @@ type Action = {
   label: string;
   to?: ScreenKey;
   href?: string;
-  modal?: keyof typeof IMAGES;
-};
-
-type DetailBlock = {
-  title: string;
-  text: string;
 };
 
 type ScreenContent = {
@@ -48,135 +36,115 @@ type ScreenContent = {
   image: string;
   imageAlt: string;
   narration: string;
-  details: DetailBlock[];
+  lesson: string;
   actions: Action[];
 };
 
-const LANGS: LangKey[] = ["English", "Español", "Tagalog", "Italiano", "עברית", "Français"];
+const image = (file: string) => `/images/${encodeURIComponent(file)}`;
 
 const IMAGES = {
-  entrance: "/images/GrowArea.jpg",
-  ecosystem: "/images/GrowArea2.jpg",
-  guest: "/images/SAM_0427.JPG",
-  story: "/images/SAM_0430.JPG",
-  airport: "/images/SAM_0377.JPG",
-  regenerative: "/images/Compost_ElliottGarden.png",
-  customer: "/images/SAM_0380.JPG",
-  marketplace: "/images/ConnectFoodEcosystem_withimages.png",
-  grower: "/images/GrowArea2.jpg",
-  planner: "/images/SAM_0407.JPG",
-  valueAdded: "/images/culniary_edibleflowers.jpeg",
-  youth: "/images/SAM_0393.JPG",
-  supervisor: "/images/SAM_0396.JPG",
-  parent: "/images/SAM_0417.JPG",
-  partner: "/images/SAM_0401.JPG",
-  events: "/images/Queens Village.png",
-  wellness: "/images/SAM_0412.JPG",
-  decision: "/images/SAM_0415.JPG",
-  feedback: "/images/SAM_0420.JPG",
-  community: "/images/Fence_volunteers.png",
-  training: "/images/Deer Fencing.png",
-  produce: "/images/Seeds_Jubilee Gardens.png",
-  nutrition: "/images/SAM_0425.JPG",
-  legacy: "/images/SAM_0430.JPG",
+  entrance: image("Grow Area.png"),
+  ecosystem: image("GrowArea2.jpg"),
+  guest: image("SAM_0427.JPG"),
+  story: image("SAM_0430.JPG"),
+  airport: image("SAM_0377.JPG"),
+  regenerative: image("Compost_ElliottGarden.png"),
+  customer: image("SAM_0380.JPG"),
+  marketplace: image("ConnectFoodEcosystem_withimages.png"),
+  grower: image("GrowArea2.jpg"),
+  planner: image("SAM_0407.JPG"),
+  valueAdded: image("culniary_edibleflowers.jpeg"),
+  youth: image("SAM_0393.JPG"),
+  supervisor: image("SAM_0396.JPG"),
+  parent: image("SAM_0417.JPG"),
+  partner: image("SAM_0401.JPG"),
+  events: image("Queens Village.png"),
+  wellness: image("SAM_0412.JPG"),
+  decision: image("SAM_0415.JPG"),
+  feedback: image("SAM_0420.JPG"),
+  fallback: image("GrowArea2.jpg"),
 };
+
+const LANGS: LangKey[] = ["English", "Español", "Tagalog", "Italiano", "עברית", "Français"];
 
 const UI: Record<LangKey, Record<string, string>> = {
   English: {
     demo: "BRONSON FAMILY FARM ECOSYSTEM",
     mainTitle: "Connected Food Ecosystem Experience",
-    start: "Start",
-    back: "Back",
-    next: "Go Forward",
     guided: "Begin Guided Tour",
     pause: "Pause Tour",
+    back: "Back",
     stay: "Stay Here",
     forward: "Go Forward",
     language: "Language Access",
-    choose: "Choose a pathway",
     return: "Return to Ecosystem",
-    feedback: "Feedback & Contact",
-    decision: "Ending Decision",
+    decision: "Decision",
+    feedback: "Feedback",
   },
   Español: {
     demo: "ECOSISTEMA DE BRONSON FAMILY FARM",
     mainTitle: "Experiencia de ecosistema alimentario conectado",
-    start: "Comenzar",
-    back: "Atrás",
-    next: "Avanzar",
     guided: "Iniciar recorrido guiado",
     pause: "Pausar recorrido",
+    back: "Atrás",
     stay: "Quedarse aquí",
     forward: "Avanzar",
     language: "Acceso de idioma",
-    choose: "Elija un camino",
     return: "Volver al ecosistema",
-    feedback: "Comentarios y contacto",
-    decision: "Decisión final",
+    decision: "Decisión",
+    feedback: "Comentarios",
   },
   Tagalog: {
     demo: "ECOSYSTEM NG BRONSON FAMILY FARM",
     mainTitle: "Konektadong karanasan sa pagkain at komunidad",
-    start: "Magsimula",
-    back: "Bumalik",
-    next: "Magpatuloy",
     guided: "Simulan ang gabay na tour",
     pause: "Ihinto muna ang tour",
+    back: "Bumalik",
     stay: "Manatili Dito",
     forward: "Magpatuloy",
     language: "Wika",
-    choose: "Pumili ng landas",
     return: "Bumalik sa ecosystem",
-    feedback: "Feedback at contact",
-    decision: "Huling desisyon",
+    decision: "Desisyon",
+    feedback: "Feedback",
   },
   Italiano: {
     demo: "ECOSISTEMA BRONSON FAMILY FARM",
     mainTitle: "Esperienza alimentare comunitaria connessa",
-    start: "Inizia",
-    back: "Indietro",
-    next: "Vai avanti",
     guided: "Avvia tour guidato",
     pause: "Pausa tour",
+    back: "Indietro",
     stay: "Resta qui",
     forward: "Vai avanti",
     language: "Lingua",
-    choose: "Scegli un percorso",
     return: "Ritorna all'ecosistema",
-    feedback: "Feedback e contatto",
-    decision: "Decisione finale",
+    decision: "Decisione",
+    feedback: "Feedback",
   },
   עברית: {
     demo: "המערכת של חוות משפחת ברונסון",
     mainTitle: "חוויה קהילתית מחוברת סביב מזון",
-    start: "התחלה",
-    back: "חזרה",
-    next: "קדימה",
     guided: "התחל סיור מודרך",
     pause: "השהה סיור",
+    back: "חזרה",
     stay: "להישאר כאן",
     forward: "קדימה",
     language: "שפה",
-    choose: "בחר מסלול",
     return: "חזרה למערכת",
-    feedback: "משוב ויצירת קשר",
-    decision: "החלטה מסכמת",
+    decision: "החלטה",
+    feedback: "משוב",
   },
   Français: {
     demo: "ÉCOSYSTÈME BRONSON FAMILY FARM",
     mainTitle: "Expérience alimentaire communautaire connectée",
-    start: "Commencer",
-    back: "Retour",
-    next: "Avancer",
     guided: "Démarrer la visite guidée",
     pause: "Pause",
+    back: "Retour",
     stay: "Rester ici",
     forward: "Avancer",
     language: "Langue",
-    choose: "Choisir un parcours",
     return: "Retour à l'écosystème",
-    feedback: "Commentaires et contact",
-    decision: "Décision finale",
+    decision: "Décision",
+    feedback: "Commentaires",
   },
 };
 
@@ -207,39 +175,33 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     eyebrow: "Welcome",
     title: "Step into the Farm. Experience the wonders of life.",
     subtitle:
-      "A guided ecosystem for food access, growers, youth workforce, marketplace activity, health education, airport history, regenerative farming, and community return.",
+      "A living online ecosystem for food access, growers, youth workforce, marketplace activity, health education, airport history, regenerative farming, and community return.",
     image: IMAGES.entrance,
-    imageAlt: "Forest farm entrance",
+    imageAlt: "Forest entrance into Bronson Family Farm",
     narration:
-      "Welcome to Bronson Family Farm. Take a moment to look around the screen. This is not just a farm page. This is an entrance into a living ecosystem where land, food, young people, growers, families, and community partners are connected.",
-    details: [
-      { title: "Entrance", text: "A calm beginning before the visitor chooses a role." },
-      { title: "Language", text: "Language access is visible immediately." },
-      { title: "Pace", text: "The guided tour moves slowly so low readers and first-time visitors can follow." },
-    ],
+      "Welcome to Bronson Family Farm. Take a moment to look around the screen first. This is the entrance into a living ecosystem where land, food, young people, growers, families, and community partners are connected.",
+    lesson:
+      "You are entering the farm experience. The screen will move slowly so every visitor can understand what they are seeing before the next layer appears.",
     actions: [
       { label: "Enter Ecosystem", to: "ecosystem" },
-      { label: "Begin Guided Tour", to: "ecosystem" },
+      { label: "Guest Journey", to: "guest" },
     ],
   },
   ecosystem: {
     eyebrow: "The Model",
     title: "Connected Food Ecosystem",
     subtitle:
-      "Bronson Family Farm brings together guests, customers, growers, youth, supervisors, parents, partners, food movement, and community resources.",
+      "Bronson Family Farm connects guests, customers, growers, youth, supervisors, parents, partners, wellness, marketplace systems, and community resources.",
     image: IMAGES.ecosystem,
     imageAlt: "Growing area at Bronson Family Farm",
     narration:
-      "This is the whole ecosystem. Each role connects to another role. A guest can become a customer. A customer can become a volunteer. A youth worker can become a grower. A partner can strengthen the entire system.",
-    details: [
-      { title: "Food access", text: "Fresh food moves toward families, markets, schools, and community destinations." },
-      { title: "Grower supply", text: "Tools, training, seeds, seedlings, demonstrations, and planning support local growers." },
-      { title: "Workforce", text: "Youth learn through real farm responsibilities, safety, teamwork, and supervision." },
-    ],
+      "This is the whole ecosystem. Each role connects to another role. A guest can become a customer. A customer can become a volunteer. A youth worker can become a grower. A partner can strengthen the whole system.",
+    lesson:
+      "The ecosystem is the whole operating system. It is not one page. It is the connection between food, people, learning, work, land, health, and opportunity.",
     actions: [
       { label: "Guest Journey", to: "guest" },
       { label: "Youth Workforce", to: "youth" },
-      { label: "Partner / Investor", to: "partner" },
+      { label: "Partner Pathway", to: "partner" },
     ],
   },
   guest: {
@@ -248,16 +210,13 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     subtitle:
       "Guests enter through beauty, story, land, airport history, regenerative farming, events, and discovery before deciding how they want to participate.",
     image: IMAGES.guest,
-    imageAlt: "Welcoming farm image for guests",
+    imageAlt: "Guest journey farm image",
     narration:
-      "The guest journey starts slowly. A guest should not be rushed. First they see the land. Then they learn the story. Then they understand that this farm is connected to an airport, to family legacy, to food access, and to the future of young people.",
-    details: [
-      { title: "See", text: "Guests first become familiar with what is on the screen." },
-      { title: "Learn", text: "The next layer explains the story, place, and purpose." },
-      { title: "Choose", text: "Guests decide whether to attend, shop, volunteer, share, sponsor, or return." },
-    ],
+      "The guest journey starts slowly. A guest should not be rushed. First they see the land. Then they learn the story. Then they understand that the farm connects airport history, family legacy, food access, youth, and the future.",
+    lesson:
+      "A guest is not pushed immediately into action. The guest is invited to look, listen, learn, and then choose a pathway.",
     actions: [
-      { label: "Open Story", to: "story" },
+      { label: "Farm Story", to: "story" },
       { label: "Airport History", to: "airport" },
       { label: "Regenerative Farming", to: "regenerative" },
     ],
@@ -268,18 +227,15 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     subtitle:
       "The ecosystem honors Bronson and Lorenzana family legacy while building a practical food and workforce destination in Youngstown.",
     image: IMAGES.story,
-    imageAlt: "Family legacy and farm story",
+    imageAlt: "Farm legacy image",
     narration:
       "The story matters because people protect what they understand. Bronson Family Farm is rooted in family history, agriculture, faith, education, culture, and community responsibility.",
-    details: [
-      { title: "Legacy", text: "Family history and community responsibility shape the farm’s purpose." },
-      { title: "Place", text: "The work is rooted in Youngstown and the East Side." },
-      { title: "Future", text: "The story points toward youth, growers, food access, and regional opportunity." },
-    ],
+    lesson:
+      "Legacy gives the farm meaning. It helps youth and visitors understand that this work belongs to a bigger story.",
     actions: [
-      { label: "Guest Journey", to: "guest" },
       { label: "Airport History", to: "airport" },
-      { label: "Choose Pathway", to: "ecosystem" },
+      { label: "Regenerative Farming", to: "regenerative" },
+      { label: "Return to Guest", to: "guest" },
     ],
   },
   airport: {
@@ -290,16 +246,13 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     image: IMAGES.airport,
     imageAlt: "Historic airport-connected farm area",
     narration:
-      "This land has a story before the farm. An airport is a place where people learn direction, safety, signals, teamwork, and responsibility. Youth can understand the airport as history, but also as a classroom. The same land that once supported flight can now support food, learning, and opportunity.",
-    details: [
-      { title: "For youth", text: "Airport history is explained through direction, safety, teamwork, and responsibility." },
-      { title: "Military connection", text: "Aviation and military history help youth understand service, discipline, and preparation." },
-      { title: "Land use", text: "The farm shows how historic land can serve a new community purpose." },
-    ],
+      "This land has a story before the farm. An airport is a place where people learn direction, safety, signals, teamwork, and responsibility. Youth can understand the airport as history and as a classroom. The same land that once supported flight can now support food, learning, and opportunity.",
+    lesson:
+      "For youth, airport history can be explained through direction, safety, signals, service, discipline, and responsibility.",
     actions: [
       { label: "Regenerative Farming", to: "regenerative" },
       { label: "Youth Workforce", to: "youth" },
-      { label: "Go Back to Guest", to: "guest" },
+      { label: "Return to Guest", to: "guest" },
     ],
   },
   regenerative: {
@@ -311,11 +264,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Compost and soil-building image",
     narration:
       "Regenerative farming means the farm is not only taking from the land. It is giving back. We build soil, use compost, protect living systems, reduce waste, care for water, and grow in a way that helps the land become stronger over time.",
-    details: [
-      { title: "Build soil", text: "Compost, leaves, mulch, and organic matter help create healthier soil." },
-      { title: "Reduce waste", text: "The farm reuses natural materials and works toward off-grid, low-waste operations." },
-      { title: "Teach stewardship", text: "Youth and growers learn that land must be cared for, not just used." },
-    ],
+    lesson:
+      "Regenerative farming is stewardship. The goal is healthier soil, stronger plants, less waste, and land that improves as people care for it.",
     actions: [
       { label: "Grower Pathway", to: "grower" },
       { label: "Youth Workforce", to: "youth" },
@@ -331,11 +281,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Customer food pathway",
     narration:
       "The customer pathway helps families move from interest to fresh food. Food access becomes stronger when people also receive recipes, nutrition support, and reasons to return.",
-    details: [
-      { title: "Shop", text: "Customers can move directly to the Bronson Family Farm store." },
-      { title: "Learn", text: "Recipes and nutrition notes help families use fresh food." },
-      { title: "Return", text: "Customers come back for produce, events, demonstrations, and wellness education." },
-    ],
+    lesson:
+      "The customer pathway connects shopping to health, learning, family meals, and repeated community participation.",
     actions: [
       { label: "Marketplace", to: "marketplace" },
       { label: "Wellness / Nutrition", to: "wellness" },
@@ -351,11 +298,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Marketplace ecosystem image",
     narration:
       "The marketplace is where growing becomes movement. Produce, seedlings, Bubble Babies, and value-added products can move from the farm into homes, schools, and community destinations.",
-    details: [
-      { title: "Store", text: "The GrownBy store gives customers a place to shop." },
-      { title: "Inventory", text: "Products need clear paths from field to sale." },
-      { title: "Community", text: "Food can support families, schools, events, and partners." },
-    ],
+    lesson:
+      "The marketplace turns growing into access. It connects farm production to customers, events, growers, and community need.",
     actions: [
       { label: "Open GrownBy Store", href: "https://grownby.com/farms/bronson-family-farm/shop" },
       { label: "Customer Path", to: "customer" },
@@ -371,11 +315,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Grower growing area",
     narration:
       "The grower pathway helps people grow successfully. Growers need timing, tools, supplies, knowledge, weather awareness, and a place to connect what they grow to buyers and community needs.",
-    details: [
-      { title: "Planning", text: "Planting windows and crop timing keep the work practical." },
-      { title: "Training", text: "Demonstrations help growers learn by seeing and doing." },
-      { title: "Market", text: "Growers can connect to inventory, sales, and distribution." },
-    ],
+    lesson:
+      "A grower needs more than seeds. A grower needs timing, tools, supplies, learning, weather awareness, and a pathway to market.",
     actions: [
       { label: "Crop Planner", to: "planner" },
       { label: "Marketplace", to: "marketplace" },
@@ -391,11 +332,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Crop planner pathway",
     narration:
       "The crop planner helps the farm make decisions. Farming depends on timing, weather, workers, crop stage, inventory, and where the food is going next.",
-    details: [
-      { title: "Season", text: "Planting and harvest windows guide daily work." },
-      { title: "Workforce", text: "Youth and supervisors can connect tasks to real outcomes." },
-      { title: "Market", text: "Planning helps products move to customers and community destinations." },
-    ],
+    lesson:
+      "Planning keeps the farm from guessing. It connects planting, harvesting, youth work, inventory, events, and sales.",
     actions: [
       { label: "Grower Path", to: "grower" },
       { label: "Youth Workforce", to: "youth" },
@@ -411,15 +349,12 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Value-added food image",
     narration:
       "Value-added work helps growers and producers create more value. A product needs a story, packaging, customer education, safety awareness, and a clear path to market.",
-    details: [
-      { title: "Branding", text: "Presentation helps customers understand the product." },
-      { title: "Demonstration", text: "Live examples teach people how to use local food." },
-      { title: "Income", text: "Products can create enterprise opportunity." },
-    ],
+    lesson:
+      "Value-added work helps produce become products, demonstrations, meals, education, and income.",
     actions: [
       { label: "Marketplace", to: "marketplace" },
       { label: "Events", to: "events" },
-      { label: "Open Produce Gallery", modal: "produce" },
+      { label: "Customer Path", to: "customer" },
     ],
   },
   youth: {
@@ -431,15 +366,12 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Youth workforce pathway",
     narration:
       "Youth workforce is more than a summer job. Youth learn safety, attendance, teamwork, growing, harvesting, inventory, marketplace support, communication, and leadership. Staff supervisors guide youth. Random people do not get access to youth.",
-    details: [
-      { title: "Safety", text: "PPE, check-in, assignments, and supervisor structure protect the youth." },
-      { title: "Skills", text: "Youth learn responsibility, teamwork, agriculture, STEAM, and enterprise." },
-      { title: "Purpose", text: "Youth see how their work becomes food, service, and opportunity." },
-    ],
+    lesson:
+      "Youth are protected through staff supervision, check-in, PPE, assignments, structure, and clear adult responsibility.",
     actions: [
       { label: "Supervisor Portal", to: "supervisor" },
       { label: "Parent / Guardian View", to: "parent" },
-      { label: "Training Gallery", modal: "training" },
+      { label: "Crop Planner", to: "planner" },
     ],
   },
   supervisor: {
@@ -451,11 +383,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Supervisor pathway",
     narration:
       "The supervisor pathway is for staff. Supervisors support youth through check-in, safety, task assignments, observations, notes, and care. This protects the program and keeps youth connected to responsible adults.",
-    details: [
-      { title: "Check-in", text: "Attendance, PPE, assignments, and daily readiness." },
-      { title: "Observation", text: "Task completion, teamwork, communication, and life skills." },
-      { title: "Support", text: "Supervisors connect youth, parents, and program leadership." },
-    ],
+    lesson:
+      "Supervisors are the staff layer. They support youth, protect the program, document progress, and communicate concerns.",
     actions: [
       { label: "Youth Workforce", to: "youth" },
       { label: "Parent / Guardian View", to: "parent" },
@@ -471,11 +400,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Parent guardian connection",
     narration:
       "Parents and guardians need to know what youth are doing and why it matters. This pathway explains safety, daily rhythm, progress, expectations, and how the program supports growth.",
-    details: [
-      { title: "Progress", text: "Families can understand attendance, participation, and skill growth." },
-      { title: "Communication", text: "Parents can receive updates and know who supervises youth." },
-      { title: "Trust", text: "The program stays clear, structured, and protective." },
-    ],
+    lesson:
+      "The parent portal builds trust by showing safety, structure, progress, communication, and next steps.",
     actions: [
       { label: "Youth Workforce", to: "youth" },
       { label: "Supervisor Portal", to: "supervisor" },
@@ -491,11 +417,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Partner pathway",
     narration:
       "Partners strengthen the whole ecosystem. The farm needs practical support: water, solar, tools, fencing, storage, tables, canopies, transportation, education, and workforce support.",
-    details: [
-      { title: "Specific asks", text: "Water, solar, fencing, tools, storage, transportation, wash stations, and workforce supports." },
-      { title: "Impact", text: "Support strengthens youth, growers, customers, and food access." },
-      { title: "Mutual benefit", text: "Strong partnerships create value for the community and the partner." },
-    ],
+    lesson:
+      "Partners do not support one isolated activity. They strengthen the infrastructure that allows the whole ecosystem to function.",
     actions: [
       { label: "Events", to: "events" },
       { label: "Feedback", to: "feedback" },
@@ -511,11 +434,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Community event pathway",
     narration:
       "Events help people return. They give guests, customers, growers, youth, partners, and families a reason to come back, learn, shop, volunteer, and connect.",
-    details: [
-      { title: "Entry", text: "Events are welcoming ways to enter the ecosystem." },
-      { title: "Demonstration", text: "Partners, growers, and youth can show the work in real time." },
-      { title: "Trust", text: "Events make the farm visible, useful, and memorable." },
-    ],
+    lesson:
+      "Events make the ecosystem visible. They help people see, learn, participate, and return.",
     actions: [
       { label: "Guest Journey", to: "guest" },
       { label: "Marketplace", to: "marketplace" },
@@ -531,15 +451,12 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Wellness and nutrition pathway",
     narration:
       "Food is more than something to buy. Food connects to health, culture, family, confidence, and community. Wellness helps people understand how to use fresh food well.",
-    details: [
-      { title: "Nutrition", text: "Families learn what to do with seasonal produce." },
-      { title: "Mental wellness", text: "Gardening and outdoor work support calm, connection, purpose, and belonging." },
-      { title: "Family", text: "Wellness connects youth, parents, customers, volunteers, and partners." },
-    ],
+    lesson:
+      "Wellness connects fresh food to health, mental wellness, recipes, culture, family, and belonging.",
     actions: [
       { label: "Customer Path", to: "customer" },
       { label: "Marketplace", to: "marketplace" },
-      { label: "Nutrition Gallery", modal: "nutrition" },
+      { label: "Events", to: "events" },
     ],
   },
   decision: {
@@ -551,11 +468,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Decision pathway",
     narration:
       "Now choose what comes next. You can become a guest, customer, grower, youth worker, supervisor, parent, partner, volunteer, or supporter. The ecosystem keeps moving forward.",
-    details: [
-      { title: "Grow", text: "Become a grower or help with planning." },
-      { title: "Support youth", text: "Support the workforce program." },
-      { title: "Shop or partner", text: "Use the marketplace or become a partner." },
-    ],
+    lesson:
+      "The ecosystem should never strand the visitor. Each role leads to a clear next step.",
     actions: [
       { label: "Become a Grower", to: "grower" },
       { label: "Support Youth", to: "youth" },
@@ -571,11 +485,8 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
     imageAlt: "Feedback and contact pathway",
     narration:
       "Thank you for entering the Bronson Family Farm ecosystem. You can return to the ecosystem, share the farm, shop, ask questions, or tell us how you want to connect.",
-    details: [
-      { title: "Contact", text: "Phone: 330-275-1604. Website: bronsonfamilyfarm.com." },
-      { title: "Share", text: "Invite a grower, family, youth supervisor, customer, partner, or supporter." },
-      { title: "Return", text: "The ecosystem does not end. It invites people back." },
-    ],
+    lesson:
+      "Contact: 330-275-1604. Website: bronsonfamilyfarm.com. The ecosystem does not end. It invites people back.",
     actions: [
       { label: "Return to Ecosystem", to: "ecosystem" },
       { label: "Shop GrownBy", href: "https://grownby.com/farms/bronson-family-farm/shop" },
@@ -585,12 +496,12 @@ const CONTENT: Record<ScreenKey, ScreenContent> = {
 };
 
 const ROLE_TILES: { key: ScreenKey; title: string; text: string; image: string }[] = [
-  { key: "guest", title: "Guest", text: "Story, events, beauty, airport history, and first discovery.", image: IMAGES.guest },
+  { key: "guest", title: "Guest", text: "Story, events, airport history, and discovery.", image: IMAGES.guest },
   { key: "customer", title: "Customer", text: "Fresh food, marketplace, recipes, and nutrition.", image: IMAGES.customer },
   { key: "grower", title: "Grower", text: "Planning, tools, training, supplies, and market connection.", image: IMAGES.grower },
   { key: "valueAdded", title: "Value-Added", text: "Packaging, demonstrations, branding, and enterprise.", image: IMAGES.valueAdded },
   { key: "youth", title: "Youth Workforce", text: "Safety, work, skill-building, agriculture, and STEAM.", image: IMAGES.youth },
-  { key: "supervisor", title: "Supervisor", text: "Staff-only support, check-ins, assessments, and accountability.", image: IMAGES.supervisor },
+  { key: "supervisor", title: "Supervisor", text: "Staff-only check-ins, support, observations, and accountability.", image: IMAGES.supervisor },
   { key: "parent", title: "Parent / Guardian", text: "Progress, communication, expectations, and support.", image: IMAGES.parent },
   { key: "partner", title: "Partner / Investor", text: "Funding, sponsorship, infrastructure, and impact.", image: IMAGES.partner },
 ];
@@ -599,41 +510,49 @@ export default function App() {
   const [screen, setScreen] = useState<ScreenKey>("home");
   const [lang, setLang] = useState<LangKey>("English");
   const [guided, setGuided] = useState(false);
-  const [imageModal, setImageModal] = useState<string | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const t = UI[lang];
   const current = CONTENT[screen];
   const currentIndex = SCREEN_ORDER.indexOf(screen);
+  const progress = Math.round(((currentIndex + 1) / SCREEN_ORDER.length) * 100);
 
-  const progress = useMemo(
-    () => Math.round(((currentIndex + 1) / SCREEN_ORDER.length) * 100),
-    [currentIndex]
-  );
+  const stopSpeech = () => {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  };
 
   const speak = (text: string) => {
     if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
+    stopSpeech();
 
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
-    const maleVoice =
-      voices.find((voice) => /male|david|mark|daniel|alex/i.test(voice.name)) || voices[0];
+    const preferred =
+      voices.find((v) => /david|mark|daniel|alex|male/i.test(v.name)) ||
+      voices.find((v) => /en/i.test(v.lang)) ||
+      voices[0];
 
-    if (maleVoice) utterance.voice = maleVoice;
-    utterance.rate = 0.82;
+    if (preferred) utterance.voice = preferred;
+    utterance.rate = 0.78;
     utterance.pitch = 1.08;
     utterance.volume = 1;
     window.speechSynthesis.speak(utterance);
   };
 
+  const clearTimer = () => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = null;
+  };
+
   const goto = (next: ScreenKey, keepGuided = false) => {
-    window.speechSynthesis?.cancel();
-    if (!keepGuided) setGuided(false);
+    clearTimer();
+    stopSpeech();
     setScreen(next);
+    if (!keepGuided) setGuided(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const goForward = (keepGuided = false) => {
+  const goForward = (keepGuided = guided) => {
     const next = SCREEN_ORDER[(currentIndex + 1) % SCREEN_ORDER.length];
     goto(next, keepGuided);
   };
@@ -644,16 +563,27 @@ export default function App() {
   };
 
   const stayHere = () => {
+    clearTimer();
+    stopSpeech();
     setGuided(false);
-    window.speechSynthesis?.cancel();
+  };
+
+  const performAction = (action: Action) => {
+    clearTimer();
+    stopSpeech();
+    if (action.href) {
+      window.open(action.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (action.to) goto(action.to);
   };
 
   useEffect(() => {
     if (!guided) return;
-
+    clearTimer();
     speak(current.narration);
 
-    const timer = window.setTimeout(() => {
+    timerRef.current = window.setTimeout(() => {
       setScreen((prev) => {
         const i = SCREEN_ORDER.indexOf(prev);
         return SCREEN_ORDER[(i + 1) % SCREEN_ORDER.length];
@@ -661,34 +591,17 @@ export default function App() {
     }, 15000);
 
     return () => {
-      window.clearTimeout(timer);
-      window.speechSynthesis?.cancel();
+      clearTimer();
+      stopSpeech();
     };
   }, [guided, screen]);
 
-  const performAction = (action: Action) => {
-    window.speechSynthesis?.cancel();
-
-    if (action.href) {
-      window.open(action.href, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    if (action.modal) {
-      setGuided(false);
-      setImageModal(IMAGES[action.modal]);
-      return;
-    }
-
-    if (action.to) goto(action.to);
-  };
-
   return (
     <main style={styles.shell} dir={lang === "עברית" ? "rtl" : "ltr"}>
-      <div style={styles.bg} />
+      <div style={styles.background} />
 
-      <header style={styles.topbar}>
-        <button style={styles.brandButton} onClick={() => goto("home")}>
+      <header style={styles.header}>
+        <button style={styles.brand} onClick={() => goto("home")}>
           <span style={styles.brandMark}>BFF</span>
           <span>
             <span style={styles.brandTiny}>{t.demo}</span>
@@ -696,7 +609,7 @@ export default function App() {
           </span>
         </button>
 
-        <div style={styles.topControls}>
+        <div style={styles.languageArea}>
           <div style={styles.languageLabel}>{t.language}</div>
           <div style={styles.languagePills}>
             {LANGS.map((item) => (
@@ -709,125 +622,88 @@ export default function App() {
               </button>
             ))}
           </div>
-          <button style={styles.smallBtn} onClick={() => setGuided((v) => !v)}>
+          <button style={styles.guidedButton} onClick={() => setGuided((v) => !v)}>
             {guided ? t.pause : t.guided}
           </button>
         </div>
       </header>
 
-      <section style={styles.progressWrap}>
+      <div style={styles.progressTrack}>
         <div style={{ ...styles.progressBar, width: `${progress}%` }} />
-      </section>
+      </div>
 
-      <section style={styles.heroGrid}>
-        <article style={styles.heroText}>
-          <div style={styles.eyebrow}>{current.eyebrow}</div>
+      <section style={styles.hero}>
+        <article style={styles.leftPanel}>
+          <p style={styles.eyebrow}>{current.eyebrow}</p>
           <h1 style={styles.title}>{current.title}</h1>
           <p style={styles.subtitle}>{current.subtitle}</p>
 
-          <div style={styles.actionRow}>
+          <div style={styles.actions}>
             {current.actions.map((action) => (
-              <button key={action.label} style={styles.whiteBtn} onClick={() => performAction(action)}>
+              <button key={action.label} style={styles.primaryBtn} onClick={() => performAction(action)}>
                 {action.label}
               </button>
             ))}
           </div>
 
-          <div style={styles.guidedRow}>
-            <button style={styles.greenBtn} onClick={stayHere}>
+          <div style={styles.tourControls}>
+            <button style={styles.secondaryBtn} onClick={goBack}>
+              {t.back}
+            </button>
+            <button style={styles.secondaryBtn} onClick={stayHere}>
               {t.stay}
             </button>
-            <button style={styles.greenBtn} onClick={() => goForward(guided)}>
+            <button style={styles.secondaryBtn} onClick={() => goForward(guided)}>
               {t.forward}
             </button>
           </div>
+
+          <p style={styles.lesson}>{current.lesson}</p>
         </article>
 
-        <aside style={styles.imagePanel}>
+        <aside style={styles.rightPanel}>
           <img
             src={current.image}
             alt={current.imageAlt}
             style={styles.heroImage}
-            onError={(e) => {
-              e.currentTarget.src = IMAGES.entrance;
+            onError={(event) => {
+              event.currentTarget.src = IMAGES.fallback;
             }}
           />
-          <div style={styles.imageFade} />
-          <div style={styles.imageCaption}>{current.imageAlt}</div>
+          <div style={styles.imageShade} />
+          <div style={styles.caption}>{current.imageAlt}</div>
         </aside>
       </section>
 
       {screen === "ecosystem" && (
-        <section style={styles.rolesSection}>
-          <div style={styles.sectionTitle}>{t.choose}</div>
-          <div style={styles.roleGrid}>
-            {ROLE_TILES.map((role) => (
-              <button
-                key={role.key}
-                style={{
-                  ...styles.roleTile,
-                  backgroundImage: `linear-gradient(180deg, rgba(5,20,14,.10), rgba(5,20,14,.90)), url(${role.image})`,
-                }}
-                onClick={() => goto(role.key)}
-              >
-                <div style={styles.roleTitle}>{role.title}</div>
-                <div style={styles.roleText}>{role.text}</div>
-              </button>
-            ))}
-          </div>
+        <section style={styles.roleGrid}>
+          {ROLE_TILES.map((role) => (
+            <button
+              key={role.key}
+              style={{
+                ...styles.roleTile,
+                backgroundImage: `linear-gradient(180deg, rgba(6,18,10,.10), rgba(6,18,10,.88)), url("${role.image}")`,
+              }}
+              onClick={() => goto(role.key)}
+            >
+              <span style={styles.roleTitle}>{role.title}</span>
+              <span style={styles.roleText}>{role.text}</span>
+            </button>
+          ))}
         </section>
       )}
 
-      <section style={styles.educationStrip}>
-        {current.details.map((block) => (
-          <article key={block.title} style={styles.lessonCard}>
-            <div style={styles.lessonTitle}>{block.title}</div>
-            <p style={styles.lessonText}>{block.text}</p>
-          </article>
-        ))}
-      </section>
-
-      <aside style={styles.sideActions}>
-        <button style={styles.ghostBtn} onClick={() => goto("ecosystem")}>
+      <nav style={styles.fixedNav}>
+        <button style={styles.navBtn} onClick={() => goto("ecosystem")}>
           {t.return}
         </button>
-        <button style={styles.ghostBtn} onClick={() => goto("decision")}>
+        <button style={styles.navBtn} onClick={() => goto("decision")}>
           {t.decision}
         </button>
-        <button style={styles.ghostBtn} onClick={() => goto("feedback")}>
+        <button style={styles.navBtn} onClick={() => goto("feedback")}>
           {t.feedback}
         </button>
-      </aside>
-
-      <footer style={styles.footerNav}>
-        <button style={styles.navBtn} onClick={goBack}>
-          {t.back}
-        </button>
-        <button style={styles.navBtn} onClick={stayHere}>
-          {t.stay}
-        </button>
-        <button style={styles.navBtn} onClick={() => goForward(guided)}>
-          {t.forward}
-        </button>
-      </footer>
-
-      {imageModal && (
-        <div style={styles.modalBackdrop} onClick={() => setImageModal(null)}>
-          <div style={styles.modalPanel} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.closeBtn} onClick={() => setImageModal(null)}>
-              ×
-            </button>
-            <img
-              src={imageModal}
-              alt="Farm gallery"
-              style={styles.modalImage}
-              onError={(e) => {
-                e.currentTarget.src = IMAGES.entrance;
-              }}
-            />
-          </div>
-        </div>
-      )}
+      </nav>
     </main>
   );
 }
@@ -839,69 +715,69 @@ const styles: Record<string, CSSProperties> = {
     fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Arial",
     position: "relative",
     overflowX: "hidden",
-    padding: "20px clamp(14px, 3vw, 42px) 92px",
+    padding: "22px clamp(14px, 3vw, 44px) 92px",
   },
-  bg: {
+  background: {
     position: "fixed",
     inset: 0,
-    background:
-      "radial-gradient(circle at top left, rgba(185,138,72,.28), transparent 32%), radial-gradient(circle at top right, rgba(110,139,76,.24), transparent 30%), linear-gradient(135deg, #132116 0%, #24351f 48%, #0b140d 100%)",
     zIndex: -2,
+    background:
+      "radial-gradient(circle at 10% 5%, rgba(242,210,124,.18), transparent 30%), radial-gradient(circle at 90% 0%, rgba(143,179,106,.16), transparent 28%), linear-gradient(135deg, #172415 0%, #26351e 44%, #0b140d 100%)",
   },
-  topbar: {
+  header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
     gap: 18,
-    marginBottom: 16,
     flexWrap: "wrap",
+    marginBottom: 18,
   },
-  brandButton: {
+  brand: {
     display: "flex",
-    gap: 12,
     alignItems: "center",
+    gap: 12,
     background: "rgba(255,255,255,.08)",
-    border: "1px solid rgba(255,255,255,.16)",
-    borderRadius: 18,
-    padding: "12px 14px",
+    border: "1px solid rgba(255,255,255,.15)",
+    borderRadius: 20,
+    padding: "12px 16px",
     color: "#fff",
     cursor: "pointer",
     textAlign: "left",
   },
   brandMark: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 50,
+    height: 50,
+    borderRadius: 15,
     display: "grid",
     placeItems: "center",
-    background: "rgba(245,210,124,.22)",
-    color: "#ffe6a4",
-    fontWeight: 900,
+    background: "rgba(242,210,124,.25)",
+    color: "#fff4cf",
+    fontWeight: 950,
   },
   brandTiny: {
     display: "block",
-    fontSize: 11,
-    letterSpacing: ".18em",
     color: "#f2d27c",
-    fontWeight: 900,
+    letterSpacing: ".18em",
+    fontSize: 11,
+    fontWeight: 950,
   },
   brandTitle: {
     display: "block",
-    fontSize: 18,
-    fontWeight: 900,
+    fontSize: 19,
+    fontWeight: 950,
     lineHeight: 1.1,
   },
-  topControls: {
+  languageArea: {
     display: "flex",
     flexDirection: "column",
-    gap: 8,
     alignItems: "flex-end",
+    gap: 8,
   },
   languageLabel: {
-    fontSize: 12,
-    letterSpacing: ".18em",
     color: "#f2d27c",
-    fontWeight: 900,
+    letterSpacing: ".25em",
+    fontSize: 12,
+    fontWeight: 950,
     textTransform: "uppercase",
   },
   languagePills: {
@@ -915,115 +791,64 @@ const styles: Record<string, CSSProperties> = {
     background: "rgba(255,255,255,.08)",
     color: "#fff",
     borderRadius: 999,
-    padding: "8px 10px",
+    padding: "8px 11px",
     cursor: "pointer",
-    fontWeight: 800,
+    fontWeight: 850,
     fontSize: 12,
   },
   langActive: {
-    border: "1px solid rgba(245,210,124,.72)",
-    background: "rgba(245,210,124,.24)",
+    border: "1px solid rgba(242,210,124,.72)",
+    background: "rgba(242,210,124,.24)",
     color: "#fff4cf",
     borderRadius: 999,
-    padding: "8px 10px",
+    padding: "8px 11px",
     cursor: "pointer",
-    fontWeight: 900,
+    fontWeight: 950,
     fontSize: 12,
   },
-  smallBtn: {
-    border: "1px solid rgba(245,210,124,.55)",
-    background: "rgba(245,210,124,.18)",
+  guidedButton: {
+    border: "1px solid rgba(242,210,124,.55)",
+    background: "rgba(242,210,124,.18)",
     color: "#fff4cf",
     borderRadius: 999,
-    padding: "10px 14px",
+    padding: "12px 18px",
     cursor: "pointer",
-    fontWeight: 900,
+    fontWeight: 950,
+    fontSize: 15,
   },
-  progressWrap: {
-    height: 8,
-    background: "rgba(255,255,255,.10)",
+  progressTrack: {
+    height: 9,
+    background: "rgba(255,255,255,.11)",
     borderRadius: 999,
     overflow: "hidden",
     marginBottom: 18,
   },
   progressBar: {
     height: "100%",
-    background: "linear-gradient(90deg, #f2d27c, #8fb36a)",
+    background: "linear-gradient(90deg, #f2d27c, #9ec06f)",
     borderRadius: 999,
     transition: "width .45s ease",
   },
-  heroGrid: {
+  hero: {
     display: "grid",
     gridTemplateColumns: "minmax(320px, .9fr) minmax(360px, 1.1fr)",
     gap: 18,
     alignItems: "stretch",
   },
-  heroText: {
-    minHeight: 465,
+  leftPanel: {
+    minHeight: 470,
     borderRadius: 28,
-    padding: "clamp(22px, 4vw, 46px)",
-    background: "rgba(6,18,10,.58)",
+    padding: "clamp(24px, 4vw, 48px)",
+    background: "rgba(6,18,10,.63)",
     border: "1px solid rgba(255,255,255,.14)",
     boxShadow: "0 24px 70px rgba(0,0,0,.28)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
   },
-  eyebrow: {
-    color: "#f2d27c",
-    letterSpacing: ".20em",
-    fontSize: 12,
-    fontWeight: 900,
-    textTransform: "uppercase",
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: "clamp(38px, 5vw, 76px)",
-    lineHeight: .95,
-    margin: "0 0 18px",
-    color: "#fff4cf",
-    letterSpacing: "-.04em",
-  },
-  subtitle: {
-    fontSize: "clamp(18px, 2vw, 25px)",
-    lineHeight: 1.32,
-    margin: 0,
-    maxWidth: 820,
-    color: "rgba(255,255,255,.90)",
-  },
-  actionRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 26,
-  },
-  guidedRow: {
-    display: "flex",
-    gap: 10,
-    marginTop: 14,
-    flexWrap: "wrap",
-  },
-  whiteBtn: {
-    border: "1px solid rgba(255,255,255,.24)",
-    background: "rgba(255,255,255,.88)",
-    color: "#142015",
-    borderRadius: 999,
-    padding: "12px 16px",
-    fontWeight: 900,
-    cursor: "pointer",
-  },
-  greenBtn: {
-    border: "1px solid rgba(143,179,106,.5)",
-    background: "rgba(143,179,106,.28)",
-    color: "#f7ffe9",
-    borderRadius: 999,
-    padding: "12px 16px",
-    fontWeight: 900,
-    cursor: "pointer",
-  },
-  imagePanel: {
+  rightPanel: {
     position: "relative",
-    minHeight: 465,
+    minHeight: 470,
     borderRadius: 28,
     overflow: "hidden",
     border: "1px solid rgba(255,255,255,.14)",
@@ -1031,118 +856,122 @@ const styles: Record<string, CSSProperties> = {
     boxShadow: "0 24px 70px rgba(0,0,0,.30)",
   },
   heroImage: {
+    position: "absolute",
+    inset: 0,
     width: "100%",
     height: "100%",
     objectFit: "cover",
     display: "block",
+  },
+  imageShade: {
     position: "absolute",
     inset: 0,
+    background: "linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.42))",
   },
-  imageFade: {
-    position: "absolute",
-    inset: 0,
-    background: "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44))",
-  },
-  imageCaption: {
+  caption: {
     position: "absolute",
     left: 18,
     right: 18,
     bottom: 16,
-    color: "#fff",
-    background: "rgba(0,0,0,.36)",
+    background: "rgba(0,0,0,.38)",
     border: "1px solid rgba(255,255,255,.16)",
     borderRadius: 16,
     padding: "10px 12px",
-    fontWeight: 800,
+    fontWeight: 850,
   },
-  rolesSection: {
-    marginTop: 18,
-    borderRadius: 28,
-    background: "rgba(255,255,255,.07)",
-    border: "1px solid rgba(255,255,255,.13)",
-    padding: 18,
-  },
-  sectionTitle: {
+  eyebrow: {
     color: "#f2d27c",
-    fontWeight: 900,
-    letterSpacing: ".16em",
+    letterSpacing: ".22em",
+    fontSize: 12,
+    fontWeight: 950,
     textTransform: "uppercase",
-    fontSize: 13,
-    marginBottom: 12,
+    margin: "0 0 14px",
+  },
+  title: {
+    fontSize: "clamp(38px, 5vw, 76px)",
+    lineHeight: .95,
+    margin: "0 0 18px",
+    color: "#fff4cf",
+    letterSpacing: "-.045em",
+  },
+  subtitle: {
+    fontSize: "clamp(18px, 2vw, 25px)",
+    lineHeight: 1.32,
+    margin: 0,
+    color: "rgba(255,255,255,.91)",
+    maxWidth: 850,
+  },
+  actions: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 28,
+  },
+  tourControls: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 14,
+  },
+  primaryBtn: {
+    border: "1px solid rgba(255,255,255,.22)",
+    background: "rgba(255,255,255,.9)",
+    color: "#112015",
+    borderRadius: 999,
+    padding: "13px 17px",
+    fontWeight: 950,
+    cursor: "pointer",
+  },
+  secondaryBtn: {
+    border: "1px solid rgba(255,255,255,.20)",
+    background: "rgba(255,255,255,.07)",
+    color: "#fff4cf",
+    borderRadius: 999,
+    padding: "13px 17px",
+    fontWeight: 950,
+    cursor: "pointer",
+  },
+  lesson: {
+    marginTop: 22,
+    color: "rgba(255,255,255,.82)",
+    fontSize: 16,
+    lineHeight: 1.45,
+    maxWidth: 780,
   },
   roleGrid: {
+    marginTop: 18,
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
     gap: 12,
   },
   roleTile: {
-    minHeight: 150,
+    minHeight: 160,
     backgroundSize: "cover",
     backgroundPosition: "center",
     border: "1px solid rgba(255,255,255,.14)",
-    borderRadius: 22,
+    borderRadius: 24,
     color: "#fff",
-    padding: 16,
+    padding: 18,
     cursor: "pointer",
     textAlign: "left",
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-end",
+    boxShadow: "0 18px 45px rgba(0,0,0,.24)",
   },
   roleTitle: {
-    fontSize: 21,
-    fontWeight: 950,
     color: "#fff4cf",
-    marginBottom: 6,
+    fontSize: 22,
+    fontWeight: 950,
+    marginBottom: 7,
   },
   roleText: {
+    color: "rgba(255,255,255,.88)",
     fontSize: 14,
     lineHeight: 1.25,
-    color: "rgba(255,255,255,.88)",
-    fontWeight: 700,
+    fontWeight: 750,
   },
-  educationStrip: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-    gap: 12,
-    marginTop: 18,
-  },
-  lessonCard: {
-    borderRadius: 22,
-    background: "rgba(255,255,255,.08)",
-    border: "1px solid rgba(255,255,255,.13)",
-    padding: 16,
-  },
-  lessonTitle: {
-    color: "#f2d27c",
-    fontSize: 13,
-    textTransform: "uppercase",
-    letterSpacing: ".15em",
-    fontWeight: 950,
-    marginBottom: 8,
-  },
-  lessonText: {
-    margin: 0,
-    lineHeight: 1.35,
-    color: "rgba(255,255,255,.88)",
-    fontWeight: 650,
-  },
-  sideActions: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 18,
-  },
-  ghostBtn: {
-    border: "1px solid rgba(255,255,255,.18)",
-    background: "rgba(255,255,255,.08)",
-    color: "#fff",
-    borderRadius: 999,
-    padding: "12px 16px",
-    fontWeight: 900,
-    cursor: "pointer",
-  },
-  footerNav: {
+  fixedNav: {
     position: "fixed",
     left: 18,
     right: 18,
@@ -1151,10 +980,11 @@ const styles: Record<string, CSSProperties> = {
     justifyContent: "center",
     gap: 12,
     zIndex: 20,
+    flexWrap: "wrap",
   },
   navBtn: {
     border: "1px solid rgba(255,255,255,.18)",
-    background: "rgba(8,20,12,.82)",
+    background: "rgba(8,20,12,.84)",
     backdropFilter: "blur(14px)",
     color: "#fff4cf",
     borderRadius: 999,
@@ -1162,43 +992,5 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 950,
     cursor: "pointer",
     boxShadow: "0 12px 36px rgba(0,0,0,.25)",
-  },
-  modalBackdrop: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,.78)",
-    display: "grid",
-    placeItems: "center",
-    zIndex: 60,
-    padding: 22,
-  },
-  modalPanel: {
-    width: "min(1050px, 94vw)",
-    height: "min(720px, 86vh)",
-    borderRadius: 28,
-    overflow: "hidden",
-    position: "relative",
-    background: "#111",
-    border: "1px solid rgba(255,255,255,.18)",
-  },
-  closeBtn: {
-    position: "absolute",
-    right: 14,
-    top: 14,
-    zIndex: 2,
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,.3)",
-    background: "rgba(0,0,0,.55)",
-    color: "#fff",
-    fontSize: 28,
-    cursor: "pointer",
-  },
-  modalImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    background: "#111",
   },
 };
