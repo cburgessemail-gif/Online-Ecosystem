@@ -722,7 +722,7 @@ function Shell({
       <div className="fixed inset-0 bg-black/46" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.30),rgba(0,0,0,.60)),radial-gradient(circle_at_top_left,rgba(255,255,255,.13),transparent_28%),radial-gradient(circle_at_bottom,rgba(16,185,129,.14),transparent_34%)]" />
 
-      <div className="relative z-10 mx-auto max-w-[1500px] px-4 py-4 md:px-8">
+      <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
         {!compactNav && <Navigation screen={screen} setScreen={setScreen} />}
         {!compactNav && <AccessRibbon />}
         {children}
@@ -749,7 +749,7 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
   ];
 
   return (
-    <div className="sticky top-3 z-40 mb-4 rounded-[1.5rem] border border-white/10 bg-black/50 p-3 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+    <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/50 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
       <div className="flex flex-wrap items-center gap-2">
         <button onClick={() => setScreen("portal")} className="mr-2 min-w-[175px] px-2 text-left">
           <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
@@ -760,7 +760,7 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
           <button
             key={item.screen}
             onClick={() => setScreen(item.screen)}
-            className={`rounded-full border px-3.5 py-2 text-xs font-semibold backdrop-blur-xl transition ${
+            className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold backdrop-blur-xl transition ${
               screen === item.screen
                 ? "border-emerald-200 bg-emerald-300 text-black"
                 : "border-white/10 bg-white/10 text-white hover:bg-white/20"
@@ -845,7 +845,7 @@ function AccessRibbon() {
   const latest = activity.slice(-1)[0];
 
   return (
-    <div className="mb-4 rounded-[1.5rem] border border-emerald-200/15 bg-black/38 p-3 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-2xl">
+    <div className="mb-3 rounded-[1.25rem] border border-emerald-200/15 bg-black/38 p-2.5 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-2xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-emerald-100/70">Multi-User Access</div>
@@ -868,7 +868,7 @@ function AccessRibbon() {
 
 function StatusBar() {
   return (
-    <div className="mb-4 rounded-[1.5rem] border border-white/10 bg-black/35 p-3 backdrop-blur-xl">
+    <div className="mb-3 rounded-[1.25rem] border border-white/10 bg-black/35 p-2.5 backdrop-blur-xl">
       <div className="grid gap-3 md:grid-cols-4">
         <StatusTile label="Ecosystem Status" value={`${ecosystemStatus.teams} Active Teams`} note={`${ecosystemStatus.zones} grow zones active`} />
         <StatusTile label="Weather" value={ecosystemStatus.weather} note="Live channel buttons available" />
@@ -881,10 +881,10 @@ function StatusBar() {
 
 function StatusTile({ label, value, note }: { label: string; value: string; note: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-2.5">
       <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
-      <div className="mt-1 text-base font-black">{value}</div>
-      <div className="mt-1 text-xs text-emerald-50/80">{note}</div>
+      <div className="mt-1 text-sm font-black">{value}</div>
+      <div className="mt-1 text-[11px] text-emerald-50/80">{note}</div>
     </div>
   );
 }
@@ -959,53 +959,64 @@ function AccessCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <Shell screen="access" setScreen={setScreen} background={IMG.forest}>
       <StatusBar />
-      <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <Panel
-          eyebrow="Live Multi-User Access"
-          title="One ecosystem link. Many users. Role-protected movement."
-          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators can enter the same online ecosystem at the same time. Each role moves through the experience differently, while protected youth tools remain limited to approved staff and administrators."
-        />
-        <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-[0_35px_100px_rgba(0,0,0,.55)] backdrop-blur-2xl">
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Current Access State</div>
-          <h2 className="mt-3 text-3xl font-black">{activeUser ? activeUser.name : "Public Guest"}</h2>
-          <p className="mt-3 text-sm leading-6 text-white/80">
-            {activeUser
-              ? `${activeUser.role} has ${activeUser.accessLevel} access. ${supabaseReadyNote()}`
-              : "No role session is active on this device. Guests can explore public pathways, or enter by role to use protected areas."}
+      <div className="grid gap-3 lg:grid-cols-[0.82fr_1.18fr]">
+        <div className="rounded-[1.75rem] border border-white/10 bg-black/48 p-4 shadow-[0_30px_90px_rgba(0,0,0,.55)] backdrop-blur-2xl">
+          <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/75">Live Multi-User Access</div>
+          <h1 className="mt-3 text-3xl font-black leading-[0.95] md:text-4xl">One link. Many users. Protected roles.</h1>
+          <p className="mt-3 text-sm leading-6 text-white/88">
+            Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators can enter the same ecosystem link. Each role sees the right pathway while youth tools stay limited to approved staff and administrators.
           </p>
+          <div className="mt-4 grid gap-2">
+            <button onClick={() => setScreen("account")} className="rounded-2xl bg-emerald-300 px-4 py-3 text-left text-sm font-black text-black transition hover:scale-[1.01]">
+              Create / Switch Role
+            </button>
+            <button onClick={() => setScreen("supervisor")} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black text-white transition hover:bg-white/20">
+              Protected Supervisor Tools
+            </button>
+            <button onClick={() => setScreen("reports")} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black text-white transition hover:bg-white/20">
+              Data + Reports
+            </button>
+          </div>
+        </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {liveUsers.length ? liveUsers.slice(-8).map((user) => (
-              <div key={user.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <div className="text-lg font-black">{user.name}</div>
-                <div className="mt-1 text-sm text-emerald-100">{user.role}</div>
-                <div className="mt-2 text-xs text-white/70">{user.accessLevel} access • last seen {user.lastSeen}</div>
+        <div className="rounded-[1.75rem] border border-white/10 bg-black/48 p-4 shadow-[0_30px_90px_rgba(0,0,0,.55)] backdrop-blur-2xl">
+          <div className="grid gap-3 md:grid-cols-[0.85fr_1.15fr]">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Current Access State</div>
+              <h2 className="mt-2 text-2xl font-black">{activeUser ? activeUser.name : "Public Guest"}</h2>
+              <p className="mt-2 text-xs leading-5 text-white/78">
+                {activeUser
+                  ? `${activeUser.role} • ${activeUser.accessLevel} access.`
+                  : "No role session is active on this device. Guests can explore public pathways or enter by role."}
+              </p>
+              <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-xs leading-5 text-white/78">
+                {supabaseReadyNote()}
               </div>
-            )) : (
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/80">No active role sessions yet. Create one from the account screen.</div>
-            )}
-          </div>
+            </div>
 
-          <div className="mt-5">
-            <ActionGrid
-              setScreen={setScreen}
-              items={[
-                { title: "Create / Switch Role", text: "Enter as supervisor, parent, youth, grower, partner, customer, or admin.", screen: "account" },
-                { title: "Protected Supervisor Tools", text: "Staff-only youth assessment and daily observation area.", screen: "supervisor" },
-                { title: "Parent View", text: "Approved youth progress and family visibility.", screen: "parent" },
-                { title: "Data + Reports", text: "Operational record of youth, crop, marketplace, and impact activity.", screen: "reports" },
-              ]}
-            />
-          </div>
+            <div>
+              <div className="grid gap-2 md:grid-cols-2">
+                {liveUsers.length ? liveUsers.slice(-4).map((user) => (
+                  <div key={user.id} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                    <div className="text-sm font-black">{user.name}</div>
+                    <div className="mt-1 text-xs text-emerald-100">{user.role}</div>
+                    <div className="mt-1 text-[11px] text-white/65">{user.accessLevel} • {user.lastSeen}</div>
+                  </div>
+                )) : (
+                  <div className="rounded-2xl border border-white/10 bg-white/10 p-3 text-xs leading-5 text-white/78">No active role sessions yet. Create one from the account screen.</div>
+                )}
+              </div>
 
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
-            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Recent Activity</div>
-            <div className="mt-3 grid gap-2">
-              {activity.length ? activity.slice(-5).reverse().map((item) => (
-                <div key={item.id} className="rounded-xl bg-white/10 p-3 text-sm text-white/82">
-                  <span className="font-black">{item.user}</span> {item.action} <span className="text-emerald-100/70">at {item.timestamp}</span>
+              <div className="mt-3 rounded-2xl border border-white/10 bg-black/30 p-3">
+                <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-100/70">Recent Activity</div>
+                <div className="mt-2 grid gap-1.5">
+                  {activity.length ? activity.slice(-3).reverse().map((item) => (
+                    <div key={item.id} className="rounded-xl bg-white/10 px-3 py-2 text-xs text-white/82">
+                      <span className="font-black">{item.user}</span> {item.action} <span className="text-emerald-100/70">at {item.timestamp}</span>
+                    </div>
+                  )) : <div className="text-xs text-white/70">Activity appears as users enter and move through pathways.</div>}
                 </div>
-              )) : <div className="text-sm text-white/70">Activity will appear as users enter and move through pathways.</div>}
+              </div>
             </div>
           </div>
         </div>
@@ -1789,10 +1800,10 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Panel({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-black/48 p-6 shadow-[0_35px_100px_rgba(0,0,0,.55)] backdrop-blur-2xl">
+    <div className="rounded-[1.75rem] border border-white/10 bg-black/48 p-4 shadow-[0_30px_90px_rgba(0,0,0,.55)] backdrop-blur-2xl">
       <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">{eyebrow}</div>
-      <h1 className="mt-4 text-4xl font-black leading-tight md:text-5xl">{title}</h1>
-      <p className="mt-5 text-base leading-8 text-white/88">{body}</p>
+      <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">{title}</h1>
+      <p className="mt-3 text-sm leading-6 text-white/88">{body}</p>
     </div>
   );
 }
