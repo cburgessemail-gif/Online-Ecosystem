@@ -588,18 +588,18 @@ export default function App() {
         button, select, textarea { font-family: inherit; }
         button { cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030603; }
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: linear-gradient(180deg, #d7ef9f 0%, #7fbf68 28%, #285e36 68%, #071307 100%); }
-        .forest-bg::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 10%, rgba(255,241,160,.50), rgba(159,218,105,.30) 25%, transparent 48%), linear-gradient(110deg, rgba(255,255,255,.10), rgba(49,109,48,.16), rgba(0,0,0,.22)); }
-        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 46% 18%, rgba(255,246,174,.42), rgba(179,226,107,.32) 28%, rgba(71,137,61,.30) 54%, transparent 74%); }
-        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 260px 100%; opacity: .18; filter: blur(1.5px); }
-        .trunks-back { background-image: linear-gradient(90deg, transparent 0 44px, rgba(48,72,38,.34) 44px 56px, transparent 56px 132px, rgba(42,67,36,.28) 132px 146px, transparent 146px 260px); transform: scale(1.08); }
-        .trunks-front { background-image: linear-gradient(90deg, transparent 0 78px, rgba(26,46,27,.38) 78px 94px, transparent 94px 186px, rgba(31,55,30,.32) 186px 202px, transparent 202px 260px); opacity: .20; }
-        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(36px); mix-blend-mode: screen; }
-        .leaves-left { width: 50vw; height: 62vh; left: -14vw; top: -8vh; background: radial-gradient(circle, rgba(151,215,84,.62), rgba(77,153,61,.32) 48%, transparent 74%); }
-        .leaves-right { width: 54vw; height: 64vh; right: -16vw; top: -5vh; background: radial-gradient(circle, rgba(180,226,103,.56), rgba(81,159,65,.28) 50%, transparent 76%); }
-        .leaves-top { width: 82vw; height: 34vh; left: 9vw; top: -12vh; background: radial-gradient(ellipse, rgba(233,239,137,.50), rgba(128,196,78,.25) 46%, transparent 76%); }
-        .forest-pathway { position: absolute; left: 32%; bottom: -14%; width: 36%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(202,172,96,.30), rgba(122,144,72,.17) 45%, transparent 72%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); filter: blur(12px); opacity: .62; }
-        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(240,230,145,.14), rgba(33,87,43,.18) 40%, rgba(0,0,0,.38) 100%), linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.34)); }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: linear-gradient(180deg, #cfeaa2 0%, #7ebb67 30%, #315f38 68%, #071307 100%); }
+        .forest-bg::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 48% 12%, rgba(255,244,166,.55), rgba(172,222,111,.28) 23%, transparent 48%), radial-gradient(circle at 22% 30%, rgba(140,205,92,.22), transparent 36%), radial-gradient(circle at 78% 32%, rgba(124,190,86,.18), transparent 38%); }
+        .forest-sky { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.10), transparent 24%, rgba(0,0,0,.14) 100%); }
+        .forest-trunks { position: absolute; inset: -6% -3%; opacity: .20; filter: blur(2px); }
+        .trunks-back { background: radial-gradient(ellipse at 20% 36%, rgba(38,75,39,.32), transparent 18%), radial-gradient(ellipse at 46% 34%, rgba(26,57,31,.36), transparent 16%), radial-gradient(ellipse at 70% 36%, rgba(35,70,37,.30), transparent 18%), radial-gradient(ellipse at 88% 42%, rgba(27,56,31,.24), transparent 16%); }
+        .trunks-front { background: radial-gradient(ellipse at 14% 55%, rgba(8,24,12,.36), transparent 14%), radial-gradient(ellipse at 35% 60%, rgba(7,21,11,.30), transparent 12%), radial-gradient(ellipse at 62% 57%, rgba(7,21,11,.28), transparent 13%), radial-gradient(ellipse at 84% 58%, rgba(8,22,11,.32), transparent 12%); opacity: .28; }
+        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(42px); mix-blend-mode: screen; }
+        .leaves-left { width: 52vw; height: 66vh; left: -16vw; top: -10vh; background: radial-gradient(circle, rgba(168,220,92,.56), rgba(84,156,68,.28) 48%, transparent 76%); }
+        .leaves-right { width: 56vw; height: 68vh; right: -18vw; top: -8vh; background: radial-gradient(circle, rgba(189,229,115,.48), rgba(92,164,72,.24) 50%, transparent 78%); }
+        .leaves-top { width: 86vw; height: 36vh; left: 7vw; top: -13vh; background: radial-gradient(ellipse, rgba(245,240,151,.46), rgba(148,205,87,.22) 48%, transparent 78%); }
+        .forest-pathway { position: absolute; left: 32%; bottom: -12%; width: 36%; height: 76%; background: radial-gradient(ellipse at bottom, rgba(215,182,112,.28), rgba(125,151,83,.18) 40%, rgba(52,98,48,.10) 62%, transparent 78%); clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); filter: blur(16px); opacity: .58; }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(247,235,150,.16), rgba(44,103,50,.14) 42%, rgba(0,0,0,.46) 100%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.30)); }
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(12,28,13,.42); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.18); box-shadow: 0 30px 90px rgba(0,0,0,.34), 0 0 60px rgba(168,220,92,.10); text-align: center; }
