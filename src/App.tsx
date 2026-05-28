@@ -19,6 +19,7 @@ type Screen =
   | "portal"
   | "guest"
   | "account"
+  | "access"
   | "roles"
   | "youth"
   | "supervisor"
@@ -64,6 +65,186 @@ type CardLink = {
   screen?: Screen;
   href?: string;
 };
+
+
+type AccessLevel = "public" | "participant" | "family" | "staff" | "admin";
+
+type EcosystemUser = {
+  id: string;
+  name: string;
+  role: Role;
+  accessLevel: AccessLevel;
+  status: "online" | "active" | "viewing";
+  lastSeen: string;
+};
+
+type EcosystemActivity = {
+  id: string;
+  user: string;
+  role: Role;
+  action: string;
+  timestamp: string;
+};
+
+const SESSION_KEY = "bff.ecosystem.activeUser";
+const USERS_KEY = "bff.ecosystem.liveUsers";
+const ACTIVITY_KEY = "bff.ecosystem.activityLog";
+const CHANNEL_KEY = "bff.ecosystem.broadcast";
+
+const roleAccess: Record<Role, AccessLevel> = {
+  Guest: "public",
+  "Youth Workforce Participant": "participant",
+  "Parent / Guardian": "family",
+  "Supervisor / Staff": "staff",
+  Grower: "participant",
+  "Marketplace Customer": "public",
+  Volunteer: "participant",
+  Partner: "family",
+  Administrator: "admin",
+  "Value-Added Producer": "participant",
+};
+
+const protectedScreens: Partial<Record<Screen, AccessLevel[]>> = {
+  supervisor: ["staff", "admin"],
+  safety: ["staff", "admin"],
+  data: ["staff", "admin"],
+  reports: ["staff", "admin", "family"],
+  parent: ["family", "staff", "admin"],
+  operations: ["staff", "admin"],
+};
+
+function nowLabel() {
+  return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function safeRead<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function safeWrite<T>(key: string, value: T) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function publishEcosystemUpdate(message: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  try {
+    const channel = new BroadcastChannel(CHANNEL_KEY);
+    channel.postMessage(message);
+    channel.close();
+  } catch {
+    window.dispatchEvent(new Event("bff-ecosystem-update"));
+  }
+}
+
+function createEcosystemUser(role: Role, name?: string): EcosystemUser {
+  const label = name?.trim() || `${role} User`;
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: label,
+    role,
+    accessLevel: roleAccess[role],
+    status: "active",
+    lastSeen: nowLabel(),
+  };
+}
+
+function signInEcosystemUser(role: Role, name?: string): EcosystemUser {
+  const user = createEcosystemUser(role, name);
+  const users = safeRead<EcosystemUser[]>(USERS_KEY, []);
+  const filtered = users.filter((item) => item.name !== user.name || item.role !== user.role).slice(-9);
+  const updatedUsers = [...filtered, user];
+  const activity = safeRead<EcosystemActivity[]>(ACTIVITY_KEY, []);
+  const updatedActivity = [
+    ...activity.slice(-12),
+    {
+      id: user.id,
+      user: user.name,
+      role: user.role,
+      action: "entered the ecosystem",
+      timestamp: nowLabel(),
+    },
+  ];
+  safeWrite(SESSION_KEY, user);
+  safeWrite(USERS_KEY, updatedUsers);
+  safeWrite(ACTIVITY_KEY, updatedActivity);
+  publishEcosystemUpdate({ type: "signin", user });
+  return user;
+}
+
+function canAccessScreen(user: EcosystemUser | null, screen: Screen) {
+  const required = protectedScreens[screen];
+  if (!required) return true;
+  if (!user) return false;
+  return required.includes(user.accessLevel);
+}
+
+function routeForDeniedAccess(user: EcosystemUser | null, requested: Screen): Screen {
+  if (!user) return "account";
+  if (requested === "supervisor" || requested === "safety" || requested === "data" || requested === "operations") return "roles";
+  return "roles";
+}
+
+function recordEcosystemActivity(user: EcosystemUser | null, action: string) {
+  if (!user) return;
+  const activity = safeRead<EcosystemActivity[]>(ACTIVITY_KEY, []);
+  const updated = [
+    ...activity.slice(-12),
+    {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      user: user.name,
+      role: user.role,
+      action,
+      timestamp: nowLabel(),
+    },
+  ];
+  safeWrite(ACTIVITY_KEY, updated);
+  publishEcosystemUpdate({ type: "activity", action });
+}
+
+function useLiveEcosystem() {
+  const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
+  const [liveUsers, setLiveUsers] = useState<EcosystemUser[]>(() => safeRead<EcosystemUser[]>(USERS_KEY, []));
+  const [activity, setActivity] = useState<EcosystemActivity[]>(() => safeRead<EcosystemActivity[]>(ACTIVITY_KEY, []));
+
+  useEffect(() => {
+    const refresh = () => {
+      setActiveUser(safeRead<EcosystemUser | null>(SESSION_KEY, null));
+      setLiveUsers(safeRead<EcosystemUser[]>(USERS_KEY, []));
+      setActivity(safeRead<EcosystemActivity[]>(ACTIVITY_KEY, []));
+    };
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel(CHANNEL_KEY);
+      channel.onmessage = refresh;
+    } catch {
+      window.addEventListener("bff-ecosystem-update", refresh);
+    }
+
+    window.addEventListener("storage", refresh);
+    const interval = window.setInterval(refresh, 2500);
+
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("bff-ecosystem-update", refresh);
+      window.clearInterval(interval);
+      channel?.close();
+    };
+  }, []);
+
+  return { activeUser, liveUsers, activity, refresh: () => publishEcosystemUpdate({ type: "manual-refresh" }) };
+}
+
+function supabaseReadyNote() {
+  return "This screen is ready to connect to Supabase Auth, profiles, role permissions, assessments, attendance, inventory, reports, and real-time subscriptions without changing the visual experience.";
+}
 
 const image = (file: string) => `/images/${file}`;
 
@@ -215,7 +396,7 @@ const guestSteps: GuestStep[] = [
     title: "Arrive first. Understand later.",
     subtitle: "The ecosystem begins with place, atmosphere, and invitation before it explains the full system.",
     image: IMG.forest,
-    why: "The entrance is a threshold. It should feel like stepping into a living forest/farm experience, not seeing a diagram first.",
+    why: "Guests enter through the forest before seeing the larger system, allowing the atmosphere, movement, and land itself to introduce the ecosystem naturally.",
     experience: [
       "The guest enters before the explanation.",
       "The farm is presented as atmosphere, welcome, and movement.",
@@ -228,7 +409,7 @@ const guestSteps: GuestStep[] = [
     title: "A farm ecosystem built for food, people, and community movement.",
     subtitle: "Bronson Family Farm connects land, youth workforce, growers, marketplace circulation, family support, and measurable impact.",
     image: IMG.growArea,
-    why: "The guest begins to understand that this is more than a farm and more than software. It is an operating model.",
+    why: "Guests begin to feel how the farm becomes an operating model — where land, food, work, learning, and community support start moving together.",
     experience: [
       "Food access connects to local production.",
       "Youth participation connects to work readiness and personal growth.",
@@ -241,7 +422,7 @@ const guestSteps: GuestStep[] = [
     title: "The farm stands on historic Lansdowne Airport land.",
     subtitle: "The location carries a layered story of land, aviation, community movement, military service, family legacy, and new food infrastructure.",
     image: IMG.growAreaAlt,
-    why: "The history belongs in the guided explanation after the guest has entered. It gives meaning without turning the entrance into an airport screen.",
+    why: "The history comes after entry so the guest can first feel the land, then understand how aviation, military service, family legacy, and food infrastructure now share one story.",
     experience: [
       "The land story is introduced respectfully.",
       "Military service and family legacy are connected to responsibility.",
@@ -254,7 +435,7 @@ const guestSteps: GuestStep[] = [
     title: "Youth participate in real work.",
     subtitle: "Assignments, PPE, attendance, reflections, assessments, badges, and supervisor encouragement connect youth development to real farm operations.",
     image: IMG.youth1,
-    why: "The youth pathway is a workforce and life-skills pathway, not a decorative activity.",
+    why: "Youth learn through real responsibility — showing up, preparing stations, solving problems, supporting grow zones, and seeing how their work contributes to the larger ecosystem.",
     experience: [
       "Youth check in and receive daily assignments.",
       "Supervisors observe participation, safety, teamwork, and growth.",
@@ -268,7 +449,7 @@ const guestSteps: GuestStep[] = [
     title: "Youth access is protected through staff and supervisor control.",
     subtitle: "Random visitors do not access youth records. Supervisors are the protected staff layer.",
     image: IMG.fencing,
-    why: "Safety is part of the ecosystem. Youth-facing data must be separated from public/guest participation.",
+    why: "Safety is built into the movement of the ecosystem so youth can participate with protection, structure, and trusted adult supervision while public users remain outside private records.",
     experience: [
       "Supervisor/staff role is required for youth records.",
       "Parents see appropriate summaries, not internal crisis notes.",
@@ -282,7 +463,7 @@ const guestSteps: GuestStep[] = [
     title: "Assessments are the heartbeat.",
     subtitle: "Attendance, PPE, teamwork, communication, leadership, reflection, and task completion feed badges, parent summaries, and reports.",
     image: IMG.volunteers,
-    why: "The assessment layer turns daily participation into measurable growth without reducing youth to labels.",
+    why: "Daily observations help youth see their growth over time while giving supervisors a practical way to support responsibility, teamwork, safety, and reflection.",
     experience: [
       "Supervisor observes and scores participation.",
       "Parent-visible summaries are separated from internal notes.",
@@ -296,7 +477,7 @@ const guestSteps: GuestStep[] = [
     title: "Crop planning drives work.",
     subtitle: "Grow zones, irrigation, harvest forecasts, succession planting, pest monitoring, and youth assignments move together.",
     image: IMG.growAreaAlt,
-    why: "The crop planner is the agricultural engine that activates work, inventory, marketplace timing, and learning.",
+    why: "The crop planner quietly guides the rhythm of the ecosystem — connecting planting, harvest timing, youth assignments, irrigation, and marketplace readiness so the entire system moves together.",
     experience: [
       "Tomato zone creates irrigation and pest-check assignments.",
       "Harvest windows inform marketplace inventory.",
@@ -310,7 +491,7 @@ const guestSteps: GuestStep[] = [
     title: "Food moves through community.",
     subtitle: "Marketplace activity connects growers, SNAP visibility, inventory movement, nutrition, and local economic circulation.",
     image: IMG.marketplaceHero,
-    why: "The marketplace shows the ecosystem becoming useful to families, customers, growers, and community partners.",
+    why: "The marketplace reveals how food moves through the ecosystem — from grow plans and harvest timing into customer access, nutrition, and community circulation.",
     experience: [
       "Harvest forecasts become availability.",
       "Inventory updates support customer access.",
@@ -324,7 +505,7 @@ const guestSteps: GuestStep[] = [
     title: "Parents receive supportive visibility.",
     subtitle: "Parents see attendance, progress, badges, encouragement, approved reflections, and safety updates.",
     image: IMG.queens,
-    why: "The parent pathway builds trust by showing growth, support, and participation without exposing internal supervisor notes.",
+    why: "Parents stay connected to the journey through attendance, encouragement, badges, reflections, and visible signs of growth while internal staff notes remain protected.",
     experience: [
       "Youth completes assignments.",
       "Supervisor scores and approves summaries.",
@@ -338,7 +519,7 @@ const guestSteps: GuestStep[] = [
     title: "Now the connected food ecosystem can be explained.",
     subtitle: "This is where the system image belongs: after the guest understands why the parts matter.",
     image: IMG.ecosystem,
-    why: "The infographic explains the entire system only after the guest has moved through the experience.",
+    why: "The full system appears after the guest has already experienced its movement, making the connections easier to understand because they have been discovered step by step.",
     experience: [
       "Youth, parents, growers, marketplace, crop planning, operations, and reports connect.",
       "The ecosystem becomes measurable.",
@@ -352,7 +533,7 @@ const guestSteps: GuestStep[] = [
     title: "At the end, the ecosystem generates reports.",
     subtitle: "Workforce, parent, crop, marketplace, inventory, partner, grant, and community impact reports are generated from real ecosystem activity.",
     image: IMG.partners,
-    why: "Reporting is the final proof that the ecosystem is operational, measurable, and funder-ready.",
+    why: "Each pathway leaves behind a visible story of participation, food movement, youth growth, marketplace circulation, and community impact that can be shared with families, partners, and supporters.",
     experience: [
       "Daily activity becomes documentation.",
       "Assessments become progress reports.",
@@ -422,6 +603,7 @@ function Shell({
 
       <div className="relative z-10 mx-auto max-w-[1500px] px-4 py-4 md:px-8">
         {!compactNav && <Navigation screen={screen} setScreen={setScreen} />}
+        {!compactNav && <AccessRibbon />}
         {children}
       </div>
     </div>
@@ -432,6 +614,7 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
   const nav: { label: string; screen: Screen }[] = [
     { label: "Portal", screen: "portal" },
     { label: "Guest Demo", screen: "guest" },
+    { label: "Access", screen: "access" },
     { label: "Roles", screen: "roles" },
     { label: "Youth", screen: "youth" },
     { label: "Supervisor", screen: "supervisor" },
@@ -535,6 +718,33 @@ function PhotoCard({
   return content;
 }
 
+function AccessRibbon() {
+  const { activeUser, liveUsers, activity } = useLiveEcosystem();
+  const visibleUsers = liveUsers.slice(-5);
+  const latest = activity.slice(-1)[0];
+
+  return (
+    <div className="mb-4 rounded-[1.5rem] border border-emerald-200/15 bg-black/38 p-3 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-2xl">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-emerald-100/70">Multi-User Access</div>
+          <div className="mt-1 text-sm font-black text-white">
+            {activeUser ? `${activeUser.name} • ${activeUser.role} • ${activeUser.accessLevel} access` : "Guest/public access active — sign in by role for protected tools"}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {visibleUsers.map((user) => (
+            <span key={user.id} className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/90">
+              {user.role.split(" ")[0]} • {user.lastSeen}
+            </span>
+          ))}
+          {latest && <span className="rounded-full bg-emerald-300 px-3 py-1.5 text-[11px] font-black text-black">Latest: {latest.action}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StatusBar() {
   return (
     <div className="mb-4 rounded-[1.5rem] border border-white/10 bg-black/35 p-3 backdrop-blur-xl">
@@ -594,6 +804,9 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
               <button onClick={() => setScreen("account")} className="rounded-full border border-white/15 bg-white/10 px-8 py-4 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20">
                 Create Account
               </button>
+              <button onClick={() => setScreen("access")} className="rounded-full border border-white/15 bg-black/30 px-8 py-4 font-semibold text-white backdrop-blur-xl transition hover:bg-white/15">
+                Live Access
+              </button>
               <button onClick={() => setScreen("guest")} className="rounded-full border border-white/15 bg-black/30 px-8 py-4 font-semibold text-white backdrop-blur-xl transition hover:bg-white/15">
                 Continue As Guest
               </button>
@@ -619,8 +832,70 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+function AccessCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const { activeUser, liveUsers, activity } = useLiveEcosystem();
+
+  return (
+    <Shell screen="access" setScreen={setScreen} background={IMG.forest}>
+      <StatusBar />
+      <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <Panel
+          eyebrow="Live Multi-User Access"
+          title="One ecosystem link. Many users. Role-protected movement."
+          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators can enter the same online ecosystem at the same time. Each role moves through the experience differently, while protected youth tools remain limited to approved staff and administrators."
+        />
+        <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-[0_35px_100px_rgba(0,0,0,.55)] backdrop-blur-2xl">
+          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Current Access State</div>
+          <h2 className="mt-3 text-3xl font-black">{activeUser ? activeUser.name : "Public Guest"}</h2>
+          <p className="mt-3 text-sm leading-6 text-white/80">
+            {activeUser
+              ? `${activeUser.role} has ${activeUser.accessLevel} access. ${supabaseReadyNote()}`
+              : "No role session is active on this device. Guests can explore public pathways, or enter by role to use protected areas."}
+          </p>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {liveUsers.length ? liveUsers.slice(-8).map((user) => (
+              <div key={user.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <div className="text-lg font-black">{user.name}</div>
+                <div className="mt-1 text-sm text-emerald-100">{user.role}</div>
+                <div className="mt-2 text-xs text-white/70">{user.accessLevel} access • last seen {user.lastSeen}</div>
+              </div>
+            )) : (
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/80">No active role sessions yet. Create one from the account screen.</div>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <ActionGrid
+              setScreen={setScreen}
+              items={[
+                { title: "Create / Switch Role", text: "Enter as supervisor, parent, youth, grower, partner, customer, or admin.", screen: "account" },
+                { title: "Protected Supervisor Tools", text: "Staff-only youth assessment and daily observation area.", screen: "supervisor" },
+                { title: "Parent View", text: "Approved youth progress and family visibility.", screen: "parent" },
+                { title: "Data + Reports", text: "Operational record of youth, crop, marketplace, and impact activity.", screen: "reports" },
+              ]}
+            />
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Recent Activity</div>
+            <div className="mt-3 grid gap-2">
+              {activity.length ? activity.slice(-5).reverse().map((item) => (
+                <div key={item.id} className="rounded-xl bg-white/10 p-3 text-sm text-white/82">
+                  <span className="font-black">{item.user}</span> {item.action} <span className="text-emerald-100/70">at {item.timestamp}</span>
+                </div>
+              )) : <div className="text-sm text-white/70">Activity will appear as users enter and move through pathways.</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Shell>
+  );
+}
+
 function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [selectedRole, setSelectedRole] = useState<Role>("Youth Workforce Participant");
+  const [displayName, setDisplayName] = useState("");
 
   const routeForRole: Record<Role, Screen> = {
     Guest: "guest",
@@ -645,6 +920,17 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
             Start as a guest, then create a role-based account when you are ready. Youth records stay protected behind supervisor/staff access.
           </p>
 
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl">
+            <label className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Name / Group Label</label>
+            <input
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Example: Supervisor A, Parent, Youth Team 1, Grower"
+              className="mt-3 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/45 focus:border-emerald-200"
+            />
+            <p className="mt-2 text-xs leading-5 text-white/70">For live production, this connects to Supabase Auth. For the current ecosystem, it creates a role-based active session so multiple users can enter at once.</p>
+          </div>
+
           <div className="mt-5 grid gap-2 md:grid-cols-2">
             {roles.map((role) => (
               <button
@@ -660,8 +946,15 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button onClick={() => setScreen(routeForRole[selectedRole])} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105">
-              Continue Account Setup
+            <button
+              onClick={() => {
+                const user = signInEcosystemUser(selectedRole, displayName);
+                recordEcosystemActivity(user, `opened ${routeForRole[selectedRole]} pathway`);
+                setScreen(routeForRole[selectedRole]);
+              }}
+              className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105"
+            >
+              Enter With This Role
             </button>
             <button onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20">
               Back To Portal
@@ -1307,49 +1600,62 @@ function Panel({ eyebrow, title, body }: { eyebrow: string; title: string; body:
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("portal");
+  const { activeUser } = useLiveEcosystem();
+
+  const navigate = (nextScreen: Screen) => {
+    if (!canAccessScreen(activeUser, nextScreen)) {
+      recordEcosystemActivity(activeUser, `was redirected from protected ${nextScreen} area`);
+      setScreen(routeForDeniedAccess(activeUser, nextScreen));
+      return;
+    }
+    recordEcosystemActivity(activeUser, `opened ${nextScreen}`);
+    setScreen(nextScreen);
+  };
 
   const screenComponent = useMemo(() => {
     switch (screen) {
       case "portal":
-        return <Portal setScreen={setScreen} />;
+        return <Portal setScreen={navigate} />;
       case "account":
-        return <Account setScreen={setScreen} />;
+        return <Account setScreen={navigate} />;
+      case "access":
+        return <AccessCenter setScreen={navigate} />;
       case "guest":
-        return <GuestJourney setScreen={setScreen} />;
+        return <GuestJourney setScreen={navigate} />;
       case "roles":
-        return <Roles setScreen={setScreen} />;
+        return <Roles setScreen={navigate} />;
       case "youth":
-        return <Youth setScreen={setScreen} />;
+        return <Youth setScreen={navigate} />;
       case "supervisor":
-        return <Supervisor setScreen={setScreen} />;
+        return <Supervisor setScreen={navigate} />;
       case "parent":
-        return <Parent setScreen={setScreen} />;
+        return <Parent setScreen={navigate} />;
       case "grower":
-        return <Grower setScreen={setScreen} />;
+        return <Grower setScreen={navigate} />;
       case "crop":
-        return <CropPlanner setScreen={setScreen} />;
+        return <CropPlanner setScreen={navigate} />;
       case "marketplace":
-        return <Marketplace setScreen={setScreen} />;
+        return <Marketplace setScreen={navigate} />;
       case "operations":
-        return <Operations setScreen={setScreen} />;
+        return <Operations setScreen={navigate} />;
       case "encouragement":
-        return <Encouragement setScreen={setScreen} />;
+        return <Encouragement setScreen={navigate} />;
       case "reports":
-        return <Reports setScreen={setScreen} />;
+        return <Reports setScreen={navigate} />;
       case "partners":
-        return <Partners setScreen={setScreen} />;
+        return <Partners setScreen={navigate} />;
       case "safety":
-        return <Safety setScreen={setScreen} />;
+        return <Safety setScreen={navigate} />;
       case "data":
-        return <DataRoom setScreen={setScreen} />;
+        return <DataRoom setScreen={navigate} />;
       case "training":
-        return <Training setScreen={setScreen} />;
+        return <Training setScreen={navigate} />;
       case "valueAdded":
-        return <ValueAdded setScreen={setScreen} />;
+        return <ValueAdded setScreen={navigate} />;
       default:
-        return <Portal setScreen={setScreen} />;
+        return <Portal setScreen={navigate} />;
     }
-  }, [screen]);
+  }, [screen, activeUser]);
 
   return screenComponent;
 }
