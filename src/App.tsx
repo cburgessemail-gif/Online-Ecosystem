@@ -478,16 +478,58 @@ export default function App() {
   const step = tourSteps[tourIndex];
   const progress = useMemo(() => ((tourIndex + 1) / tourSteps.length) * 100, [tourIndex]);
 
+  const prepareNarration = (text: string) =>
+    text
+      .replace(/\. /g, ".   ")
+      .replace(/, /g, ",  ")
+      .replace(/ — /g, " ... ");
+
+  const pickNarrationVoice = () => {
+    if (!("speechSynthesis" in window)) return null;
+
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith("en"));
+
+    const preferredNames = [
+      "Microsoft Aria",
+      "Microsoft Jenny",
+      "Microsoft Guy",
+      "Google US English",
+      "Google English",
+      "Samantha",
+      "Alex",
+      "Karen",
+      "Daniel",
+    ];
+
+    const avoidNames = ["Mei", "Hui", "Han", "Yuna", "Kyoko", "Otoya", "Ting", "Sin", "Zhi", "Chinese", "Japanese", "Korean"];
+
+    const cleanVoices = englishVoices.filter(
+      (voice) => !avoidNames.some((avoid) => voice.name.toLowerCase().includes(avoid.toLowerCase()))
+    );
+
+    for (const preferred of preferredNames) {
+      const match = cleanVoices.find((voice) => voice.name.toLowerCase().includes(preferred.toLowerCase()));
+      if (match) return match;
+    }
+
+    return cleanVoices.find((voice) => voice.lang.toLowerCase() === "en-us") || cleanVoices[0] || voices[0] || null;
+  };
+
   const speak = (text: string) => {
     if (!("speechSynthesis" in window)) return;
+
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.82;
-    utterance.pitch = 1.02;
+
+    const utterance = new SpeechSynthesisUtterance(prepareNarration(text));
+    utterance.rate = 0.78;
+    utterance.pitch = 1.04;
     utterance.volume = 1;
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find((voice) => voice.name.toLowerCase().includes("google")) || voices[0];
-    if (preferred) utterance.voice = preferred;
+    utterance.lang = "en-US";
+
+    const voice = pickNarrationVoice();
+    if (voice) utterance.voice = voice;
+
     window.speechSynthesis.speak(utterance);
   };
 
