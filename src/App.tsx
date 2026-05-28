@@ -14,6 +14,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Staff/Supervisors are the protected access layer for youth.
  * - Every visible button goes somewhere or opens a real external resource.
  * - Includes weather/live channels, crop planner, grow plan, assessments, proverbs, data, reports, and parent summaries.
+ * - User-facing guest journey no longer displays developer rationale panels.
+ * - Guest learning happens through movement, choice, imagery, and role pathways.
  */
 
 type Screen =
@@ -362,183 +364,13 @@ function supabaseReadyNote() {
   return supabase ? "Supabase Auth is connected for secure role sessions, profiles, permissions, and live ecosystem records." : "Supabase environment keys are not loaded yet, so this screen is using local role sessions until VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are added.";
 }
 
-
-type OperationalTable =
-  | "youth_assignments"
-  | "supervisor_assessments"
-  | "parent_summaries"
-  | "crop_plans"
-  | "marketplace_inventory"
-  | "ecosystem_reports";
-
-type OperationalRecord = {
-  id: string;
-  table: OperationalTable;
-  title: string;
-  status: string;
-  role?: Role;
-  detail: string;
-  created_at: string;
-  updated_at: string;
-};
-
-const OPERATIONAL_KEY = "bff.ecosystem.operationalRecords";
-
-const seedOperationalRecords: OperationalRecord[] = [
-  {
-    id: "assignment-qr-checkin",
-    table: "youth_assignments",
-    title: "QR check-in",
-    status: "ready",
-    role: "Supervisor / Staff",
-    detail: "Supervisors verify arrival, PPE, and daily station assignment before youth begin work.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "assessment-daily-score",
-    table: "supervisor_assessments",
-    title: "Daily mobile scoring",
-    status: "active",
-    role: "Supervisor / Staff",
-    detail: "Attendance, PPE, teamwork, communication, leadership, and reflection are tracked from the field.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "crop-tomato-zone",
-    table: "crop_plans",
-    title: "Tomato grow zone",
-    status: "in progress",
-    role: "Grower",
-    detail: "Irrigation, pest watch, harvest window, and marketplace forecast are linked to youth work assignments.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "marketplace-seedlings",
-    table: "marketplace_inventory",
-    title: "Seedling inventory",
-    status: "forecasted",
-    role: "Marketplace Customer",
-    detail: "Marketplace availability is connected to grow plans, harvest timing, SNAP visibility, and customer access.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "parent-progress-summary",
-    table: "parent_summaries",
-    title: "Parent progress summary",
-    status: "review ready",
-    role: "Parent / Guardian",
-    detail: "Families see attendance, approved reflections, badges, encouragement, and visible signs of growth.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "impact-report",
-    table: "ecosystem_reports",
-    title: "Community impact report",
-    status: "building",
-    role: "Partner",
-    detail: "Youth activity, crop movement, marketplace circulation, and partner support become measurable impact evidence.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
-function getLocalOperationalRecords() {
-  const stored = safeRead<OperationalRecord[]>(OPERATIONAL_KEY, []);
-  if (stored.length) return stored;
-  safeWrite(OPERATIONAL_KEY, seedOperationalRecords);
-  return seedOperationalRecords;
-}
-
-async function loadOperationalRecords(table?: OperationalTable) {
-  if (supabase) {
-    try {
-      const query = table
-        ? supabase.from(table).select("*").order("updated_at", { ascending: false }).limit(25)
-        : supabase.from("ecosystem_activity_view").select("*").order("updated_at", { ascending: false }).limit(25);
-      const { data, error } = await query;
-      if (!error && data && data.length) {
-        return data.map((item: any) => ({
-          id: String(item.id || `${item.title}-${item.updated_at}`),
-          table: (item.table || table || "ecosystem_reports") as OperationalTable,
-          title: item.title || item.name || item.assignment || "Ecosystem record",
-          status: item.status || "active",
-          role: item.role || undefined,
-          detail: item.detail || item.description || item.notes || "Live Supabase record connected to the ecosystem.",
-          created_at: item.created_at || new Date().toISOString(),
-          updated_at: item.updated_at || item.created_at || new Date().toISOString(),
-        })) as OperationalRecord[];
-      }
-    } catch {
-      // Local fallback keeps the ecosystem usable while Supabase tables are being connected.
-    }
-  }
-
-  const records = getLocalOperationalRecords();
-  return table ? records.filter((record) => record.table === table) : records;
-}
-
-async function saveOperationalRecord(record: Omit<OperationalRecord, "id" | "created_at" | "updated_at"> & { id?: string }) {
-  const now = new Date().toISOString();
-  const fullRecord: OperationalRecord = {
-    id: record.id || `${record.table}-${Date.now()}`,
-    table: record.table,
-    title: record.title,
-    status: record.status,
-    role: record.role,
-    detail: record.detail,
-    created_at: now,
-    updated_at: now,
-  };
-
-  if (supabase) {
-    try {
-      await supabase.from(record.table).upsert(fullRecord);
-    } catch {
-      // Keep the field experience moving even if a Supabase table is not ready yet.
-    }
-  }
-
-  const existing = getLocalOperationalRecords().filter((item) => item.id !== fullRecord.id);
-  safeWrite(OPERATIONAL_KEY, [fullRecord, ...existing].slice(0, 50));
-  publishEcosystemUpdate({ type: "operational-record", record: fullRecord });
-  return fullRecord;
-}
-
-function useOperationalRecords(table?: OperationalTable) {
-  const [records, setRecords] = useState<OperationalRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refresh = async () => {
-    setLoading(true);
-    const loaded = await loadOperationalRecords(table);
-    setRecords(loaded);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    refresh();
-    const handler = () => refresh();
-    window.addEventListener("storage", handler);
-    window.addEventListener("bff-ecosystem-update", handler);
-    return () => {
-      window.removeEventListener("storage", handler);
-      window.removeEventListener("bff-ecosystem-update", handler);
-    };
-  }, [table]);
-
-  return { records, loading, refresh };
-}
-
 const image = (file: string) => `/images/${file}`;
 
 const IMG = {
-  forest: image("large (18).jpg"),
-  forestAlt: image("large (18).jpg"),
+  // Forest-entry images are used first so guests feel arrival before explanation.
+  forest: image("SAM_0384.JPG"),
+  forestAlt: image("SAM_0391.JPG"),
+  forestBackup: image("large (2).jpg"),
   youth1: image("large (16).jpg"),
   youth2: image("large (15).jpg"),
   youth3: image("large (12).jpg"),
@@ -682,39 +514,39 @@ const guestSteps: GuestStep[] = [
     id: "arrival",
     eyebrow: "Guest Journey / Demo",
     title: "Arrive first. Understand later.",
-    subtitle: "The ecosystem begins with place, atmosphere, and invitation before it explains the full system.",
+    subtitle: "Some places tell you what they are. This one invites you to enter, look around, and discover what is connected.",
     image: IMG.forest,
-    why: "Guests enter through the forest before seeing the larger system, allowing the atmosphere, movement, and land itself to introduce the ecosystem naturally.",
+    why: "Follow the path. Listen to the land. Let the place introduce itself before the larger system is revealed.",
     experience: [
-      "The guest enters before the explanation.",
-      "The farm is presented as atmosphere, welcome, and movement.",
-      "The connected ecosystem image is held back until the system is being explained.",
+      "Follow the path.",
+      "Explore the land.",
+      "Discover what connects us.",
     ],
   },
   {
     id: "why",
     eyebrow: "Why This Exists",
     title: "A farm ecosystem built for food, people, and community movement.",
-    subtitle: "Bronson Family Farm connects land, youth workforce, growers, marketplace circulation, family support, and measurable impact.",
+    subtitle: "Land, food, people, work, learning, family, and community begin moving together.",
     image: IMG.growArea,
-    why: "Guests begin to feel how the farm becomes an operating model — where land, food, work, learning, and community support start moving together.",
+    why: "Walk deeper into the farm and notice how each part supports another — food, learning, work, health, and community.",
     experience: [
-      "Food access connects to local production.",
-      "Youth participation connects to work readiness and personal growth.",
-      "Marketplace movement connects to crop planning and community nutrition.",
+      "See where food begins.",
+      "Notice how work becomes learning.",
+      "Watch community movement take shape.",
     ],
   },
   {
     id: "history",
     eyebrow: "Place / History",
     title: "The farm stands on historic Lansdowne Airport land.",
-    subtitle: "The location carries a layered story of land, aviation, community movement, military service, family legacy, and new food infrastructure.",
+    subtitle: "The land carries memory, service, movement, family legacy, and a new purpose for food infrastructure.",
     image: IMG.growAreaAlt,
-    why: "The history comes after entry so the guest can first feel the land, then understand how aviation, military service, family legacy, and food infrastructure now share one story.",
+    why: "After arrival, the story widens — from land and aviation to military service, family legacy, and the future being built here.",
     experience: [
-      "The land story is introduced respectfully.",
-      "Military service and family legacy are connected to responsibility.",
-      "The farm becomes a future-facing use of historic land.",
+      "Meet the history of the place.",
+      "Honor service and family legacy.",
+      "See the land becoming useful again.",
     ],
   },
   {
@@ -723,11 +555,11 @@ const guestSteps: GuestStep[] = [
     title: "Youth participate in real work.",
     subtitle: "Assignments, PPE, attendance, reflections, assessments, badges, and supervisor encouragement connect youth development to real farm operations.",
     image: IMG.youth1,
-    why: "Youth learn through real responsibility — showing up, preparing stations, solving problems, supporting grow zones, and seeing how their work contributes to the larger ecosystem.",
+    why: "Youth learn by doing real work — showing up, preparing stations, solving problems, supporting grow zones, and seeing their effort matter.",
     experience: [
-      "Youth check in and receive daily assignments.",
-      "Supervisors observe participation, safety, teamwork, and growth.",
-      "Progress becomes visible through badges, reflection, and reports.",
+      "Check in and get ready.",
+      "Join a station and work with purpose.",
+      "Reflect, grow, and earn progress.",
     ],
     nextScreen: "youth",
   },
@@ -737,11 +569,11 @@ const guestSteps: GuestStep[] = [
     title: "Youth access is protected through staff and supervisor control.",
     subtitle: "Random visitors do not access youth records. Supervisors are the protected staff layer.",
     image: IMG.fencing,
-    why: "Safety is built into the movement of the ecosystem so youth can participate with protection, structure, and trusted adult supervision while public users remain outside private records.",
+    why: "Young people move through the farm with structure, protection, and trusted adults nearby while private records stay protected.",
     experience: [
-      "Supervisor/staff role is required for youth records.",
-      "Parents see appropriate summaries, not internal crisis notes.",
-      "Guest, marketplace, and partner users do not enter youth supervision tools.",
+      "Move with trusted supervision.",
+      "Keep youth records protected.",
+      "Share only what families should see.",
     ],
     nextScreen: "safety",
   },
@@ -751,11 +583,11 @@ const guestSteps: GuestStep[] = [
     title: "Assessments are the heartbeat.",
     subtitle: "Attendance, PPE, teamwork, communication, leadership, reflection, and task completion feed badges, parent summaries, and reports.",
     image: IMG.volunteers,
-    why: "Daily observations help youth see their growth over time while giving supervisors a practical way to support responsibility, teamwork, safety, and reflection.",
+    why: "Daily moments become signs of growth as supervisors notice responsibility, teamwork, safety, leadership, and reflection.",
     experience: [
-      "Supervisor observes and scores participation.",
-      "Parent-visible summaries are separated from internal notes.",
-      "Reports generate from the same data used to support youth growth.",
+      "Notice growth in the moment.",
+      "Encourage the next step.",
+      "Turn daily effort into progress.",
     ],
     nextScreen: "supervisor",
   },
@@ -767,9 +599,9 @@ const guestSteps: GuestStep[] = [
     image: IMG.growAreaAlt,
     why: "The crop planner quietly guides the rhythm of the ecosystem — connecting planting, harvest timing, youth assignments, irrigation, and marketplace readiness so the entire system moves together.",
     experience: [
-      "Tomato zone creates irrigation and pest-check assignments.",
-      "Harvest windows inform marketplace inventory.",
-      "Crop activity becomes workforce learning and reporting data.",
+      "Follow the grow zone.",
+      "Plan water, care, and harvest.",
+      "Connect field work to the market.",
     ],
     nextScreen: "crop",
   },
@@ -781,9 +613,9 @@ const guestSteps: GuestStep[] = [
     image: IMG.marketplaceHero,
     why: "The marketplace reveals how food moves through the ecosystem — from grow plans and harvest timing into customer access, nutrition, and community circulation.",
     experience: [
-      "Harvest forecasts become availability.",
-      "Inventory updates support customer access.",
-      "Marketplace reports show circulation and community reach.",
+      "See what is ready.",
+      "Move food toward families.",
+      "Keep the community connected.",
     ],
     nextScreen: "marketplace",
   },
@@ -795,9 +627,9 @@ const guestSteps: GuestStep[] = [
     image: IMG.queens,
     why: "Parents stay connected to the journey through attendance, encouragement, badges, reflections, and visible signs of growth while internal staff notes remain protected.",
     experience: [
-      "Youth completes assignments.",
-      "Supervisor scores and approves summaries.",
-      "Parent sees progress, encouragement, and next steps.",
+      "See the day’s progress.",
+      "Celebrate strengths.",
+      "Stay connected to the journey.",
     ],
     nextScreen: "parent",
   },
@@ -805,13 +637,13 @@ const guestSteps: GuestStep[] = [
     id: "operations",
     eyebrow: "Explaining The Whole System",
     title: "Now the connected food ecosystem can be explained.",
-    subtitle: "The connected food ecosystem comes into view after the journey has revealed how the parts move together.",
+    subtitle: "This is where the system image belongs: after the guest understands why the parts matter.",
     image: IMG.ecosystem,
     why: "The full system appears after the guest has already experienced its movement, making the connections easier to understand because they have been discovered step by step.",
     experience: [
-      "Youth, parents, growers, marketplace, crop planning, operations, and reports connect.",
-      "The ecosystem becomes measurable.",
-      "Partners and funders can see how participation turns into outcomes.",
+      "See the whole system come together.",
+      "Follow the movement from role to role.",
+      "Recognize how participation becomes impact.",
     ],
     nextScreen: "operations",
   },
@@ -823,9 +655,9 @@ const guestSteps: GuestStep[] = [
     image: IMG.partners,
     why: "Each pathway leaves behind a visible story of participation, food movement, youth growth, marketplace circulation, and community impact that can be shared with families, partners, and supporters.",
     experience: [
-      "Daily activity becomes documentation.",
-      "Assessments become progress reports.",
-      "Crop and marketplace activity become impact evidence.",
+      "Remember what happened.",
+      "Show what changed.",
+      "Carry the story forward.",
     ],
     nextScreen: "reports",
   },
@@ -881,7 +713,9 @@ function Shell({
           className="h-full w-full scale-[1.02] object-cover"
           onError={(event) => {
             const target = event.currentTarget;
-            if (!target.src.includes("GrowArea2")) target.src = IMG.growArea;
+            if (!target.src.includes("large%20(2)") && !target.src.includes("large (2)")) target.src = IMG.forestBackup || IMG.growArea;
+            else if (!target.src.includes("large%20(2)") && !target.src.includes("large (2)")) target.src = IMG.forestBackup || IMG.growArea;
+          else if (!target.src.includes("GrowArea2")) target.src = IMG.growArea;
           }}
         />
       </div>
@@ -1082,7 +916,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/85">Bronson Family Farm</div>
             <h1 className="mt-5 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">Enter The Ecosystem.</h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-white/92 drop-shadow-2xl md:text-xl md:leading-9">
-              Step through the forest gate first. The guest journey becomes the guided tour and explains the ecosystem as you move.
+              Step through the forest gate. Follow the path. Discover how food, people, work, learning, and community move together.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
@@ -1108,7 +942,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         >
           <PhotoCard
             title="The Forest Gate Is Open"
-            subtitle="Step forward into the forest entrance. The journey opens through movement, place, and discovery."
+            subtitle="Follow the path into a living farm experience. The deeper you move, the more the ecosystem reveals."
             image={IMG.forestAlt}
             height="440px"
             label="Arrival"
@@ -1129,8 +963,8 @@ function AccessCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         <Panel
           eyebrow="Live Multi-User Access"
-          title="One ecosystem link. Many users. Protected role movement."
-          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators enter the same online ecosystem through role-appropriate pathways. Protected youth tools remain limited to approved staff and administrators."
+          title="One ecosystem link. Many users. Role-protected movement."
+          body="Guests, youth, parents, supervisors, growers, marketplace users, partners, and administrators can enter the same online ecosystem at the same time. Each role moves through the experience differently, while protected youth tools remain limited to approved staff and administrators."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 shadow-[0_35px_100px_rgba(0,0,0,.55)] backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Current Access State</div>
@@ -1327,7 +1161,7 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
 
         <div className="rounded-[2rem] border border-white/10 bg-black/40 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Access Path</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Account Purpose</div>
           <h2 className="mt-4 text-3xl font-black leading-tight">One ecosystem. Many users. Clear permissions.</h2>
           <div className="mt-5 grid gap-3">
             {[
@@ -1365,12 +1199,10 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <div className="text-xs uppercase tracking-[0.32em] text-emerald-100/80">{step.eyebrow}</div>
           <h1 className="mt-4 text-4xl font-black leading-[0.95] md:text-5xl">{step.title}</h1>
           <p className="mt-5 text-base leading-7 text-white/90 md:text-lg md:leading-8">{step.subtitle}</p>
-
-
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+<div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
             <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Narration Control Panel</div>
             <div className="mt-3 flex flex-wrap gap-3">
-              <button onClick={() => speak(`${step.title}. ${step.subtitle}`)} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black shadow-xl transition hover:scale-105">
+              <button onClick={() => speak(`${step.title}. ${step.subtitle}. ${step.why}`)} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black shadow-xl transition hover:scale-105">
                 Play Guided Voice
               </button>
               <button onClick={() => window.speechSynthesis?.cancel()} className="rounded-full border border-white/10 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/20">
@@ -1404,14 +1236,21 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
 
         <div className="space-y-4">
-          <PhotoCard title={step.title} subtitle={step.subtitle} image={step.image} height="360px" label={`Step ${stepIndex + 1} of ${guestSteps.length}`} cta="Active" />
+          <PhotoCard title={step.title} subtitle="Follow the path and continue the journey." image={step.image} height="360px" label={`Step ${stepIndex + 1} of ${guestSteps.length}`} cta="Active" />
           <div className="rounded-[2rem] border border-white/10 bg-black/46 p-5 backdrop-blur-2xl">
-            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Pathway Movement</div>
+            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Choose The Next Movement</div>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              {step.experience.map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/85">
+              {step.experience.map((item, index) => (
+                <button
+                  key={item}
+                  onClick={() => {
+                    if (index === 2 && step.nextScreen) setScreen(step.nextScreen);
+                    else setStepIndex((v) => Math.min(v + 1, guestSteps.length - 1));
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black leading-6 text-white/90 transition hover:bg-emerald-300 hover:text-black"
+                >
                   {item}
-                </div>
+                </button>
               ))}
             </div>
             <div className="mt-5 flex gap-2">
@@ -1470,8 +1309,8 @@ function Encouragement({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <Shell screen="encouragement" setScreen={setScreen} background={IMG.seeds}>
       <StatusBar />
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel eyebrow="Daily Proverb" title={proverb} body="A daily grounding message for work, responsibility, and growth." />
-        <Panel eyebrow="Positive Message" title={message} body="A daily encouragement that keeps actions connected to purpose." />
+        <Panel eyebrow="Daily Proverb" title={proverb} body="This is the grounding message that connects work, responsibility, and personal growth before the day begins." />
+        <Panel eyebrow="Positive Message" title={message} body="This gives youth, volunteers, and staff a reason to connect their daily actions to purpose." />
       </div>
       <div className="mt-4">
         <ActionGrid
@@ -1536,7 +1375,7 @@ function Supervisor({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Supervisor / Staff Protected Access"
           title="Supervisors are the youth access layer."
-          body="Staff guide the daily youth journey, protect records, document growth, and keep public users outside private youth tools."
+          body="Staff support, guide, counsel, assess, and protect youth through their daily journey. Public guests, customers, partners, and marketplace users do not enter youth records."
         />
 
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
@@ -1560,7 +1399,6 @@ function Supervisor({ setScreen }: { setScreen: (screen: Screen) => void }) {
               ]}
             />
           </div>
-          <OperationalSnapshot setScreen={setScreen} table="supervisor_assessments" />
         </div>
       </div>
     </Shell>
@@ -1575,7 +1413,7 @@ function Safety({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Youth Protection"
           title="Access is separated by role."
-          body="Public, family, staff, and admin access remain separated so youth records stay protected while the ecosystem remains open for appropriate participation."
+          body="Guests can explore. Customers can shop. Partners can review impact. Parents can see approved summaries. Supervisors/staff are the only users with youth observation, assessment, and support-note access."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Protected Rules</div>
@@ -1616,7 +1454,7 @@ function Parent({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Parent / Guardian Portal"
           title="Parents see support, progress, and next steps."
-          body="Parents receive approved progress, attendance, safety, badges, strengths, encouragement, announcements, and reflections while private staff notes remain protected."
+          body="The parent view builds trust by showing attendance, safety, badges, strengths, encouragement, announcements, and approved reflections without exposing internal crisis labels or private supervisor notes."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Youth Progress Snapshot</div>
@@ -1720,7 +1558,6 @@ function CropPlanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
               </div>
             ))}
           </div>
-          <OperationalSnapshot setScreen={setScreen} table="crop_plans" />
         </div>
       </div>
     </Shell>
@@ -1744,7 +1581,7 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <Panel
           eyebrow="Marketplace Circulation"
           title="Inventory connects to crop planning and community access."
-          body="The marketplace shows availability, forecasts, SNAP-visible products, and the movement from grow plan to customer access."
+          body="The marketplace pathway shows what is available, what is forecasted, what is SNAP-visible, and how products move from grow plan to customer access."
         />
         <div className="rounded-[2rem] border border-white/10 bg-black/48 p-5 backdrop-blur-2xl">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Marketplace Inventory</div>
@@ -1768,7 +1605,6 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
               ]}
             />
           </div>
-          <OperationalSnapshot setScreen={setScreen} table="marketplace_inventory" />
         </div>
       </div>
     </Shell>
@@ -1795,7 +1631,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         <PhotoCard
           title="Connected Food Ecosystem"
-          subtitle="The connected system comes into view here, showing how the pathways move together."
+          subtitle="This is the explaining screen. The system graphic appears here because the user has already moved through the experience."
           image={IMG.ecosystem}
           height="430px"
           label="System View"
@@ -1853,7 +1689,6 @@ function DataRoom({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ]}
           />
         </div>
-        <OperationalSnapshot setScreen={setScreen} />
       </div>
     </Shell>
   );
@@ -1884,7 +1719,6 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ]}
           />
         </div>
-        <OperationalSnapshot setScreen={setScreen} table="ecosystem_reports" />
       </div>
     </Shell>
   );
@@ -1937,7 +1771,7 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <Panel
         eyebrow="Training"
         title="Supervisor and participant training connects the work to safety, skill, and growth."
-        body="Training guides PPE, youth protection, assessment language, role-based access, field stations, emergency procedures, reflection, crop planning, marketplace preparation, and reporting."
+        body="Training includes PPE, youth protection, assessment language, role-based access, field station expectations, emergency procedures, daily reflection, crop planning, marketplace preparation, and reporting."
       />
       <div className="mt-4">
         <ActionGrid
@@ -1951,68 +1785,6 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
         />
       </div>
     </Shell>
-  );
-}
-
-
-function OperationalSnapshot({ setScreen, table }: { setScreen: (screen: Screen) => void; table?: OperationalTable }) {
-  const { activeUser } = useLiveEcosystem();
-  const { records, loading, refresh } = useOperationalRecords(table);
-
-  const addFieldRecord = async () => {
-    const role = activeUser?.role || "Guest";
-    const tableName: OperationalTable =
-      role === "Supervisor / Staff" || role === "Administrator"
-        ? "supervisor_assessments"
-        : role === "Grower"
-          ? "crop_plans"
-          : role === "Marketplace Customer"
-            ? "marketplace_inventory"
-            : "ecosystem_reports";
-
-    await saveOperationalRecord({
-      table: table || tableName,
-      title: `${role} field update`,
-      status: "recorded",
-      role,
-      detail: "A live ecosystem action was recorded from the role pathway and is ready for operations, reporting, or family/partner visibility.",
-    });
-    recordEcosystemActivity(activeUser, "recorded an operational ecosystem update");
-    await refresh();
-  };
-
-  return (
-    <div className="mt-5 rounded-[2rem] border border-emerald-200/15 bg-black/35 p-5 backdrop-blur-2xl">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Operational Platform Layer</div>
-          <h3 className="mt-2 text-2xl font-black">Live records, protected roles, and shared ecosystem movement.</h3>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/78">
-            These records can run locally for testing and connect to Supabase tables when the production database is ready. The visible ecosystem stays the same while the operational layer stores assignments, assessments, crop plans, inventory, parent summaries, and reports.
-          </p>
-        </div>
-        <button onClick={addFieldRecord} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black shadow-xl transition hover:scale-105">
-          Record Live Update
-        </button>
-      </div>
-
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        {loading ? (
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">Loading ecosystem records...</div>
-        ) : records.length ? (
-          records.slice(0, 6).map((record) => (
-            <button key={record.id} onClick={() => setScreen("reports")} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black">
-              <div className="text-[10px] uppercase tracking-[0.22em] opacity-75">{record.table.replaceAll("_", " ")}</div>
-              <div className="mt-2 text-lg font-black">{record.title}</div>
-              <div className="mt-1 text-xs font-bold opacity-80">{record.status}</div>
-              <div className="mt-2 text-sm leading-5 opacity-85">{record.detail}</div>
-            </button>
-          ))
-        ) : (
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">No operational records yet.</div>
-        )}
-      </div>
-    </div>
   );
 }
 
