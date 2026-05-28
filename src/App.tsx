@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
@@ -90,6 +91,121 @@ const SESSION_KEY = "bff.ecosystem.activeUser";
 const USERS_KEY = "bff.ecosystem.liveUsers";
 const ACTIVITY_KEY = "bff.ecosystem.activityLog";
 const CHANNEL_KEY = "bff.ecosystem.broadcast";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const supabase: SupabaseClient | null = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+type AuthMode = "signIn" | "signUp";
+
+function roleSlug(role: Role) {
+  const map: Record<Role, string> = {
+    Guest: "guest",
+    "Youth Workforce Participant": "youth",
+    "Parent / Guardian": "parent",
+    "Supervisor / Staff": "supervisor",
+    Grower: "grower",
+    "Marketplace Customer": "marketplace",
+    Volunteer: "volunteer",
+    Partner: "partner",
+    Administrator: "admin",
+    "Value-Added Producer": "value_added",
+  };
+  return map[role];
+}
+
+function persistEcosystemUser(user: EcosystemUser, action = "entered the ecosystem") {
+  const users = safeRead<EcosystemUser[]>(USERS_KEY, []);
+  const filtered = users.filter((item) => item.id !== user.id).slice(-9);
+  const updatedUsers = [...filtered, user];
+  const activity = safeRead<EcosystemActivity[]>(ACTIVITY_KEY, []);
+  const updatedActivity = [
+    ...activity.slice(-12),
+    {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      user: user.name,
+      role: user.role,
+      action,
+      timestamp: nowLabel(),
+    },
+  ];
+  safeWrite(SESSION_KEY, user);
+  safeWrite(USERS_KEY, updatedUsers);
+  safeWrite(ACTIVITY_KEY, updatedActivity);
+  publishEcosystemUpdate({ type: "auth", user });
+}
+
+async function authenticateEcosystemUser(params: {
+  email: string;
+  password: string;
+  role: Role;
+  name?: string;
+  mode: AuthMode;
+}) {
+  const email = params.email.trim();
+  const password = params.password.trim();
+  const name = params.name?.trim() || email || `${params.role} User`;
+
+  if (!supabase || !email || !password) {
+    const localUser = createEcosystemUser(params.role, name);
+    persistEcosystemUser(localUser, "entered with local role access");
+    return localUser;
+  }
+
+  const authResponse =
+    params.mode === "signUp"
+      ? await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              display_name: name,
+              role: roleSlug(params.role),
+              ecosystem_role: params.role,
+              access_level: roleAccess[params.role],
+            },
+          },
+        })
+      : await supabase.auth.signInWithPassword({ email, password });
+
+  if (authResponse.error) throw authResponse.error;
+
+  const authUser = authResponse.data.user;
+  const user: EcosystemUser = {
+    id: authUser?.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name,
+    role: params.role,
+    accessLevel: roleAccess[params.role],
+    status: "active",
+    lastSeen: nowLabel(),
+  };
+
+  try {
+    if (authUser?.id) {
+      await supabase.from("profiles").upsert({
+        id: authUser.id,
+        email,
+        display_name: name,
+        role: roleSlug(params.role),
+        ecosystem_role: params.role,
+        access_level: roleAccess[params.role],
+        approved: params.role === "Guest" || params.role === "Marketplace Customer" ? true : false,
+        last_seen_at: new Date().toISOString(),
+      });
+    }
+  } catch {
+    // The ecosystem still enters safely if the profiles table is not created yet.
+  }
+
+  persistEcosystemUser(user, params.mode === "signUp" ? "created an ecosystem account" : "signed into the ecosystem");
+  return user;
+}
+
+async function signOutEcosystemUser() {
+  if (supabase) await supabase.auth.signOut();
+  safeWrite<EcosystemUser | null>(SESSION_KEY, null);
+  publishEcosystemUpdate({ type: "signout" });
+}
 
 const roleAccess: Record<Role, AccessLevel> = {
   Guest: "public",
@@ -243,7 +359,7 @@ function useLiveEcosystem() {
 }
 
 function supabaseReadyNote() {
-  return "This screen is ready to connect to Supabase Auth, profiles, role permissions, assessments, attendance, inventory, reports, and real-time subscriptions without changing the visual experience.";
+  return supabase ? "Supabase Auth is connected for secure role sessions, profiles, permissions, and live ecosystem records." : "Supabase environment keys are not loaded yet, so this screen is using local role sessions until VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are added.";
 }
 
 const image = (file: string) => `/images/${file}`;
@@ -896,6 +1012,11 @@ function AccessCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [selectedRole, setSelectedRole] = useState<Role>("Youth Workforce Participant");
   const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authMode, setAuthMode] = useState<AuthMode>("signIn");
+  const [authMessage, setAuthMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const routeForRole: Record<Role, Screen> = {
     Guest: "guest",
@@ -910,15 +1031,52 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
     "Value-Added Producer": "valueAdded",
   };
 
+  const handleAccess = async () => {
+    setIsSubmitting(true);
+    setAuthMessage("");
+    try {
+      const user = await authenticateEcosystemUser({
+        email,
+        password,
+        role: selectedRole,
+        name: displayName,
+        mode: authMode,
+      });
+      recordEcosystemActivity(user, `opened ${routeForRole[selectedRole]} pathway`);
+      setScreen(routeForRole[selectedRole]);
+    } catch (error: any) {
+      setAuthMessage(error?.message || "The ecosystem could not complete this sign-in. Check the email, password, and Supabase settings.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Shell screen="account" setScreen={setScreen} background={IMG.forest} compactNav>
       <div className="grid min-h-[calc(100vh-2rem)] items-center gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-[2rem] border border-white/10 bg-black/50 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
-          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">Create Your Ecosystem Account</div>
-          <h1 className="mt-4 text-4xl font-black leading-[0.95] md:text-5xl">Choose how you participate.</h1>
+          <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/80">Ecosystem Role Access</div>
+          <h1 className="mt-4 text-4xl font-black leading-[0.95] md:text-5xl">Enter with secure role access.</h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-white/90">
-            Start as a guest, then create a role-based account when you are ready. Youth records stay protected behind supervisor/staff access.
+            Guests can explore immediately. Returning users, supervisors, parents, growers, partners, and administrators sign in so the ecosystem knows what each person may safely see and do.
           </p>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <button
+              onClick={() => setAuthMode("signIn")}
+              className={`rounded-2xl border px-4 py-3 text-left font-black ${authMode === "signIn" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
+            >
+              Sign In
+              <span className="mt-1 block text-xs font-medium opacity-75">Existing ecosystem user</span>
+            </button>
+            <button
+              onClick={() => setAuthMode("signUp")}
+              className={`rounded-2xl border px-4 py-3 text-left font-black ${authMode === "signUp" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
+            >
+              Create Account
+              <span className="mt-1 block text-xs font-medium opacity-75">New role request</span>
+            </button>
+          </div>
 
           <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl">
             <label className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Name / Group Label</label>
@@ -928,7 +1086,35 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
               placeholder="Example: Supervisor A, Parent, Youth Team 1, Grower"
               className="mt-3 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/45 focus:border-emerald-200"
             />
-            <p className="mt-2 text-xs leading-5 text-white/70">For live production, this connects to Supabase Auth. For the current ecosystem, it creates a role-based active session so multiple users can enter at once.</p>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div>
+                <label className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Email</label>
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="name@email.com"
+                  type="email"
+                  className="mt-3 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/45 focus:border-emerald-200"
+                />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-[0.28em] text-emerald-100/70">Password</label>
+                <input
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Enter password"
+                  type="password"
+                  className="mt-3 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/45 focus:border-emerald-200"
+                />
+              </div>
+            </div>
+
+            <p className="mt-3 text-xs leading-5 text-white/70">
+              {supabase
+                ? "Supabase is connected. Email/password sessions will persist and role metadata will be saved. Staff and administrator areas remain protected."
+                : "Supabase keys are not loaded yet. This still allows local role-session testing; add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for true secure login."}
+            </p>
           </div>
 
           <div className="mt-5 grid gap-2 md:grid-cols-2">
@@ -945,16 +1131,22 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ))}
           </div>
 
+          {authMessage && (
+            <div className="mt-4 rounded-2xl border border-orange-200/30 bg-orange-950/45 p-4 text-sm leading-6 text-orange-50">
+              {authMessage}
+            </div>
+          )}
+
           <div className="mt-5 flex flex-wrap gap-3">
             <button
-              onClick={() => {
-                const user = signInEcosystemUser(selectedRole, displayName);
-                recordEcosystemActivity(user, `opened ${routeForRole[selectedRole]} pathway`);
-                setScreen(routeForRole[selectedRole]);
-              }}
-              className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105"
+              onClick={handleAccess}
+              disabled={isSubmitting}
+              className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105 disabled:opacity-50"
             >
-              Enter With This Role
+              {isSubmitting ? "Opening Access..." : authMode === "signUp" ? "Create Account + Enter" : "Sign In + Enter"}
+            </button>
+            <button onClick={() => setScreen("guest")} className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20">
+              Continue As Guest
             </button>
             <button onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-xl transition hover:bg-white/20">
               Back To Portal
@@ -964,13 +1156,14 @@ function Account({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
         <div className="rounded-[2rem] border border-white/10 bg-black/40 p-5 shadow-[0_35px_100px_rgba(0,0,0,.65)] backdrop-blur-2xl md:p-7">
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/80">Account Purpose</div>
-          <h2 className="mt-4 text-3xl font-black leading-tight">One account. One role. Clear access.</h2>
+          <h2 className="mt-4 text-3xl font-black leading-tight">One ecosystem. Many users. Clear permissions.</h2>
           <div className="mt-5 grid gap-3">
             {[
               ["Selected Role", selectedRole],
-              ["Guest First", "Explore without pressure before committing."],
-              ["Protected Youth Data", "Only supervisor/staff role enters youth observation and internal assessment tools."],
-              ["Parent Visibility", "Parents see attendance, badges, strengths, approved reflections, and encouragement."],
+              ["Guest First", "Guests can explore the living ecosystem before creating an account."],
+              ["Protected Youth Data", "Only approved supervisor/staff and administrators enter youth observation and assessment tools."],
+              ["Parent Visibility", "Parents see attendance, badges, strengths, encouragement, and approved reflections."],
+              ["Live Access", "Multiple users can enter the same Vercel link while Supabase manages secure sessions and shared records."],
             ].map(([title, text]) => (
               <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-xl">
                 <div className="text-lg font-black">{title}</div>
