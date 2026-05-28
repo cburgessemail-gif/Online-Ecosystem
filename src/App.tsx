@@ -362,11 +362,183 @@ function supabaseReadyNote() {
   return supabase ? "Supabase Auth is connected for secure role sessions, profiles, permissions, and live ecosystem records." : "Supabase environment keys are not loaded yet, so this screen is using local role sessions until VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are added.";
 }
 
+
+type OperationalTable =
+  | "youth_assignments"
+  | "supervisor_assessments"
+  | "parent_summaries"
+  | "crop_plans"
+  | "marketplace_inventory"
+  | "ecosystem_reports";
+
+type OperationalRecord = {
+  id: string;
+  table: OperationalTable;
+  title: string;
+  status: string;
+  role?: Role;
+  detail: string;
+  created_at: string;
+  updated_at: string;
+};
+
+const OPERATIONAL_KEY = "bff.ecosystem.operationalRecords";
+
+const seedOperationalRecords: OperationalRecord[] = [
+  {
+    id: "assignment-qr-checkin",
+    table: "youth_assignments",
+    title: "QR check-in",
+    status: "ready",
+    role: "Supervisor / Staff",
+    detail: "Supervisors verify arrival, PPE, and daily station assignment before youth begin work.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "assessment-daily-score",
+    table: "supervisor_assessments",
+    title: "Daily mobile scoring",
+    status: "active",
+    role: "Supervisor / Staff",
+    detail: "Attendance, PPE, teamwork, communication, leadership, and reflection are tracked from the field.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "crop-tomato-zone",
+    table: "crop_plans",
+    title: "Tomato grow zone",
+    status: "in progress",
+    role: "Grower",
+    detail: "Irrigation, pest watch, harvest window, and marketplace forecast are linked to youth work assignments.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "marketplace-seedlings",
+    table: "marketplace_inventory",
+    title: "Seedling inventory",
+    status: "forecasted",
+    role: "Marketplace Customer",
+    detail: "Marketplace availability is connected to grow plans, harvest timing, SNAP visibility, and customer access.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "parent-progress-summary",
+    table: "parent_summaries",
+    title: "Parent progress summary",
+    status: "review ready",
+    role: "Parent / Guardian",
+    detail: "Families see attendance, approved reflections, badges, encouragement, and visible signs of growth.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "impact-report",
+    table: "ecosystem_reports",
+    title: "Community impact report",
+    status: "building",
+    role: "Partner",
+    detail: "Youth activity, crop movement, marketplace circulation, and partner support become measurable impact evidence.",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+function getLocalOperationalRecords() {
+  const stored = safeRead<OperationalRecord[]>(OPERATIONAL_KEY, []);
+  if (stored.length) return stored;
+  safeWrite(OPERATIONAL_KEY, seedOperationalRecords);
+  return seedOperationalRecords;
+}
+
+async function loadOperationalRecords(table?: OperationalTable) {
+  if (supabase) {
+    try {
+      const query = table
+        ? supabase.from(table).select("*").order("updated_at", { ascending: false }).limit(25)
+        : supabase.from("ecosystem_activity_view").select("*").order("updated_at", { ascending: false }).limit(25);
+      const { data, error } = await query;
+      if (!error && data && data.length) {
+        return data.map((item: any) => ({
+          id: String(item.id || `${item.title}-${item.updated_at}`),
+          table: (item.table || table || "ecosystem_reports") as OperationalTable,
+          title: item.title || item.name || item.assignment || "Ecosystem record",
+          status: item.status || "active",
+          role: item.role || undefined,
+          detail: item.detail || item.description || item.notes || "Live Supabase record connected to the ecosystem.",
+          created_at: item.created_at || new Date().toISOString(),
+          updated_at: item.updated_at || item.created_at || new Date().toISOString(),
+        })) as OperationalRecord[];
+      }
+    } catch {
+      // Local fallback keeps the ecosystem usable while Supabase tables are being connected.
+    }
+  }
+
+  const records = getLocalOperationalRecords();
+  return table ? records.filter((record) => record.table === table) : records;
+}
+
+async function saveOperationalRecord(record: Omit<OperationalRecord, "id" | "created_at" | "updated_at"> & { id?: string }) {
+  const now = new Date().toISOString();
+  const fullRecord: OperationalRecord = {
+    id: record.id || `${record.table}-${Date.now()}`,
+    table: record.table,
+    title: record.title,
+    status: record.status,
+    role: record.role,
+    detail: record.detail,
+    created_at: now,
+    updated_at: now,
+  };
+
+  if (supabase) {
+    try {
+      await supabase.from(record.table).upsert(fullRecord);
+    } catch {
+      // Keep the field experience moving even if a Supabase table is not ready yet.
+    }
+  }
+
+  const existing = getLocalOperationalRecords().filter((item) => item.id !== fullRecord.id);
+  safeWrite(OPERATIONAL_KEY, [fullRecord, ...existing].slice(0, 50));
+  publishEcosystemUpdate({ type: "operational-record", record: fullRecord });
+  return fullRecord;
+}
+
+function useOperationalRecords(table?: OperationalTable) {
+  const [records, setRecords] = useState<OperationalRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = async () => {
+    setLoading(true);
+    const loaded = await loadOperationalRecords(table);
+    setRecords(loaded);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    refresh();
+    const handler = () => refresh();
+    window.addEventListener("storage", handler);
+    window.addEventListener("bff-ecosystem-update", handler);
+    return () => {
+      window.removeEventListener("storage", handler);
+      window.removeEventListener("bff-ecosystem-update", handler);
+    };
+  }, [table]);
+
+  return { records, loading, refresh };
+}
+
 const image = (file: string) => `/images/${file}`;
 
 const IMG = {
   forest: image("large (18).jpg"),
-  forestAlt: image("large (2).jpg"),
+  forestAlt: image("large (18).jpg"),
   youth1: image("large (16).jpg"),
   youth2: image("large (15).jpg"),
   youth3: image("large (12).jpg"),
@@ -1392,6 +1564,7 @@ function Supervisor({ setScreen }: { setScreen: (screen: Screen) => void }) {
               ]}
             />
           </div>
+          <OperationalSnapshot setScreen={setScreen} table="supervisor_assessments" />
         </div>
       </div>
     </Shell>
@@ -1551,6 +1724,7 @@ function CropPlanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
               </div>
             ))}
           </div>
+          <OperationalSnapshot setScreen={setScreen} table="crop_plans" />
         </div>
       </div>
     </Shell>
@@ -1598,6 +1772,7 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
               ]}
             />
           </div>
+          <OperationalSnapshot setScreen={setScreen} table="marketplace_inventory" />
         </div>
       </div>
     </Shell>
@@ -1682,6 +1857,7 @@ function DataRoom({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ]}
           />
         </div>
+        <OperationalSnapshot setScreen={setScreen} />
       </div>
     </Shell>
   );
@@ -1712,6 +1888,7 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ]}
           />
         </div>
+        <OperationalSnapshot setScreen={setScreen} table="ecosystem_reports" />
       </div>
     </Shell>
   );
@@ -1778,6 +1955,68 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
         />
       </div>
     </Shell>
+  );
+}
+
+
+function OperationalSnapshot({ setScreen, table }: { setScreen: (screen: Screen) => void; table?: OperationalTable }) {
+  const { activeUser } = useLiveEcosystem();
+  const { records, loading, refresh } = useOperationalRecords(table);
+
+  const addFieldRecord = async () => {
+    const role = activeUser?.role || "Guest";
+    const tableName: OperationalTable =
+      role === "Supervisor / Staff" || role === "Administrator"
+        ? "supervisor_assessments"
+        : role === "Grower"
+          ? "crop_plans"
+          : role === "Marketplace Customer"
+            ? "marketplace_inventory"
+            : "ecosystem_reports";
+
+    await saveOperationalRecord({
+      table: table || tableName,
+      title: `${role} field update`,
+      status: "recorded",
+      role,
+      detail: "A live ecosystem action was recorded from the role pathway and is ready for operations, reporting, or family/partner visibility.",
+    });
+    recordEcosystemActivity(activeUser, "recorded an operational ecosystem update");
+    await refresh();
+  };
+
+  return (
+    <div className="mt-5 rounded-[2rem] border border-emerald-200/15 bg-black/35 p-5 backdrop-blur-2xl">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/70">Operational Platform Layer</div>
+          <h3 className="mt-2 text-2xl font-black">Live records, protected roles, and shared ecosystem movement.</h3>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/78">
+            These records can run locally for testing and connect to Supabase tables when the production database is ready. The visible ecosystem stays the same while the operational layer stores assignments, assessments, crop plans, inventory, parent summaries, and reports.
+          </p>
+        </div>
+        <button onClick={addFieldRecord} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black shadow-xl transition hover:scale-105">
+          Record Live Update
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {loading ? (
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">Loading ecosystem records...</div>
+        ) : records.length ? (
+          records.slice(0, 6).map((record) => (
+            <button key={record.id} onClick={() => setScreen("reports")} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black">
+              <div className="text-[10px] uppercase tracking-[0.22em] opacity-75">{record.table.replaceAll("_", " ")}</div>
+              <div className="mt-2 text-lg font-black">{record.title}</div>
+              <div className="mt-1 text-xs font-bold opacity-80">{record.status}</div>
+              <div className="mt-2 text-sm leading-5 opacity-85">{record.detail}</div>
+            </button>
+          ))
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">No operational records yet.</div>
+        )}
+      </div>
+    </div>
   );
 }
 
