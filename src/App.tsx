@@ -16,6 +16,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Includes weather/live channels, crop planner, grow plan, assessments, proverbs, data, reports, and parent summaries.
  * - User-facing guest journey no longer displays developer rationale panels.
  * - Guest learning happens through movement, choice, imagery, and role pathways.
+ * - Build-safe image fallback repaired after Vercel syntax failure.
  */
 
 type Screen =
@@ -370,7 +371,7 @@ const IMG = {
   // Forest-entry images are used first so guests feel arrival before explanation.
   forest: image("SAM_0384.JPG"),
   forestAlt: image("SAM_0391.JPG"),
-  forestBackup: image("large (2).jpg"),
+  forestBackup: image("GrowArea2.jpg"),
   youth1: image("large (16).jpg"),
   youth2: image("large (15).jpg"),
   youth3: image("large (12).jpg"),
@@ -713,9 +714,7 @@ function Shell({
           className="h-full w-full scale-[1.02] object-cover"
           onError={(event) => {
             const target = event.currentTarget;
-            if (!target.src.includes("large%20(2)") && !target.src.includes("large (2)")) target.src = IMG.forestBackup || IMG.growArea;
-            else if (!target.src.includes("large%20(2)") && !target.src.includes("large (2)")) target.src = IMG.forestBackup || IMG.growArea;
-          else if (!target.src.includes("GrowArea2")) target.src = IMG.growArea;
+            target.src = IMG.forestBackup || IMG.growArea;
           }}
         />
       </div>
