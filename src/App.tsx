@@ -546,24 +546,24 @@ export default function App() {
         button, select, textarea { font-family: inherit; }
         button { cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030603; }
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(circle at top, rgba(70,125,58,.46), rgba(2,6,3,.96) 76%); }
-        .forest-bg::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0,0,0,.62), rgba(41,89,45,.22), rgba(0,0,0,.68)); }
-        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(218,239,141,.28), rgba(86,148,65,.30) 30%, rgba(9,28,14,.78) 66%, #020402 100%); }
-        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 220px 100%; opacity: .44; filter: blur(1px); }
-        .trunks-back { background-image: linear-gradient(90deg, transparent 0 34px, rgba(8,17,10,.62) 34px 45px, transparent 45px 112px, rgba(10,22,12,.50) 112px 128px, transparent 128px 220px); transform: scale(1.08); }
-        .trunks-front { background-image: linear-gradient(90deg, transparent 0 60px, rgba(3,8,4,.78) 60px 76px, transparent 76px 156px, rgba(5,12,6,.72) 156px 170px, transparent 170px 220px); opacity: .38; }
-        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(28px); mix-blend-mode: screen; }
-        .leaves-left { width: 48vw; height: 60vh; left: -16vw; top: -8vh; background: radial-gradient(circle, rgba(103,173,70,.52), rgba(52,111,45,.25) 48%, transparent 72%); }
-        .leaves-right { width: 52vw; height: 64vh; right: -18vw; top: -4vh; background: radial-gradient(circle, rgba(130,191,82,.46), rgba(43,97,43,.23) 50%, transparent 74%); }
-        .leaves-top { width: 76vw; height: 32vh; left: 12vw; top: -14vh; background: radial-gradient(ellipse, rgba(148,206,86,.44), rgba(64,119,48,.22) 45%, transparent 74%); }
-        .forest-pathway { position: absolute; left: 34%; bottom: -18%; width: 32%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(98,76,43,.30), rgba(65,86,43,.15) 45%, transparent 72%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(9px); opacity: .58; }
-        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(139,202,88,.16), rgba(0,0,0,.26) 43%, rgba(0,0,0,.70) 100%), linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.48)); }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: linear-gradient(180deg, #d7ef9f 0%, #7fbf68 28%, #285e36 68%, #071307 100%); }
+        .forest-bg::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 10%, rgba(255,241,160,.50), rgba(159,218,105,.30) 25%, transparent 48%), linear-gradient(110deg, rgba(255,255,255,.10), rgba(49,109,48,.16), rgba(0,0,0,.22)); }
+        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 46% 18%, rgba(255,246,174,.42), rgba(179,226,107,.32) 28%, rgba(71,137,61,.30) 54%, transparent 74%); }
+        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 260px 100%; opacity: .18; filter: blur(1.5px); }
+        .trunks-back { background-image: linear-gradient(90deg, transparent 0 44px, rgba(48,72,38,.34) 44px 56px, transparent 56px 132px, rgba(42,67,36,.28) 132px 146px, transparent 146px 260px); transform: scale(1.08); }
+        .trunks-front { background-image: linear-gradient(90deg, transparent 0 78px, rgba(26,46,27,.38) 78px 94px, transparent 94px 186px, rgba(31,55,30,.32) 186px 202px, transparent 202px 260px); opacity: .20; }
+        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(36px); mix-blend-mode: screen; }
+        .leaves-left { width: 50vw; height: 62vh; left: -14vw; top: -8vh; background: radial-gradient(circle, rgba(151,215,84,.62), rgba(77,153,61,.32) 48%, transparent 74%); }
+        .leaves-right { width: 54vw; height: 64vh; right: -16vw; top: -5vh; background: radial-gradient(circle, rgba(180,226,103,.56), rgba(81,159,65,.28) 50%, transparent 76%); }
+        .leaves-top { width: 82vw; height: 34vh; left: 9vw; top: -12vh; background: radial-gradient(ellipse, rgba(233,239,137,.50), rgba(128,196,78,.25) 46%, transparent 76%); }
+        .forest-pathway { position: absolute; left: 32%; bottom: -14%; width: 36%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(202,172,96,.30), rgba(122,144,72,.17) 45%, transparent 72%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); filter: blur(12px); opacity: .62; }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(240,230,145,.14), rgba(33,87,43,.18) 40%, rgba(0,0,0,.38) 100%), linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.34)); }
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-        .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(5,8,6,.36); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 30px 100px rgba(0,0,0,.45); text-align: center; }
+        .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(12,28,13,.42); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.18); box-shadow: 0 30px 90px rgba(0,0,0,.34), 0 0 60px rgba(168,220,92,.10); text-align: center; }
         .portal-kicker, .eyebrow { color: #c0e67d; font-size: 12px; letter-spacing: .38em; font-weight: 900; margin-bottom: 18px; text-transform: uppercase; }
-        .portal h1 { margin: 0; font-size: clamp(54px, 7vw, 92px); line-height: .92; font-weight: 950; letter-spacing: -3px; text-shadow: 0 4px 22px rgba(0,0,0,.68); }
-        .portal p { margin: 26px auto 0; max-width: 640px; color: rgba(255,255,255,.88); font-size: clamp(17px, 1.35vw, 22px); line-height: 1.5; }
+        .portal h1 { margin: 0; font-size: clamp(54px, 7vw, 92px); line-height: .92; font-weight: 950; letter-spacing: -3px; text-shadow: 0 4px 18px rgba(0,0,0,.46); }
+        .portal p { margin: 26px auto 0; max-width: 640px; color: rgba(255,255,255,.92); font-size: clamp(17px, 1.35vw, 22px); line-height: 1.5; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
         .portal-actions { display: flex; justify-content: center; margin-top: 34px; }
         .primary-button, .secondary-button { border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 15px 24px; color: white; font-weight: 950; font-size: 16px; background: rgba(255,255,255,.10); }
         .primary-button { border: none; background: linear-gradient(135deg, #8fc642, #5b9727); box-shadow: 0 16px 36px rgba(91,151,39,.38); }
