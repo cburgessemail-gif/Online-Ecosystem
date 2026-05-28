@@ -243,15 +243,31 @@ function SmartImage({ src, alt, contain = false }: { src: string; alt: string; c
 }
 
 function BackgroundAtmosphere() {
+  const candidates = useMemo(
+    () => [
+      "/images/SAM_0391.JPG",
+      "/SAM_0391.JPG",
+      "/images/SAM_0393.JPG",
+      "/SAM_0393.JPG",
+      "/images/SAM_0396.JPG",
+      "/SAM_0396.JPG",
+    ],
+    []
+  );
+  const [index, setIndex] = useState(0);
+
   return (
     <div className="forest-bg" aria-hidden="true">
-      <div className="forest-sky" />
-      <div className="forest-trunks trunks-back" />
-      <div className="forest-trunks trunks-front" />
-      <div className="forest-leaves leaves-left" />
-      <div className="forest-leaves leaves-right" />
-      <div className="forest-leaves leaves-top" />
-      <div className="forest-pathway" />
+      <img
+        src={candidates[index]}
+        alt="Soft spring and summer forest entrance"
+        className="forest-bg-photo"
+        loading="eager"
+        decoding="async"
+        onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
+      />
+      <div className="forest-sun" />
+      <div className="forest-haze" />
       <div className="forest-overlay" />
     </div>
   );
@@ -588,21 +604,14 @@ export default function App() {
         button, select, textarea { font-family: inherit; }
         button { cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030603; }
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: linear-gradient(180deg, #cfeaa2 0%, #7ebb67 30%, #315f38 68%, #071307 100%); }
-        .forest-bg::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 48% 12%, rgba(255,244,166,.55), rgba(172,222,111,.28) 23%, transparent 48%), radial-gradient(circle at 22% 30%, rgba(140,205,92,.22), transparent 36%), radial-gradient(circle at 78% 32%, rgba(124,190,86,.18), transparent 38%); }
-        .forest-sky { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.10), transparent 24%, rgba(0,0,0,.14) 100%); }
-        .forest-trunks { position: absolute; inset: -6% -3%; opacity: .20; filter: blur(2px); }
-        .trunks-back { background: radial-gradient(ellipse at 20% 36%, rgba(38,75,39,.32), transparent 18%), radial-gradient(ellipse at 46% 34%, rgba(26,57,31,.36), transparent 16%), radial-gradient(ellipse at 70% 36%, rgba(35,70,37,.30), transparent 18%), radial-gradient(ellipse at 88% 42%, rgba(27,56,31,.24), transparent 16%); }
-        .trunks-front { background: radial-gradient(ellipse at 14% 55%, rgba(8,24,12,.36), transparent 14%), radial-gradient(ellipse at 35% 60%, rgba(7,21,11,.30), transparent 12%), radial-gradient(ellipse at 62% 57%, rgba(7,21,11,.28), transparent 13%), radial-gradient(ellipse at 84% 58%, rgba(8,22,11,.32), transparent 12%); opacity: .28; }
-        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(42px); mix-blend-mode: screen; }
-        .leaves-left { width: 52vw; height: 66vh; left: -16vw; top: -10vh; background: radial-gradient(circle, rgba(168,220,92,.56), rgba(84,156,68,.28) 48%, transparent 76%); }
-        .leaves-right { width: 56vw; height: 68vh; right: -18vw; top: -8vh; background: radial-gradient(circle, rgba(189,229,115,.48), rgba(92,164,72,.24) 50%, transparent 78%); }
-        .leaves-top { width: 86vw; height: 36vh; left: 7vw; top: -13vh; background: radial-gradient(ellipse, rgba(245,240,151,.46), rgba(148,205,87,.22) 48%, transparent 78%); }
-        .forest-pathway { position: absolute; left: 32%; bottom: -12%; width: 36%; height: 76%; background: radial-gradient(ellipse at bottom, rgba(215,182,112,.28), rgba(125,151,83,.18) 40%, rgba(52,98,48,.10) 62%, transparent 78%); clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); filter: blur(16px); opacity: .58; }
-        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(247,235,150,.16), rgba(44,103,50,.14) 42%, rgba(0,0,0,.46) 100%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.30)); }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #071307; }
+        .forest-bg-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; transform: scale(1.04); filter: blur(5px) brightness(.86) saturate(1.18) contrast(1.02); opacity: .96; }
+        .forest-sun { position: absolute; inset: 0; background: radial-gradient(circle at 48% 18%, rgba(255,239,160,.28), rgba(152,210,91,.14) 20%, transparent 45%); mix-blend-mode: screen; }
+        .forest-haze { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.05), transparent 26%, rgba(0,0,0,.22) 100%); backdrop-filter: blur(1px); }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(255,240,170,.08), rgba(25,74,36,.16) 42%, rgba(0,0,0,.54) 100%), linear-gradient(90deg, rgba(0,0,0,.46), rgba(0,0,0,.18), rgba(0,0,0,.50)); }
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-        .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(12,28,13,.42); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.18); box-shadow: 0 30px 90px rgba(0,0,0,.34), 0 0 60px rgba(168,220,92,.10); text-align: center; }
+        .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(9,18,10,.48); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.16); box-shadow: 0 30px 90px rgba(0,0,0,.40), 0 0 50px rgba(168,
         .portal-kicker, .eyebrow { color: #c0e67d; font-size: 12px; letter-spacing: .38em; font-weight: 900; margin-bottom: 18px; text-transform: uppercase; }
         .portal h1 { margin: 0; font-size: clamp(54px, 7vw, 92px); line-height: .92; font-weight: 950; letter-spacing: -3px; text-shadow: 0 4px 18px rgba(0,0,0,.46); }
         .portal p { margin: 26px auto 0; max-width: 640px; color: rgba(255,255,255,.92); font-size: clamp(17px, 1.35vw, 22px); line-height: 1.5; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
