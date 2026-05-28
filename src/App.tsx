@@ -26,9 +26,30 @@ type TourStep = {
   visual?: "forest" | "operations";
 };
 
-type JourneyStep = {
-  title: string;
-  text: string;
+type JourneyStep = { title: string; text: string };
+
+type YouthRecord = {
+  name: string;
+  team: string;
+  attendance: string;
+  skill: string;
+  supervisor: string;
+  note: string;
+};
+
+type CropRecord = {
+  crop: string;
+  stage: string;
+  location: string;
+  nextTask: string;
+  marketStatus: string;
+};
+
+type MarketItem = {
+  item: string;
+  source: string;
+  status: string;
+  channel: string;
 };
 
 const navItems: { key: TabKey; label: string }[] = [
@@ -177,6 +198,27 @@ const journeys: Record<string, JourneyStep[]> = {
   ],
 };
 
+const youthRecords: YouthRecord[] = [
+  { name: "Team A", team: "Grow Zone", attendance: "92%", skill: "Safety + teamwork", supervisor: "Assigned", note: "Ready for daily task review" },
+  { name: "Team B", team: "Marketplace Prep", attendance: "88%", skill: "Communication", supervisor: "Assigned", note: "Needs hydration reminder" },
+  { name: "Team C", team: "Crop Support", attendance: "95%", skill: "Responsibility", supervisor: "Assigned", note: "Strong participation" },
+  { name: "Team D", team: "Site Stewardship", attendance: "90%", skill: "Leadership", supervisor: "Assigned", note: "Good peer support" },
+];
+
+const crops: CropRecord[] = [
+  { crop: "Tomatoes", stage: "Approaching harvest", location: "Grow Zone 1", nextTask: "Stake, water, inspect", marketStatus: "Prepare listing" },
+  { crop: "Collards", stage: "Growing", location: "Grow Zone 2", nextTask: "Weed + water", marketStatus: "Future bundle" },
+  { crop: "Peppers", stage: "Vegetative", location: "Grow Zone 3", nextTask: "Monitor heat", marketStatus: "Not ready" },
+  { crop: "Bubble Babies", stage: "Seedling start", location: "Prep station", nextTask: "Label + sort", marketStatus: "Ready soon" },
+];
+
+const marketItems: MarketItem[] = [
+  { item: "Seedlings", source: "Bronson Family Farm", status: "Pre-order ready", channel: "GrownBy / QR" },
+  { item: "Produce bundles", source: "Grow zones", status: "Harvest forecast", channel: "Marketplace" },
+  { item: "Grower supplies", source: "Partners", status: "Demo ready", channel: "Event table" },
+  { item: "Community giveaway", source: "Seed donations", status: "While supplies last", channel: "Event QR" },
+];
+
 const roleCards = [
   { key: "guest" as TabKey, label: "Guest", text: "Experience the story, purpose, history, and entry into the ecosystem." },
   { key: "youth" as TabKey, label: "Youth", text: "Build skills, confidence, responsibility, and future readiness." },
@@ -190,38 +232,28 @@ function buildImageCandidates(src: string) {
   const clean = src.replace(/^\//, "");
   const file = clean.split("/").pop() || clean;
   const encoded = encodeURIComponent(file);
-
-  return Array.from(
-    new Set([
-      src,
-      `/${clean}`,
-      `/images/${file}`,
-      `/${file}`,
-      `/images/${encoded}`,
-      `/${encoded}`,
-      "/images/ConnectFoodEcosystem_withimages.png",
-      "/ConnectFoodEcosystem_withimages.png",
-      "/images/GrowArea2.jpg",
-      "/GrowArea2.jpg",
-    ])
-  );
+  return Array.from(new Set([src, `/${clean}`, `/images/${file}`, `/${file}`, `/images/${encoded}`, `/${encoded}`, "/images/ConnectFoodEcosystem_withimages.png", "/ConnectFoodEcosystem_withimages.png", "/images/GrowArea2.jpg", "/GrowArea2.jpg"]));
 }
 
 function SmartImage({ src, alt, contain = false }: { src: string; alt: string; contain?: boolean }) {
   const candidates = useMemo(() => buildImageCandidates(src), [src]);
   const [index, setIndex] = useState(0);
-
   useEffect(() => setIndex(0), [src]);
+  return <img src={candidates[index]} alt={alt} loading="eager" decoding="async" onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))} className={contain ? "smart-image contain" : "smart-image"} />;
+}
 
+function BackgroundAtmosphere() {
   return (
-    <img
-      src={candidates[index]}
-      alt={alt}
-      loading="eager"
-      decoding="async"
-      onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
-      className={contain ? "smart-image contain" : "smart-image"}
-    />
+    <div className="forest-bg" aria-hidden="true">
+      <div className="forest-sky" />
+      <div className="forest-trunks trunks-back" />
+      <div className="forest-trunks trunks-front" />
+      <div className="forest-leaves leaves-left" />
+      <div className="forest-leaves leaves-right" />
+      <div className="forest-leaves leaves-top" />
+      <div className="forest-pathway" />
+      <div className="forest-overlay" />
+    </div>
   );
 }
 
@@ -237,21 +269,6 @@ function ForestThresholdVisual() {
         <span>Quiet forest threshold</span>
         <strong>The farm has not been revealed yet.</strong>
       </div>
-    </div>
-  );
-}
-
-function BackgroundAtmosphere() {
-  return (
-    <div className="forest-bg" aria-hidden="true">
-      <div className="forest-sky" />
-      <div className="forest-trunks trunks-back" />
-      <div className="forest-trunks trunks-front" />
-      <div className="forest-leaves leaves-left" />
-      <div className="forest-leaves leaves-right" />
-      <div className="forest-leaves leaves-top" />
-      <div className="forest-pathway" />
-      <div className="forest-overlay" />
     </div>
   );
 }
@@ -274,9 +291,35 @@ function OperationsVisual() {
   );
 }
 
+function StatCard({ label, value, note }: { label: string; value: string; note: string }) {
+  return (
+    <div className="stat-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{note}</p>
+    </div>
+  );
+}
+
+function DataTable({ columns, rows }: { columns: string[]; rows: string[][] }) {
+  return (
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>{columns.map((col) => <th key={col}>{col}</th>)}</tr>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index}>{row.map((cell, cellIndex) => <td key={`${index}-${cellIndex}`}>{cell}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function JourneyPanel({ type }: { type: string }) {
   const steps = journeys[type] || journeys.guest;
-
   return (
     <div className="journey-grid">
       {steps.map((step, index) => (
@@ -290,37 +333,167 @@ function JourneyPanel({ type }: { type: string }) {
   );
 }
 
+function OperationalPanel({ tab, openTab }: { tab: TabKey; openTab: (key: TabKey) => void }) {
+  if (tab === "youth") {
+    return (
+      <div className="ops-stack">
+        <div className="stats-row">
+          <StatCard label="Youth Capacity" value="50" note="Initial summer cohort" />
+          <StatCard label="Supervisor Ratio" value="1:15" note="Approved staff access only" />
+          <StatCard label="Program Window" value="8 Weeks" note="Outdoor workforce pathway" />
+          <StatCard label="Daily Flow" value="8 AM–2 PM" note="Check-in, work, reflection" />
+        </div>
+        <DataTable columns={["Team", "Assignment", "Attendance", "Skill Focus", "Supervisor", "Today Note"]} rows={youthRecords.map((r) => [r.name, r.team, r.attendance, r.skill, r.supervisor, r.note])} />
+      </div>
+    );
+  }
+
+  if (tab === "supervisor") {
+    return (
+      <div className="ops-stack">
+        <div className="control-list">
+          <div className="control-item">Mobile attendance capture</div>
+          <div className="control-item">Daily youth observation notes</div>
+          <div className="control-item">Skill rubric and LSP-style progress tracking</div>
+          <div className="control-item">Safety, behavior, and escalation flags</div>
+          <div className="control-item">Parent update summary support</div>
+          <div className="control-item">Reports exported for leadership and funders</div>
+        </div>
+        <div className="mock-phone">
+          <div className="phone-top">Supervisor Mobile Check-In</div>
+          <label>Team</label><select><option>Team A · Grow Zone</option><option>Team B · Marketplace Prep</option></select>
+          <label>Attendance</label><select><option>Present</option><option>Late</option><option>Absent</option></select>
+          <label>Skill Observation</label><textarea defaultValue="Youth followed PPE expectations and completed assigned task with peer support." />
+          <button className="primary-button">Save Supervisor Note</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (tab === "crop") {
+    return <DataTable columns={["Crop", "Stage", "Location", "Next Task", "Market Status"]} rows={crops.map((c) => [c.crop, c.stage, c.location, c.nextTask, c.marketStatus])} />;
+  }
+
+  if (tab === "marketplace") {
+    return <DataTable columns={["Item", "Source", "Status", "Channel"]} rows={marketItems.map((m) => [m.item, m.source, m.status, m.channel])} />;
+  }
+
+  if (tab === "operations") {
+    return (
+      <div className="ops-stack">
+        <div className="stats-row">
+          <StatCard label="Active Teams" value="4" note="Youth workforce groups" />
+          <StatCard label="Weather" value="Live Layer" note="Outdoor task awareness" />
+          <StatCard label="Reports" value="Ready" note="Attendance, skills, notes" />
+          <StatCard label="Access" value="Role-Based" note="Staff and supervisor permissions" />
+        </div>
+        <div className="tour-layout">
+          <JourneyPanel type="operations" />
+          <OperationsVisual />
+        </div>
+      </div>
+    );
+  }
+
+  if (tab === "reports") {
+    return (
+      <div className="ops-stack">
+        <div className="stats-row">
+          <StatCard label="Attendance" value="91%" note="Sample current cohort average" />
+          <StatCard label="Skill Growth" value="4 Areas" note="Safety, teamwork, responsibility, communication" />
+          <StatCard label="Marketplace" value="Connected" note="Crop readiness flows into inventory" />
+          <StatCard label="Partner Report" value="Draft Ready" note="Narrative + data summary" />
+        </div>
+        <div className="report-box">
+          <h3>Executive Summary Snapshot</h3>
+          <p>Bronson Family Farm is tracking participation, supervisor observations, crop readiness, marketplace movement, parent connection, and partner impact through one ecosystem reporting layer.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (tab === "parent") {
+    return (
+      <div className="ops-stack">
+        <div className="control-list">
+          <div className="control-item">Youth attendance update</div>
+          <div className="control-item">Supervisor encouragement note</div>
+          <div className="control-item">Safety reminders and PPE expectations</div>
+          <div className="control-item">Weekly progress summary</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (tab === "grower") {
+    return (
+      <div className="ops-stack">
+        <div className="control-list">
+          <div className="control-item">Grower supply needs</div>
+          <div className="control-item">Crop planning support</div>
+          <div className="control-item">Marketplace readiness</div>
+          <div className="control-item">Education and demonstration requests</div>
+        </div>
+        <button className="primary-button" onClick={() => openTab("crop")}>Open Crop Planner</button>
+      </div>
+    );
+  }
+
+  if (tab === "partners") {
+    return (
+      <div className="ops-stack">
+        <div className="control-list">
+          <div className="control-item">Supplies and demonstrations</div>
+          <div className="control-item">Youth workforce support</div>
+          <div className="control-item">Health and nutrition education</div>
+          <div className="control-item">Funding and infrastructure alignment</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (tab === "roles") {
+    return (
+      <div className="role-grid">
+        {roleCards.map((role) => (
+          <article className="role-card" key={role.key}>
+            <h3>{role.label}</h3>
+            <p>{role.text}</p>
+            <div style={{ height: 18 }} />
+            <button className="primary-button" onClick={() => openTab(role.key)}>Open Journey</button>
+          </article>
+        ))}
+      </div>
+    );
+  }
+
+  return <JourneyPanel type={tab} />;
+}
+
 export default function App() {
   const [tab, setTab] = useState<TabKey>("portal");
   const [tourOpen, setTourOpen] = useState(false);
   const [tourRunning, setTourRunning] = useState(false);
   const [tourIndex, setTourIndex] = useState(0);
-
   const step = tourSteps[tourIndex];
   const progress = useMemo(() => ((tourIndex + 1) / tourSteps.length) * 100, [tourIndex]);
 
   const speak = (text: string) => {
     if (!("speechSynthesis" in window)) return;
-
     window.speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.82;
     utterance.pitch = 1.02;
     utterance.volume = 1;
-
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find((voice) => voice.name.toLowerCase().includes("google")) || voices[0];
     if (preferred) utterance.voice = preferred;
-
     window.speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
     if (!tourOpen || !tourRunning) return;
-
     speak(step.narration);
-
     const timer = window.setTimeout(() => {
       setTourIndex((prev) => {
         if (prev >= tourSteps.length - 1) {
@@ -330,7 +503,6 @@ export default function App() {
         return prev + 1;
       });
     }, 26000);
-
     return () => window.clearTimeout(timer);
   }, [tourOpen, tourRunning, tourIndex]);
 
@@ -371,21 +543,21 @@ export default function App() {
       <style>{`
         * { box-sizing: border-box; }
         html, body, #root { margin: 0; min-height: 100%; background: #030603; color: white; font-family: Inter, Arial, Helvetica, sans-serif; }
-        button { font-family: inherit; cursor: pointer; }
+        button, select, textarea { font-family: inherit; }
+        button { cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030603; }
-
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #071006; }
-        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(196,225,126,.22), rgba(61,117,49,.22) 28%, rgba(9,28,14,.88) 66%, #020402 100%); }
-        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 180px 100%; opacity: .62; filter: blur(.6px); }
-        .trunks-back { background-image: linear-gradient(90deg, transparent 0 18px, rgba(8,17,10,.78) 18px 29px, transparent 29px 82px, rgba(10,22,12,.62) 82px 96px, transparent 96px 180px); transform: scale(1.08); opacity: .38; }
-        .trunks-front { background-image: linear-gradient(90deg, transparent 0 44px, rgba(3,8,4,.92) 44px 62px, transparent 62px 130px, rgba(5,12,6,.86) 130px 146px, transparent 146px 180px); opacity: .50; }
-        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(24px); mix-blend-mode: screen; }
-        .leaves-left { width: 48vw; height: 60vh; left: -16vw; top: -8vh; background: radial-gradient(circle, rgba(94,156,65,.44), rgba(41,92,40,.22) 48%, transparent 72%); }
-        .leaves-right { width: 52vw; height: 64vh; right: -18vw; top: -4vh; background: radial-gradient(circle, rgba(117,174,76,.38), rgba(35,84,38,.20) 50%, transparent 74%); }
-        .leaves-top { width: 76vw; height: 32vh; left: 12vw; top: -14vh; background: radial-gradient(ellipse, rgba(126,184,76,.34), rgba(52,102,43,.18) 45%, transparent 74%); }
-        .forest-pathway { position: absolute; left: 34%; bottom: -18%; width: 32%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(77,61,39,.30), rgba(53,69,39,.13) 45%, transparent 72%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(8px); opacity: .72; }
-        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(127,188,82,.12), rgba(0,0,0,.28) 43%, rgba(0,0,0,.78) 100%), linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.58)); }
-
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(circle at top, rgba(70,125,58,.46), rgba(2,6,3,.96) 76%); }
+        .forest-bg::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0,0,0,.62), rgba(41,89,45,.22), rgba(0,0,0,.68)); }
+        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(218,239,141,.28), rgba(86,148,65,.30) 30%, rgba(9,28,14,.78) 66%, #020402 100%); }
+        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 220px 100%; opacity: .44; filter: blur(1px); }
+        .trunks-back { background-image: linear-gradient(90deg, transparent 0 34px, rgba(8,17,10,.62) 34px 45px, transparent 45px 112px, rgba(10,22,12,.50) 112px 128px, transparent 128px 220px); transform: scale(1.08); }
+        .trunks-front { background-image: linear-gradient(90deg, transparent 0 60px, rgba(3,8,4,.78) 60px 76px, transparent 76px 156px, rgba(5,12,6,.72) 156px 170px, transparent 170px 220px); opacity: .38; }
+        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(28px); mix-blend-mode: screen; }
+        .leaves-left { width: 48vw; height: 60vh; left: -16vw; top: -8vh; background: radial-gradient(circle, rgba(103,173,70,.52), rgba(52,111,45,.25) 48%, transparent 72%); }
+        .leaves-right { width: 52vw; height: 64vh; right: -18vw; top: -4vh; background: radial-gradient(circle, rgba(130,191,82,.46), rgba(43,97,43,.23) 50%, transparent 74%); }
+        .leaves-top { width: 76vw; height: 32vh; left: 12vw; top: -14vh; background: radial-gradient(ellipse, rgba(148,206,86,.44), rgba(64,119,48,.22) 45%, transparent 74%); }
+        .forest-pathway { position: absolute; left: 34%; bottom: -18%; width: 32%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(98,76,43,.30), rgba(65,86,43,.15) 45%, transparent 72%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(9px); opacity: .58; }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(139,202,88,.16), rgba(0,0,0,.26) 43%, rgba(0,0,0,.70) 100%), linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.48)); }
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(5,8,6,.36); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 30px 100px rgba(0,0,0,.45); text-align: center; }
@@ -397,14 +569,12 @@ export default function App() {
         .primary-button { border: none; background: linear-gradient(135deg, #8fc642, #5b9727); box-shadow: 0 16px 36px rgba(91,151,39,.38); }
         .portal-tags { margin-top: 24px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
         .portal-tag { padding: 10px 16px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); font-size: 13px; font-weight: 700; color: rgba(255,255,255,.68); pointer-events: none; }
-
         .topbar { position: sticky; top: 12px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 18px; padding: 14px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 28px; background: rgba(16,22,17,.82); backdrop-filter: blur(22px); }
         .brand-kicker { color: #c0e67d; font-size: 12px; letter-spacing: .30em; font-weight: 950; }
         .brand-title { font-size: 20px; line-height: 1.1; font-weight: 950; margin-top: 4px; }
         .nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; flex: 1; }
         .nav button { border: 1px solid rgba(255,255,255,.16); color: white; border-radius: 999px; background: rgba(255,255,255,.11); padding: 12px 16px; font-size: 14px; font-weight: 900; }
         .nav button.active { background: linear-gradient(135deg, #53e28e, #27c875); color: #031005; }
-
         .tour-panel, .section { margin-top: 24px; border: 1px solid rgba(255,255,255,.12); background: rgba(7,10,8,.74); backdrop-filter: blur(18px); border-radius: 34px; padding: 28px; box-shadow: 0 25px 70px rgba(0,0,0,.34); }
         .tour-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 26px; align-items: stretch; }
         .tour-copy { display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
@@ -421,36 +591,47 @@ export default function App() {
         .tour-image { border-radius: 30px; overflow: hidden; min-height: 520px; background: rgba(0,0,0,.34); }
         .smart-image { width: 100%; height: 100%; min-height: 520px; object-fit: cover; object-position: center; display: block; }
         .smart-image.contain { object-fit: contain; background: rgba(0,0,0,.65); padding: 12px; }
-
-        .forest-threshold-visual { position: relative; min-height: 520px; height: 100%; overflow: hidden; background: linear-gradient(180deg, #142814, #050905 72%); }
-        .forest-threshold-visual::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top center, rgba(143,198,66,.28), transparent 38%), linear-gradient(90deg, rgba(0,0,0,.72), transparent 40%, rgba(0,0,0,.72)); }
+        .forest-threshold-visual { position: relative; min-height: 520px; height: 100%; overflow: hidden; background: linear-gradient(180deg, #213d20, #071107 72%); }
+        .forest-threshold-visual::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top center, rgba(174,218,91,.36), transparent 38%), linear-gradient(90deg, rgba(0,0,0,.62), transparent 40%, rgba(0,0,0,.62)); }
         .forest-canopy { position: absolute; border-radius: 999px; filter: blur(28px); opacity: .78; }
-        .canopy-one { width: 60%; height: 58%; left: -18%; top: -5%; background: rgba(49,102,47,.55); }
-        .canopy-two { width: 62%; height: 60%; right: -20%; top: -3%; background: rgba(61,116,54,.52); }
-        .canopy-three { width: 80%; height: 45%; left: 10%; bottom: -12%; background: rgba(19,52,25,.68); }
-        .forest-path { position: absolute; width: 46%; height: 100%; left: 27%; bottom: -18%; background: radial-gradient(ellipse at bottom, rgba(128,101,67,.34), rgba(51,69,37,.12) 45%, transparent 70%); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); opacity: .65; }
-        .forest-light { position: absolute; width: 24%; height: 92%; left: 38%; top: 0; background: linear-gradient(180deg, rgba(201,239,139,.20), rgba(108,170,78,.06), transparent); filter: blur(18px); opacity: .8; }
-        .forest-caption { position: absolute; left: 28px; right: 28px; bottom: 28px; padding: 18px; border-radius: 22px; background: rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(10px); }
+        .canopy-one { width: 60%; height: 58%; left: -18%; top: -5%; background: rgba(67,130,55,.60); }
+        .canopy-two { width: 62%; height: 60%; right: -20%; top: -3%; background: rgba(82,147,62,.56); }
+        .canopy-three { width: 80%; height: 45%; left: 10%; bottom: -12%; background: rgba(22,62,27,.62); }
+        .forest-path { position: absolute; width: 46%; height: 100%; left: 27%; bottom: -18%; background: radial-gradient(ellipse at bottom, rgba(142,115,70,.30), rgba(72,92,48,.14) 45%, transparent 70%); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); opacity: .65; }
+        .forest-light { position: absolute; width: 24%; height: 92%; left: 38%; top: 0; background: linear-gradient(180deg, rgba(218,243,154,.25), rgba(128,190,91,.08), transparent); filter: blur(18px); opacity: .9; }
+        .forest-caption { position: absolute; left: 28px; right: 28px; bottom: 28px; padding: 18px; border-radius: 22px; background: rgba(0,0,0,.38); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(10px); }
         .forest-caption span { display: block; color: #c0e67d; font-size: 12px; text-transform: uppercase; letter-spacing: .24em; font-weight: 900; margin-bottom: 8px; }
         .forest-caption strong { display: block; font-size: 24px; line-height: 1.1; }
-
-        .journey-grid, .role-grid { display: grid; gap: 18px; }
+        .journey-grid, .role-grid, .stats-row, .control-list { display: grid; gap: 18px; }
         .journey-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .role-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .journey-card, .role-card { border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.07); border-radius: 28px; padding: 22px; }
+        .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .control-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .journey-card, .role-card, .stat-card, .control-item, .report-box { border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.07); border-radius: 28px; padding: 22px; }
         .journey-number { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: rgba(125,181,64,.28); border: 1px solid rgba(188,242,124,.34); color: #d5ff9f; font-weight: 950; margin-bottom: 14px; }
-        .journey-card h3, .role-card h3 { margin: 0 0 10px; font-size: 24px; line-height: 1.12; }
-        .journey-card p, .role-card p { margin: 0; color: rgba(255,255,255,.76); line-height: 1.4; }
-
+        .journey-card h3, .role-card h3, .report-box h3 { margin: 0 0 10px; font-size: 24px; line-height: 1.12; }
+        .journey-card p, .role-card p, .report-box p { margin: 0; color: rgba(255,255,255,.76); line-height: 1.4; }
+        .stat-card span { color: #c0e67d; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; font-weight: 900; }
+        .stat-card strong { display: block; font-size: 34px; margin: 10px 0 6px; }
+        .stat-card p { color: rgba(255,255,255,.70); margin: 0; }
+        .ops-stack { display: grid; gap: 22px; }
+        .table-wrap { overflow-x: auto; border-radius: 24px; border: 1px solid rgba(255,255,255,.13); }
+        table { width: 100%; border-collapse: collapse; background: rgba(0,0,0,.24); }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.82); }
+        th { color: #c0e67d; text-transform: uppercase; font-size: 12px; letter-spacing: .18em; }
+        .mock-phone { max-width: 420px; border-radius: 34px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.36); padding: 22px; display: grid; gap: 12px; }
+        .phone-top { font-weight: 950; font-size: 20px; margin-bottom: 8px; }
+        .mock-phone label { color: #c0e67d; font-weight: 900; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+        .mock-phone select, .mock-phone textarea { width: 100%; border-radius: 16px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.08); color: white; padding: 12px; }
+        .mock-phone textarea { min-height: 110px; resize: vertical; }
         .operations-visual { min-height: 520px; height: 100%; padding: 34px; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(circle at top right, rgba(83,226,142,.20), transparent 38%), linear-gradient(135deg, rgba(11,35,24,.94), rgba(5,8,6,.96)); border: 1px solid rgba(83,226,142,.24); color: white; }
         .operations-kicker { color: #b7dc75; font-size: 12px; letter-spacing: .36em; font-weight: 950; text-transform: uppercase; margin-bottom: 14px; }
         .operations-visual h3 { margin: 0 0 20px; font-size: clamp(34px, 4vw, 58px); line-height: .95; font-weight: 950; }
         .operations-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 22px; }
         .operations-grid div { border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: rgba(255,255,255,.08); padding: 16px; font-weight: 900; }
         .operations-visual p { margin: 0; color: rgba(255,255,255,.78); line-height: 1.45; font-size: 18px; }
-
-        @media (max-width: 1100px) { .tour-layout { grid-template-columns: 1fr; } .journey-grid, .role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tour-step-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-        @media (max-width: 720px) { .screen { width: min(100vw - 20px, 1540px); } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 52px; } .tour-bullets, .journey-grid, .role-grid, .tour-step-buttons { grid-template-columns: 1fr; } .smart-image, .tour-image, .forest-threshold-visual { min-height: 330px; } }
+        @media (max-width: 1100px) { .tour-layout { grid-template-columns: 1fr; } .journey-grid, .role-grid, .stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tour-step-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 720px) { .screen { width: min(100vw - 20px, 1540px); } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 52px; } .tour-bullets, .journey-grid, .role-grid, .tour-step-buttons, .stats-row, .control-list { grid-template-columns: 1fr; } .smart-image, .tour-image, .forest-threshold-visual { min-height: 330px; } }
       `}</style>
 
       <BackgroundAtmosphere />
@@ -463,11 +644,7 @@ export default function App() {
               <div className="brand-title">Online Ecosystem</div>
             </div>
             <nav className="nav" aria-label="Ecosystem navigation">
-              {navItems.map((item) => (
-                <button key={item.key} className={tab === item.key ? "active" : ""} onClick={() => openTab(item.key)}>
-                  {item.label}
-                </button>
-              ))}
+              {navItems.map((item) => <button key={item.key} className={tab === item.key ? "active" : ""} onClick={() => openTab(item.key)}>{item.label}</button>)}
             </nav>
           </header>
         )}
@@ -478,9 +655,7 @@ export default function App() {
               <div className="portal-kicker">Forest Gate Portal</div>
               <h1>Step Into<br />the Ecosystem</h1>
               <p>Enter slowly. This is a guided journey through a living ecosystem. The farm will reveal itself when the story is ready.</p>
-              <div className="portal-actions">
-                <button className="primary-button" onClick={startTour}>Begin Guided Experience</button>
-              </div>
+              <div className="portal-actions"><button className="primary-button" onClick={startTour}>Begin Guided Experience</button></div>
               <div className="portal-tags">
                 <div className="portal-tag">Forest Threshold</div>
                 <div className="portal-tag">Guided Story</div>
@@ -500,11 +675,8 @@ export default function App() {
                   <h2>{step.title}</h2>
                   <p>{step.narration}</p>
                   <div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
-                  <div className="tour-bullets">
-                    {step.bullets.map((bullet) => <div className="tour-bullet" key={bullet}>{bullet}</div>)}
-                  </div>
+                  <div className="tour-bullets">{step.bullets.map((bullet) => <div className="tour-bullet" key={bullet}>{bullet}</div>)}</div>
                 </div>
-
                 <div>
                   <div className="tour-actions">
                     {tourRunning ? <button className="primary-button" onClick={pauseTour}>Pause Narration</button> : <button className="primary-button" onClick={resumeTour}>Resume Narration</button>}
@@ -513,15 +685,10 @@ export default function App() {
                     <button className="primary-button" onClick={() => openTab("guest")}>Enter Ecosystem</button>
                   </div>
                   <div className="tour-step-buttons">
-                    {tourSteps.map((tourStep, index) => (
-                      <button key={tourStep.id} className={tourIndex === index ? "active" : ""} onClick={() => { pauseTour(); setTourIndex(index); }}>
-                        {tourStep.eyebrow}
-                      </button>
-                    ))}
+                    {tourSteps.map((tourStep, index) => <button key={tourStep.id} className={tourIndex === index ? "active" : ""} onClick={() => { pauseTour(); setTourIndex(index); }}>{tourStep.eyebrow}</button>)}
                   </div>
                 </div>
               </div>
-
               <div className="tour-image">
                 {step.visual === "forest" ? <ForestThresholdVisual /> : step.visual === "operations" ? <OperationsVisual /> : <SmartImage src={step.image || "/images/ConnectFoodEcosystem_withimages.png"} alt={step.imageAlt || step.title} contain={step.containImage} />}
               </div>
@@ -532,9 +699,7 @@ export default function App() {
         {tab !== "portal" && (
           <section className="section">
             <div className="eyebrow">{navItems.find((item) => item.key === tab)?.label} Pathway</div>
-            <h1 className="section-title">
-              {tab === "operations" ? "Living Control Room" : tab === "roles" ? "Every Role Connects to the Whole" : `${navItems.find((item) => item.key === tab)?.label} Journey`}
-            </h1>
+            <h1 className="section-title">{tab === "operations" ? "Living Control Room" : tab === "roles" ? "Every Role Connects to the Whole" : `${navItems.find((item) => item.key === tab)?.label} Journey`}</h1>
             <p className="section-lead">
               {tab === "operations"
                 ? "This operational layer appears after the guest understands the people, history, service, purpose, and pathway movement."
@@ -542,64 +707,10 @@ export default function App() {
                 ? "Each role has its own doorway, but no role stands alone. Every role connects back to food, learning, workforce, marketplace, family, and community impact."
                 : "This pathway lets the viewer experience what happens in this part of the ecosystem."}
             </p>
-
-            {tab === "roles" ? (
-              <div className="role-grid">
-                {roleCards.map((role) => (
-                  <article className="role-card" key={role.key}>
-                    <h3>{role.label}</h3>
-                    <p>{role.text}</p>
-                    <div style={{ height: 18 }} />
-                    <button className="primary-button" onClick={() => openTab(role.key)}>Open Journey</button>
-                  </article>
-                ))}
-              </div>
-            ) : tab === "operations" ? (
-              <div className="tour-layout">
-                <JourneyPanel type="operations" />
-                <OperationsVisual />
-              </div>
-            ) : (
-              <JourneyPanel type={tab} />
-            )}
+            <OperationalPanel tab={tab} openTab={openTab} />
           </section>
         )}
       </div>
     </main>
   );
 }
-
-
-const operationalModules = {
-  youth: {
-    attendance: true,
-    assessments: true,
-    supervisorTracking: true,
-    skillBadges: true,
-    dailyReflection: true,
-  },
-  marketplace: {
-    inventoryConnected: true,
-    cropPlanningConnected: true,
-    qrReady: true,
-    pickupWorkflow: true,
-  },
-  operations: {
-    weatherConnected: true,
-    taskFlow: true,
-    reporting: true,
-    rolePermissions: true,
-  },
-};
-
-/*
-FULL OPERATIONAL ECOSYSTEM LAYER ADDED
-- Youth workforce tracking
-- Supervisor workflow support
-- Crop planning integration
-- Marketplace readiness
-- QR ecosystem logic
-- Reporting structure
-- Weather awareness layer
-- Connected operations architecture
-*/
