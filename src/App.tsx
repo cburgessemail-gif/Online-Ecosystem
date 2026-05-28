@@ -227,19 +227,8 @@ function SmartImage({ src, alt, contain = false }: { src: string; alt: string; c
 }
 
 function BackgroundImage() {
-  const candidates = useMemo(() => buildImageCandidates("/images/SAM_0396.JPG"), []);
-  const [index, setIndex] = useState(0);
-
   return (
     <div className="forest-bg">
-      <img
-        src={candidates[index]}
-        alt="Bronson Family Farm spring and summer forest background"
-        className="forest-bg-image"
-        loading="eager"
-        decoding="async"
-        onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
-      />
       <div className="forest-overlay" />
     </div>
   );
@@ -353,9 +342,8 @@ export default function App() {
         html, body, #root { margin: 0; min-height: 100%; background: #040704; color: white; font-family: Inter, Arial, Helvetica, sans-serif; }
         button { font-family: inherit; cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #040704; }
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #071006; }
-        .forest-bg-image { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(.95) saturate(1.25) contrast(1.05); }
-        .forest-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.42)); }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(circle at top, rgba(48,94,44,.35), rgba(2,6,3,.96) 70%); }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(115,160,68,.10), rgba(0,0,0,.30) 45%, rgba(0,0,0,.70) 100%); }
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
         .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(5,8,6,.34); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 30px 100px rgba(0,0,0,.45); text-align: center; }
