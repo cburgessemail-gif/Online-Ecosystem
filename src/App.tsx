@@ -1,8 +1,3 @@
-// ======================================================
-// BRONSON FAMILY FARM — FINAL ONLINE ECOSYSTEM
-// IMMERSIVE GUIDED EXPERIENCE
-// ======================================================
-
 import { useEffect, useMemo, useState } from "react";
 
 type TabKey =
@@ -30,6 +25,11 @@ type TourStep = {
   containImage?: boolean;
 };
 
+type JourneyStep = {
+  title: string;
+  text: string;
+};
+
 const navItems: { key: TabKey; label: string }[] = [
   { key: "portal", label: "Portal" },
   { key: "guest", label: "Guest Demo" },
@@ -48,784 +48,473 @@ const navItems: { key: TabKey; label: string }[] = [
 const tourSteps: TourStep[] = [
   {
     id: "arrival",
-    eyebrow: "STEP 1 · ARRIVAL",
+    eyebrow: "Step 1 · Arrival",
     title: "Welcome To Bronson Family Farm",
     narration:
       "Welcome to Bronson Family Farm. Take your time. Look around carefully. You are entering a living ecosystem rooted in food, healing, youth, growers, and community opportunity.",
-    bullets: [
-      "Forest Entrance",
-      "Living Ecosystem",
-      "Guided Experience",
-      "Community Vision",
-    ],
-    image: "/images/SAM_0396.JPG",
-    imageAlt: "Forest entrance into Bronson Family Farm",
+    bullets: ["Forest Entrance", "Living Ecosystem", "Guided Experience", "Community Vision"],
+    image: "/images/GrowArea2.jpg",
+    imageAlt: "Spring and summer farm entrance at Bronson Family Farm",
   },
-
   {
     id: "airport",
-    eyebrow: "STEP 2 · HISTORIC LAND",
+    eyebrow: "Step 2 · Historic Land",
     title: "The Historic Lansdowne Airport",
     narration:
-      "Long before this became a living food ecosystem, this land served aviation, movement, and regional connection through the historic Lansdowne Airport. Today, the property continues its story in a different way — connecting people through food, learning, healing, and community restoration.",
-    bullets: [
-      "Historic Airport",
-      "Regional Connection",
-      "Transformation",
-      "Living Land",
-    ],
-    image: "/images/GrowArea2.jpg",
-    imageAlt: "Historic Lansdowne Airport property",
+      "Long before this became a living food ecosystem, this land served aviation, movement, and regional connection through the historic Lansdowne Airport. Today, the property continues its story in a different way by connecting people through food, learning, healing, and community restoration.",
+    bullets: ["Historic Airport", "Regional Connection", "Transformation", "Living Land"],
+    image: "/images/Grow Area.png",
+    imageAlt: "Historic Lansdowne Airport property and growing area",
   },
-
   {
-    id: "military",
-    eyebrow: "STEP 3 · SERVICE & LEGACY",
+    id: "service",
+    eyebrow: "Step 3 · Service And Legacy",
     title: "Service, Discipline, And Future Generations",
     narration:
       "This land also carries the spirit of service, leadership, and legacy. Parts of the Bronson family history include military service and public leadership. Today, that spirit continues through youth workforce development, stewardship, responsibility, and rebuilding community connection.",
-    bullets: [
-      "Military Legacy",
-      "Youth Leadership",
-      "Responsibility",
-      "Future Generations",
-    ],
+    bullets: ["Military Legacy", "Youth Leadership", "Responsibility", "Future Generations"],
     image: "/images/Fence_volunteers.png",
-    imageAlt: "Community and workforce activity",
+    imageAlt: "Community members working together at Bronson Family Farm",
   },
-
   {
     id: "ecosystem",
-    eyebrow: "STEP 4 · THE ECOSYSTEM",
+    eyebrow: "Step 4 · The Ecosystem",
     title: "Everything Connects Together",
     narration:
-      "Food access, growers, youth workforce development, families, marketplace circulation, education, health, and operations all connect together through one place-based ecosystem.",
-    bullets: [
-      "Food Access",
-      "Youth Workforce",
-      "Grower Opportunity",
-      "Community Healing",
-    ],
+      "Food access, growers, youth workforce development, families, marketplace circulation, education, health, and operations all connect together through one place based ecosystem.",
+    bullets: ["Food Access", "Youth Workforce", "Grower Opportunity", "Community Healing"],
     image: "/images/ConnectFoodEcosystem_withimages.png",
-    imageAlt: "Connected Bronson Family Farm ecosystem",
+    imageAlt: "Connected Bronson Family Farm ecosystem overview graphic",
     containImage: true,
   },
-
   {
     id: "pathways",
-    eyebrow: "STEP 5 · PATHWAYS",
+    eyebrow: "Step 5 · Pathways",
     title: "Every Person Has A Journey",
     narration:
-      "Guests, youth, parents, supervisors, growers, customers, and partners each experience a different journey through the ecosystem. Every pathway connects back to the larger mission.",
-    bullets: [
-      "Guest Journey",
-      "Youth Journey",
-      "Grower Journey",
-      "Operations Journey",
-    ],
+      "As a guest on this tour, you will see that every person enters through a different doorway. Youth, parents, supervisors, growers, customers, partners, and visitors each have a pathway, but every pathway connects back to the larger mission.",
+    bullets: ["Guest Journey", "Youth Journey", "Grower Journey", "Operations Journey"],
     image: "/images/SAM_0405.JPG",
-    imageAlt: "Youth and community participants",
+    imageAlt: "Youth and community participants at the farm",
   },
-
   {
     id: "operations",
-    eyebrow: "STEP 6 · OPERATIONS",
+    eyebrow: "Step 6 · Living Operations",
     title: "The Living Control Room",
     narration:
-      "As your guided tour reaches the living control room, you begin to see how the ecosystem stays coordinated day by day. Weather, crop planning, youth safety, marketplace readiness, assessments, supervisors, and reports all connect together in one operational system.",
-    bullets: [
-      "Weather Awareness",
-      "Youth Safety",
-      "Marketplace Readiness",
-      "Assessment Tracking",
-    ],
+      "As your guided tour reaches the living control room, you begin to see how the ecosystem stays coordinated day by day. Weather, youth safety, crop planning, marketplace readiness, assessments, supervisors, and reports all connect together in one operational system.",
+    bullets: ["Weather Awareness", "Youth Safety", "Marketplace Readiness", "Assessment Tracking"],
     image: "/images/ConnectFoodEcosystem_withimages.png",
-    imageAlt: "Operations overview",
+    imageAlt: "Connected operations overview for the living control room",
     containImage: true,
   },
 ];
 
-function speak(text: string) {
-  if (!("speechSynthesis" in window)) return;
+const journeys: Record<string, JourneyStep[]> = {
+  guest: [
+    { title: "Arrive", text: "The guest enters through the forest portal and understands this is a place based ecosystem." },
+    { title: "Discover", text: "The guest learns how food, youth, land, health, history, service, and community opportunity connect." },
+    { title: "Choose", text: "The guest may continue into the youth, parent, grower, marketplace, partner, or operations pathway." },
+    { title: "Respond", text: "The guest leaves with a clear invitation to shop, volunteer, partner, support, or return." },
+  ],
+  roles: [
+    { title: "Guests", text: "Visitors experience the story, purpose, and doorway into the ecosystem." },
+    { title: "Youth", text: "Youth build responsibility, confidence, teamwork, safety, and workforce readiness." },
+    { title: "Supervisors", text: "Approved staff guide youth, protect access, document progress, and encourage growth." },
+    { title: "Growers", text: "Growers connect to tools, planning, education, market opportunities, and local circulation." },
+  ],
+  youth: [
+    { title: "Orientation", text: "Youth begin with safety, PPE, expectations, attendance, permissions, and supervisor assignment." },
+    { title: "Daily Rhythm", text: "Each day includes check-in, farm tasks, hydration, skill focus, reflection, and supervisor notes." },
+    { title: "Skill Growth", text: "Youth build responsibility, teamwork, communication, crop knowledge, and work readiness." },
+    { title: "Progress", text: "Supervisors document participation, life skills progression, achievements, and support needs." },
+  ],
+  supervisor: [
+    { title: "Approved Access", text: "Supervisors are approved staff. They are the adults with assigned access to youth tools and records." },
+    { title: "Team Support", text: "Each supervisor supports no more than 15 youth and guides safety, work, behavior, and encouragement." },
+    { title: "Mobile Assessment", text: "Supervisors use phone friendly tools for attendance, checklists, rubric notes, observations, and flags." },
+    { title: "Reports", text: "Supervisor notes flow into progress reports, parent updates, program review, and documentation." },
+  ],
+  parent: [
+    { title: "Connection", text: "Parents understand where youth are, who supervises them, and what the program is building." },
+    { title: "Updates", text: "Families receive attendance, milestones, safety notices, encouragement, and progress summaries." },
+    { title: "Support", text: "The system helps families reinforce punctuality, responsibility, and positive participation." },
+    { title: "Celebration", text: "Parents see growth through badges, reflections, approved photos, and completion summaries." },
+  ],
+  grower: [
+    { title: "Enter", text: "A grower comes looking for tools, knowledge, supplies, market access, or collaboration." },
+    { title: "Plan", text: "The grower connects with crop planning, planting calendars, resource needs, and growing education." },
+    { title: "Sell And Share", text: "The grower can connect to marketplace opportunities, community events, and food distribution." },
+    { title: "Strengthen", text: "The system builds a stronger regional network of growers and producers." },
+  ],
+  crop: [
+    { title: "Plan", text: "Crop plans connect seed starts, Bubble Babies, growing areas, harvest windows, and market inventory." },
+    { title: "Weather", text: "Weather affects watering, outdoor work, planting, transplanting, and youth task scheduling." },
+    { title: "Harvest", text: "Harvest notes prepare the marketplace, reports, and customer communication." },
+    { title: "Move", text: "Crops move from planning to growing to harvest to marketplace to community access." },
+  ],
+  marketplace: [
+    { title: "Products", text: "The marketplace includes produce, seedlings, Bubble Babies, grower supplies, demonstrations, and seasonal offerings." },
+    { title: "Access", text: "Families and customers connect to food, nutrition education, pickup, ordering, and community events." },
+    { title: "Circulation", text: "Money, food, knowledge, and opportunity circulate locally." },
+    { title: "Sustainability", text: "Marketplace activity helps sustain the farm, growers, youth workforce, and programming." },
+  ],
+  operations: [
+    { title: "Control Room", text: "Operations shows active teams, weather, harvest status, supervisor access, inventory, and reports." },
+    { title: "Safety", text: "Youth access is limited to approved supervisors and staff roles. Random visitors do not access youth records." },
+    { title: "Coordination", text: "Schedules, crop plans, assessments, parent updates, and marketplace inventory connect in one system." },
+    { title: "Decisions", text: "Leadership can see what is happening and decide what needs attention today." },
+  ],
+  reports: [
+    { title: "Capture", text: "Attendance, participation, reflections, supervisor notes, and task completion are captured throughout the program." },
+    { title: "Progress", text: "Reports show growth in reliability, teamwork, responsibility, communication, safety, and skills." },
+    { title: "Evidence", text: "Reports support partner communication, funder documentation, board updates, and improvement." },
+    { title: "Story And Data", text: "The ecosystem preserves both human stories and operational data." },
+  ],
+  partners: [
+    { title: "Alignment", text: "Partners understand where their resources fit inside the larger food, youth, health, and community system." },
+    { title: "Contribution", text: "Partners can contribute supplies, expertise, demonstrations, funding, workforce support, or visibility." },
+    { title: "Collaboration", text: "The system shows how partners connect without duplicating effort." },
+    { title: "Impact", text: "Partners see outcomes through reports, participation, food access, youth progress, and regional growth." },
+  ],
+};
 
-  window.speechSynthesis.cancel();
+const roleCards = [
+  { key: "guest" as TabKey, label: "Guest", text: "Experience the story, purpose, history, and entry into the ecosystem." },
+  { key: "youth" as TabKey, label: "Youth", text: "Build skills, confidence, responsibility, and future readiness." },
+  { key: "supervisor" as TabKey, label: "Supervisor", text: "Guide, protect, assess, encourage, and document youth progress." },
+  { key: "parent" as TabKey, label: "Parent", text: "Stay connected to attendance, progress, safety, and encouragement." },
+  { key: "grower" as TabKey, label: "Grower", text: "Connect to tools, knowledge, crop planning, and market opportunity." },
+  { key: "marketplace" as TabKey, label: "Marketplace", text: "Move food, knowledge, products, and economic circulation." },
+];
 
-  const utterance = new SpeechSynthesisUtterance(text);
-
-  utterance.rate = 0.82;
-  utterance.pitch = 1.0;
-  utterance.volume = 1;
-
-  const voices = window.speechSynthesis.getVoices();
-
-  const preferred =
-    voices.find((voice) =>
-      voice.name.toLowerCase().includes("google")
-    ) || voices[0];
-
-  if (preferred) {
-    utterance.voice = preferred;
-  }
-
-  window.speechSynthesis.speak(utterance);
+function buildImageCandidates(src: string) {
+  const clean = src.replace(/^\//, "");
+  const file = clean.split("/").pop() || clean;
+  const encoded = encodeURIComponent(file);
+  return Array.from(
+    new Set([
+      src,
+      `/${clean}`,
+      `/images/${file}`,
+      `/${file}`,
+      `/images/${encoded}`,
+      `/${encoded}`,
+      "/images/GrowArea2.jpg",
+      "/GrowArea2.jpg",
+      "/images/Grow Area.png",
+      "/Grow Area.png",
+    ])
+  );
 }
 
-function SmartImage({
-  src,
-  alt,
-  contain = false,
-}: {
-  src: string;
-  alt: string;
-  contain?: boolean;
-}) {
-  const [currentSrc, setCurrentSrc] = useState(src);
+function SmartImage({ src, alt, contain = false }: { src: string; alt: string; contain?: boolean }) {
+  const candidates = useMemo(() => buildImageCandidates(src), [src]);
+  const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    setCurrentSrc(src);
-  }, [src]);
+  useEffect(() => setIndex(0), [src]);
 
   return (
     <img
-      src={currentSrc}
+      src={candidates[index]}
       alt={alt}
       loading="eager"
       decoding="async"
-      onError={() =>
-        setCurrentSrc("/images/GrowArea2.jpg")
-      }
-      className={
-        contain
-          ? "smart-image contain"
-          : "smart-image"
-      }
+      onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
+      className={contain ? "smart-image contain" : "smart-image"}
     />
   );
 }
 
-export default function App() {
-  const [tab, setTab] =
-    useState<TabKey>("portal");
+function BackgroundImage() {
+  const candidates = useMemo(() => buildImageCandidates("/images/SAM_0396.JPG"), []);
+  const [index, setIndex] = useState(0);
 
-  const [tourOpen, setTourOpen] =
-    useState(false);
-
-  const [tourIndex, setTourIndex] =
-    useState(0);
-
-  const [tourRunning, setTourRunning] =
-    useState(false);
-
-  const step = tourSteps[tourIndex];
-
-  const progress = useMemo(
-    () =>
-      ((tourIndex + 1) /
-        tourSteps.length) *
-      100,
-    [tourIndex]
+  return (
+    <div className="forest-bg">
+      <img
+        src={candidates[index]}
+        alt="Bronson Family Farm spring and summer forest background"
+        className="forest-bg-image"
+        loading="eager"
+        decoding="async"
+        onError={() => setIndex((value) => Math.min(value + 1, candidates.length - 1))}
+      />
+      <div className="forest-overlay" />
+    </div>
   );
+}
+
+function JourneyPanel({ type }: { type: string }) {
+  const steps = journeys[type] || journeys.guest;
+  return (
+    <div className="journey-grid">
+      {steps.map((step, index) => (
+        <article className="journey-card" key={step.title}>
+          <div className="journey-number">{index + 1}</div>
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function OperationsVisual() {
+  return (
+    <div className="operations-visual">
+      <div className="operations-kicker">Living Control Room</div>
+      <h3>Operations Connect the Ecosystem</h3>
+      <div className="operations-grid">
+        <div>Weather</div>
+        <div>Teams</div>
+        <div>Youth Safety</div>
+        <div>Crop Planning</div>
+        <div>Marketplace</div>
+        <div>Reports</div>
+      </div>
+      <p>As a guest on the tour, this is where you begin to see how the farm stays coordinated day by day.</p>
+    </div>
+  );
+}
+
+export default function App() {
+  const [tab, setTab] = useState<TabKey>("portal");
+  const [tourOpen, setTourOpen] = useState(false);
+  const [tourRunning, setTourRunning] = useState(false);
+  const [tourIndex, setTourIndex] = useState(0);
+  const step = tourSteps[tourIndex];
+  const progress = useMemo(() => ((tourIndex + 1) / tourSteps.length) * 100, [tourIndex]);
+
+  const speak = (text: string) => {
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.82;
+    utterance.pitch = 1.0;
+    utterance.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find((voice) => voice.name.toLowerCase().includes("google")) || voices[0];
+    if (preferred) utterance.voice = preferred;
+    window.speechSynthesis.speak(utterance);
+  };
 
   useEffect(() => {
-    if (!tourRunning) return;
-
+    if (!tourOpen || !tourRunning) return;
     speak(step.narration);
-
     const timer = window.setTimeout(() => {
       setTourIndex((prev) => {
-        if (
-          prev >=
-          tourSteps.length - 1
-        ) {
+        if (prev >= tourSteps.length - 1) {
           setTourRunning(false);
           return prev;
         }
-
         return prev + 1;
       });
     }, 26000);
-
-    return () => clearTimeout(timer);
-  }, [tourIndex, tourRunning]);
+    return () => window.clearTimeout(timer);
+  }, [tourOpen, tourRunning, tourIndex]);
 
   const startTour = () => {
     setTourOpen(true);
     setTourIndex(0);
     setTourRunning(false);
+    speak("Welcome to Bronson Family Farm. Take your time. Let the vision open slowly.");
+    window.setTimeout(() => setTourRunning(true), 9000);
+  };
 
-    speak(
-      "Welcome to Bronson Family Farm. Take your time. Let the vision open slowly."
-    );
+  const pauseTour = () => {
+    setTourRunning(false);
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  };
 
-    window.setTimeout(() => {
-      setTourRunning(true);
-    }, 9000);
+  const resumeTour = () => setTourRunning(true);
+
+  const nextTour = () => {
+    pauseTour();
+    setTourIndex((prev) => Math.min(prev + 1, tourSteps.length - 1));
+  };
+
+  const backTour = () => {
+    pauseTour();
+    setTourIndex((prev) => Math.max(prev - 1, 0));
   };
 
   const openTab = (key: TabKey) => {
     setTab(key);
     setTourOpen(false);
     setTourRunning(false);
-
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   };
 
   return (
     <main className="app">
       <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body,
-        #root {
-          margin: 0;
-          min-height: 100%;
-          background: #040704;
-          color: white;
-          font-family: Inter, Arial, sans-serif;
-        }
-
-        .app {
-          min-height: 100vh;
-          overflow-x: hidden;
-        }
-
-        .forest-bg {
-          position: fixed;
-          inset: 0;
-          z-index: 0;
-          overflow: hidden;
-          background: #071006;
-        }
-
-        .forest-bg-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center;
-          filter:
-            brightness(.95)
-            saturate(1.25)
-            contrast(1.05);
-        }
-
-        .forest-overlay {
-          position: absolute;
-          inset: 0;
-
-          background:
-            linear-gradient(
-              180deg,
-              rgba(0,0,0,.18),
-              rgba(0,0,0,.42)
-            );
-        }
-
-        .screen {
-          position: relative;
-          z-index: 1;
-          width: min(
-            1540px,
-            calc(100vw - 36px)
-          );
-          margin: 0 auto;
-        }
-
-        .portal {
-          min-height: 100vh;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          padding: 40px 20px;
-        }
-
-        .portal-card {
-          width: min(760px, 100%);
-
-          border-radius: 38px;
-
-          padding: 56px;
-
-          background:
-            rgba(5,8,6,.34);
-
-          backdrop-filter: blur(8px);
-
-          border:
-            1px solid rgba(255,255,255,.12);
-
-          box-shadow:
-            0 30px 100px rgba(0,0,0,.45);
-
-          text-align: center;
-        }
-
-        .portal-kicker {
-          color: #c0e67d;
-
-          font-size: 12px;
-
-          letter-spacing: .42em;
-
-          font-weight: 900;
-
-          margin-bottom: 22px;
-
-          text-transform: uppercase;
-        }
-
-        .portal h1 {
-          margin: 0;
-
-          font-size:
-            clamp(56px, 7vw, 92px);
-
-          line-height: .92;
-
-          font-weight: 950;
-
-          letter-spacing: -3px;
-        }
-
-        .portal p {
-          margin: 26px auto 0;
-
-          max-width: 640px;
-
-          color:
-            rgba(255,255,255,.88);
-
-          font-size: 22px;
-
-          line-height: 1.5;
-        }
-
-        .portal-actions {
-          display: flex;
-
-          justify-content: center;
-
-          margin-top: 34px;
-        }
-
-        .primary-button {
-          border: none;
-
-          border-radius: 999px;
-
-          padding: 18px 34px;
-
-          color: white;
-
-          font-weight: 950;
-
-          font-size: 18px;
-
-          background:
-            linear-gradient(
-              135deg,
-              #8fc642,
-              #5b9727
-            );
-
-          box-shadow:
-            0 16px 36px rgba(91,151,39,.38);
-
-          cursor: pointer;
-        }
-
-        .portal-tags {
-          margin-top: 24px;
-
-          display: flex;
-
-          justify-content: center;
-
-          flex-wrap: wrap;
-
-          gap: 12px;
-        }
-
-        .portal-tag {
-          padding: 10px 16px;
-
-          border-radius: 999px;
-
-          background:
-            rgba(255,255,255,.05);
-
-          border:
-            1px solid rgba(255,255,255,.08);
-
-          font-size: 13px;
-
-          font-weight: 700;
-
-          color:
-            rgba(255,255,255,.68);
-
-          pointer-events: none;
-        }
-
-        .topbar {
-          position: sticky;
-
-          top: 12px;
-
-          z-index: 30;
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: space-between;
-
-          gap: 14px;
-
-          margin-top: 18px;
-
-          padding: 14px 18px;
-
-          border:
-            1px solid rgba(255,255,255,.12);
-
-          border-radius: 28px;
-
-          background:
-            rgba(16,22,17,.82);
-
-          backdrop-filter: blur(22px);
-        }
-
-        .tour-panel {
-          margin-top: 24px;
-
-          border:
-            1px solid rgba(255,255,255,.12);
-
-          background:
-            rgba(7,10,8,.74);
-
-          backdrop-filter: blur(18px);
-
-          border-radius: 34px;
-
-          padding: 28px;
-        }
-
-        .tour-layout {
-          display: grid;
-
-          grid-template-columns:
-            .82fr 1.18fr;
-
-          gap: 26px;
-        }
-
-        .eyebrow {
-          color: #b7dc75;
-
-          font-size: 12px;
-
-          letter-spacing: .38em;
-
-          font-weight: 950;
-
-          text-transform: uppercase;
-
-          margin-bottom: 15px;
-        }
-
-        .tour-copy h2 {
-          margin: 0 0 12px;
-
-          font-size:
-            clamp(42px, 5vw, 74px);
-
-          line-height: .94;
-
-          font-weight: 950;
-        }
-
-        .tour-copy p {
-          color:
-            rgba(255,255,255,.82);
-
-          font-size: 21px;
-
-          line-height: 1.55;
-        }
-
-        .tour-bullets {
-          display: grid;
-
-          grid-template-columns:
-            repeat(2, 1fr);
-
-          gap: 12px;
-
-          margin-top: 22px;
-        }
-
-        .tour-bullet {
-          border:
-            1px solid rgba(255,255,255,.12);
-
-          border-radius: 20px;
-
-          background:
-            rgba(255,255,255,.07);
-
-          padding: 15px;
-
-          font-weight: 850;
-        }
-
-        .tour-image {
-          border-radius: 30px;
-
-          overflow: hidden;
-
-          min-height: 520px;
-
-          background:
-            rgba(0,0,0,.34);
-        }
-
-        .smart-image {
-          width: 100%;
-          height: 100%;
-
-          object-fit: cover;
-
-          display: block;
-        }
-
-        .contain {
-          object-fit: contain;
-
-          background:
-            rgba(0,0,0,.65);
-
-          padding: 12px;
-        }
-
+        * { box-sizing: border-box; }
+        html, body, #root { margin: 0; min-height: 100%; background: #040704; color: white; font-family: Inter, Arial, Helvetica, sans-serif; }
+        button { font-family: inherit; cursor: pointer; }
+        .app { min-height: 100vh; overflow-x: hidden; background: #040704; }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #071006; }
+        .forest-bg-image { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(.95) saturate(1.25) contrast(1.05); }
+        .forest-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.42)); }
+        .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
+        .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        .portal-card { width: min(760px, 100%); border-radius: 38px; padding: clamp(32px, 4vw, 56px); background: rgba(5,8,6,.34); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 30px 100px rgba(0,0,0,.45); text-align: center; }
+        .portal-kicker, .eyebrow { color: #c0e67d; font-size: 12px; letter-spacing: .38em; font-weight: 900; margin-bottom: 18px; text-transform: uppercase; }
+        .portal h1 { margin: 0; font-size: clamp(54px, 7vw, 92px); line-height: .92; font-weight: 950; letter-spacing: -3px; text-shadow: 0 4px 22px rgba(0,0,0,.68); }
+        .portal p { margin: 26px auto 0; max-width: 640px; color: rgba(255,255,255,.88); font-size: clamp(17px, 1.35vw, 22px); line-height: 1.5; }
+        .portal-actions { display: flex; justify-content: center; margin-top: 34px; }
+        .primary-button, .secondary-button { border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 15px 24px; color: white; font-weight: 950; font-size: 16px; background: rgba(255,255,255,.10); }
+        .primary-button { border: none; background: linear-gradient(135deg, #8fc642, #5b9727); box-shadow: 0 16px 36px rgba(91,151,39,.38); }
+        .portal-tags { margin-top: 24px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+        .portal-tag { padding: 10px 16px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); font-size: 13px; font-weight: 700; color: rgba(255,255,255,.68); pointer-events: none; }
+        .topbar { position: sticky; top: 12px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 18px; padding: 14px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 28px; background: rgba(16,22,17,.82); backdrop-filter: blur(22px); }
+        .brand-kicker { color: #c0e67d; font-size: 12px; letter-spacing: .30em; font-weight: 950; }
+        .brand-title { font-size: 20px; line-height: 1.1; font-weight: 950; margin-top: 4px; }
+        .nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+        .nav button { border: 1px solid rgba(255,255,255,.16); color: white; border-radius: 999px; background: rgba(255,255,255,.11); padding: 12px 16px; font-size: 14px; font-weight: 900; }
+        .nav button.active { background: linear-gradient(135deg, #53e28e, #27c875); color: #031005; }
+        .tour-panel, .section { margin-top: 24px; border: 1px solid rgba(255,255,255,.12); background: rgba(7,10,8,.74); backdrop-filter: blur(18px); border-radius: 34px; padding: 28px; box-shadow: 0 25px 70px rgba(0,0,0,.34); }
+        .tour-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 26px; align-items: stretch; }
+        .tour-copy { display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+        .tour-copy h2, .section-title { margin: 0 0 12px; font-size: clamp(38px, 5vw, 74px); line-height: .94; font-weight: 950; letter-spacing: -1px; }
+        .tour-copy p, .section-lead { color: rgba(255,255,255,.82); font-size: 21px; line-height: 1.55; max-width: 900px; }
+        .progress-track { height: 8px; width: 100%; background: rgba(255,255,255,.14); border-radius: 999px; overflow: hidden; margin-top: 20px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #8fc642, #d7bb6a); transition: width 350ms ease; }
+        .tour-bullets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }
+        .tour-bullet { border: 1px solid rgba(255,255,255,.12); border-radius: 20px; background: rgba(255,255,255,.07); padding: 15px; font-weight: 850; }
+        .tour-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .tour-step-buttons { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; margin-top: 14px; }
+        .tour-step-buttons button { border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.08); color: rgba(255,255,255,.74); border-radius: 16px; padding: 10px; min-height: 58px; text-align: left; font-weight: 900; font-size: 12px; }
+        .tour-step-buttons button.active { background: rgba(124,183,63,.25); color: white; border-color: rgba(188,242,124,.42); }
+        .tour-image { border-radius: 30px; overflow: hidden; min-height: 520px; background: rgba(0,0,0,.34); }
+        .smart-image { width: 100%; height: 100%; min-height: 520px; object-fit: cover; object-position: center; display: block; }
+        .smart-image.contain { object-fit: contain; background: rgba(0,0,0,.65); padding: 12px; }
+        .journey-grid, .role-grid { display: grid; gap: 18px; }
+        .journey-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .role-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .journey-card, .role-card { border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.07); border-radius: 28px; padding: 22px; }
+        .journey-number { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: rgba(125,181,64,.28); border: 1px solid rgba(188,242,124,.34); color: #d5ff9f; font-weight: 950; margin-bottom: 14px; }
+        .journey-card h3, .role-card h3 { margin: 0 0 10px; font-size: 24px; line-height: 1.12; }
+        .journey-card p, .role-card p { margin: 0; color: rgba(255,255,255,.76); line-height: 1.4; }
+        .operations-visual { min-height: 520px; height: 100%; padding: 34px; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(circle at top right, rgba(83,226,142,.20), transparent 38%), linear-gradient(135deg, rgba(11,35,24,.94), rgba(5,8,6,.96)); border: 1px solid rgba(83,226,142,.24); color: white; }
+        .operations-kicker { color: #b7dc75; font-size: 12px; letter-spacing: .36em; font-weight: 950; text-transform: uppercase; margin-bottom: 14px; }
+        .operations-visual h3 { margin: 0 0 20px; font-size: clamp(34px, 4vw, 58px); line-height: .95; font-weight: 950; }
+        .operations-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 22px; }
+        .operations-grid div { border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: rgba(255,255,255,.08); padding: 16px; font-weight: 900; }
+        .operations-visual p { margin: 0; color: rgba(255,255,255,.78); line-height: 1.45; font-size: 18px; }
+        @media (max-width: 1100px) { .tour-layout { grid-template-columns: 1fr; } .journey-grid, .role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tour-step-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 720px) { .screen { width: min(100vw - 20px, 1540px); } .portal-card, .tour-panel, .section { padding: 22px; border-radius: 26px; } .portal h1 { font-size: 52px; } .tour-bullets, .journey-grid, .role-grid, .tour-step-buttons { grid-template-columns: 1fr; } .smart-image, .tour-image { min-height: 330px; } }
       `}</style>
 
-      <div className="forest-bg">
-        <img
-          src="/images/SAM_0396.JPG"
-          alt="Forest Background"
-          className="forest-bg-image"
-        />
-
-        <div className="forest-overlay" />
-      </div>
+      <BackgroundImage />
 
       <div className="screen">
-
         {tab !== "portal" && (
           <header className="topbar">
-
             <div>
-              <div className="portal-kicker">
-                BRONSON FAMILY FARM
-              </div>
-
-              <div
-                style={{
-                  fontWeight: 950,
-                  fontSize: 20,
-                }}
-              >
-                Online Ecosystem
-              </div>
+              <div className="brand-kicker">BRONSON FAMILY FARM</div>
+              <div className="brand-title">Online Ecosystem</div>
             </div>
-
+            <nav className="nav" aria-label="Ecosystem navigation">
+              {navItems.map((item) => (
+                <button key={item.key} className={tab === item.key ? "active" : ""} onClick={() => openTab(item.key)}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
           </header>
         )}
 
-        {tab === "portal" &&
-          !tourOpen && (
-            <section className="portal">
-
-              <div className="portal-card">
-
-                <div className="portal-kicker">
-                  FOREST GATE PORTAL
-                </div>
-
-                <h1>
-                  Step Into
-                  <br />
-                  the Ecosystem
-                </h1>
-
-                <p>
-                  Bronson Family Farm
-                  is a living ecosystem
-                  where food, learning,
-                  healing, growers,
-                  families, youth,
-                  and community
-                  opportunity come
-                  together.
-                </p>
-
-                <div className="portal-actions">
-
-                  <button
-                    className="primary-button"
-                    onClick={startTour}
-                  >
-                    Enter The Ecosystem
-                  </button>
-
-                </div>
-
-                <div className="portal-tags">
-
-                  <div className="portal-tag">
-                    Food Access
-                  </div>
-
-                  <div className="portal-tag">
-                    Youth Workforce
-                  </div>
-
-                  <div className="portal-tag">
-                    Grower Opportunity
-                  </div>
-
-                  <div className="portal-tag">
-                    Community Healing
-                  </div>
-
-                </div>
-
+        {tab === "portal" && !tourOpen && (
+          <section className="portal">
+            <div className="portal-card">
+              <div className="portal-kicker">Forest Gate Portal</div>
+              <h1>Step Into<br />the Ecosystem</h1>
+              <p>Bronson Family Farm is a living ecosystem where food, learning, healing, growers, families, youth, and community opportunity come together.</p>
+              <div className="portal-actions">
+                <button className="primary-button" onClick={startTour}>Enter The Ecosystem</button>
               </div>
-
-            </section>
-          )}
-
-        {tourOpen && (
-          <section className="tour-panel">
-
-            <div className="tour-layout">
-
-              <div className="tour-copy">
-
-                <div>
-
-                  <div className="eyebrow">
-                    {step.eyebrow}
-                  </div>
-
-                  <h2>
-                    {step.title}
-                  </h2>
-
-                  <p>
-                    {step.narration}
-                  </p>
-
-                  <div
-                    style={{
-                      height: 8,
-                      width: "100%",
-                      background:
-                        "rgba(255,255,255,.14)",
-                      borderRadius: 999,
-                      overflow: "hidden",
-                      marginTop: 20,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${progress}%`,
-                        height: "100%",
-                        background:
-                          "linear-gradient(90deg,#8fc642,#d7bb6a)",
-                      }}
-                    />
-                  </div>
-
-                  <div className="tour-bullets">
-
-                    {step.bullets.map(
-                      (bullet) => (
-                        <div
-                          key={bullet}
-                          className="tour-bullet"
-                        >
-                          {bullet}
-                        </div>
-                      )
-                    )}
-
-                  </div>
-
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    marginTop: 24,
-                  }}
-                >
-
-                  <button
-                    className="primary-button"
-                    onClick={() =>
-                      setTourRunning(
-                        !tourRunning
-                      )
-                    }
-                  >
-                    {tourRunning
-                      ? "Pause Narration"
-                      : "Resume Narration"}
-                  </button>
-
-                  <button
-                    className="primary-button"
-                    onClick={() =>
-                      openTab("guest")
-                    }
-                  >
-                    Enter Ecosystem
-                  </button>
-
-                </div>
-
+              <div className="portal-tags">
+                <div className="portal-tag">Food Access</div>
+                <div className="portal-tag">Youth Workforce</div>
+                <div className="portal-tag">Grower Opportunity</div>
+                <div className="portal-tag">Community Healing</div>
               </div>
-
-              <div className="tour-image">
-
-                <SmartImage
-                  src={step.image}
-                  alt={step.imageAlt}
-                  contain={
-                    step.containImage
-                  }
-                />
-
-              </div>
-
             </div>
-
           </section>
         )}
 
-      </div>
+        {tab === "portal" && tourOpen && (
+          <section className="tour-panel">
+            <div className="tour-layout">
+              <div className="tour-copy">
+                <div>
+                  <div className="eyebrow">{step.eyebrow}</div>
+                  <h2>{step.title}</h2>
+                  <p>{step.narration}</p>
+                  <div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
+                  <div className="tour-bullets">
+                    {step.bullets.map((bullet) => <div className="tour-bullet" key={bullet}>{bullet}</div>)}
+                  </div>
+                </div>
+                <div>
+                  <div className="tour-actions">
+                    {tourRunning ? <button className="primary-button" onClick={pauseTour}>Pause Narration</button> : <button className="primary-button" onClick={resumeTour}>Resume Narration</button>}
+                    <button className="secondary-button" onClick={backTour}>Back</button>
+                    <button className="secondary-button" onClick={nextTour}>Next</button>
+                    <button className="primary-button" onClick={() => openTab("guest")}>Enter Ecosystem</button>
+                  </div>
+                  <div className="tour-step-buttons">
+                    {tourSteps.map((tourStep, index) => (
+                      <button key={tourStep.id} className={tourIndex === index ? "active" : ""} onClick={() => { pauseTour(); setTourIndex(index); }}>
+                        {tourStep.eyebrow}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="tour-image">
+                {step.id === "operations" ? <OperationsVisual /> : <SmartImage src={step.image} alt={step.imageAlt} contain={step.containImage} />}
+              </div>
+            </div>
+          </section>
+        )}
 
+        {tab !== "portal" && (
+          <section className="section">
+            <div className="eyebrow">{navItems.find((item) => item.key === tab)?.label} Pathway</div>
+            <h1 className="section-title">
+              {tab === "operations" ? "Living Control Room" : tab === "roles" ? "Every Role Connects to the Whole" : `${navItems.find((item) => item.key === tab)?.label} Journey`}
+            </h1>
+            <p className="section-lead">
+              {tab === "operations"
+                ? "This operational layer appears after the guest understands the people, history, purpose, and pathway movement."
+                : tab === "roles"
+                ? "Each role has its own doorway, but no role stands alone. Every role connects back to food, learning, workforce, marketplace, family, and community impact."
+                : "This pathway lets the viewer experience what happens in this part of the ecosystem."}
+            </p>
+            {tab === "roles" ? (
+              <div className="role-grid">
+                {roleCards.map((role) => (
+                  <article className="role-card" key={role.key}>
+                    <h3>{role.label}</h3>
+                    <p>{role.text}</p>
+                    <div style={{ height: 18 }} />
+                    <button className="primary-button" onClick={() => openTab(role.key)}>Open Journey</button>
+                  </article>
+                ))}
+              </div>
+            ) : tab === "operations" ? (
+              <div className="tour-layout">
+                <JourneyPanel type="operations" />
+                <OperationsVisual />
+              </div>
+            ) : (
+              <JourneyPanel type={tab} />
+            )}
+          </section>
+        )}
+      </div>
     </main>
   );
 }
