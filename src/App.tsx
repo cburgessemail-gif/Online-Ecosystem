@@ -244,9 +244,13 @@ function ForestThresholdVisual() {
 function BackgroundAtmosphere() {
   return (
     <div className="forest-bg" aria-hidden="true">
-      <div className="forest-depth depth-a" />
-      <div className="forest-depth depth-b" />
-      <div className="forest-depth depth-c" />
+      <div className="forest-sky" />
+      <div className="forest-trunks trunks-back" />
+      <div className="forest-trunks trunks-front" />
+      <div className="forest-leaves leaves-left" />
+      <div className="forest-leaves leaves-right" />
+      <div className="forest-leaves leaves-top" />
+      <div className="forest-pathway" />
       <div className="forest-overlay" />
     </div>
   );
@@ -370,13 +374,17 @@ export default function App() {
         button { font-family: inherit; cursor: pointer; }
         .app { min-height: 100vh; overflow-x: hidden; background: #030603; }
 
-        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(circle at top, rgba(48,94,44,.35), rgba(2,6,3,.96) 70%); }
-        .forest-bg::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0,0,0,.74), rgba(28,64,35,.20), rgba(0,0,0,.78)); }
-        .forest-depth { position: absolute; border-radius: 999px; filter: blur(34px); opacity: .48; }
-        .depth-a { width: 46vw; height: 70vh; left: -8vw; top: 10vh; background: rgba(49,95,48,.38); }
-        .depth-b { width: 52vw; height: 64vh; right: -12vw; top: 0; background: rgba(76,122,61,.26); }
-        .depth-c { width: 70vw; height: 42vh; left: 15vw; bottom: -14vh; background: rgba(24,56,28,.42); }
-        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(113,170,73,.08), rgba(0,0,0,.35) 45%, rgba(0,0,0,.82) 100%); }
+        .forest-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #071006; }
+        .forest-sky { position: absolute; inset: 0; background: radial-gradient(circle at 50% 18%, rgba(196,225,126,.22), rgba(61,117,49,.22) 28%, rgba(9,28,14,.88) 66%, #020402 100%); }
+        .forest-trunks { position: absolute; inset: -8% -4%; background-repeat: repeat-x; background-size: 180px 100%; opacity: .62; filter: blur(.6px); }
+        .trunks-back { background-image: linear-gradient(90deg, transparent 0 18px, rgba(8,17,10,.78) 18px 29px, transparent 29px 82px, rgba(10,22,12,.62) 82px 96px, transparent 96px 180px); transform: scale(1.08); opacity: .38; }
+        .trunks-front { background-image: linear-gradient(90deg, transparent 0 44px, rgba(3,8,4,.92) 44px 62px, transparent 62px 130px, rgba(5,12,6,.86) 130px 146px, transparent 146px 180px); opacity: .50; }
+        .forest-leaves { position: absolute; border-radius: 999px; filter: blur(24px); mix-blend-mode: screen; }
+        .leaves-left { width: 48vw; height: 60vh; left: -16vw; top: -8vh; background: radial-gradient(circle, rgba(94,156,65,.44), rgba(41,92,40,.22) 48%, transparent 72%); }
+        .leaves-right { width: 52vw; height: 64vh; right: -18vw; top: -4vh; background: radial-gradient(circle, rgba(117,174,76,.38), rgba(35,84,38,.20) 50%, transparent 74%); }
+        .leaves-top { width: 76vw; height: 32vh; left: 12vw; top: -14vh; background: radial-gradient(ellipse, rgba(126,184,76,.34), rgba(52,102,43,.18) 45%, transparent 74%); }
+        .forest-pathway { position: absolute; left: 34%; bottom: -18%; width: 32%; height: 78%; background: radial-gradient(ellipse at bottom, rgba(77,61,39,.30), rgba(53,69,39,.13) 45%, transparent 72%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(8px); opacity: .72; }
+        .forest-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(127,188,82,.12), rgba(0,0,0,.28) 43%, rgba(0,0,0,.78) 100%), linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.58)); }
 
         .screen { position: relative; z-index: 1; width: min(1540px, calc(100vw - 36px)); margin: 0 auto; }
         .portal { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
