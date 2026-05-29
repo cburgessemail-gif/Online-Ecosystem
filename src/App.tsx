@@ -151,6 +151,33 @@ type ValueAddedRegistration = {
   capacity: string;
 };
 
+type RelationshipRecord = {
+  id: string;
+  primary_profile_id: string;
+  related_profile_id: string;
+  relationship_type:
+    | "parent_to_youth"
+    | "supervisor_to_youth"
+    | "grower_to_market"
+    | "producer_to_market"
+    | "partner_to_program"
+    | "volunteer_to_program";
+  status: "active" | "pending" | "inactive";
+  notes?: string;
+  created_at: string;
+};
+
+type ParentMessage = {
+  id: string;
+  participant_id: string;
+  sender_role: "supervisor" | "parent" | "admin";
+  message_type: "progress" | "attendance" | "badge" | "support" | "general";
+  subject: string;
+  body: string;
+  parent_safe: boolean;
+  created_at: string;
+};
+
 type AttendanceRecord = {
   id: string;
   participant_id: string;
@@ -294,6 +321,8 @@ const INVENTORY_KEY = "bff.master.inventory";
 const ACTIVITY_KEY = "bff.master.activity";
 const BADGE_KEY = "bff.master.badges";
 const INCIDENT_KEY = "bff.master.incidents";
+const RELATIONSHIP_KEY = "bff.master.relationships";
+const PARENT_MESSAGE_KEY = "bff.master.parentMessages";
 const LANG_KEY = "bff.master.lang";
 
 const image = (file: string) => `/images/${file}`;
@@ -508,6 +537,35 @@ function roleToProfileType(role: Role): ProfileType {
     "Board / Funder": "board",
   };
   return map[role];
+}
+
+function latestProfileByName(firstName: string, lastName: string) {
+  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
+  return profiles.find(
+    (p) =>
+      p.first_name.trim().toLowerCase() === firstName.trim().toLowerCase() &&
+      p.last_name.trim().toLowerCase() === lastName.trim().toLowerCase()
+  );
+}
+
+function profilesByType(profileType: ProfileType) {
+  return safeRead<MasterProfile[]>(PROFILE_KEY, []).filter((p) => p.profile_type === profileType);
+}
+
+function profileLabel(profile: MasterProfile) {
+  return `${profile.preferred_name || profile.first_name} ${profile.last_name}`.trim() || profile.organization_name || profile.id;
+}
+
+function findYouthByProfile(profileId: string) {
+  return safeRead<YouthRegistration[]>(YOUTH_KEY, []).find((y) => y.profile_id === profileId);
+}
+
+function getParentSafeProgress(participantId?: string) {
+  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []).filter((a) => !participantId || a.participant_id === participantId);
+  const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []).filter((a) => !participantId || a.participant_id === participantId);
+  const badges = safeRead<YouthBadge[]>(BADGE_KEY, []).filter((b) => !participantId || b.participant_id === participantId);
+  const messages = safeRead<ParentMessage[]>(PARENT_MESSAGE_KEY, []).filter((m) => !participantId || m.participant_id === participantId);
+  return { attendance, assessments, badges, messages };
 }
 
 function useActiveUser() {
@@ -753,6 +811,8 @@ function StatGrid() {
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
   const inventory = safeRead<InventoryItem[]>(INVENTORY_KEY, []);
   const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
+  const relationships = safeRead<RelationshipRecord[]>(RELATIONSHIP_KEY, []);
+  const parentMessages = safeRead<ParentMessage[]>(PARENT_MESSAGE_KEY, []);
 
   const stats = [
     ["Profiles", profiles.length.toString(), "Registration hub"],
@@ -763,10 +823,12 @@ function StatGrid() {
     ["Feedback", feedback.length.toString(), "Experience responses"],
     ["Inventory", inventory.length.toString(), "Market items"],
     ["Incidents", incidents.length.toString(), "Staff-only reports"],
+    ["Links", relationships.length.toString(), "Profile relationships"],
+    ["Messages", parentMessages.length.toString(), "Parent-safe notes"],
   ];
 
   return (
-    <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-8">
+    <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-5">
       {stats.map(([label, value, note]) => (
         <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
@@ -928,6 +990,12 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
   const [licenseStatus, setLicenseStatus] = useState("Need guidance");
   const [kitchenType, setKitchenType] = useState("Home kitchen");
   const [insuranceStatus, setInsuranceStatus] = useState("Need guidance");
+  const [relationshipTarget, setRelationshipTarget] = useState("");
+  const [parentYouthName, setParentYouthName] = useState("");
+  const [supervisorCrewLimit, setSupervisorCrewLimit] = useState("15");
+  const [volunteerInterest, setVolunteerInterest] = useState("");
+  const [partnerSupport, setPartnerSupport] = useState("");
+  const [customerInterest, setCustomerInterest] = useState("");
 
   const submit = async () => {
     const profile: MasterProfile = {
@@ -1009,13 +1077,65 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
       await insertRow("value_added_registrations", VALUE_ADDED_KEY, valueAdded);
     }
 
+    if (profileType === "parent" && parentYouthName.trim()) {
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: parentYouthName.trim(),
+        relationship_type: "parent_to_youth",
+        status: "pending",
+        notes: "Parent/guardian linked by youth name or participant ID. Staff should verify.",
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
+    }
+
+    if (profileType === "supervisor" && relationshipTarget.trim()) {
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: relationshipTarget.trim(),
+        relationship_type: "supervisor_to_youth",
+        status: "pending",
+        notes: `Supervisor crew assignment. Max youth target: ${supervisorCrewLimit}`,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
+    }
+
+    if (profileType === "partner" && partnerSupport.trim()) {
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: "Bronson Family Farm / Farm & Family Alliance",
+        relationship_type: "partner_to_program",
+        status: "active",
+        notes: partnerSupport,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
+    }
+
+    if (profileType === "volunteer" && volunteerInterest.trim()) {
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: "Volunteer Program",
+        relationship_type: "volunteer_to_program",
+        status: "pending",
+        notes: volunteerInterest,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
+    }
+
     updateActivity(activeUser, `registered ${profileType}`);
-    setMessage("Registration saved. This profile can now autofill future forms.");
+    setMessage("Registration saved. This profile now feeds role dashboards, autofill, reports, and protected access relationships.");
   };
 
   return (
     <Shell screen="registration" setScreen={setScreen} background={IMG.ecosystem} lang={lang} setLang={setLang}>
-      <HeroCard eyebrow="Registration Hub" title="One intake. Many pathways." text="This is the shared profile layer. Youth, supervisors, parents, growers, value-added producers, volunteers, partners, customers, and board/funders register here so future forms can autofill." image={IMG.growArea}>
+      <HeroCard eyebrow="Registration Hub" title="One intake. Many pathways." text="This is the shared profile and relationship layer. Youth, supervisors, parents, growers, value-added producers, volunteers, partners, customers, and board/funders register here so future forms, dashboards, parent-safe reports, and role tools can autofill." image={IMG.growArea}>
         <div className="grid gap-4 md:grid-cols-3">
           <SelectField label="Registration type" value={profileType} onChange={(v) => setProfileType(v as ProfileType)} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
           <Field label="First name" value={firstName} onChange={setFirstName} />
@@ -1058,6 +1178,53 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
             <SelectField label="License status" value={licenseStatus} onChange={setLicenseStatus} options={["Licensed", "In process", "Need guidance", "Not applicable"]} />
             <SelectField label="Kitchen type" value={kitchenType} onChange={setKitchenType} options={["Home kitchen", "Shared commercial kitchen", "Commercial kitchen", "Need kitchen access"]} />
             <SelectField label="Insurance status" value={insuranceStatus} onChange={setInsuranceStatus} options={["Insured", "In process", "Need guidance", "Not applicable"]} />
+          </div>
+        )}
+
+        {profileType === "parent" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <Field label="Youth name or participant ID to link" value={parentYouthName} onChange={setParentYouthName} />
+            <TextArea label="Parent/guardian notes" value={customerInterest} onChange={setCustomerInterest} placeholder="Transportation, communication preference, family support needs..." />
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
+              Parent accounts link to youth progress, attendance, badges, and supervisor-approved updates. Private youth wellness reflections remain staff-only.
+            </div>
+          </div>
+        )}
+
+        {profileType === "supervisor" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <Field label="Assigned youth / crew / group" value={relationshipTarget} onChange={setRelationshipTarget} />
+            <Field label="Maximum youth target" value={supervisorCrewLimit} onChange={setSupervisorCrewLimit} />
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
+              Supervisor access is for approved staff only. Supervisors can enter attendance, PPE, assessments, badges, parent-safe updates, and safety/support records.
+            </div>
+          </div>
+        )}
+
+        {profileType === "volunteer" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <TextArea label="Volunteer interests" value={volunteerInterest} onChange={setVolunteerInterest} placeholder="Planting, setup, teardown, event support, market support, supplies..." />
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
+              Volunteers support the farm and events but do not receive access to protected youth records.
+            </div>
+          </div>
+        )}
+
+        {profileType === "partner" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <TextArea label="Partner support area" value={partnerSupport} onChange={setPartnerSupport} placeholder="Water, tools, education, wellness, market access, youth workforce, transportation..." />
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
+              Partner records help convert support into visible outcomes and grant/funder reporting.
+            </div>
+          </div>
+        )}
+
+        {profileType === "customer" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <TextArea label="Customer interest" value={customerInterest} onChange={setCustomerInterest} placeholder="Seedlings, Bubble Babies, produce, events, nutrition, SNAP-eligible products..." />
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
+              Customer registration prepares marketplace follow-up, pickup communication, and repeat healthy food choices.
+            </div>
           </div>
         )}
 
@@ -1149,6 +1316,31 @@ function SupervisorScreen({ setScreen, activeUser, lang, setLang }: { setScreen:
           {badges.map((badge) => (
             <button key={badge} onClick={() => awardBadge(badge)} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">{badge}</button>
           ))}
+        </div>
+
+        <div className="mt-5 rounded-3xl border border-white/10 bg-white/10 p-5">
+          <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Parent-safe update</div>
+          <p className="mt-2 text-sm leading-7 text-white/75">Use this only for progress, attendance, badges, encouragement, or general updates. Do not place private youth wellness reflections here.</p>
+          <button
+            onClick={async () => {
+              const row: ParentMessage = {
+                id: uuid(),
+                participant_id: participantId || "unknown",
+                sender_role: "supervisor",
+                message_type: "progress",
+                subject: "Progress update",
+                body: notes || "Youth participated in today's farm workforce activities.",
+                parent_safe: true,
+                created_at: new Date().toISOString(),
+              };
+              await insertRow("parent_messages", PARENT_MESSAGE_KEY, row);
+              updateActivity(activeUser, "sent parent-safe progress update");
+              setMessage("Parent-safe progress update saved.");
+            }}
+            className="mt-4 rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black"
+          >
+            Save Parent-Safe Update
+          </button>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3">
@@ -1331,22 +1523,54 @@ function ParentScreen({ setScreen, lang, setLang }: { setScreen: (screen: Screen
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
   const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
   const earned = safeRead<YouthBadge[]>(BADGE_KEY, []);
+  const messages = safeRead<ParentMessage[]>(PARENT_MESSAGE_KEY, []);
+  const relationships = safeRead<RelationshipRecord[]>(RELATIONSHIP_KEY, []).filter((r) => r.relationship_type === "parent_to_youth");
+  const avgResponsibility = assessments.length ? (assessments.reduce((s, a) => s + a.responsibility, 0) / assessments.length).toFixed(1) : "—";
 
   return (
     <Shell screen="parent" setScreen={setScreen} background={IMG.growArea} lang={lang} setLang={setLang}>
       <HeroCard eyebrow="Parent / Guardian Portal" title="Progress without exposing private reflections." text="Parents receive attendance, badges, skills, supervisor encouragement, family opportunities, and support notices when appropriate — not raw youth mental health responses." image={IMG.growArea}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-white/10 p-5"><div className="text-3xl font-black">{attendance.length}</div><div className="mt-1 text-sm">Attendance entries</div></div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-5"><div className="text-3xl font-black">{assessments.length}</div><div className="mt-1 text-sm">Skill observations</div></div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-5"><div className="text-3xl font-black">{earned.length}</div><div className="mt-1 text-sm">Badges awarded</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-5"><div className="text-3xl font-black">{avgResponsibility}</div><div className="mt-1 text-sm">Responsibility average</div></div>
         </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="rounded-3xl border border-white/10 bg-white/10 p-5">
+            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Linked youth records</div>
+            <div className="mt-3 space-y-2">
+              {relationships.slice(0, 6).map((r) => (
+                <div key={r.id} className="rounded-2xl bg-black/30 p-3 text-sm">
+                  {r.related_profile_id} • {r.status}
+                </div>
+              ))}
+              {!relationships.length && <div className="rounded-2xl bg-black/30 p-3 text-sm">No parent/youth link saved yet. Register as parent and enter youth name or participant ID.</div>}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/10 p-5">
+            <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Parent-safe messages</div>
+            <div className="mt-3 space-y-2">
+              {messages.slice(0, 5).map((m) => (
+                <div key={m.id} className="rounded-2xl bg-black/30 p-3 text-sm">
+                  <b>{m.subject}</b>
+                  <div className="mt-1 text-white/75">{m.body}</div>
+                </div>
+              ))}
+              {!messages.length && <div className="rounded-2xl bg-black/30 p-3 text-sm">No parent-safe messages yet.</div>}
+            </div>
+          </div>
+        </div>
+
         <ActionGrid
           setScreen={setScreen}
           items={[
-            { title: "Attendance", text: "See whether youth participated and completed the day." },
+            { title: "Register / Link Youth", text: "Create or update family connection.", screen: "registration" },
             { title: "Badges", text: "Safety, responsibility, teamwork, communication, cultivation, and marketplace exposure." },
-            { title: "Supervisor Notes", text: "Short updates help families understand growth and next opportunities." },
             { title: "Family Feedback", text: "Families can share what growth they noticed.", screen: "feedback" },
+            { title: "Reports", text: "Review parent-safe progress summaries.", screen: "reports" },
           ]}
         />
       </HeroCard>
@@ -1633,6 +1857,8 @@ function DataScreen({ setScreen, lang, setLang }: { setScreen: (screen: Screen) 
     ["Inventory", safeRead<InventoryItem[]>(INVENTORY_KEY, []).length],
     ["Badges", safeRead<YouthBadge[]>(BADGE_KEY, []).length],
     ["Incidents", safeRead<IncidentRecord[]>(INCIDENT_KEY, []).length],
+    ["Relationships", safeRead<RelationshipRecord[]>(RELATIONSHIP_KEY, []).length],
+    ["Parent messages", safeRead<ParentMessage[]>(PARENT_MESSAGE_KEY, []).length],
   ];
 
   return (
