@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DEFAULT_PROGRAM_STATUS = {
@@ -54,28 +53,32 @@ function App() {
             Bronson Family Farm Online Ecosystem
           </h1>
           <p className="mt-2 text-gray-700">
-            Youth Workforce Program Communication, Weather, Safety, and
-            Attendance Operations
+            Youth Workforce Program Registration, Communication, Safety,
+            Attendance, and Parent Support Operations
           </p>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            {["admin", "supervisor", "youth", "parent", "nesco"].map((r) => (
-              <button
-                key={r}
-                onClick={() => setRole(r)}
-                className={`rounded-2xl px-5 py-3 font-bold ${
-                  role === r
-                    ? "bg-amber-500 text-emerald-950"
-                    : "bg-emerald-100 text-emerald-950"
-                }`}
-              >
-                {r.toUpperCase()}
-              </button>
-            ))}
+            {["admin", "supervisor", "youth", "parent", "nesco", "guest"].map(
+              (r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className={`rounded-2xl px-5 py-3 font-bold ${
+                    role === r
+                      ? "bg-amber-500 text-emerald-950"
+                      : "bg-emerald-100 text-emerald-950"
+                  }`}
+                >
+                  {r.toUpperCase()}
+                </button>
+              )
+            )}
           </div>
         </section>
 
         <ProgramStatusBanner activeBroadcast={activeBroadcast} />
+
+        <EcosystemRegistrationCenter />
 
         {(role === "admin" || role === "supervisor") && (
           <ProgramBroadcastCenter
@@ -110,6 +113,259 @@ function ProgramStatusBanner({ activeBroadcast }: { activeBroadcast: any }) {
           <strong>Dismissal:</strong> {status.dismissal_time || "Not applicable"}
         </div>
       </div>
+    </section>
+  );
+}
+
+function EcosystemRegistrationCenter() {
+  const [role, setRole] = useState("youth");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const [organization, setOrganization] = useState("");
+  const [emergencyContactName, setEmergencyContactName] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+
+  const [youthAge, setYouthAge] = useState("");
+  const [youthGrade, setYouthGrade] = useState("");
+  const [school, setSchool] = useState("");
+
+  const [parentName, setParentName] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
+  const [pickupAuthorized, setPickupAuthorized] = useState(false);
+
+  const [interests, setInterests] = useState("");
+  const [reasonForJoining, setReasonForJoining] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function submitRegistration() {
+    if (!firstName || !lastName || !role) {
+      alert("Please enter first name, last name, and role.");
+      return;
+    }
+
+    setSaving(true);
+
+    const { error } = await supabase.from("ecosystem_registrations").insert([
+      {
+        role,
+        registration_type: "online_ecosystem",
+        full_name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone,
+        organization,
+        emergency_contact_name: emergencyContactName,
+        emergency_contact_phone: emergencyContactPhone,
+        youth_age: youthAge ? Number(youthAge) : null,
+        youth_grade: youthGrade,
+        school,
+        parent_name: parentName,
+        parent_email: parentEmail,
+        parent_phone: parentPhone,
+        pickup_authorized: pickupAuthorized,
+        interests,
+        reason_for_joining: reasonForJoining,
+        status: "pending",
+        onboarding_complete: false,
+      },
+    ]);
+
+    setSaving(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Registration saved successfully.");
+
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPhone("");
+    setOrganization("");
+    setEmergencyContactName("");
+    setEmergencyContactPhone("");
+    setYouthAge("");
+    setYouthGrade("");
+    setSchool("");
+    setParentName("");
+    setParentEmail("");
+    setParentPhone("");
+    setPickupAuthorized(false);
+    setInterests("");
+    setReasonForJoining("");
+  }
+
+  return (
+    <section className="rounded-3xl bg-white/95 p-6 shadow-xl border border-emerald-200">
+      <h2 className="text-2xl font-bold">Ecosystem Registration Center</h2>
+      <p className="mt-2 text-gray-700">
+        Register youth, parents, supervisors, growers, marketplace vendors,
+        partners, value-added producers, volunteers, guests, and customers.
+      </p>
+
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <select
+          className="rounded-xl border p-3"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="youth">Youth</option>
+          <option value="parent">Parent / Guardian</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="grower">Grower</option>
+          <option value="marketplace">Marketplace Vendor</option>
+          <option value="partner">Partner</option>
+          <option value="value_added">Value-Added Producer</option>
+          <option value="volunteer">Volunteer</option>
+          <option value="guest">Guest</option>
+          <option value="customer">Customer</option>
+        </select>
+
+        <input
+          className="rounded-xl border p-3"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+
+        <input
+          className="rounded-xl border p-3"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+
+        <input
+          className="rounded-xl border p-3"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          className="rounded-xl border p-3"
+          placeholder="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+
+        <input
+          className="rounded-xl border p-3"
+          placeholder="Organization / Business / Farm"
+          value={organization}
+          onChange={(e) => setOrganization(e.target.value)}
+        />
+      </div>
+
+      {role === "youth" && (
+        <div className="mt-5 rounded-2xl bg-emerald-50 p-4 border border-emerald-200">
+          <h3 className="font-bold">Youth Workforce Information</h3>
+
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Youth Age"
+              value={youthAge}
+              onChange={(e) => setYouthAge(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Grade"
+              value={youthGrade}
+              onChange={(e) => setYouthGrade(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="School"
+              value={school}
+              onChange={(e) => setSchool(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Parent / Guardian Name"
+              value={parentName}
+              onChange={(e) => setParentName(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Parent / Guardian Email"
+              value={parentEmail}
+              onChange={(e) => setParentEmail(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Parent / Guardian Phone"
+              value={parentPhone}
+              onChange={(e) => setParentPhone(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Emergency Contact Name"
+              value={emergencyContactName}
+              onChange={(e) => setEmergencyContactName(e.target.value)}
+            />
+
+            <input
+              className="rounded-xl border p-3"
+              placeholder="Emergency Contact Phone"
+              value={emergencyContactPhone}
+              onChange={(e) => setEmergencyContactPhone(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+
+      {role === "parent" && (
+        <div className="mt-5 rounded-2xl bg-amber-50 p-4 border border-amber-200">
+          <h3 className="font-bold">Parent / Guardian Access</h3>
+
+          <label className="mt-4 flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={pickupAuthorized}
+              onChange={(e) => setPickupAuthorized(e.target.checked)}
+            />
+            Authorized for pickup or emergency communication
+          </label>
+        </div>
+      )}
+
+      <textarea
+        className="mt-5 w-full rounded-xl border p-3"
+        rows={3}
+        placeholder="Interests, skills, products, services, or pathway interest"
+        value={interests}
+        onChange={(e) => setInterests(e.target.value)}
+      />
+
+      <textarea
+        className="mt-4 w-full rounded-xl border p-3"
+        rows={3}
+        placeholder="Reason for joining the Bronson Family Farm ecosystem"
+        value={reasonForJoining}
+        onChange={(e) => setReasonForJoining(e.target.value)}
+      />
+
+      <button
+        onClick={submitRegistration}
+        disabled={saving}
+        className="mt-5 rounded-2xl bg-amber-500 px-6 py-3 font-bold shadow disabled:opacity-60"
+      >
+        {saving ? "Saving Registration..." : "Create Registration"}
+      </button>
     </section>
   );
 }
