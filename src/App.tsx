@@ -1,15 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-
-/**
- * Bronson Family Farm Online Ecosystem
- * FINAL App.tsx
- *
- * Portal-first.
- * Public guest journey.
- * Operational youth workforce platform.
- * Supervisor, parent, grower, crop, marketplace, reports, partners.
- * Reports use Participant ID only — no youth names in reports.
- */
+import React, { useEffect, useState } from "react";
 
 type Screen =
   | "portal"
@@ -109,10 +98,6 @@ const IMG = {
   mushrooms: image("culniary_mushrooms.jpeg"),
   partners: image("Partners.png"),
   queens: image("Queens Village.png"),
-  sameera2: image("Samaeera2.jpg"),
-  sameera3: image("Sameera3.jpg"),
-  sameera4: image("Samerra4.jpg"),
-  sameera5: image("Samerra5.jpg"),
   wkbn: image("WKBN Interview.png"),
   csu: image("CSU_MParker.png"),
 };
@@ -231,22 +216,11 @@ const cropRecords: CropRecord[] = [
   },
 ];
 
-const reportRows = youthRecords.map((item) => ({
-  participantId: item.participantId,
-  crew: item.crew,
-  ageRange: item.ageRange,
-  attendance: item.attendance,
-  skillsCompleted: item.skillsCompleted,
-  assessmentAverage: item.assessmentAverage,
-  badge: item.badge,
-}));
-
 const guestSteps: GuestStep[] = [
   {
     eyebrow: "Portal",
     title: "Step into the Farm. Experience the wonders of life.",
-    subtitle:
-      "Bronson Family Farm begins as an experience before it becomes an explanation.",
+    subtitle: "Bronson Family Farm begins as an experience before it becomes an explanation.",
     image: IMG.portal,
     narration:
       "Welcome to Bronson Family Farm. Take a moment to look around. You are entering a living ecosystem where food, land, youth, families, growers, and partners are connected.",
@@ -258,8 +232,7 @@ const guestSteps: GuestStep[] = [
   {
     eyebrow: "Guest Journey",
     title: "Arrive first. Understand later.",
-    subtitle:
-      "Guests follow the path, experience the land, then discover the full food ecosystem.",
+    subtitle: "Guests follow the path, experience the land, then discover the full food ecosystem.",
     image: IMG.portalAlt,
     narration:
       "The guest journey moves slowly. First, people see the land. Then they learn the story. Then they understand how food, work, youth, health, and community move together.",
@@ -322,7 +295,6 @@ function speak(text: string) {
 
   const utterance = new SpeechSynthesisUtterance(text);
   const voices = window.speechSynthesis.getVoices();
-
   const preferred =
     voices.find((v) => /david|mark|daniel|alex|male/i.test(v.name)) ||
     voices.find((v) => v.lang === "en-US") ||
@@ -343,7 +315,7 @@ function canAccess(session: UserSession | null, screen: Screen) {
   return required.includes(session.accessLevel);
 }
 
-function App() {
+export default function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [session, setSession] = useState<UserSession | null>(() =>
     safeRead<UserSession | null>(SESSION_KEY, null)
@@ -369,6 +341,7 @@ function App() {
     };
     setSession(user);
     safeWrite(SESSION_KEY, user);
+
     if (role === "Supervisor / Staff" || role === "Administrator") setScreenState("supervisor");
     else if (role === "Parent / Guardian") setScreenState("parent");
     else if (role === "Youth Workforce Participant") setScreenState("youth");
@@ -422,7 +395,7 @@ function Shell({
   const compact = screen === "portal";
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-black text-white">
+    <main className="relative h-screen overflow-hidden bg-black text-white">
       <div className="fixed inset-0">
         <img
           src={screen === "portal" ? IMG.portal : IMG.growArea}
@@ -433,17 +406,19 @@ function Shell({
           }}
         />
       </div>
+
       <div className="fixed inset-0 bg-black/55" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.28),rgba(0,0,0,.72)),radial-gradient(circle_at_top_left,rgba(255,255,255,.12),transparent_28%),radial-gradient(circle_at_bottom,rgba(16,185,129,.14),transparent_34%)]" />
 
-      <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
+      <div className="relative z-10 mx-auto flex h-screen max-w-[1500px] flex-col px-3 py-3 md:px-5">
         {!compact && (
           <>
             <Navigation screen={screen} setScreen={setScreen} />
             <AccessRibbon session={session} signOut={signOut} />
           </>
         )}
-        {children}
+
+        <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
       </div>
     </main>
   );
@@ -460,27 +435,27 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
     { label: "Parent", screen: "parent" },
     { label: "Grower", screen: "grower" },
     { label: "Crop", screen: "crop" },
-    { label: "Marketplace", screen: "marketplace" },
-    { label: "Operations", screen: "operations" },
+    { label: "Market", screen: "marketplace" },
+    { label: "Ops", screen: "operations" },
     { label: "Reports", screen: "reports" },
     { label: "Partners", screen: "partners" },
   ];
 
   return (
-    <nav className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
-      <div className="flex flex-wrap items-center gap-2">
-        <button onClick={() => setScreen("portal")} className="mr-2 min-w-[175px] px-2 text-left">
-          <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">
+    <nav className="mb-2 shrink-0 rounded-[1.15rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <button onClick={() => setScreen("portal")} className="mr-2 min-w-[160px] px-2 text-left">
+          <div className="text-[9px] uppercase tracking-[0.28em] text-emerald-100/70">
             Bronson Family Farm
           </div>
-          <div className="text-base font-black leading-tight">Online Ecosystem</div>
+          <div className="text-sm font-black leading-tight">Online Ecosystem</div>
         </button>
 
         {nav.map((item) => (
           <button
             key={item.screen}
             onClick={() => setScreen(item.screen)}
-            className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold backdrop-blur-xl transition ${
+            className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-xl transition ${
               screen === item.screen
                 ? "border-emerald-200 bg-emerald-300 text-black"
                 : "border-white/10 bg-white/10 text-white hover:bg-white/20"
@@ -496,13 +471,13 @@ function Navigation({ screen, setScreen }: { screen: Screen; setScreen: (screen:
 
 function AccessRibbon({ session, signOut }: { session: UserSession | null; signOut: () => void }) {
   return (
-    <div className="mb-3 rounded-[1.25rem] border border-emerald-200/15 bg-black/40 p-2.5 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-2xl">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mb-2 shrink-0 rounded-[1.15rem] border border-emerald-200/15 bg-black/40 p-2 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-2xl">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-emerald-100/70">
+          <div className="text-[9px] uppercase tracking-[0.25em] text-emerald-100/70">
             Role-Based Access
           </div>
-          <div className="mt-1 text-sm font-black text-white">
+          <div className="mt-0.5 text-xs font-black text-white">
             {session
               ? `${session.displayName} • ${session.role} • ${session.accessLevel} access`
               : "Public access active — sign in by role for protected tools"}
@@ -511,7 +486,7 @@ function AccessRibbon({ session, signOut }: { session: UserSession | null; signO
         {session && (
           <button
             onClick={signOut}
-            className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black hover:bg-white hover:text-black"
+            className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-black hover:bg-white hover:text-black"
           >
             Sign Out
           </button>
@@ -523,47 +498,47 @@ function AccessRibbon({ session, signOut }: { session: UserSession | null; signO
 
 function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid min-h-[calc(100vh-2rem)] items-center gap-6 lg:grid-cols-[1.08fr_.92fr]">
-      <div className="max-w-4xl rounded-[2.25rem] border border-white/10 bg-black/38 p-6 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl md:p-9">
-        <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/85">
+    <section className="grid h-full min-h-0 items-center gap-4 overflow-hidden lg:grid-cols-[1.05fr_.95fr]">
+      <div className="max-h-full overflow-y-auto rounded-[2rem] border border-white/10 bg-black/38 p-5 shadow-[0_40px_120px_rgba(0,0,0,.65)] backdrop-blur-xl md:p-8">
+        <div className="text-[11px] uppercase tracking-[0.34em] text-emerald-100/85">
           Bronson Family Farm
         </div>
-        <h1 className="mt-5 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">
+        <h1 className="mt-4 text-4xl font-black leading-[0.92] tracking-tight md:text-6xl">
           Enter The Ecosystem.
         </h1>
-        <p className="mt-7 max-w-3xl text-lg leading-8 text-white/92 md:text-xl md:leading-9">
+        <p className="mt-5 max-w-3xl text-base leading-7 text-white/92 md:text-lg">
           Step through the forest gate. Follow the path. Discover how food, people,
           work, learning, and community move together.
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-4">
+        <div className="mt-6 flex flex-wrap gap-3">
           <button
             onClick={() => setScreen("guest")}
-            className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl transition hover:scale-105"
+            className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black shadow-2xl transition hover:scale-105"
           >
             Enter The Ecosystem
           </button>
           <button
             onClick={() => setScreen("access")}
-            className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black text-white backdrop-blur-xl transition hover:bg-white hover:text-black"
+            className="rounded-full border border-white/20 bg-white/10 px-6 py-3 font-black text-white backdrop-blur-xl transition hover:bg-white hover:text-black"
           >
             Staff / Parent / Program Access
           </button>
         </div>
 
-        <div className="mt-8 grid gap-2 text-sm text-white/75 md:grid-cols-3">
+        <div className="mt-6 grid gap-2 text-xs text-white/75 md:grid-cols-3">
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3">Language Access</div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3">15-Second Guided Pace</div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3">Stay Here / Go Forward</div>
         </div>
       </div>
 
-      <div className="hidden lg:block">
+      <div className="hidden h-full min-h-0 lg:block">
         <PhotoCard
           title="Step into the Farm"
           subtitle="The first view is a threshold, not a presentation."
           image={IMG.portalAlt}
-          height="520px"
+          height="100%"
           label="Portal"
           cta="Enter"
           onClick={() => setScreen("guest")}
@@ -580,8 +555,8 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
   const goForward = () => {
     window.speechSynthesis?.cancel();
-    if (current.actions[0]?.screen && index === guestSteps.length - 1) {
-      setScreen(current.actions[0].screen);
+    if (index >= guestSteps.length - 1) {
+      setScreen("roles");
       return;
     }
     setIndex((value) => Math.min(value + 1, guestSteps.length - 1));
@@ -609,34 +584,34 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   }, [guided, index]);
 
   return (
-    <section className="grid h-[calc(100vh-150px)] min-h-[540px] gap-4 lg:grid-cols-[.92fr_1.08fr]">
-      <div className="flex min-h-0 flex-col justify-center rounded-[2rem] border border-white/10 bg-black/55 p-5 shadow-2xl backdrop-blur-2xl md:p-8">
-        <div className="text-xs uppercase tracking-[0.32em] text-emerald-100/75">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[.92fr_1.08fr]">
+      <div className="flex min-h-0 flex-col justify-center overflow-y-auto rounded-[2rem] border border-white/10 bg-black/55 p-4 shadow-2xl backdrop-blur-2xl md:p-6">
+        <div className="text-[11px] uppercase tracking-[0.28em] text-emerald-100/75">
           {current.eyebrow}
         </div>
-        <h1 className="mt-4 text-4xl font-black leading-[.95] tracking-tight text-white md:text-6xl">
+        <h1 className="mt-3 text-3xl font-black leading-[.96] tracking-tight text-white md:text-5xl">
           {current.title}
         </h1>
-        <p className="mt-5 max-w-3xl text-base leading-7 text-white/86 md:text-lg">
+        <p className="mt-4 max-w-3xl text-sm leading-6 text-white/86 md:text-base">
           {current.subtitle}
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap gap-2.5">
           <button
             onClick={() => setGuided((value) => !value)}
-            className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black"
+            className="rounded-full bg-emerald-300 px-4 py-2.5 text-sm font-black text-black"
           >
             {guided ? "Pause Guided Tour" : "Begin Guided Tour"}
           </button>
-          <button onClick={stayHere} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">
+          <button onClick={stayHere} className="rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-black">
             Stay Here
           </button>
-          <button onClick={goForward} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">
+          <button onClick={goForward} className="rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-black">
             Go Forward
           </button>
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {current.actions.map((action) => (
             <button
               key={action.label}
@@ -644,14 +619,14 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
                 if (action.href) window.open(action.href, "_blank", "noopener,noreferrer");
                 if (action.screen) setScreen(action.screen);
               }}
-              className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black hover:bg-white hover:text-black"
+              className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-black hover:bg-white hover:text-black"
             >
               {action.label}
             </button>
           ))}
         </div>
 
-        <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full rounded-full bg-emerald-300 transition-all"
             style={{ width: `${((index + 1) / guestSteps.length) * 100}%` }}
@@ -659,7 +634,7 @@ function GuestJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
       </div>
 
-      <div className="min-h-0">
+      <div className="min-h-0 overflow-hidden">
         <PhotoCard
           title={current.eyebrow}
           subtitle={current.title}
@@ -684,25 +659,25 @@ function Access({
   const [displayName, setDisplayName] = useState("");
 
   return (
-    <section className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[.9fr_1.1fr]">
       <Panel eyebrow="Access" title="Choose your role to enter the correct part of the platform.">
-        <p className="text-white/80">
+        <p className="text-sm leading-6 text-white/80">
           Public guests can explore. Staff, parents, and administrators receive protected access.
           Reports use Participant ID only.
         </p>
 
-        <div className="mt-5 grid gap-3">
+        <div className="mt-4 grid gap-3">
           <input
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             placeholder="Display name or staff label"
-            className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white placeholder:text-white/50"
+            className="rounded-2xl border border-white/10 bg-white/10 px-4 py-2.5 text-white placeholder:text-white/50"
           />
 
           <select
             value={selectedRole}
             onChange={(event) => setSelectedRole(event.target.value as Role)}
-            className="rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-white"
+            className="rounded-2xl border border-white/10 bg-black/70 px-4 py-2.5 text-white"
           >
             {roles.map((role) => (
               <option key={role}>{role}</option>
@@ -711,28 +686,28 @@ function Access({
 
           <button
             onClick={() => signIn(selectedRole, displayName || selectedRole)}
-            className="rounded-full bg-emerald-300 px-6 py-4 font-black text-black"
+            className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black"
           >
             Enter as {selectedRole}
           </button>
         </div>
 
         {session && (
-          <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm">
+          <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm">
             Current session: <strong>{session.displayName}</strong> — {session.role}
           </div>
         )}
       </Panel>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid min-h-0 gap-3 overflow-y-auto pr-1 md:grid-cols-2">
         {roles.map((role) => (
           <button
             key={role}
             onClick={() => signIn(role, role)}
-            className="rounded-[1.5rem] border border-white/10 bg-black/45 p-5 text-left shadow-xl backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black"
+            className="rounded-[1.35rem] border border-white/10 bg-black/45 p-4 text-left shadow-xl backdrop-blur-xl transition hover:bg-emerald-300 hover:text-black"
           >
-            <div className="text-lg font-black">{role}</div>
-            <div className="mt-2 text-sm opacity-85">{roleAccess[role]} access</div>
+            <div className="text-base font-black">{role}</div>
+            <div className="mt-1 text-xs opacity-85">{roleAccess[role]} access</div>
           </button>
         ))}
       </div>
@@ -753,14 +728,14 @@ function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
   ];
 
   return (
-    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid h-full min-h-0 gap-3 overflow-y-auto pr-1 md:grid-cols-2 xl:grid-cols-4">
       {items.map((item) => (
         <PhotoCard
           key={item.title}
           title={item.title}
           subtitle={item.text}
           image={item.image}
-          height="300px"
+          height="255px"
           label="Pathway"
           cta="Open"
           onClick={() => setScreen(item.screen)}
@@ -772,7 +747,7 @@ function Roles({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Youth() {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <Panel eyebrow="Youth Workforce" title="Today’s youth dashboard">
         <div className="grid gap-3">
           <Metric label="Schedule" value="Monday–Friday • 8 AM–2 PM" />
@@ -781,15 +756,15 @@ function Youth() {
         </div>
       </Panel>
 
-      <Panel eyebrow="Progress" title="Youth view uses personal progress — not public reporting.">
+      <Panel eyebrow="Progress" title="Youth progress view">
         <div className="grid gap-3">
           {youthRecords.map((item) => (
-            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
+            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/70">
                 {item.participantId}
               </div>
-              <div className="mt-2 text-xl font-black">{item.badge}</div>
-              <div className="mt-1 text-sm text-white/75">
+              <div className="mt-1 text-lg font-black">{item.badge}</div>
+              <div className="mt-1 text-xs text-white/75">
                 {item.crew} • Skills Completed: {item.skillsCompleted}
               </div>
             </div>
@@ -802,11 +777,11 @@ function Youth() {
 
 function Supervisor() {
   return (
-    <section className="grid gap-4 xl:grid-cols-[1.05fr_.95fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden xl:grid-cols-[1.05fr_.95fr]">
       <Panel eyebrow="Supervisor / Staff" title="Phone-first daily supervision dashboard">
         <div className="grid gap-3 md:grid-cols-2">
           {["QR Check-In", "Attendance", "PPE Verification", "Daily Assignment", "Observation Notes", "Incident Report", "Assessment", "Progress Badge"].map((item) => (
-            <button key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left font-black hover:bg-emerald-300 hover:text-black">
+            <button key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-left text-sm font-black hover:bg-emerald-300 hover:text-black">
               {item}
             </button>
           ))}
@@ -816,15 +791,15 @@ function Supervisor() {
       <Panel eyebrow="Protected Youth Records" title="Names stay inside protected staff view only.">
         <div className="grid gap-3">
           {youthRecords.map((item) => (
-            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">
+            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/70">
                 {item.participantId}
               </div>
-              <div className="mt-1 text-lg font-black">{item.protectedName}</div>
-              <div className="mt-2 text-sm text-white/78">
+              <div className="mt-1 text-base font-black">{item.protectedName}</div>
+              <div className="mt-1 text-xs text-white/78">
                 {item.crew} • {item.attendance} • PPE: {item.ppe}
               </div>
-              <div className="mt-2 text-sm text-white/70">{item.supervisorNote}</div>
+              <div className="mt-2 text-xs text-white/70">{item.supervisorNote}</div>
             </div>
           ))}
         </div>
@@ -835,9 +810,9 @@ function Supervisor() {
 
 function Parent() {
   return (
-    <section className="grid gap-4 lg:grid-cols-[.95fr_1.05fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[.95fr_1.05fr]">
       <Panel eyebrow="Parent / Guardian Portal" title="Approved family visibility">
-        <p className="text-white/80">
+        <p className="text-sm leading-6 text-white/80">
           Parents see attendance, progress, badges, announcements, and approved summaries.
           Internal staff notes remain protected.
         </p>
@@ -851,12 +826,12 @@ function Parent() {
       <Panel eyebrow="Progress Summaries" title="Parent-safe summaries">
         <div className="grid gap-3">
           {youthRecords.map((item) => (
-            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div key={item.participantId} className="rounded-2xl border border-white/10 bg-white/10 p-3">
               <div className="font-black">{item.participantId}</div>
-              <div className="mt-1 text-sm text-white/75">
+              <div className="mt-1 text-xs text-white/75">
                 {item.attendance} • {item.badge} • {item.skillsCompleted} skills completed
               </div>
-              <div className="mt-2 text-sm text-white/70">{item.parentSummary}</div>
+              <div className="mt-2 text-xs text-white/70">{item.parentSummary}</div>
             </div>
           ))}
         </div>
@@ -867,12 +842,12 @@ function Parent() {
 
 function Grower({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <PhotoCard
         title="Regenerative Farming"
         subtitle="Build soil, protect water, reduce waste, and leave the land healthier over time."
         image={IMG.compost}
-        height="420px"
+        height="100%"
         label="Grower Education"
         cta="Learn"
         onClick={() => setScreen("training")}
@@ -895,11 +870,11 @@ function Grower({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function CropPlanner() {
   return (
-    <section>
+    <section className="h-full min-h-0 overflow-hidden">
       <Panel eyebrow="Crop Planner" title="Crop planning connects field work to youth assignments and marketplace movement.">
         <div className="overflow-auto rounded-2xl border border-white/10">
           <table className="w-full min-w-[850px] border-collapse text-left text-sm">
-            <thead className="bg-white/10 text-xs uppercase tracking-[0.2em] text-emerald-100/80">
+            <thead className="bg-white/10 text-[10px] uppercase tracking-[0.18em] text-emerald-100/80">
               <tr>
                 <th className="p-3">Crop</th>
                 <th className="p-3">Variety</th>
@@ -934,12 +909,12 @@ function CropPlanner() {
 
 function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <PhotoCard
         title="Marketplace Movement"
         subtitle="Produce, seedlings, Bubble Babies™, value-added products, and grower supply activity move through this layer."
         image={IMG.marketplace}
-        height="430px"
+        height="100%"
         label="Marketplace"
         cta="Shop"
         onClick={() => window.open("https://grownby.com/farms/bronson-family-farm/shop", "_blank", "noopener,noreferrer")}
@@ -962,11 +937,11 @@ function Marketplace({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <Panel eyebrow="Operations Control" title="Daily program operations">
         <div className="grid gap-3 md:grid-cols-2">
           {["QR Check-In", "Daily Announcements", "Weather Alert", "Crew Assignments", "Harvest Log", "Volunteer Log", "Supervisor Reports", "Emergency Notes"].map((item) => (
-            <button key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left font-black hover:bg-emerald-300 hover:text-black">
+            <button key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-left text-sm font-black hover:bg-emerald-300 hover:text-black">
               {item}
             </button>
           ))}
@@ -977,7 +952,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <ActionGrid
           items={[
             { title: "Weather Underground", text: "Hourly Youngstown weather.", href: "https://www.wunderground.com/hourly/us/oh/youngstown" },
-            { title: "AccuWeather", text: "Youngstown forecast and minute-by-minute reference.", href: "https://www.accuweather.com/en/us/youngstown/44503/weather-forecast/350128" },
+            { title: "AccuWeather", text: "Youngstown forecast reference.", href: "https://www.accuweather.com/en/us/youngstown/44503/weather-forecast/350128" },
             { title: "Farmers’ Almanac", text: "Seasonal grow context.", href: "https://www.farmersalmanac.com/" },
             { title: "Reports", text: "Open privacy-safe reporting.", screen: "reports" },
           ]}
@@ -990,16 +965,16 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Reports() {
   return (
-    <section>
+    <section className="h-full min-h-0 overflow-hidden">
       <Panel eyebrow="Reports" title="Privacy-safe reporting — Participant ID only">
-        <div className="mb-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm text-amber-50">
+        <div className="mb-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-3 text-xs text-amber-50">
           Reporting rule: do not use youth names in public reports, partner reports, grant reports,
           dashboards, or demo views. Use Participant ID only.
         </div>
 
         <div className="overflow-auto rounded-2xl border border-white/10">
           <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-            <thead className="bg-white/10 text-xs uppercase tracking-[0.2em] text-emerald-100/80">
+            <thead className="bg-white/10 text-[10px] uppercase tracking-[0.18em] text-emerald-100/80">
               <tr>
                 <th className="p-3">Participant ID</th>
                 <th className="p-3">Crew</th>
@@ -1011,7 +986,7 @@ function Reports() {
               </tr>
             </thead>
             <tbody>
-              {reportRows.map((row) => (
+              {youthRecords.map((row) => (
                 <tr key={row.participantId} className="border-t border-white/10">
                   <td className="p-3 font-black">{row.participantId}</td>
                   <td className="p-3">{row.crew}</td>
@@ -1032,12 +1007,12 @@ function Reports() {
 
 function Partners() {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <PhotoCard
         title="Partner Infrastructure"
         subtitle="Partners support the infrastructure that lets the ecosystem function."
         image={IMG.partners}
-        height="430px"
+        height="100%"
         label="Partner"
         cta="Impact"
       />
@@ -1045,7 +1020,7 @@ function Partners() {
       <Panel eyebrow="Partner Pathway" title="Specific support areas">
         <div className="grid gap-3">
           {["Water access", "Solar equipment", "Fencing", "Storage", "Wash station", "Youth workforce support", "Tools and supplies", "Transportation"].map((item) => (
-            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black">
               {item}
             </div>
           ))}
@@ -1057,13 +1032,13 @@ function Partners() {
 
 function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[1fr_1fr]">
       <Panel eyebrow="Airport History / Youth Education" title="Youth-accessible place-based learning">
-        <p className="text-white/82">
+        <p className="text-sm leading-6 text-white/82">
           Lansdowne Airport can help youth understand direction, signals, safety,
           responsibility, service, aviation, military connection, and land reuse.
         </p>
-        <div className="mt-5 grid gap-3">
+        <div className="mt-4 grid gap-3">
           <Metric label="Direction" value="Learning where you are and where you are going." />
           <Metric label="Safety" value="Signals, boundaries, rules, and responsibility." />
           <Metric label="Service" value="Military and aviation history connect discipline and purpose." />
@@ -1074,7 +1049,7 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
         title="Historic Land, New Purpose"
         subtitle="The same land that carried aviation history now supports food, youth learning, and community renewal."
         image={IMG.growAreaAlt}
-        height="430px"
+        height="100%"
         label="History"
         cta="Learn"
         onClick={() => setScreen("guest")}
@@ -1085,7 +1060,7 @@ function Training({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Safety() {
   return (
-    <section>
+    <section className="h-full min-h-0 overflow-hidden">
       <Panel eyebrow="Youth Protection" title="Staff access protects youth">
         <div className="grid gap-3 md:grid-cols-2">
           {[
@@ -1096,7 +1071,7 @@ function Safety() {
             "Incident notes remain staff/admin protected",
             "Public demo uses aggregate data only",
           ].map((item) => (
-            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black">
               {item}
             </div>
           ))}
@@ -1108,9 +1083,9 @@ function Safety() {
 
 function ValueAdded({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-3">
-      <PhotoCard title="Edible Flowers" subtitle="Product education and culinary creativity." image={IMG.flowers} height="360px" label="Value-Added" cta="Product" />
-      <PhotoCard title="Mushrooms" subtitle="Specialty product education and market opportunity." image={IMG.mushrooms} height="360px" label="Value-Added" cta="Product" />
+    <section className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-3">
+      <PhotoCard title="Edible Flowers" subtitle="Product education and culinary creativity." image={IMG.flowers} height="100%" label="Value-Added" cta="Product" />
+      <PhotoCard title="Mushrooms" subtitle="Specialty product education and market opportunity." image={IMG.mushrooms} height="100%" label="Value-Added" cta="Product" />
       <Panel eyebrow="Value-Added" title="Turn farm products into demonstrations, packaging, and enterprise.">
         <ActionGrid
           items={[
@@ -1126,7 +1101,7 @@ function ValueAdded({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Wellness() {
   return (
-    <section>
+    <section className="h-full min-h-0 overflow-hidden">
       <Panel eyebrow="Wellness / Nutrition" title="Food is health, culture, learning, and confidence.">
         <div className="grid gap-3 md:grid-cols-3">
           <Metric label="Nutrition" value="Families learn how to use seasonal produce." />
@@ -1148,19 +1123,19 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <article className="rounded-[2rem] border border-white/10 bg-black/55 p-5 shadow-[0_28px_80px_rgba(0,0,0,.42)] backdrop-blur-2xl md:p-7">
-      <div className="text-xs uppercase tracking-[0.32em] text-emerald-100/70">{eyebrow}</div>
-      <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">{title}</h1>
-      <div className="mt-5">{children}</div>
+    <article className="h-full min-h-0 overflow-y-auto rounded-[2rem] border border-white/10 bg-black/55 p-4 shadow-[0_28px_80px_rgba(0,0,0,.42)] backdrop-blur-2xl md:p-5">
+      <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">{eyebrow}</div>
+      <h1 className="mt-2 text-2xl font-black leading-tight md:text-3xl">{title}</h1>
+      <div className="mt-4">{children}</div>
     </article>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-      <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
-      <div className="mt-2 text-lg font-black">{value}</div>
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+      <div className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/70">{label}</div>
+      <div className="mt-1 text-sm font-black md:text-base">{value}</div>
     </div>
   );
 }
@@ -1184,7 +1159,7 @@ function PhotoCard({
 }) {
   const content = (
     <div
-      className={`group relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-black shadow-[0_28px_70px_rgba(0,0,0,.52)] transition duration-500 ${
+      className={`group relative min-h-0 overflow-hidden rounded-[1.75rem] border border-white/10 bg-black shadow-[0_28px_70px_rgba(0,0,0,.52)] transition duration-500 ${
         onClick ? "cursor-pointer hover:scale-[1.01] hover:border-emerald-200/40" : ""
       }`}
       style={{ height }}
@@ -1211,16 +1186,16 @@ function PhotoCard({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-5">
-        <div className="text-2xl font-black leading-tight drop-shadow-2xl">{title}</div>
-        <div className="mt-2 max-w-xl text-sm leading-6 text-emerald-50/90">{subtitle}</div>
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-4">
+        <div className="text-xl font-black leading-tight drop-shadow-2xl md:text-2xl">{title}</div>
+        <div className="mt-1 max-w-xl text-xs leading-5 text-emerald-50/90 md:text-sm">{subtitle}</div>
       </div>
     </div>
   );
 
   if (onClick) {
     return (
-      <button onClick={onClick} className="block w-full text-left">
+      <button onClick={onClick} className="block h-full w-full text-left">
         {content}
       </button>
     );
@@ -1245,14 +1220,12 @@ function ActionGrid({
             if (item.href) window.open(item.href, "_blank", "noopener,noreferrer");
             if (item.screen) setScreen(item.screen);
           }}
-          className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
+          className="rounded-2xl border border-white/10 bg-white/10 p-3 text-left transition hover:bg-emerald-300 hover:text-black"
         >
-          <div className="text-lg font-black">{item.title}</div>
-          <div className="mt-2 text-sm leading-6 opacity-90">{item.text}</div>
+          <div className="text-sm font-black md:text-base">{item.title}</div>
+          <div className="mt-1 text-xs leading-5 opacity-90">{item.text}</div>
         </button>
       ))}
     </div>
   );
 }
-
-export default App;
