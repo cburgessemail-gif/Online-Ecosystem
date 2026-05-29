@@ -556,6 +556,10 @@ function profileLabel(profile: MasterProfile) {
   return `${profile.preferred_name || profile.first_name} ${profile.last_name}`.trim() || profile.organization_name || profile.id;
 }
 
+function recentProfiles(limit = 8) {
+  return safeRead<MasterProfile[]>(PROFILE_KEY, []).slice(0, limit);
+}
+
 function findYouthByProfile(profileId: string) {
   return safeRead<YouthRegistration[]>(YOUTH_KEY, []).find((y) => y.profile_id === profileId);
 }
@@ -970,6 +974,8 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
   const [state, setState] = useState("OH");
   const [zip, setZip] = useState("");
   const [message, setMessage] = useState("");
+  const [saveMode, setSaveMode] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [savedProfiles, setSavedProfiles] = useState<MasterProfile[]>(() => recentProfiles(10));
 
   const [crew, setCrew] = useState("Crew A");
   const [ageRange, setAgeRange] = useState("14-18");
@@ -980,31 +986,55 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
   const [emergencyContact, setEmergencyContact] = useState("");
   const [programGoal, setProgramGoal] = useState("");
 
+  const [supervisorCrewAssignment, setSupervisorCrewAssignment] = useState("Crew A");
+  const [supervisorYouthLimit, setSupervisorYouthLimit] = useState("15");
+  const [backgroundStatus, setBackgroundStatus] = useState("Pending");
+  const [trainingStatus, setTrainingStatus] = useState("Not yet completed");
+  const [certifications, setCertifications] = useState("");
+
+  const [parentYouthName, setParentYouthName] = useState("");
+  const [communicationPreference, setCommunicationPreference] = useState("Text message");
+  const [transportationNotes, setTransportationNotes] = useState("");
+
   const [farmName, setFarmName] = useState("");
   const [cropsGrown, setCropsGrown] = useState("");
   const [waterSource, setWaterSource] = useState("");
   const [marketInterest, setMarketInterest] = useState("");
+  const [equipmentAvailable, setEquipmentAvailable] = useState("");
 
   const [businessName, setBusinessName] = useState("");
   const [productCategories, setProductCategories] = useState("");
   const [licenseStatus, setLicenseStatus] = useState("Need guidance");
   const [kitchenType, setKitchenType] = useState("Home kitchen");
   const [insuranceStatus, setInsuranceStatus] = useState("Need guidance");
-  const [relationshipTarget, setRelationshipTarget] = useState("");
-  const [parentYouthName, setParentYouthName] = useState("");
-  const [supervisorCrewLimit, setSupervisorCrewLimit] = useState("15");
+
   const [volunteerInterest, setVolunteerInterest] = useState("");
+  const [volunteerAvailability, setVolunteerAvailability] = useState("");
   const [partnerSupport, setPartnerSupport] = useState("");
   const [customerInterest, setCustomerInterest] = useState("");
 
+  const clearMessage = () => {
+    setMessage("");
+    setSaveMode("idle");
+  };
+
   const submit = async () => {
+    setSaveMode("saving");
+    setMessage("");
+
+    if (!firstName.trim() && !lastName.trim() && !organizationName.trim() && !farmName.trim() && !businessName.trim()) {
+      setSaveMode("error");
+      setMessage("Please enter at least a name, organization, farm, or business name before saving.");
+      return;
+    }
+
     const profile: MasterProfile = {
       id: uuid(),
       profile_type: profileType,
       first_name: firstName,
       last_name: lastName,
       preferred_name: preferredName,
-      organization_name: organizationName,
+      organization_name: organizationName || farmName || businessName,
       email,
       phone,
       city,
@@ -1013,6 +1043,7 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
       active: true,
       created_at: new Date().toISOString(),
     };
+
     await insertRow("profiles", PROFILE_KEY, profile);
 
     if (profileType === "youth") {
@@ -1029,7 +1060,7 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
         emergency_contact: emergencyContact,
         medical_notes: "",
         media_release: false,
-        transportation_plan: "",
+        transportation_plan: transportationNotes,
         program_goal: programGoal,
       };
       await insertRow("youth_registrations", YOUTH_KEY, youth);
@@ -1039,14 +1070,38 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
       const supervisor: SupervisorRegistration = {
         id: uuid(),
         profile_id: profile.id,
-        crew,
+        crew: supervisorCrewAssignment,
         role_title: "Supervisor Aide",
-        training_completed: false,
-        background_check_status: "Pending",
+        training_completed: trainingStatus === "Completed",
+        background_check_status: backgroundStatus,
         emergency_contact: emergencyContact,
-        support_needed: "",
+        support_needed: certifications,
       };
       await insertRow("supervisor_registrations", SUPERVISOR_KEY, supervisor);
+
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: supervisorCrewAssignment,
+        relationship_type: "supervisor_to_youth",
+        status: backgroundStatus === "Cleared" ? "active" : "pending",
+        notes: `Supervisor assignment. Youth limit: ${supervisorYouthLimit}. Training: ${trainingStatus}. Certifications: ${certifications || "none listed"}`,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
+    }
+
+    if (profileType === "parent") {
+      const relationship: RelationshipRecord = {
+        id: uuid(),
+        primary_profile_id: profile.id,
+        related_profile_id: parentYouthName.trim() || "Youth link pending",
+        relationship_type: "parent_to_youth",
+        status: "pending",
+        notes: `Communication: ${communicationPreference}. Transportation: ${transportationNotes || "not provided"}`,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
     }
 
     if (profileType === "grower") {
@@ -1057,7 +1112,7 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
         growing_area: "",
         crops_grown: cropsGrown,
         water_source: waterSource,
-        equipment_available: "",
+        equipment_available: equipmentAvailable,
         market_interest: marketInterest,
       };
       await insertRow("grower_registrations", GROWER_KEY, grower);
@@ -1075,32 +1130,6 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
         capacity: "",
       };
       await insertRow("value_added_registrations", VALUE_ADDED_KEY, valueAdded);
-    }
-
-    if (profileType === "parent" && parentYouthName.trim()) {
-      const relationship: RelationshipRecord = {
-        id: uuid(),
-        primary_profile_id: profile.id,
-        related_profile_id: parentYouthName.trim(),
-        relationship_type: "parent_to_youth",
-        status: "pending",
-        notes: "Parent/guardian linked by youth name or participant ID. Staff should verify.",
-        created_at: new Date().toISOString(),
-      };
-      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
-    }
-
-    if (profileType === "supervisor" && relationshipTarget.trim()) {
-      const relationship: RelationshipRecord = {
-        id: uuid(),
-        primary_profile_id: profile.id,
-        related_profile_id: relationshipTarget.trim(),
-        relationship_type: "supervisor_to_youth",
-        status: "pending",
-        notes: `Supervisor crew assignment. Max youth target: ${supervisorCrewLimit}`,
-        created_at: new Date().toISOString(),
-      };
-      await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
     }
 
     if (profileType === "partner" && partnerSupport.trim()) {
@@ -1123,21 +1152,24 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
         related_profile_id: "Volunteer Program",
         relationship_type: "volunteer_to_program",
         status: "pending",
-        notes: volunteerInterest,
+        notes: `${volunteerInterest}. Availability: ${volunteerAvailability}`,
         created_at: new Date().toISOString(),
       };
       await insertRow("relationship_records", RELATIONSHIP_KEY, relationship);
     }
 
+    const refreshedProfiles = recentProfiles(10);
+    setSavedProfiles(refreshedProfiles);
+    setSaveMode("saved");
     updateActivity(activeUser, `registered ${profileType}`);
-    setMessage("Registration saved. This profile now feeds role dashboards, autofill, reports, and protected access relationships.");
+    setMessage(`Saved: ${profileLabel(profile)}. This registration now feeds role dashboards, autofill, reports, and protected access relationships.`);
   };
 
   return (
     <Shell screen="registration" setScreen={setScreen} background={IMG.ecosystem} lang={lang} setLang={setLang}>
-      <HeroCard eyebrow="Registration Hub" title="One intake. Many pathways." text="This is the shared profile and relationship layer. Youth, supervisors, parents, growers, value-added producers, volunteers, partners, customers, and board/funders register here so future forms, dashboards, parent-safe reports, and role tools can autofill." image={IMG.growArea}>
+      <HeroCard eyebrow="Registration Hub" title="One intake. Many pathways." text="This is the shared profile and relationship layer. Each role now receives only the fields that belong to that pathway." image={IMG.growArea}>
         <div className="grid gap-4 md:grid-cols-3">
-          <SelectField label="Registration type" value={profileType} onChange={(v) => setProfileType(v as ProfileType)} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
+          <SelectField label="Registration type" value={profileType} onChange={(v) => { clearMessage(); setProfileType(v as ProfileType); }} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
           <Field label="First name" value={firstName} onChange={setFirstName} />
           <Field label="Last name" value={lastName} onChange={setLastName} />
           <Field label="Preferred name" value={preferredName} onChange={setPreferredName} />
@@ -1149,16 +1181,42 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
           <Field label="ZIP" value={zip} onChange={setZip} />
         </div>
 
-        {(profileType === "youth" || profileType === "supervisor") && (
+        {profileType === "youth" && (
           <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <SelectField label="Crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Floating / Support"]} />
-            {profileType === "youth" && <SelectField label="Age range" value={ageRange} onChange={setAgeRange} options={["14-15", "16-18", "18+", "Other"]} />}
+            <SelectField label="Youth crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Floating / Support"]} />
+            <SelectField label="Age range" value={ageRange} onChange={setAgeRange} options={["14-15", "16-18", "18+", "Other"]} />
             <Field label="Guardian name" value={guardianName} onChange={setGuardianName} />
             <Field label="Guardian phone" value={guardianPhone} onChange={setGuardianPhone} />
             <Field label="Guardian email" value={guardianEmail} onChange={setGuardianEmail} />
             <Field label="Trusted adult" value={trustedAdult} onChange={setTrustedAdult} />
             <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
             <Field label="Program goal" value={programGoal} onChange={setProgramGoal} />
+            <TextArea label="Transportation notes" value={transportationNotes} onChange={setTransportationNotes} />
+          </div>
+        )}
+
+        {profileType === "supervisor" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <SelectField label="Assigned crew" value={supervisorCrewAssignment} onChange={setSupervisorCrewAssignment} options={["Crew A", "Crew B", "Crew C", "Crew D", "Crew Floater", "Operations Support"]} />
+            <Field label="Maximum youth target" value={supervisorYouthLimit} onChange={setSupervisorYouthLimit} />
+            <SelectField label="Background check status" value={backgroundStatus} onChange={setBackgroundStatus} options={["Pending", "Submitted", "Cleared", "Not cleared", "Needs review"]} />
+            <SelectField label="Training status" value={trainingStatus} onChange={setTrainingStatus} options={["Not yet completed", "Scheduled", "Completed", "Needs refresher"]} />
+            <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
+            <TextArea label="Certifications / notes" value={certifications} onChange={setCertifications} placeholder="First Aid, CPR, youth work, outdoor safety, counseling, food safety..." />
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
+              Supervisor access is for approved staff only. Supervisors can enter attendance, PPE, assessments, badges, parent-safe updates, and safety/support records.
+            </div>
+          </div>
+        )}
+
+        {profileType === "parent" && (
+          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
+            <Field label="Youth name or participant ID to link" value={parentYouthName} onChange={setParentYouthName} />
+            <SelectField label="Communication preference" value={communicationPreference} onChange={setCommunicationPreference} options={["Text message", "Email", "Phone call", "App/portal only"]} />
+            <TextArea label="Transportation / family notes" value={transportationNotes} onChange={setTransportationNotes} />
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7">
+              Parent accounts link to progress, attendance, badges, and supervisor-approved updates. Private youth wellness reflections remain staff-only.
+            </div>
           </div>
         )}
 
@@ -1167,7 +1225,8 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
             <Field label="Farm name" value={farmName} onChange={setFarmName} />
             <Field label="Crops grown" value={cropsGrown} onChange={setCropsGrown} />
             <Field label="Water source" value={waterSource} onChange={setWaterSource} />
-            <Field label="Market interest" value={marketInterest} onChange={setMarketInterest} />
+            <Field label="Equipment available" value={equipmentAvailable} onChange={setEquipmentAvailable} />
+            <TextArea label="Market interest" value={marketInterest} onChange={setMarketInterest} />
           </div>
         )}
 
@@ -1181,32 +1240,10 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
           </div>
         )}
 
-        {profileType === "parent" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <Field label="Youth name or participant ID to link" value={parentYouthName} onChange={setParentYouthName} />
-            <TextArea label="Parent/guardian notes" value={customerInterest} onChange={setCustomerInterest} placeholder="Transportation, communication preference, family support needs..." />
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
-              Parent accounts link to youth progress, attendance, badges, and supervisor-approved updates. Private youth wellness reflections remain staff-only.
-            </div>
-          </div>
-        )}
-
-        {profileType === "supervisor" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <Field label="Assigned youth / crew / group" value={relationshipTarget} onChange={setRelationshipTarget} />
-            <Field label="Maximum youth target" value={supervisorCrewLimit} onChange={setSupervisorCrewLimit} />
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
-              Supervisor access is for approved staff only. Supervisors can enter attendance, PPE, assessments, badges, parent-safe updates, and safety/support records.
-            </div>
-          </div>
-        )}
-
         {profileType === "volunteer" && (
           <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
             <TextArea label="Volunteer interests" value={volunteerInterest} onChange={setVolunteerInterest} placeholder="Planting, setup, teardown, event support, market support, supplies..." />
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
-              Volunteers support the farm and events but do not receive access to protected youth records.
-            </div>
+            <TextArea label="Availability" value={volunteerAvailability} onChange={setVolunteerAvailability} placeholder="Weekdays, weekends, event day, mornings, afternoons..." />
           </div>
         )}
 
@@ -1228,11 +1265,49 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
           </div>
         )}
 
+        {profileType === "board" && (
+          <div className="mt-5 rounded-3xl border border-white/10 bg-white/10 p-5">
+            <TextArea label="Board / funder interest" value={partnerSupport} onChange={setPartnerSupport} placeholder="Oversight, grant outcomes, investment readiness, capital needs, youth workforce outcomes..." />
+          </div>
+        )}
+
+        <div className="mt-5 rounded-3xl border border-emerald-200/20 bg-black/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Saved Registration Records</div>
+              <div className="mt-1 text-sm text-white/75">This list updates immediately after saving. It confirms the registration was stored locally while Supabase is being connected.</div>
+            </div>
+            <button type="button" onClick={() => setSavedProfiles(recentProfiles(10))} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black">Refresh Saved List</button>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {savedProfiles.length ? (
+              savedProfiles.map((profile) => (
+                <div key={profile.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                  <div className="text-xs uppercase tracking-[0.22em] text-emerald-100/70">{profile.profile_type}</div>
+                  <div className="mt-1 text-lg font-black">{profileLabel(profile)}</div>
+                  <div className="mt-1 text-xs text-white/65">{profile.email || "No email"} • {profile.phone || "No phone"}</div>
+                  <div className="mt-2 text-[11px] text-white/45">ID: {profile.id}</div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">
+                No registrations saved yet. Complete the form and press Save Registration.
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="mt-5 flex flex-wrap gap-3">
-          <button onClick={submit} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Registration</button>
+          <button onClick={submit} disabled={saveMode === "saving"} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black disabled:opacity-60">{saveMode === "saving" ? "Saving..." : "Save Registration"}</button>
           <button onClick={() => setScreen("account")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black text-white">Enter Role</button>
         </div>
-        {message && <div className="mt-4 rounded-2xl bg-emerald-300/20 p-4 font-black text-emerald-50">{message}</div>}
+
+        {message && (
+          <div className={`mt-4 rounded-2xl p-4 font-black ${saveMode === "error" ? "bg-red-500/20 text-red-50" : "bg-emerald-300/20 text-emerald-50"}`}>
+            {message}
+          </div>
+        )}
       </HeroCard>
     </Shell>
   );
@@ -1863,7 +1938,7 @@ function DataScreen({ setScreen, lang, setLang }: { setScreen: (screen: Screen) 
 
   return (
     <Shell screen="data" setScreen={setScreen} background={IMG.ecosystem} lang={lang} setLang={setLang}>
-      <HeroCard eyebrow="Data" title="Every form writes into the ecosystem." text={supabase ? "Supabase environment variables are present. Records also keep a local fallback." : "Supabase is not connected yet. Records are saving locally in this browser as a fallback."} image={IMG.ecosystem}>
+      <HeroCard eyebrow="Data" title="Every form writes into the ecosystem." text={supabase ? "Supabase environment variables are present. Records also save locally first so users receive immediate confirmation." : "Supabase is not connected yet. Records are saving locally in this browser as a fallback and will remain visible on this device."} image={IMG.ecosystem}>
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-5">
           {rows.map(([label, count]) => (
             <div key={label as string} className="rounded-2xl border border-white/10 bg-white/10 p-4">
