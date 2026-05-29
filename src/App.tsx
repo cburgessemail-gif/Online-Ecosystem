@@ -1013,6 +1013,18 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
   const [partnerSupport, setPartnerSupport] = useState("");
   const [customerInterest, setCustomerInterest] = useState("");
 
+  const registrationTypes: { type: ProfileType; title: string; note: string }[] = [
+    { type: "youth", title: "Youth", note: "Guardian, crew, goal" },
+    { type: "supervisor", title: "Supervisor", note: "Crew, clearance, training" },
+    { type: "parent", title: "Parent", note: "Youth link, communication" },
+    { type: "grower", title: "Grower", note: "Crops, water, market" },
+    { type: "value_added", title: "Value-Added", note: "Kitchen, license, products" },
+    { type: "volunteer", title: "Volunteer", note: "Interest, availability" },
+    { type: "partner", title: "Partner", note: "Support offered" },
+    { type: "customer", title: "Customer", note: "Market interest" },
+    { type: "board", title: "Board/Funder", note: "Outcomes, oversight" },
+  ];
+
   const clearMessage = () => {
     setMessage("");
     setSaveMode("idle");
@@ -1167,148 +1179,211 @@ function RegistrationHub({ setScreen, activeUser, lang, setLang }: { setScreen: 
 
   return (
     <Shell screen="registration" setScreen={setScreen} background={IMG.ecosystem} lang={lang} setLang={setLang}>
-      <HeroCard eyebrow="Registration Hub" title="One intake. Many pathways." text="This is the shared profile and relationship layer. Each role now receives only the fields that belong to that pathway." image={IMG.growArea}>
-        <div className="grid gap-4 md:grid-cols-3">
-          <SelectField label="Registration type" value={profileType} onChange={(v) => { clearMessage(); setProfileType(v as ProfileType); }} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
-          <Field label="First name" value={firstName} onChange={setFirstName} />
-          <Field label="Last name" value={lastName} onChange={setLastName} />
-          <Field label="Preferred name" value={preferredName} onChange={setPreferredName} />
-          <Field label="Organization / farm / business" value={organizationName} onChange={setOrganizationName} />
-          <Field label="Email" value={email} onChange={setEmail} type="email" />
-          <Field label="Phone" value={phone} onChange={setPhone} />
-          <Field label="City" value={city} onChange={setCity} />
-          <Field label="State" value={state} onChange={setState} />
-          <Field label="ZIP" value={zip} onChange={setZip} />
-        </div>
-
-        {profileType === "youth" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <SelectField label="Youth crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Floating / Support"]} />
-            <SelectField label="Age range" value={ageRange} onChange={setAgeRange} options={["14-15", "16-18", "18+", "Other"]} />
-            <Field label="Guardian name" value={guardianName} onChange={setGuardianName} />
-            <Field label="Guardian phone" value={guardianPhone} onChange={setGuardianPhone} />
-            <Field label="Guardian email" value={guardianEmail} onChange={setGuardianEmail} />
-            <Field label="Trusted adult" value={trustedAdult} onChange={setTrustedAdult} />
-            <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
-            <Field label="Program goal" value={programGoal} onChange={setProgramGoal} />
-            <TextArea label="Transportation notes" value={transportationNotes} onChange={setTransportationNotes} />
-          </div>
-        )}
-
-        {profileType === "supervisor" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <SelectField label="Assigned crew" value={supervisorCrewAssignment} onChange={setSupervisorCrewAssignment} options={["Crew A", "Crew B", "Crew C", "Crew D", "Crew Floater", "Operations Support"]} />
-            <Field label="Maximum youth target" value={supervisorYouthLimit} onChange={setSupervisorYouthLimit} />
-            <SelectField label="Background check status" value={backgroundStatus} onChange={setBackgroundStatus} options={["Pending", "Submitted", "Cleared", "Not cleared", "Needs review"]} />
-            <SelectField label="Training status" value={trainingStatus} onChange={setTrainingStatus} options={["Not yet completed", "Scheduled", "Completed", "Needs refresher"]} />
-            <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
-            <TextArea label="Certifications / notes" value={certifications} onChange={setCertifications} placeholder="First Aid, CPR, youth work, outdoor safety, counseling, food safety..." />
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7 md:col-span-2">
-              Supervisor access is for approved staff only. Supervisors can enter attendance, PPE, assessments, badges, parent-safe updates, and safety/support records.
+      <div className="rounded-[2rem] border border-white/10 bg-black/52 p-4 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl md:p-6">
+        <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
+          <div>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Registration Hub</div>
+                <h1 className="mt-2 text-3xl font-black leading-none tracking-tight md:text-5xl">Register once. Connect everywhere.</h1>
+                <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78 md:text-base">
+                  Choose the pathway first. The form changes by role so youth, supervisors, parents, growers, value-added producers, volunteers, partners, customers, and board/funders only see what belongs to them.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">
+                {savedProfiles.length} saved registration{savedProfiles.length === 1 ? "" : "s"}
+              </div>
             </div>
-          </div>
-        )}
 
-        {profileType === "parent" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <Field label="Youth name or participant ID to link" value={parentYouthName} onChange={setParentYouthName} />
-            <SelectField label="Communication preference" value={communicationPreference} onChange={setCommunicationPreference} options={["Text message", "Email", "Phone call", "App/portal only"]} />
-            <TextArea label="Transportation / family notes" value={transportationNotes} onChange={setTransportationNotes} />
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7">
-              Parent accounts link to progress, attendance, badges, and supervisor-approved updates. Private youth wellness reflections remain staff-only.
+            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {registrationTypes.map((item) => (
+                <button
+                  key={item.type}
+                  type="button"
+                  onClick={() => { clearMessage(); setProfileType(item.type); }}
+                  className={`rounded-2xl border p-3 text-left transition ${
+                    profileType === item.type
+                      ? "border-emerald-200 bg-emerald-300 text-black"
+                      : "border-white/10 bg-white/10 text-white hover:bg-white/20"
+                  }`}
+                >
+                  <div className="text-sm font-black">{item.title}</div>
+                  <div className="mt-1 text-[11px] leading-4 opacity-75">{item.note}</div>
+                </button>
+              ))}
             </div>
-          </div>
-        )}
 
-        {profileType === "grower" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <Field label="Farm name" value={farmName} onChange={setFarmName} />
-            <Field label="Crops grown" value={cropsGrown} onChange={setCropsGrown} />
-            <Field label="Water source" value={waterSource} onChange={setWaterSource} />
-            <Field label="Equipment available" value={equipmentAvailable} onChange={setEquipmentAvailable} />
-            <TextArea label="Market interest" value={marketInterest} onChange={setMarketInterest} />
-          </div>
-        )}
-
-        {profileType === "value_added" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <Field label="Business name" value={businessName} onChange={setBusinessName} />
-            <Field label="Product categories" value={productCategories} onChange={setProductCategories} />
-            <SelectField label="License status" value={licenseStatus} onChange={setLicenseStatus} options={["Licensed", "In process", "Need guidance", "Not applicable"]} />
-            <SelectField label="Kitchen type" value={kitchenType} onChange={setKitchenType} options={["Home kitchen", "Shared commercial kitchen", "Commercial kitchen", "Need kitchen access"]} />
-            <SelectField label="Insurance status" value={insuranceStatus} onChange={setInsuranceStatus} options={["Insured", "In process", "Need guidance", "Not applicable"]} />
-          </div>
-        )}
-
-        {profileType === "volunteer" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <TextArea label="Volunteer interests" value={volunteerInterest} onChange={setVolunteerInterest} placeholder="Planting, setup, teardown, event support, market support, supplies..." />
-            <TextArea label="Availability" value={volunteerAvailability} onChange={setVolunteerAvailability} placeholder="Weekdays, weekends, event day, mornings, afternoons..." />
-          </div>
-        )}
-
-        {profileType === "partner" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <TextArea label="Partner support area" value={partnerSupport} onChange={setPartnerSupport} placeholder="Water, tools, education, wellness, market access, youth workforce, transportation..." />
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
-              Partner records help convert support into visible outcomes and grant/funder reporting.
+            <div className="mt-5 rounded-3xl border border-white/10 bg-white/8 p-4 md:p-5">
+              <div className="grid gap-4 md:grid-cols-3">
+                <SelectField label="Registration type" value={profileType} onChange={(v) => { clearMessage(); setProfileType(v as ProfileType); }} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
+                <Field label="First name" value={firstName} onChange={setFirstName} />
+                <Field label="Last name" value={lastName} onChange={setLastName} />
+                <Field label="Preferred name" value={preferredName} onChange={setPreferredName} />
+                <Field label="Organization / farm / business" value={organizationName} onChange={setOrganizationName} />
+                <Field label="Email" value={email} onChange={setEmail} type="email" />
+                <Field label="Phone" value={phone} onChange={setPhone} />
+                <Field label="City" value={city} onChange={setCity} />
+                <Field label="State" value={state} onChange={setState} />
+                <Field label="ZIP" value={zip} onChange={setZip} />
+              </div>
             </div>
-          </div>
-        )}
 
-        {profileType === "customer" && (
-          <div className="mt-5 grid gap-4 rounded-3xl border border-white/10 bg-white/10 p-5 md:grid-cols-2">
-            <TextArea label="Customer interest" value={customerInterest} onChange={setCustomerInterest} placeholder="Seedlings, Bubble Babies, produce, events, nutrition, SNAP-eligible products..." />
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7">
-              Customer registration prepares marketplace follow-up, pickup communication, and repeat healthy food choices.
-            </div>
-          </div>
-        )}
-
-        {profileType === "board" && (
-          <div className="mt-5 rounded-3xl border border-white/10 bg-white/10 p-5">
-            <TextArea label="Board / funder interest" value={partnerSupport} onChange={setPartnerSupport} placeholder="Oversight, grant outcomes, investment readiness, capital needs, youth workforce outcomes..." />
-          </div>
-        )}
-
-        <div className="mt-5 rounded-3xl border border-emerald-200/20 bg-black/30 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Saved Registration Records</div>
-              <div className="mt-1 text-sm text-white/75">This list updates immediately after saving. It confirms the registration was stored locally while Supabase is being connected.</div>
-            </div>
-            <button type="button" onClick={() => setSavedProfiles(recentProfiles(10))} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black">Refresh Saved List</button>
-          </div>
-
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {savedProfiles.length ? (
-              savedProfiles.map((profile) => (
-                <div key={profile.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                  <div className="text-xs uppercase tracking-[0.22em] text-emerald-100/70">{profile.profile_type}</div>
-                  <div className="mt-1 text-lg font-black">{profileLabel(profile)}</div>
-                  <div className="mt-1 text-xs text-white/65">{profile.email || "No email"} • {profile.phone || "No phone"}</div>
-                  <div className="mt-2 text-[11px] text-white/45">ID: {profile.id}</div>
+            {profileType === "youth" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Youth Workforce Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <SelectField label="Youth crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Floating / Support"]} />
+                  <SelectField label="Age range" value={ageRange} onChange={setAgeRange} options={["14-15", "16-18", "18+", "Other"]} />
+                  <Field label="Guardian name" value={guardianName} onChange={setGuardianName} />
+                  <Field label="Guardian phone" value={guardianPhone} onChange={setGuardianPhone} />
+                  <Field label="Guardian email" value={guardianEmail} onChange={setGuardianEmail} />
+                  <Field label="Trusted adult" value={trustedAdult} onChange={setTrustedAdult} />
+                  <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
+                  <Field label="Program goal" value={programGoal} onChange={setProgramGoal} />
+                  <TextArea label="Transportation notes" value={transportationNotes} onChange={setTransportationNotes} />
                 </div>
-              ))
-            ) : (
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">
-                No registrations saved yet. Complete the form and press Save Registration.
               </div>
             )}
-          </div>
-        </div>
 
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button onClick={submit} disabled={saveMode === "saving"} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black disabled:opacity-60">{saveMode === "saving" ? "Saving..." : "Save Registration"}</button>
-          <button onClick={() => setScreen("account")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black text-white">Enter Role</button>
-        </div>
+            {profileType === "supervisor" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Supervisor / Staff Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <SelectField label="Assigned crew" value={supervisorCrewAssignment} onChange={setSupervisorCrewAssignment} options={["Crew A", "Crew B", "Crew C", "Crew D", "Crew Floater", "Operations Support"]} />
+                  <Field label="Maximum youth target" value={supervisorYouthLimit} onChange={setSupervisorYouthLimit} />
+                  <SelectField label="Background check status" value={backgroundStatus} onChange={setBackgroundStatus} options={["Pending", "Submitted", "Cleared", "Not cleared", "Needs review"]} />
+                  <SelectField label="Training status" value={trainingStatus} onChange={setTrainingStatus} options={["Not yet completed", "Scheduled", "Completed", "Needs refresher"]} />
+                  <Field label="Emergency contact" value={emergencyContact} onChange={setEmergencyContact} />
+                  <TextArea label="Certifications / notes" value={certifications} onChange={setCertifications} placeholder="First Aid, CPR, youth work, outdoor safety, counseling, food safety..." />
+                </div>
+                <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7">
+                  Supervisor access is for approved staff only. Supervisors can enter attendance, PPE, assessments, badges, parent-safe updates, and safety/support records.
+                </div>
+              </div>
+            )}
 
-        {message && (
-          <div className={`mt-4 rounded-2xl p-4 font-black ${saveMode === "error" ? "bg-red-500/20 text-red-50" : "bg-emerald-300/20 text-emerald-50"}`}>
-            {message}
+            {profileType === "parent" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Parent / Guardian Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <Field label="Youth name or participant ID to link" value={parentYouthName} onChange={setParentYouthName} />
+                  <SelectField label="Communication preference" value={communicationPreference} onChange={setCommunicationPreference} options={["Text message", "Email", "Phone call", "App/portal only"]} />
+                  <TextArea label="Transportation / family notes" value={transportationNotes} onChange={setTransportationNotes} />
+                  <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-7">
+                    Parent accounts link to progress, attendance, badges, and supervisor-approved updates. Private youth wellness reflections remain staff-only.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {profileType === "grower" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Grower Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <Field label="Farm name" value={farmName} onChange={setFarmName} />
+                  <Field label="Crops grown" value={cropsGrown} onChange={setCropsGrown} />
+                  <Field label="Water source" value={waterSource} onChange={setWaterSource} />
+                  <Field label="Equipment available" value={equipmentAvailable} onChange={setEquipmentAvailable} />
+                  <TextArea label="Market interest" value={marketInterest} onChange={setMarketInterest} />
+                </div>
+              </div>
+            )}
+
+            {profileType === "value_added" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Value-Added Producer Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <Field label="Business name" value={businessName} onChange={setBusinessName} />
+                  <Field label="Product categories" value={productCategories} onChange={setProductCategories} />
+                  <SelectField label="License status" value={licenseStatus} onChange={setLicenseStatus} options={["Licensed", "In process", "Need guidance", "Not applicable"]} />
+                  <SelectField label="Kitchen type" value={kitchenType} onChange={setKitchenType} options={["Home kitchen", "Shared commercial kitchen", "Commercial kitchen", "Need kitchen access"]} />
+                  <SelectField label="Insurance status" value={insuranceStatus} onChange={setInsuranceStatus} options={["Insured", "In process", "Need guidance", "Not applicable"]} />
+                </div>
+              </div>
+            )}
+
+            {profileType === "volunteer" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Volunteer Details</div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <TextArea label="Volunteer interests" value={volunteerInterest} onChange={setVolunteerInterest} placeholder="Planting, setup, teardown, event support, market support, supplies..." />
+                  <TextArea label="Availability" value={volunteerAvailability} onChange={setVolunteerAvailability} placeholder="Weekdays, weekends, event day, mornings, afternoons..." />
+                </div>
+              </div>
+            )}
+
+            {profileType === "partner" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Partner Details</div>
+                <TextArea label="Partner support area" value={partnerSupport} onChange={setPartnerSupport} placeholder="Water, tools, education, wellness, market access, youth workforce, transportation..." />
+              </div>
+            )}
+
+            {profileType === "customer" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Customer Details</div>
+                <TextArea label="Customer interest" value={customerInterest} onChange={setCustomerInterest} placeholder="Seedlings, Bubble Babies, produce, events, nutrition, SNAP-eligible products..." />
+              </div>
+            )}
+
+            {profileType === "board" && (
+              <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-4 md:p-5">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Board / Funder Details</div>
+                <TextArea label="Board / funder interest" value={partnerSupport} onChange={setPartnerSupport} placeholder="Oversight, grant outcomes, investment readiness, capital needs, youth workforce outcomes..." />
+              </div>
+            )}
+
+            <div className="sticky bottom-3 z-30 mt-5 rounded-3xl border border-white/10 bg-black/70 p-3 shadow-[0_15px_60px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+              <div className="flex flex-wrap items-center gap-3">
+                <button onClick={submit} disabled={saveMode === "saving"} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black disabled:opacity-60">{saveMode === "saving" ? "Saving..." : "Save Registration"}</button>
+                <button onClick={() => setScreen(routeForRole(profileType === "youth" ? "Youth Workforce Participant" : profileType === "supervisor" ? "Supervisor / Staff" : profileType === "parent" ? "Parent / Guardian" : profileType === "grower" ? "Grower" : profileType === "value_added" ? "Value-Added Producer" : profileType === "volunteer" ? "Volunteer" : profileType === "partner" ? "Partner" : profileType === "board" ? "Board / Funder" : "Marketplace Customer"))} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black text-white">Open Role Dashboard</button>
+                {message && (
+                  <div className={`flex-1 rounded-2xl p-4 text-sm font-black ${saveMode === "error" ? "bg-red-500/20 text-red-50" : "bg-emerald-300/20 text-emerald-50"}`}>
+                    {message}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        )}
-      </HeroCard>
+
+          <aside className="space-y-4">
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/35">
+              <img src={IMG.growArea} alt="Registration" className="h-48 w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.growArea2)} />
+              <div className="p-4">
+                <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Current pathway</div>
+                <div className="mt-1 text-2xl font-black">{registrationTypes.find((r) => r.type === profileType)?.title}</div>
+                <p className="mt-2 text-sm leading-6 text-white/70">This intake connects the person to dashboards, reports, parent-safe views, and role tools.</p>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-emerald-200/20 bg-black/35 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/70">Saved Records</div>
+                  <div className="mt-1 text-sm text-white/70">Visible proof that registration saved.</div>
+                </div>
+                <button type="button" onClick={() => setSavedProfiles(recentProfiles(10))} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-[11px] font-black">Refresh</button>
+              </div>
+
+              <div className="mt-4 max-h-[460px] space-y-3 overflow-auto pr-1">
+                {savedProfiles.length ? (
+                  savedProfiles.map((profile) => (
+                    <div key={profile.id} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                      <div className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/70">{profile.profile_type}</div>
+                      <div className="mt-1 text-sm font-black">{profileLabel(profile)}</div>
+                      <div className="mt-1 text-[11px] text-white/65">{profile.email || "No email"} • {profile.phone || "No phone"}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">
+                    No registrations saved yet. Complete the form and press Save Registration.
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
     </Shell>
   );
 }
