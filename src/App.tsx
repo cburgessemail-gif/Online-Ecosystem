@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * REAL SUPERVISOR OPERATIONS CENTER
+ * REAL SUPERVISOR + MARKETPLACE OPERATIONS CENTER
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -15,6 +15,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Incident/support log
  * - Parent-safe summary generator
  * - Reports
+ * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
  */
 
@@ -175,6 +176,49 @@ type FeedbackRecord = {
   created_at: string;
 };
 
+type MarketplaceProduct = {
+  id: string;
+  name: string;
+  category: "Produce" | "Seeds & Plants" | "Value-Added" | "Grower Marketplace" | "Events";
+  description: string;
+  price: number;
+  unit: string;
+  inventory: number;
+  snap_eligible: boolean;
+  image_url?: string;
+  active: boolean;
+  created_at: string;
+};
+
+type MarketplaceOrder = {
+  id: string;
+  customer_name: string;
+  email?: string;
+  phone?: string;
+  payment_method: "SNAP" | "Cash" | "Card" | "Invoice" | "Sponsor";
+  pickup_date: string;
+  pickup_window: string;
+  total: number;
+  status: "pending" | "confirmed" | "packed" | "picked_up" | "cancelled";
+  notes?: string;
+  created_at: string;
+};
+
+type MarketplaceOrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+};
+
+type CartItem = {
+  product: MarketplaceProduct;
+  quantity: number;
+};
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 const supabase: SupabaseClient | null =
@@ -189,6 +233,9 @@ const WELLNESS_KEY = "bff.launch.wellness";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
 const FEEDBACK_KEY = "bff.launch.feedback";
+const MARKET_PRODUCTS_KEY = "bff.launch.market.products";
+const MARKET_ORDERS_KEY = "bff.launch.market.orders";
+const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
 
 const IMG = {
   forest: "/images/SAM_0384.JPG",
@@ -242,6 +289,10 @@ function todayISO() {
 
 function nowLabel() {
   return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function money(value: number) {
+  return value.toLocaleString(undefined, { style: "currency", currency: "USD" });
 }
 
 function safeRead<T>(key: string, fallback: T): T {
@@ -378,7 +429,7 @@ function App() {
       {screen === "parent" && <ParentScreen setScreen={setScreen} />}
       {screen === "grower" && <SimplePathway title="Grower Pathway" image={IMG.grow} setScreen={setScreen} text="Growers connect crop plans, production notes, marketplace opportunity, and community food movement." />}
       {screen === "valueAdded" && <SimplePathway title="Value-Added Producer Pathway" image={IMG.market} setScreen={setScreen} text="Value-added producers connect products, kitchen readiness, licensing awareness, and marketplace participation." />}
-      {screen === "marketplace" && <SimplePathway title="Marketplace" image={IMG.market} setScreen={setScreen} text="Food moves, not the farmer. The marketplace connects growers, youth-grown produce, families, schools, businesses, and community access." />}
+      {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
@@ -1245,6 +1296,351 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </div>
       <button onClick={() => setScreen("supervisor")} className="mt-6 rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
     </Card>
+  );
+}
+
+const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
+  {
+    id: "seed-produce-greens",
+    name: "Seasonal Greens Bundle",
+    category: "Produce",
+    description: "Fresh chemical-free greens prepared for farm pickup while supplies last.",
+    price: 6,
+    unit: "bundle",
+    inventory: 25,
+    snap_eligible: true,
+    image_url: "/images/Grow Area.png",
+    active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "seed-produce-tomatoes",
+    name: "Tomato Harvest Pack",
+    category: "Produce",
+    description: "Mixed tomatoes from Bronson Family Farm seasonal production.",
+    price: 8,
+    unit: "pack",
+    inventory: 20,
+    snap_eligible: true,
+    image_url: "/images/SAM_0420.JPG",
+    active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "seed-bubble-babies",
+    name: "Bubble Babies Seed Roll",
+    category: "Seeds & Plants",
+    description: "Seed roll starter for easy planting, education, and grower supply demonstrations.",
+    price: 5,
+    unit: "packet",
+    inventory: 100,
+    snap_eligible: true,
+    image_url: "/images/Seeds_Jubilee Gardens.png",
+    active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "seed-grower-table",
+    name: "Grower Marketplace Table",
+    category: "Grower Marketplace",
+    description: "Vendor/grower table reservation for marketplace participation and supply demonstrations.",
+    price: 25,
+    unit: "space",
+    inventory: 12,
+    snap_eligible: false,
+    image_url: "/images/ConnectFoodEcosystem_withimages.png",
+    active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "seed-value-added-sampler",
+    name: "Value-Added Product Sampler",
+    category: "Value-Added",
+    description: "Placeholder product for approved shelf-stable or kitchen-ready value-added goods.",
+    price: 10,
+    unit: "item",
+    inventory: 15,
+    snap_eligible: false,
+    image_url: "/images/large (11).jpg",
+    active: true,
+    created_at: new Date().toISOString(),
+  },
+];
+
+function MarketplaceOperations({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
+  const [tab, setTab] = useState<"shop" | "checkout" | "orders" | "manage">("shop");
+  const [products, setProducts] = useState<MarketplaceProduct[]>(() => {
+    const saved = safeRead<MarketplaceProduct[]>(MARKET_PRODUCTS_KEY, []);
+    return saved.length ? saved : DEFAULT_MARKET_PRODUCTS;
+  });
+  const [orders, setOrders] = useState<MarketplaceOrder[]>(() => safeRead<MarketplaceOrder[]>(MARKET_ORDERS_KEY, []));
+  const [orderItems, setOrderItems] = useState<MarketplaceOrderItem[]>(() => safeRead<MarketplaceOrderItem[]>(MARKET_ORDER_ITEMS_KEY, []));
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [category, setCategory] = useState("All");
+  const [message, setMessage] = useState("");
+  const [customerName, setCustomerName] = useState(activeUser?.name || "");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<MarketplaceOrder["payment_method"]>("SNAP");
+  const [pickupDate, setPickupDate] = useState(todayISO());
+  const [pickupWindow, setPickupWindow] = useState("9:00 AM - 11:00 AM");
+  const [notes, setNotes] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState<MarketplaceProduct["category"]>("Produce");
+  const [newPrice, setNewPrice] = useState("5");
+  const [newInventory, setNewInventory] = useState("10");
+  const [newUnit, setNewUnit] = useState("item");
+  const [newDescription, setNewDescription] = useState("");
+  const [newSnap, setNewSnap] = useState(true);
+
+  const refresh = async () => {
+    const loadedProducts = await loadSupabaseRows<MarketplaceProduct>("marketplace_products", MARKET_PRODUCTS_KEY);
+    const productRows = loadedProducts.length ? loadedProducts : safeRead<MarketplaceProduct[]>(MARKET_PRODUCTS_KEY, DEFAULT_MARKET_PRODUCTS);
+    setProducts(productRows.length ? productRows : DEFAULT_MARKET_PRODUCTS);
+    setOrders(await loadSupabaseRows<MarketplaceOrder>("marketplace_orders", MARKET_ORDERS_KEY));
+    setOrderItems(await loadSupabaseRows<MarketplaceOrderItem>("marketplace_order_items", MARKET_ORDER_ITEMS_KEY));
+  };
+
+  useEffect(() => {
+    if (!safeRead<MarketplaceProduct[]>(MARKET_PRODUCTS_KEY, []).length) safeWrite(MARKET_PRODUCTS_KEY, DEFAULT_MARKET_PRODUCTS);
+    refresh();
+  }, []);
+
+  const categories = ["All", "Produce", "Seeds & Plants", "Value-Added", "Grower Marketplace", "Events"];
+  const visibleProducts = products.filter((p) => p.active && (category === "All" || p.category === category));
+  const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const snapTotal = cart.filter((item) => item.product.snap_eligible).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const nonSnapTotal = Math.max(0, total - snapTotal);
+  const ordersToday = orders.filter((order) => order.created_at.slice(0, 10) === todayISO());
+  const lowInventory = products.filter((p) => p.active && p.inventory <= 5);
+
+  const addToCart = (product: MarketplaceProduct) => {
+    if (product.inventory <= 0) {
+      setMessage("This item is currently unavailable.");
+      return;
+    }
+    setMessage("");
+    setCart((items) => {
+      const found = items.find((item) => item.product.id === product.id);
+      if (found) return items.map((item) => item.product.id === product.id ? { ...item, quantity: Math.min(item.quantity + 1, product.inventory) } : item);
+      return [...items, { product, quantity: 1 }];
+    });
+  };
+
+  const updateQuantity = (productId: string, quantity: number) => {
+    setCart((items) => items.flatMap((item) => {
+      if (item.product.id !== productId) return [item];
+      if (quantity <= 0) return [];
+      return [{ ...item, quantity: Math.min(quantity, item.product.inventory) }];
+    }));
+  };
+
+  const placeOrder = async () => {
+    if (!cart.length) {
+      setMessage("Add at least one marketplace item first.");
+      return;
+    }
+    if (!customerName.trim()) {
+      setMessage("Customer name is required before checkout.");
+      return;
+    }
+
+    const order: MarketplaceOrder = {
+      id: uuid(),
+      customer_name: customerName.trim(),
+      email,
+      phone,
+      payment_method: paymentMethod,
+      pickup_date: pickupDate,
+      pickup_window: pickupWindow,
+      total,
+      status: "pending",
+      notes,
+      created_at: new Date().toISOString(),
+    };
+
+    const items: MarketplaceOrderItem[] = cart.map((item) => ({
+      id: uuid(),
+      order_id: order.id,
+      product_id: item.product.id,
+      product_name: item.product.name,
+      quantity: item.quantity,
+      unit_price: item.product.price,
+      line_total: item.product.price * item.quantity,
+    }));
+
+    await insertRow("marketplace_orders", MARKET_ORDERS_KEY, order);
+    for (const item of items) await insertRow("marketplace_order_items", MARKET_ORDER_ITEMS_KEY, item);
+
+    const updatedProducts = products.map((product) => {
+      const purchased = cart.find((item) => item.product.id === product.id);
+      return purchased ? { ...product, inventory: Math.max(0, product.inventory - purchased.quantity) } : product;
+    });
+    safeWrite(MARKET_PRODUCTS_KEY, updatedProducts);
+    setProducts(updatedProducts);
+    setOrders([order, ...orders]);
+    setOrderItems([...items, ...orderItems]);
+    setCart([]);
+    setMessage(`Order saved for ${order.customer_name}. Pickup: ${order.pickup_date}, ${order.pickup_window}.`);
+    setTab("orders");
+  };
+
+  const addProduct = async () => {
+    if (!newName.trim()) {
+      setMessage("Product name is required.");
+      return;
+    }
+    const product: MarketplaceProduct = {
+      id: uuid(),
+      name: newName.trim(),
+      category: newCategory,
+      description: newDescription || "Marketplace item for Bronson Family Farm operations.",
+      price: Number(newPrice) || 0,
+      unit: newUnit || "item",
+      inventory: Number(newInventory) || 0,
+      snap_eligible: newSnap,
+      image_url: IMG.market,
+      active: true,
+      created_at: new Date().toISOString(),
+    };
+    await insertRow("marketplace_products", MARKET_PRODUCTS_KEY, product);
+    setProducts([product, ...products]);
+    setNewName("");
+    setNewDescription("");
+    setMessage("Product added to marketplace catalog.");
+  };
+
+  return (
+    <div className="grid gap-5 xl:grid-cols-[330px_1fr]">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Marketplace Operations</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight">Food moves, not the farmer.</h1>
+        <p className="mt-4 text-sm leading-7 text-white/82">Browse, cart, checkout, pickup scheduling, SNAP awareness, order tracking, and marketplace reporting.</p>
+        <div className="mt-5 grid gap-2">
+          {[
+            ["shop", "Storefront"],
+            ["checkout", `Cart / Checkout (${cartCount})`],
+            ["orders", "Orders"],
+            ["manage", "Catalog / Reports"],
+          ].map(([key, label]) => (
+            <button key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
+          ))}
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(ordersToday.reduce((s, o) => s + o.total, 0))}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{products.filter((p) => p.active).length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Inventory Alerts</div></div>
+        </div>
+        <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
+        <button onClick={() => setScreen("reports")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Reports</button>
+      </Card>
+
+      <div>
+        {message && <Notice text={message} />}
+        {tab === "shop" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Storefront</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {categories.map((cat) => <button key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {visibleProducts.map((product) => (
+                <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
+                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-85" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
+                    <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
+                    <p className="mt-3 text-sm leading-6 text-white/78">{product.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-black/35 px-3 py-1">Inventory: {product.inventory}</span>{product.snap_eligible && <span className="rounded-full bg-emerald-300 px-3 py-1 text-black">SNAP eligible</span>}</div>
+                    <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {tab === "checkout" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cart / Checkout</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Confirm order and pickup details.</h1>
+            <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_.9fr]">
+              <div className="space-y-3">
+                {cart.map((item) => (
+                  <div key={item.product.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                    <div className="flex items-center justify-between gap-4"><div><div className="font-black">{item.product.name}</div><div className="text-sm text-white/65">{money(item.product.price)} / {item.product.unit}</div></div><input type="number" min={0} max={item.product.inventory} value={item.quantity} onChange={(e) => updateQuantity(item.product.id, Number(e.target.value))} className="w-24 rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-white" /></div>
+                    <div className="mt-2 text-right font-black">{money(item.product.price * item.quantity)}</div>
+                  </div>
+                ))}
+                {!cart.length && <Notice text="Your cart is empty. Add produce, seeds, plants, value-added items, or grower marketplace items first." />}
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="grid gap-4">
+                  <Field label="Customer Name" value={customerName} onChange={setCustomerName} />
+                  <Field label="Email" value={email} onChange={setEmail} />
+                  <Field label="Phone" value={phone} onChange={setPhone} />
+                  <SelectField label="Payment Method" value={paymentMethod} onChange={(v) => setPaymentMethod(v as MarketplaceOrder["payment_method"])} options={["SNAP", "Cash", "Card", "Invoice", "Sponsor"]} />
+                  <Field label="Pickup Date" type="date" value={pickupDate} onChange={setPickupDate} />
+                  <SelectField label="Pickup Window" value={pickupWindow} onChange={setPickupWindow} options={["9:00 AM - 11:00 AM", "11:00 AM - 1:00 PM", "1:00 PM - 2:00 PM", "Event pickup", "By appointment"]} />
+                  <TextArea label="Order Notes" value={notes} onChange={setNotes} />
+                </div>
+                <div className="mt-5 rounded-2xl border border-white/10 bg-black/35 p-4 text-sm leading-7"><div className="flex justify-between"><span>SNAP eligible estimate</span><b>{money(snapTotal)}</b></div><div className="flex justify-between"><span>Non-SNAP estimate</span><b>{money(nonSnapTotal)}</b></div><div className="mt-2 flex justify-between text-xl"><span className="font-black">Total</span><b>{money(total)}</b></div></div>
+                <button onClick={placeOrder} className="mt-5 w-full rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Save Marketplace Order</button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {tab === "orders" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Orders</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Pickup and order tracking.</h1>
+            <div className="mt-6 grid gap-3">
+              {orders.map((order) => {
+                const items = orderItems.filter((item) => item.order_id === order.id);
+                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="text-lg font-black">{order.customer_name}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(order.total)}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div></div>;
+              })}
+              {!orders.length && <Notice text="No marketplace orders have been saved yet." />}
+            </div>
+          </Card>
+        )}
+
+        {tab === "manage" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Catalog / Reports</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="text-xl font-black">Add Product</div>
+                <div className="mt-4 grid gap-4">
+                  <Field label="Product Name" value={newName} onChange={setNewName} />
+                  <SelectField label="Category" value={newCategory} onChange={(v) => setNewCategory(v as MarketplaceProduct["category"])} options={["Produce", "Seeds & Plants", "Value-Added", "Grower Marketplace", "Events"]} />
+                  <Field label="Price" type="number" value={newPrice} onChange={setNewPrice} />
+                  <Field label="Inventory" type="number" value={newInventory} onChange={setNewInventory} />
+                  <Field label="Unit" value={newUnit} onChange={setNewUnit} />
+                  <TextArea label="Description" value={newDescription} onChange={setNewDescription} />
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newSnap} onChange={(e) => setNewSnap(e.target.checked)} /> SNAP eligible</label>
+                  <button onClick={addProduct} className="rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Add Product</button>
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="text-xl font-black">Marketplace Snapshot</div>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{orders.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Total Orders</div></div>
+                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{money(orders.reduce((s, o) => s + o.total, 0))}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Total Sales</div></div>
+                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{orders.filter((o) => o.payment_method === "SNAP").length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">SNAP Orders</div></div>
+                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
+                </div>
+                <div className="mt-5 space-y-2">{products.map((p) => <div key={p.id} className="flex justify-between rounded-xl bg-black/30 px-4 py-3 text-sm"><span>{p.name}</span><b>{p.inventory} {p.unit}</b></div>)}</div>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
   );
 }
 
