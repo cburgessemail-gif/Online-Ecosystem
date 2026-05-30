@@ -76,6 +76,20 @@ type MasterProfile = {
   created_at: string;
 };
 
+type EcosystemRegistration = {
+  id: string;
+  role: Role;
+  full_name: string;
+  first_name: string;
+  last_name: string;
+  preferred_name?: string;
+  email?: string;
+  phone?: string;
+  profile_type: ProfileType;
+  active: boolean;
+  created_at: string;
+};
+
 type YouthRegistration = {
   id: string;
   profile_id: string;
@@ -226,6 +240,7 @@ const supabase: SupabaseClient | null =
 
 const SESSION_KEY = "bff.launch.activeUser";
 const PROFILE_KEY = "bff.launch.profiles";
+const REGISTRATION_KEY = "bff.launch.ecosystem_registrations";
 const YOUTH_KEY = "bff.launch.youth";
 const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
@@ -640,20 +655,51 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [saved, setSaved] = useState("");
 
   const save = async () => {
+    setSaved("Saving...");
+
     const profileType = roleToProfileType(role);
+    const cleanFirst = firstName.trim();
+    const cleanLast = lastName.trim();
+    const cleanPreferred = preferredName.trim();
+    const fullName = `${cleanPreferred || cleanFirst} ${cleanLast}`.trim();
+
+    if (!cleanFirst || !cleanLast) {
+      setSaved("Please enter first and last name before saving.");
+      return;
+    }
+
     const profile: MasterProfile = {
       id: uuid(),
       profile_type: profileType,
-      first_name: firstName,
-      last_name: lastName,
-      preferred_name: preferredName,
-      email,
-      phone,
+      first_name: cleanFirst,
+      last_name: cleanLast,
+      preferred_name: cleanPreferred,
+      email: email.trim(),
+      phone: phone.trim(),
       active: true,
       created_at: new Date().toISOString(),
     };
 
-    await insertRow("profiles", PROFILE_KEY, profile);
+    const registration: EcosystemRegistration = {
+      id: profile.id,
+      role,
+      full_name: fullName,
+      first_name: cleanFirst,
+      last_name: cleanLast,
+      preferred_name: cleanPreferred,
+      email: email.trim(),
+      phone: phone.trim(),
+      profile_type: profileType,
+      active: true,
+      created_at: profile.created_at,
+    };
+
+    const registrationResult = await insertRow("ecosystem_registrations", REGISTRATION_KEY, registration);
+    const profileResult = await insertRow("profiles", PROFILE_KEY, profile);
+    const errors: string[] = [];
+
+    if (!registrationResult.ok) errors.push(`ecosystem_registrations: ${String((registrationResult.error as any)?.message || registrationResult.error)}`);
+    if (!profileResult.ok) errors.push(`profiles: ${String((profileResult.error as any)?.message || profileResult.error)}`);
 
     if (profileType === "youth") {
       const youth: YouthRegistration = {
@@ -662,18 +708,24 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         participant_id: `BFF-${Math.floor(100000 + Math.random() * 899999)}`,
         age_range: "14-18",
         crew,
-        guardian_name: guardianName,
-        guardian_phone: guardianPhone,
-        guardian_email: guardianEmail,
-        emergency_contact: guardianPhone,
-        medical_notes: medicalNotes,
+        guardian_name: guardianName.trim(),
+        guardian_phone: guardianPhone.trim(),
+        guardian_email: guardianEmail.trim(),
+        emergency_contact: guardianPhone.trim(),
+        medical_notes: medicalNotes.trim(),
         transportation_plan: "Parent/guardian pickup",
-        program_goal: programGoal,
+        program_goal: programGoal.trim(),
       };
-      await insertRow("youth_participants", YOUTH_KEY, youth);
+      const youthResult = await insertRow("youth_participants", YOUTH_KEY, youth);
+      if (!youthResult.ok) errors.push(`youth_participants: ${String((youthResult.error as any)?.message || youthResult.error)}`);
     }
 
-    setSaved("Saved. This profile is now available for supervisor autofill.");
+    if (errors.length) {
+      setSaved(`Saved locally, but Supabase did not accept all records. ${errors.join(" | ")}`);
+      return;
+    }
+
+    setSaved("Saved to Supabase. This profile is now available for supervisor autofill.");
   };
 
   return (
