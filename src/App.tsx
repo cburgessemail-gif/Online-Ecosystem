@@ -784,7 +784,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
 }
 
 function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [tab, setTab] = useState<"dashboard" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports">("dashboard");
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
@@ -814,6 +814,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
+    { key: "roster", label: "Youth Roster" },
     { key: "attendance", label: "Attendance / PPE" },
     { key: "wellness", label: "Wellness Review" },
     { key: "assessment", label: "Assessment" },
@@ -852,6 +853,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
             setScreen={setScreen}
           />
         )}
+        {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
         {tab === "assessment" && <AssessmentTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
@@ -877,11 +879,11 @@ function SupervisorDashboard({
   supportFlags: number;
   incidentCount: number;
   parentSummaryCount: number;
-  setTab: (tab: "dashboard" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports") => void;
+  setTab: (tab: "dashboard" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports") => void;
   setScreen: (screen: Screen) => void;
 }) {
   const stats = [
-    { title: "Youth Roster", value: youthCount, action: () => setScreen("registration") },
+    { title: "Youth Roster", value: youthCount, action: () => setTab("roster") },
     { title: "Today Attendance", value: attendanceCount, action: () => setTab("attendance") },
     { title: "Support Flags", value: supportFlags, action: () => setTab("wellness") },
     { title: "Today Incidents", value: incidentCount, action: () => setTab("incident") },
@@ -908,6 +910,82 @@ function SupervisorDashboard({
         ].map((item) => (
           <div key={item} className="rounded-2xl border border-white/10 bg-black/35 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
+      </div>
+    </Card>
+  );
+}
+
+
+function YouthRosterModule({
+  youthRows,
+  attendance,
+  assessments,
+  wellness,
+  incidents,
+  setScreen,
+  setTab,
+}: {
+  youthRows: { registration: YouthRegistration; profile?: MasterProfile }[];
+  attendance: AttendanceRecord[];
+  assessments: AssessmentRecord[];
+  wellness: WellnessCheckIn[];
+  incidents: IncidentRecord[];
+  setScreen: (screen: Screen) => void;
+  setTab: (tab: "dashboard" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports") => void;
+}) {
+  const today = todayISO();
+  const nameFor = (row: { registration: YouthRegistration; profile?: MasterProfile }) =>
+    row.profile ? `${row.profile.first_name} ${row.profile.last_name}`.trim() : row.registration.participant_id;
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Roster</div>
+      <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="text-4xl font-black">Active youth participants.</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.</p>
+        </div>
+        <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
+      </div>
+
+      {youthRows.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
+      ) : (
+        <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
+          <div className="grid grid-cols-[1.3fr_0.9fr_0.8fr_0.8fr_0.8fr_0.9fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
+            <div>Youth</div><div>Participant ID</div><div>Crew</div><div>Age</div><div>Today</div><div>Status</div>
+          </div>
+          <div className="divide-y divide-white/10">
+            {youthRows.map((row) => {
+              const participantId = row.registration.participant_id;
+              const todayStatus = attendance.find((a) => a.participant_id === participantId && a.date === today)?.status || "not checked in";
+              const lastAssessment = assessments.filter((a) => a.participant_id === participantId).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+              const hasFlag = wellness.some((w) => w.profile_id === row.registration.profile_id && w.safety_flag) || incidents.some((i) => i.participant_id === participantId && i.urgency !== "low");
+              return (
+                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.9fr_0.8fr_0.8fr_0.8fr_0.9fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
+                  <div>
+                    <div className="font-black text-white">{nameFor(row)}</div>
+                    <div className="text-xs text-white/60">Guardian: {row.registration.guardian_name || "not entered"}</div>
+                  </div>
+                  <div>{participantId}</div>
+                  <div>{row.registration.crew || "Unassigned"}</div>
+                  <div>{row.registration.age_range || "—"}</div>
+                  <div className="capitalize">{todayStatus.replaceAll("_", " ")}</div>
+                  <div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "Clear"}</span>
+                    {lastAssessment && <div className="mt-1 text-xs text-white/60">Safety {lastAssessment.safety}/5</div>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button onClick={() => setTab("attendance")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Take Attendance / PPE</button>
+        <button onClick={() => setTab("assessment")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Daily Assessment</button>
+        <button onClick={() => setTab("parent")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Parent Summary</button>
       </div>
     </Card>
   );
