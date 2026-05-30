@@ -1693,13 +1693,14 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
   },
 ];
 
+
 function MarketplaceOperations({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
-  const [tab, setTab] = useState<"shop" | "checkout" | "orders" | "manage">("shop");
+  const [tab, setTab] = useState<"command" | "storefront" | "checkout" | "orders" | "fulfillment" | "catalog">("command");
   const [products, setProducts] = useState<MarketplaceProduct[]>(() => {
     const saved = safeRead<MarketplaceProduct[]>(MARKET_PRODUCTS_KEY, []);
     return saved.length ? saved : DEFAULT_MARKET_PRODUCTS;
   });
-  const [orders, setOrders] = useState<MarketplaceOrder[]>(() => safeRead<MarketplaceOrder[]>(MARKET_ORDERS_KEY, []));
+  const [orders, setOrders] = useState<(MarketplaceOrder & Record<string, any>)[]>(() => safeRead<(MarketplaceOrder & Record<string, any>)[]>(MARKET_ORDERS_KEY, []));
   const [orderItems, setOrderItems] = useState<MarketplaceOrderItem[]>(() => safeRead<MarketplaceOrderItem[]>(MARKET_ORDER_ITEMS_KEY, []));
   const [cart, setCart] = useState<CartItem[]>([]);
   const [category, setCategory] = useState("All");
@@ -1708,8 +1709,11 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<MarketplaceOrder["payment_method"]>("SNAP");
+  const [salesChannel, setSalesChannel] = useState("Direct");
+  const [grownByReference, setGrownByReference] = useState("");
   const [pickupDate, setPickupDate] = useState(todayISO());
   const [pickupWindow, setPickupWindow] = useState("9:00 AM - 11:00 AM");
+  const [pickupLocation, setPickupLocation] = useState("Bronson Family Farm / Lansdowne");
   const [notes, setNotes] = useState("");
   const [newName, setNewName] = useState("");
   const [newCategory, setNewCategory] = useState<MarketplaceProduct["category"]>("Produce");
@@ -1718,12 +1722,15 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   const [newUnit, setNewUnit] = useState("item");
   const [newDescription, setNewDescription] = useState("");
   const [newSnap, setNewSnap] = useState(true);
+  const [newGrownByEnabled, setNewGrownByEnabled] = useState(true);
+  const [newDirectEnabled, setNewDirectEnabled] = useState(true);
+  const [newHarvestReady, setNewHarvestReady] = useState(false);
 
   const refresh = async () => {
     const loadedProducts = await loadSupabaseRows<MarketplaceProduct>("marketplace_products", MARKET_PRODUCTS_KEY);
     const productRows = loadedProducts.length ? loadedProducts : safeRead<MarketplaceProduct[]>(MARKET_PRODUCTS_KEY, DEFAULT_MARKET_PRODUCTS);
     setProducts(productRows.length ? productRows : DEFAULT_MARKET_PRODUCTS);
-    setOrders(await loadSupabaseRows<MarketplaceOrder>("marketplace_orders", MARKET_ORDERS_KEY));
+    setOrders(await loadSupabaseRows<MarketplaceOrder & Record<string, any>>("marketplace_orders", MARKET_ORDERS_KEY));
     setOrderItems(await loadSupabaseRows<MarketplaceOrderItem>("marketplace_order_items", MARKET_ORDER_ITEMS_KEY));
   };
 
@@ -1738,8 +1745,16 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const snapTotal = cart.filter((item) => item.product.snap_eligible).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const nonSnapTotal = Math.max(0, total - snapTotal);
-  const ordersToday = orders.filter((order) => order.created_at.slice(0, 10) === todayISO());
-  const lowInventory = products.filter((p) => p.active && p.inventory <= 5);
+  const ordersToday = orders.filter((order) => order.created_at?.slice(0, 10) === todayISO());
+  const directOrders = orders.filter((order) => (order.sales_channel || "Direct") === "Direct");
+  const grownByOrders = orders.filter((order) => (order.sales_channel || "Direct") === "GrownBy");
+  const pendingOrders = orders.filter((order) => !["picked_up", "cancelled"].includes(order.status));
+  const lowInventory = products.filter((p) => p.active && p.inventory <= Number((p as any).low_inventory_threshold || 5));
+  const harvestReady = products.filter((p) => p.active && Boolean((p as any).harvest_ready));
+  const activeProducts = products.filter((p) => p.active);
+  const revenueToday = ordersToday.reduce((s, o) => s + Number(o.total || 0), 0);
+  const snapProductCount = products.filter((p) => p.active && p.snap_eligible).length;
+  const fulfillmentNeeds = pendingOrders.filter((o) => (o.fulfillment_status || "needs_harvest") !== "picked_up");
 
   const addToCart = (product: MarketplaceProduct) => {
     if (product.inventory <= 0) {
@@ -1772,7 +1787,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       return;
     }
 
-    const order: MarketplaceOrder = {
+    const order: MarketplaceOrder & Record<string, any> = {
       id: uuid(),
       customer_name: customerName.trim(),
       email,
@@ -1784,6 +1799,14 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       status: "pending",
       notes,
       created_at: new Date().toISOString(),
+      sales_channel: salesChannel,
+      grownby_reference: salesChannel === "GrownBy" ? grownByReference.trim() : "",
+      pickup_location: pickupLocation,
+      fulfillment_status: "needs_harvest",
+      harvest_status: "not_started",
+      snap_amount: paymentMethod === "SNAP" ? snapTotal : 0,
+      direct_amount: paymentMethod === "SNAP" ? nonSnapTotal : total,
+      customer_type: salesChannel === "GrownBy" ? "grownby_customer" : "direct_customer",
     };
 
     const items: MarketplaceOrderItem[] = cart.map((item) => ({
@@ -1796,7 +1819,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       line_total: item.product.price * item.quantity,
     }));
 
-    await insertRow("marketplace_orders", MARKET_ORDERS_KEY, order);
+    const orderResult = await insertRow("marketplace_orders", MARKET_ORDERS_KEY, order);
     for (const item of items) await insertRow("marketplace_order_items", MARKET_ORDER_ITEMS_KEY, item);
 
     const updatedProducts = products.map((product) => {
@@ -1808,7 +1831,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
     setOrders([order, ...orders]);
     setOrderItems([...items, ...orderItems]);
     setCart([]);
-    setMessage(`Order saved for ${order.customer_name}. Pickup: ${order.pickup_date}, ${order.pickup_window}.`);
+    setMessage(orderResult.ok ? `Order saved for ${order.customer_name}. Channel: ${salesChannel}. Pickup: ${order.pickup_date}, ${order.pickup_window}.` : `Order saved locally but Supabase rejected it. Run the Marketplace Operations V2 SQL, then try again.`);
     setTab("orders");
   };
 
@@ -1817,7 +1840,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       setMessage("Product name is required.");
       return;
     }
-    const product: MarketplaceProduct = {
+    const product: MarketplaceProduct & Record<string, any> = {
       id: uuid(),
       name: newName.trim(),
       category: newCategory,
@@ -1829,45 +1852,94 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       image_url: IMG.market,
       active: true,
       created_at: new Date().toISOString(),
+      grownby_sales_enabled: newGrownByEnabled,
+      direct_sales_enabled: newDirectEnabled,
+      harvest_ready: newHarvestReady,
+      low_inventory_threshold: 5,
     };
-    await insertRow("marketplace_products", MARKET_PRODUCTS_KEY, product);
+    const result = await insertRow("marketplace_products", MARKET_PRODUCTS_KEY, product);
     setProducts([product, ...products]);
     setNewName("");
     setNewDescription("");
-    setMessage("Product added to marketplace catalog.");
+    setMessage(result.ok ? "Product added to marketplace catalog." : "Product saved locally. Run Marketplace Operations V2 SQL if Supabase rejected extra marketplace columns.");
   };
+
+  const ChannelBadge = ({ channel }: { channel: string }) => (
+    <span className={`rounded-full px-3 py-1 text-xs font-black ${channel === "GrownBy" ? "bg-blue-200 text-black" : "bg-emerald-300 text-black"}`}>{channel}</span>
+  );
 
   return (
     <div className="grid gap-5 xl:grid-cols-[330px_1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Marketplace Operations</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight">Food moves, not the farmer.</h1>
-        <p className="mt-4 text-sm leading-7 text-white/82">Browse, cart, checkout, pickup scheduling, SNAP awareness, order tracking, and marketplace reporting.</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Operations Center</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight">GrownBy + Direct Sales.</h1>
+        <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
         <div className="mt-5 grid gap-2">
           {[
-            ["shop", "Storefront"],
+            ["command", "Operations Dashboard"],
+            ["storefront", "Product Catalog"],
             ["checkout", `Cart / Checkout (${cartCount})`],
             ["orders", "Orders"],
-            ["manage", "Catalog / Reports"],
+            ["fulfillment", "Harvest / Fulfillment"],
+            ["catalog", "Catalog Admin"],
           ].map(([key, label]) => (
             <button key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
           ))}
         </div>
         <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(ordersToday.reduce((s, o) => s + o.total, 0))}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{products.filter((p) => p.active).length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Inventory Alerts</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(revenueToday)}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
         </div>
         <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
-        <button onClick={() => setScreen("reports")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Reports</button>
+        <button onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
       </Card>
 
       <div>
         {message && <Notice text={message} />}
-        {tab === "shop" && (
+
+        {tab === "command" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Storefront</div>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Marketplace Command</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Orders become harvest instructions.</h1>
+            <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {[
+                ["GrownBy Orders", grownByOrders.length],
+                ["Direct Orders", directOrders.length],
+                ["Pending Pickups", pendingOrders.length],
+                ["SNAP Products", snapProductCount],
+                ["Harvest Ready", harvestReady.length],
+                ["Needs Fulfillment", fulfillmentNeeds.length],
+                ["Inventory Alerts", lowInventory.length],
+                ["Revenue Today", money(revenueToday)],
+              ].map(([label, value]) => (
+                <div key={label as string} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+                  <div className="text-3xl font-black">{value}</div>
+                  <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/65">{label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <div className="text-xl font-black">GrownBy Channel</div>
+                <p className="mt-3 text-sm leading-7 text-white/78">Use for sales you complete through GrownBy, especially SNAP-supported orders. Enter the GrownBy reference so harvest and pickup can be tracked here.</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <div className="text-xl font-black">Direct Channel</div>
+                <p className="mt-3 text-sm leading-7 text-white/78">Use for farm gate sales, schools, businesses, churches, events, wholesale, invoices, and community orders.</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+                <div className="text-xl font-black">Youth Connection</div>
+                <p className="mt-3 text-sm leading-7 text-white/78">Youth should see safe marketplace impact: where food is going, what crops are needed, and why today’s harvest matters — not private customer data.</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {tab === "storefront" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
             <div className="mt-5 flex flex-wrap gap-2">
               {categories.map((cat) => <button key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
@@ -1880,7 +1952,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                     <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
                     <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
                     <p className="mt-3 text-sm leading-6 text-white/78">{product.description}</p>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-black/35 px-3 py-1">Inventory: {product.inventory}</span>{product.snap_eligible && <span className="rounded-full bg-emerald-300 px-3 py-1 text-black">SNAP eligible</span>}</div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-black/35 px-3 py-1">Inventory: {product.inventory}</span>{product.snap_eligible && <span className="rounded-full bg-emerald-300 px-3 py-1 text-black">SNAP eligible</span>}{Boolean((product as any).harvest_ready) && <span className="rounded-full bg-amber-200 px-3 py-1 text-black">Harvest ready</span>}</div>
                     <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
                   </div>
                 </div>
@@ -1892,7 +1964,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "checkout" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cart / Checkout</div>
-            <h1 className="mt-3 text-4xl font-black md:text-5xl">Confirm order and pickup details.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Record GrownBy or Direct orders.</h1>
             <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_.9fr]">
               <div className="space-y-3">
                 {cart.map((item) => (
@@ -1905,12 +1977,15 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
                 <div className="grid gap-4">
+                  <SelectField label="Sales Channel" value={salesChannel} onChange={setSalesChannel} options={["Direct", "GrownBy", "Sponsor", "Wholesale"]} />
+                  {salesChannel === "GrownBy" && <Field label="GrownBy Order / Reference" value={grownByReference} onChange={setGrownByReference} placeholder="Paste GrownBy order number/reference" />}
                   <Field label="Customer Name" value={customerName} onChange={setCustomerName} />
                   <Field label="Email" value={email} onChange={setEmail} />
                   <Field label="Phone" value={phone} onChange={setPhone} />
                   <SelectField label="Payment Method" value={paymentMethod} onChange={(v) => setPaymentMethod(v as MarketplaceOrder["payment_method"])} options={["SNAP", "Cash", "Card", "Invoice", "Sponsor"]} />
                   <Field label="Pickup Date" type="date" value={pickupDate} onChange={setPickupDate} />
                   <SelectField label="Pickup Window" value={pickupWindow} onChange={setPickupWindow} options={["9:00 AM - 11:00 AM", "11:00 AM - 1:00 PM", "1:00 PM - 2:00 PM", "Event pickup", "By appointment"]} />
+                  <Field label="Pickup Location" value={pickupLocation} onChange={setPickupLocation} />
                   <TextArea label="Order Notes" value={notes} onChange={setNotes} />
                 </div>
                 <div className="mt-5 rounded-2xl border border-white/10 bg-black/35 p-4 text-sm leading-7"><div className="flex justify-between"><span>SNAP eligible estimate</span><b>{money(snapTotal)}</b></div><div className="flex justify-between"><span>Non-SNAP estimate</span><b>{money(nonSnapTotal)}</b></div><div className="mt-2 flex justify-between text-xl"><span className="font-black">Total</span><b>{money(total)}</b></div></div>
@@ -1927,16 +2002,39 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <div className="mt-6 grid gap-3">
               {orders.map((order) => {
                 const items = orderItems.filter((item) => item.order_id === order.id);
-                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="text-lg font-black">{order.customer_name}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(order.total)}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div></div>;
+                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="flex flex-wrap items-center gap-2"><div className="text-lg font-black">{order.customer_name}</div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(Number(order.total || 0))}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div><div className="mt-2 text-xs text-white/60">Fulfillment: {order.fulfillment_status || "needs_harvest"} • Harvest: {order.harvest_status || "not_started"} {order.grownby_reference ? `• GrownBy: ${order.grownby_reference}` : ""}</div></div>;
               })}
               {!orders.length && <Notice text="No marketplace orders have been saved yet." />}
             </div>
           </Card>
         )}
 
-        {tab === "manage" && (
+        {tab === "fulfillment" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Catalog / Reports</div>
+            <div className="text-xs uppercase tracking-[0.35em] text-amber-100/75">Harvest / Fulfillment</div>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">What must be harvested, packed, and picked up?</h1>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="text-xl font-black">Pending Fulfillment</div>
+                <div className="mt-4 space-y-3">
+                  {pendingOrders.slice(0, 8).map((order) => <div key={order.id} className="rounded-2xl bg-black/30 p-4"><div className="flex justify-between gap-3"><div><div className="font-black">{order.customer_name}</div><div className="text-xs uppercase tracking-[0.18em] text-white/55">{order.pickup_date} • {order.pickup_window}</div></div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="mt-2 text-sm text-white/70">{order.fulfillment_status || "needs_harvest"}</div></div>)}
+                  {!pendingOrders.length && <div className="text-sm text-white/70">No pending orders.</div>}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="text-xl font-black">Low Inventory / Harvest Attention</div>
+                <div className="mt-4 space-y-3">
+                  {lowInventory.concat(harvestReady).slice(0, 10).map((product) => <div key={product.id} className="rounded-2xl bg-black/30 p-4"><div className="flex justify-between gap-3"><div className="font-black">{product.name}</div><div className="font-black">{product.inventory} {product.unit}</div></div><div className="mt-2 text-xs uppercase tracking-[0.18em] text-white/55">{product.category} {Boolean((product as any).harvest_ready) ? "• Harvest ready" : ""}</div></div>)}
+                  {!lowInventory.length && !harvestReady.length && <div className="text-sm text-white/70">No current harvest alerts.</div>}
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {tab === "catalog" && (
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Catalog Admin</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
@@ -1949,46 +2047,25 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                   <Field label="Unit" value={newUnit} onChange={setNewUnit} />
                   <TextArea label="Description" value={newDescription} onChange={setNewDescription} />
                   <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newSnap} onChange={(e) => setNewSnap(e.target.checked)} /> SNAP eligible</label>
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newGrownByEnabled} onChange={(e) => setNewGrownByEnabled(e.target.checked)} /> Available through GrownBy</label>
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newDirectEnabled} onChange={(e) => setNewDirectEnabled(e.target.checked)} /> Available for Direct Sales</label>
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newHarvestReady} onChange={(e) => setNewHarvestReady(e.target.checked)} /> Harvest ready</label>
                   <button onClick={addProduct} className="rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Add Product</button>
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">Marketplace Snapshot</div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{orders.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Total Orders</div></div>
-                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{money(orders.reduce((s, o) => s + o.total, 0))}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Total Sales</div></div>
-                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{orders.filter((o) => o.payment_method === "SNAP").length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">SNAP Orders</div></div>
-                  <div className="rounded-2xl bg-black/30 p-4"><div className="text-3xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
+                <div className="text-xl font-black">Channel Rules</div>
+                <div className="mt-4 space-y-3 text-sm leading-7 text-white/82">
+                  <div className="rounded-2xl bg-black/30 p-4"><b>GrownBy:</b> sales channel for GrownBy orders and SNAP-supported order tracking. Enter order references here for harvest planning.</div>
+                  <div className="rounded-2xl bg-black/30 p-4"><b>Direct:</b> Bronson direct sales for farm gate, events, schools, churches, businesses, wholesale, and invoice customers.</div>
+                  <div className="rounded-2xl bg-black/30 p-4"><b>Youth visible:</b> safe aggregate impact only — harvest goals, product demand, and destinations. No customer private data.</div>
                 </div>
-                <div className="mt-5 space-y-2">{products.map((p) => <div key={p.id} className="flex justify-between rounded-xl bg-black/30 px-4 py-3 text-sm"><span>{p.name}</span><b>{p.inventory} {p.unit}</b></div>)}</div>
               </div>
             </div>
           </Card>
         )}
       </div>
     </div>
-  );
-}
-
-function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
-  const youth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
-  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
-  const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
-  const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
-  const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
-  const parentSummaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
-
-  return (
-    <SupervisorReports
-      profiles={profiles}
-      youth={youth}
-      attendance={attendance}
-      assessments={assessments}
-      wellness={wellness}
-      incidents={incidents}
-      parentSummaries={parentSummaries}
-    />
   );
 }
 
