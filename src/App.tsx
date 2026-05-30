@@ -1324,7 +1324,7 @@ function SupervisorReports({
 
 function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [profileId, setProfileId] = useState(activeUser?.id || "");
-  const [profileType, setProfileType] = useState<ProfileType>(activeUser ? roleToProfileType(activeUser.role) : "youth");
+  const [profileType] = useState<ProfileType>(activeUser ? roleToProfileType(activeUser.role) : "youth");
   const [mood, setMood] = useState("Okay");
   const [energy, setEnergy] = useState("Medium");
   const [sleep, setSleep] = useState("Okay");
@@ -1337,6 +1337,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [support, setSupport] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const safetyFlag =
     hope <= 1 ||
@@ -1345,27 +1346,64 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(`${support} ${privateNote}`);
 
   const save = async () => {
-    const row: WellnessCheckIn = {
-      id: uuid(),
-      profile_id: profileId || activeUser?.id || "anonymous",
-      profile_type: profileType,
-      checkin_type: "morning",
-      mood,
-      energy,
-      sleep,
-      breakfast,
-      hope_score: hope,
-      belonging_score: belonging,
-      trusted_adult_score: trustedAdult,
-      confidence_score: confidence,
-      stress_score: stress,
-      support_needed: support,
-      private_note: privateNote,
-      safety_flag: safetyFlag,
-      created_at: new Date().toISOString(),
-    };
-    await insertRow("wellness_checkins", WELLNESS_KEY, row);
-    setMessage(safetyFlag ? "Saved. Staff should review this privately and promptly." : "Saved. Thank you for checking in.");
+    if (saving) return;
+    setSaving(true);
+    setMessage("Saving morning check-in...");
+
+    try {
+      const row: WellnessCheckIn = {
+        id: uuid(),
+        profile_id: (profileId || activeUser?.id || activeUser?.name || "anonymous").trim(),
+        profile_type: profileType,
+        checkin_type: "morning",
+        mood,
+        energy,
+        sleep,
+        breakfast,
+        hope_score: hope,
+        belonging_score: belonging,
+        trusted_adult_score: trustedAdult,
+        confidence_score: confidence,
+        stress_score: stress,
+        support_needed: support.trim(),
+        private_note: privateNote.trim(),
+        safety_flag: safetyFlag,
+        created_at: new Date().toISOString(),
+      };
+
+      const timeout = new Promise<{ ok: boolean; mode: string; error: unknown }>((resolve) => {
+        window.setTimeout(() => resolve({ ok: false, mode: "timeout", error: "Supabase save timed out" }), 8000);
+      });
+
+      const result = await Promise.race([insertRow("wellness_checkins", WELLNESS_KEY, row), timeout]);
+
+      if (result.ok && result.mode === "supabase") {
+        setMessage(
+          safetyFlag
+            ? "Saved to Supabase. Support flag created for approved staff review."
+            : "Saved to Supabase. Morning check-in recorded."
+        );
+        return;
+      }
+
+      if (result.ok && result.mode === "local") {
+        setMessage("Saved on this device only. Supabase keys are not connected in this deployment.");
+        return;
+      }
+
+      if (result.mode === "timeout") {
+        setMessage("Saved on this device, but Supabase did not respond. Check the wellness_checkins table and try again.");
+        return;
+      }
+
+      console.error("Morning check-in Supabase save failed:", result.error);
+      setMessage("Saved on this device, but not Supabase. Check the wellness_checkins table columns/policies, then save again.");
+    } catch (error) {
+      console.error("Morning check-in button failed:", error);
+      setMessage("The save button ran, but an app error stopped the live save. Check Console for the exact error.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -1375,7 +1413,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">This is not a diagnosis. It helps staff notice when support may be needed.</p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Profile ID or name" value={profileId} onChange={setProfileId} />
-        <SelectField label="Profile Type" value={profileType} onChange={(v) => setProfileType(v as ProfileType)} options={["youth", "supervisor", "parent", "grower", "value_added", "volunteer", "partner", "customer", "board"]} />
+        <div>
+          <label className="mb-2 block text-xs font-black uppercase tracking-[0.28em] text-emerald-100/70">Profile Path</label>
+          <div className="rounded-2xl border border-white/10 bg-black/45 px-5 py-4 text-white/85">
+            {activeUser ? `${activeUser.role} → ${profileType}` : `Current path → ${profileType}`}
+          </div>
+        </div>
         <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
         <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
         <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
@@ -1400,7 +1443,19 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <TextArea label="Private note for approved staff" value={privateNote} onChange={setPrivateNote} />
       </div>
       {safetyFlag && <Notice text="Support flag detected. This should be reviewed by approved staff, not exposed publicly or automatically sent to parents." />}
-      <button onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Morning Check-In</button>
+      <button
+        type="button"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void save();
+        }}
+        disabled={saving}
+        className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black disabled:opacity-60"
+      >
+        {saving ? "Saving..." : "Save Morning Check-In"}
+      </button>
       {message && <Notice text={message} />}
     </Card>
   );
