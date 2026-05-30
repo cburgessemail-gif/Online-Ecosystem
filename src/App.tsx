@@ -459,7 +459,7 @@ function App() {
       {screen === "portal" && <Portal setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "roles" && <Roles signIn={signIn} />}
+      {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
       {screen === "parent" && <ParentScreen setScreen={setScreen} />}
@@ -491,7 +491,7 @@ function Shell({
     { label: "Portal", screen: "portal" },
     { label: "Guest", screen: "guest" },
     { label: "Register", screen: "registration" },
-    { label: "Roles", screen: "roles" },
+    { label: "My Workspace", screen: "roles" },
     { label: "Youth", screen: "youth" },
     { label: "Supervisor", screen: "supervisor" },
     { label: "Parent", screen: "parent" },
@@ -609,7 +609,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="mt-8 flex flex-wrap gap-4">
           <button onClick={() => setScreen("guest")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
           <button onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
-          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">Choose A Role</button>
+          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
       </Card>
       <Card>
@@ -639,22 +639,138 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
-function Roles({ signIn }: { signIn: (role: Role, name?: string) => void }) {
+function MyWorkspace({
+  signIn,
+  activeUser,
+  setScreen,
+}: {
+  signIn: (role: Role, name?: string) => void;
+  activeUser: EcosystemUser | null;
+  setScreen: (screen: Screen) => void;
+}) {
   const [name, setName] = useState("");
+  const [showAccessTools, setShowAccessTools] = useState(false);
+
+  const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
+  const isYouth = activeUser?.role === "Youth Workforce Participant";
+  const isParent = activeUser?.role === "Parent / Guardian";
+  const isGrower = activeUser?.role === "Grower";
+  const isMarketplace = activeUser?.role === "Marketplace Customer" || activeUser?.role === "Value-Added Producer";
+
+  const workspaceCards: { title: string; subtitle: string; screen: Screen; show: boolean }[] = [
+    {
+      title: "Youth Daily Check-In",
+      subtitle: "Start My Day: attendance, date/time, PPE, wellness, goal, and support request.",
+      screen: "youth",
+      show: isYouth || isStaff,
+    },
+    {
+      title: "Supervisor Operations Center",
+      subtitle: "Attendance, PPE, wellness review, assessments, incidents, parent summaries, and reports.",
+      screen: "supervisor",
+      show: isStaff,
+    },
+    {
+      title: "Parent Portal",
+      subtitle: "Parent-safe attendance, progress notes, announcements, and family updates.",
+      screen: "parent",
+      show: isParent || isStaff,
+    },
+    {
+      title: "Grower Operations Center",
+      subtitle: "Weather, crop plans, grower tasks, field notes, inventory, and marketplace demand.",
+      screen: "grower",
+      show: isGrower || isStaff,
+    },
+    {
+      title: "Marketplace Operations",
+      subtitle: "GrownBy + direct sales, products, inventory, orders, SNAP awareness, and fulfillment.",
+      screen: "marketplace",
+      show: isMarketplace || isGrower || isStaff || !activeUser,
+    },
+    {
+      title: "Executive Reports",
+      subtitle: "Program metrics, workforce status, youth readiness, marketplace activity, and impact reporting.",
+      screen: "reports",
+      show: isStaff,
+    },
+    {
+      title: "Guest Experience",
+      subtitle: "Public story, farm ecosystem, historic place, and community pathway.",
+      screen: "guest",
+      show: !activeUser,
+    },
+    {
+      title: "Registration / Profile",
+      subtitle: "Create one profile once, then reuse it across every workspace.",
+      screen: "registration",
+      show: true,
+    },
+  ];
+
+  const visibleCards = workspaceCards.filter((card) => card.show);
+
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Role Access</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Choose how you are entering today.</h1>
-      <div className="mt-6 max-w-xl">
-        <Field label="Name for this session" value={name} onChange={setName} placeholder="Example: Supervisor Aide" />
-      </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {roles.map((role) => (
-          <button key={role} onClick={() => signIn(role, name)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black">
-            <div className="text-lg font-black">{role}</div>
-            <div className="mt-2 text-sm opacity-85">Access level: {roleAccess[role]}</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Workspace</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">
+        {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
+      </h1>
+      <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
+        Roles stay in the background as permissions. This page shows the workspaces available for the person who is signed in.
+      </p>
+
+      {activeUser && (
+        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
+          <div className="mt-2 text-2xl font-black">{activeUser.role}</div>
+          <div className="mt-1 text-sm text-white/72">Access level: {activeUser.accessLevel}</div>
+        </div>
+      )}
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {visibleCards.map((card) => (
+          <button
+            key={card.title}
+            onClick={() => setScreen(card.screen)}
+            className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
+          >
+            <div className="text-xl font-black">{card.title}</div>
+            <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
           </button>
         ))}
+      </div>
+
+      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
+        <button
+          type="button"
+          onClick={() => setShowAccessTools((value) => !value)}
+          className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
+        >
+          {showAccessTools ? "Hide Access Tools" : "First-Time / Testing Access"}
+        </button>
+        {showAccessTools && (
+          <div className="mt-5">
+            <div className="max-w-xl">
+              <Field label="Name for this session" value={name} onChange={setName} placeholder="Example: Supervisor Aide" />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {roles.map((role) => (
+                <button
+                  key={role}
+                  onClick={() => signIn(role, name)}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
+                >
+                  <div className="text-lg font-black">{role}</div>
+                  <div className="mt-2 text-sm opacity-85">Opens: {routeForRole(role)}</div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 text-xs leading-6 text-white/60">
+              These access buttons are for launch testing and first-time entry only. In daily use, registered users should come back to My Workspace and open only their assigned workspaces.
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );
