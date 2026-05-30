@@ -1941,6 +1941,16 @@ const DEFAULT_GROWER_TASKS = [
   { title: "Document crop notes", priority: "Medium", detail: "Record what changed today so the farm can learn over time." },
 ];
 
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+      <div className="text-3xl font-black text-white">{value}</div>
+      <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+    </div>
+  );
+}
+
 function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [weather, setWeather] = useState<GrowerWeather>({ source: "fallback" });
   const [weatherMessage, setWeatherMessage] = useState("Loading Youngstown farm weather...");
