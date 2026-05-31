@@ -317,9 +317,13 @@ export default function RealSupervisorDashboard() {
       }
 
       try {
-        const [rolesRes, profilesRes, teamRes, skillRes, badgeRes, assignmentRes] = await Promise.all([
-          supabase.from("user_roles").select("profile_id, role_key").eq("role_key", "youth"),
-          supabase.from("profiles").select("id, first_name, last_name, preferred_name, email, profile_type, phone, organization_name"),
+        const [profilesRes, teamRes, skillRes, badgeRes, assignmentRes] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("id, first_name, last_name, preferred_name, email, profile_type, phone, organization_name, active")
+            .eq("profile_type", "youth")
+            .eq("active", true)
+            .order("first_name"),
           supabase.from("teams").select("team_key, team_name").order("team_name"),
           supabase.from("skills").select("skill_key, skill_name, category_key").order("skill_name"),
           supabase.from("badges").select("badge_key, badge_name, badge_level").order("badge_name"),
@@ -332,9 +336,7 @@ export default function RealSupervisorDashboard() {
         if (badgeRes.data) setBadges(badgeRes.data);
         if (assignmentRes.data) setAssignments(assignmentRes.data);
 
-        const youthIds = new Set((rolesRes.data || []).map((r: any) => r.profile_id));
-        const profileRows = profilesRes.data || [];
-        const youthProfiles = profileRows.filter((p: any) => youthIds.has(p.id) || p.profile_type === "youth");
+        const youthProfiles = profilesRes.data || [];
 
         const mappedYouth: YouthRecord[] = youthProfiles.length
           ? youthProfiles.map((p: any, index: number) => {
@@ -361,7 +363,7 @@ export default function RealSupervisorDashboard() {
         setSelectedYouthId((current) => current || mappedYouth[0]?.id || "");
         setLiveMode(youthProfiles.length > 0);
         setRecords(local);
-        setMessage(youthProfiles.length ? "Live Supabase foundation loaded. Attendance saves to database and local backup." : "No youth role profiles found yet. Showing fallback youth while database tables remain connected.");
+        setMessage(youthProfiles.length ? "Live Supabase foundation loaded. Attendance saves to database and local backup." : "No active youth profiles found yet. Showing fallback youth while database tables remain connected.");
       } catch (err: any) {
         if (!mounted) return;
         setRecords(local);
