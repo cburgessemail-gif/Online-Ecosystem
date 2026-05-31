@@ -32,6 +32,7 @@ type Screen =
   | "marketplace"
   | "wellness"
   | "myDayStatus"
+  | "assignment"
   | "reports"
   | "operations"
   | "feedback";
@@ -175,6 +176,34 @@ type PPECheckIn = {
   created_at: string;
 };
 
+
+
+type YouthAssignmentStatus = {
+  id: string;
+  participant_id: string;
+  profile_id?: string;
+  assignment_date: string;
+  assignment_title: string;
+  crew: string;
+  work_area: string;
+  supervisor_name?: string;
+  status: "assigned" | "working" | "needs_help" | "safety_issue" | "complete";
+  started_at?: string;
+  completed_at?: string;
+  notes?: string;
+  created_at: string;
+};
+
+type AttendanceCommunication = {
+  id: string;
+  participant_id: string;
+  profile_id?: string;
+  communication_type: "need_supervisor" | "safety_issue" | "question" | "ready";
+  message: string;
+  status: "open" | "reviewed" | "closed";
+  created_at: string;
+};
+
 type YouthEncouragement = {
   id: string;
   message: string;
@@ -275,6 +304,8 @@ const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
 const WELLNESS_KEY = "bff.launch.wellness";
 const PPE_KEY = "bff.launch.ppeCheckins";
+const YOUTH_ASSIGNMENT_STATUS_KEY = "bff.launch.youth.assignment.status";
+const ATTENDANCE_COMMUNICATIONS_KEY = "bff.launch.attendance.communications";
 const YOUTH_ENCOURAGEMENT_KEY = "bff.launch.youthEncouragements";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
@@ -499,6 +530,7 @@ function App() {
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "myDayStatus" && <MyDayStatus setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "assignment" && <DailyAssignmentBoard setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
@@ -1890,6 +1922,153 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 }
 
 
+
+function DailyAssignmentBoard({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
+  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
+  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
+  const [ppeRows, setPpeRows] = useState<PPECheckIn[]>(() => safeRead<PPECheckIn[]>(PPE_KEY, []));
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
+      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
+      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
+      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
+      setPpeRows(await loadSupabaseRows<PPECheckIn>("ppe_checkins", PPE_KEY));
+    };
+    void load();
+  }, []);
+
+  const today = todayISO();
+  const selectedYouth = youth[0];
+  const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
+  const participantId = selectedYouth?.participant_id || "No participant selected";
+  const todayAttendance = attendance.find((a) => a.participant_id === participantId && a.date === today);
+  const todayWellness = wellness.find((w) => w.profile_id === selectedYouth?.profile_id && w.created_at.slice(0, 10) === today);
+  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.checkin_date || p.created_at || "").slice(0, 10) === today);
+  const checkedIn = Boolean(todayAttendance && todayWellness && todayPpe);
+  const ready = checkedIn && todayAttendance?.ppe_status === "complete" && todayPpe?.ready_for_assignment;
+  const crew = selectedYouth?.crew || "Crew A";
+
+  const assignmentTitle = "Orientation / First Workday Readiness";
+  const workArea = "Main Farm Gathering Area → assigned grow area";
+  const supervisorName = activeUser?.role === "Supervisor / Staff" ? activeUser.name : "Supervisor will confirm onsite";
+
+  const saveStatus = async (status: YouthAssignmentStatus["status"], notice: string) => {
+    if (!selectedYouth) {
+      setMessage("No youth profile is connected to this device yet. Register or choose a youth profile first.");
+      return;
+    }
+    setSaving(true);
+    const row: YouthAssignmentStatus = {
+      id: uuid(),
+      participant_id: participantId,
+      profile_id: selectedYouth.profile_id,
+      assignment_date: today,
+      assignment_title: assignmentTitle,
+      crew,
+      work_area: workArea,
+      supervisor_name: supervisorName,
+      status,
+      started_at: status === "working" ? new Date().toISOString() : undefined,
+      completed_at: status === "complete" ? new Date().toISOString() : undefined,
+      notes: notice,
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("youth_assignment_statuses", YOUTH_ASSIGNMENT_STATUS_KEY, row);
+    setMessage(result.ok ? notice : `Saved on this device, but Supabase did not accept the assignment status. ${String((result.error as any)?.message || result.error)}`);
+    setSaving(false);
+  };
+
+  const sendCommunication = async (communication_type: AttendanceCommunication["communication_type"], notice: string) => {
+    if (!selectedYouth) {
+      setMessage("No youth profile is connected to this device yet.");
+      return;
+    }
+    setSaving(true);
+    const row: AttendanceCommunication = {
+      id: uuid(),
+      participant_id: participantId,
+      profile_id: selectedYouth.profile_id,
+      communication_type,
+      message: notice,
+      status: "open",
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("attendance_communications", ATTENDANCE_COMMUNICATIONS_KEY, row);
+    setMessage(result.ok ? notice : `Saved on this device, but Supabase did not accept the support request. ${String((result.error as any)?.message || result.error)}`);
+    setSaving(false);
+  };
+
+  return (
+    <Card className="min-h-[calc(100vh-120px)]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today&apos;s Assignment</div>
+          <h1 className="mt-1 text-3xl font-black md:text-5xl">Good morning, {profileName(selectedProfile) || activeUser?.name || "Cultivator"}.</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/78">After Start My Day, this screen tells you where to go, what to do, and how to ask for help.</p>
+        </div>
+        <div className={`rounded-2xl px-5 py-3 text-center text-sm font-black ${ready ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
+          {ready ? "READY FOR ASSIGNMENT" : "SUPERVISOR REVIEW"}
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.15fr_.95fr]">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Identity + Check-In</div>
+          <div className="mt-3 grid gap-2 text-sm">
+            <div className="flex justify-between gap-2"><span className="text-white/65">Participant ID</span><b>{participantId}</b></div>
+            <div className="flex justify-between gap-2"><span className="text-white/65">Date</span><b>{new Date().toLocaleDateString()}</b></div>
+            <div className="flex justify-between gap-2"><span className="text-white/65">Check-In</span><b>{todayAttendance?.check_in_time || "Not checked in"}</b></div>
+            <div className="flex justify-between gap-2"><span className="text-white/65">Crew</span><b>{crew}</b></div>
+            <div className="flex justify-between gap-2"><span className="text-white/65">PPE</span><b className="capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</b></div>
+            <div className="flex justify-between gap-2"><span className="text-white/65">Readiness</span><b>{todayWellness ? "Submitted" : "Pending"}</b></div>
+          </div>
+        </div>
+
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Assignment</div>
+          <h2 className="mt-2 text-2xl font-black">{assignmentTitle}</h2>
+          <div className="mt-3 grid gap-2 text-sm leading-6 text-white/84 md:grid-cols-2">
+            <div><b>Location:</b><br />{workArea}</div>
+            <div><b>Supervisor:</b><br />{supervisorName}</div>
+            <div><b>Mission:</b><br />Learn the site rhythm, safety flow, and first workday expectations.</div>
+            <div><b>Tools:</b><br />Water bottle, gloves, closed-toe shoes, notebook or phone if approved.</div>
+          </div>
+          <div className="mt-3 rounded-2xl bg-emerald-300/12 p-3 text-sm leading-6 text-white/88">
+            <b>Learning Goal:</b> Understand how your work connects growing food, safety, teamwork, and community impact.
+          </div>
+        </div>
+
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Safety + Next Steps</div>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-white/84">
+            <li>• Stay with your crew until released.</li>
+            <li>• Drink water before you feel thirsty.</li>
+            <li>• Report injuries, dizziness, conflict, or confusion immediately.</li>
+            <li>• Do not leave the site without approved pickup.</li>
+          </ul>
+          <div className="mt-3 rounded-2xl bg-white/10 p-3 text-sm font-black text-white">Today&apos;s wisdom: A good harvest begins with good preparation.</div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-5">
+        <button disabled={!ready || saving} onClick={() => void saveStatus("working", "Assignment started. Stay with your crew and follow supervisor instructions.")} className="rounded-full bg-emerald-300 px-4 py-3 text-sm font-black text-black disabled:opacity-50">Begin Assignment</button>
+        <button disabled={saving} onClick={() => void sendCommunication("need_supervisor", "Supervisor help requested. Please stay where you are and wait for approved staff.")} className="rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm font-black">Need Supervisor</button>
+        <button disabled={saving} onClick={() => void sendCommunication("safety_issue", "Safety issue reported. Stop work and wait for approved staff.")} className="rounded-full border border-red-200/30 bg-red-500/20 px-4 py-3 text-sm font-black">Report Safety Issue</button>
+        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm font-black">View Grower Notes</button>
+        <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm font-black">End My Day</button>
+      </div>
+      {message && <Notice text={message} />}
+      {!checkedIn && <Notice text="Complete Start My Day first. Assignment buttons unlock after attendance, PPE, and readiness are saved." />}
+    </Card>
+  );
+}
+
 function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
@@ -1958,7 +2137,7 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
 
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         <button onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Back to Youth Home</button>
-        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">See Farm Information</button>
+        <button onClick={() => setScreen("assignment")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">View Today's Assignment</button>
         <button onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Youth Voice / Reflection</button>
       </div>
     </Card>
