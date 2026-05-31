@@ -5,7 +5,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * Bronson Family Farm Online Ecosystem
  * REAL SUPERVISOR + MARKETPLACE OPERATIONS CENTER
  *
- * Complete React/Vite App.tsx replacement focused on orientation operations.
+ * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
  * - Role access
  * - Youth roster
@@ -174,6 +174,14 @@ type PPECheckIn = {
   created_at: string;
 };
 
+type YouthEncouragement = {
+  id: string;
+  message: string;
+  theme: "growing" | "confidence" | "learning" | "teamwork" | "responsibility" | "resilience" | "self_discovery";
+  active: boolean;
+  created_at: string;
+};
+
 type IncidentRecord = {
   id: string;
   participant_id?: string;
@@ -266,6 +274,7 @@ const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
 const WELLNESS_KEY = "bff.launch.wellness";
 const PPE_KEY = "bff.launch.ppeCheckins";
+const YOUTH_ENCOURAGEMENT_KEY = "bff.launch.youthEncouragements";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
 const FEEDBACK_KEY = "bff.launch.feedback";
@@ -285,6 +294,27 @@ const IMG = {
   partners: "/images/Partners.png",
   queens: "/images/Queens Village.png",
 };
+
+const DEFAULT_YOUTH_ENCOURAGEMENTS: YouthEncouragement[] = [
+  { id: "enc-001", theme: "growing", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Good morning, Cultivator. Today is another chance to grow food, grow skills, and grow yourself." },
+  { id: "enc-002", theme: "learning", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Every row, seed, and task can teach you something. Stay curious and keep learning." },
+  { id: "enc-003", theme: "confidence", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "You do not have to know everything today. Show up, ask questions, and grow stronger one step at a time." },
+  { id: "enc-004", theme: "responsibility", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Your work matters. The food you help grow can feed families, build community, and open doors." },
+  { id: "enc-005", theme: "self_discovery", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "As you learn the land, also learn yourself: your strengths, your choices, your voice, and your future." },
+  { id: "enc-006", theme: "teamwork", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Great farms are built by teams. Encourage someone today and let someone encourage you." },
+  { id: "enc-007", theme: "resilience", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Growth takes patience. Plants grow little by little, and so do people." },
+  { id: "enc-008", theme: "growing", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "We Grow Green to Harvest Dreams. Today, you are part of that dream becoming real." },
+  { id: "enc-009", theme: "learning", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Pay attention to the weather, the soil, the plants, and your own growth. All of them are speaking." },
+  { id: "enc-010", theme: "confidence", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "You belong here. Your effort, your questions, and your ideas are part of this farm." },
+];
+
+function encouragementForYouth(entries: YouthEncouragement[], participantId: string, dateSeed: string) {
+  const active = entries.filter((entry) => entry.active && entry.message.trim());
+  const source = active.length ? active : DEFAULT_YOUTH_ENCOURAGEMENTS;
+  const seed = `${participantId || "cultivator"}-${dateSeed}`;
+  const index = Array.from(seed).reduce((sum, char) => sum + char.charCodeAt(0), 0) % source.length;
+  return source[index];
+}
 
 const roles: Role[] = [
   "Guest",
@@ -455,7 +485,7 @@ function App() {
 
   return (
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut}>
-      {message && <Notice text={message} />}
+      {message && <div className="mt-2"><Notice text={message} /></div>}
       {screen === "portal" && <Portal setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -613,13 +643,13 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
       </Card>
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Orientation Focus</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
         {[
           "Supervisor Operations Center is now the working control room.",
           "Youth check-ins and supervisor records save to Supabase when connected.",
           "Parents receive progress summaries, not private raw youth reflections.",
           "Incident and support flags stay staff-facing.",
-          "Reports convert daily records into orientation readiness and program impact.",
+          "Reports convert daily records into launch readiness and program impact.",
         ].map((item) => (
           <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
@@ -1453,7 +1483,7 @@ function SupervisorReports({
         ))}
       </div>
       <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-sm leading-7 text-white/84">
-        This report is designed for orientation operations, staff briefings, parent-safe updates, partner accountability, and future funder reporting.
+        This report is designed for launch operations, staff briefings, parent-safe updates, partner accountability, and future funder reporting.
       </div>
     </Card>
   );
@@ -1484,6 +1514,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [privateNote, setPrivateNote] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [encouragements, setEncouragements] = useState<YouthEncouragement[]>(() => safeRead<YouthEncouragement[]>(YOUTH_ENCOURAGEMENT_KEY, DEFAULT_YOUTH_ENCOURAGEMENTS));
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -1495,8 +1526,10 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     const load = async () => {
       const loadedProfiles = await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY);
       const loadedYouth = await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY);
+      const loadedEncouragements = await loadSupabaseRows<YouthEncouragement>("youth_encouragements", YOUTH_ENCOURAGEMENT_KEY);
       setProfiles(loadedProfiles);
       setYouth(loadedYouth);
+      setEncouragements(loadedEncouragements.length ? loadedEncouragements : DEFAULT_YOUTH_ENCOURAGEMENTS);
       if (!participantId && loadedYouth[0]?.participant_id) setParticipantId(loadedYouth[0].participant_id);
     };
     void load();
@@ -1507,6 +1540,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const profileId = selectedYouth?.profile_id || activeUser?.id || "anonymous";
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   const checkinTime = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const selectedEncouragement = encouragementForYouth(encouragements, selectedYouth?.participant_id || participantId, currentTime.toISOString().slice(0, 10));
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
   const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Hold for supervisor review";
 
@@ -1517,7 +1551,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     !allRequiredPPE ||
     /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(`${support} ${privateNote}`);
 
-  const checkboxClass = "flex min-h-[44px] items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black";
+  const checkboxClass = "flex min-h-[34px] items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-black";
 
   const save = async () => {
     if (saving) return;
@@ -1545,7 +1579,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         status: "present",
         ppe_status: ppeStatus,
         qr_method: "manual",
-        notes: `${readinessStatus}. ${dailyGoal ? `Goal: ${dailyGoal}. ` : ""}${equipmentNeeded && equipmentNeeded !== "None" ? `Equipment needed: ${equipmentNeeded}.` : ""}`,
+        notes: `${readinessStatus}. Encouragement: ${selectedEncouragement.message} ${dailyGoal ? `Goal: ${dailyGoal}. ` : ""}${equipmentNeeded && equipmentNeeded !== "None" ? `Equipment needed: ${equipmentNeeded}.` : ""}`,
         created_at: iso,
       };
 
@@ -1624,65 +1658,71 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   );
 
   const Slider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="rounded-2xl border border-white/10 bg-white/10 p-3">
-      <div className="flex justify-between text-xs font-black"><span>{label}</span><span>{value}/5</span></div>
-      <input className="mt-2 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+    <label className="rounded-xl border border-white/10 bg-white/10 p-2">
+      <div className="flex justify-between text-[11px] font-black leading-tight"><span>{label}</span><span>{value}/5</span></div>
+      <input className="mt-1 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
     </label>
   );
 
   return (
     <Card>
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-3 text-3xl font-black md:text-5xl">Start My Day</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/80">One screen records attendance, PPE readiness, basic wellness, and support needs.</p>
+          <h1 className="mt-1 text-3xl font-black md:text-4xl">Start My Day</h1>
+          <p className="mt-1 max-w-3xl text-xs leading-5 text-white/78">Attendance, PPE, wellness, goal, and support needs are recorded together.</p>
         </div>
-        <div className="rounded-3xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-right">
+        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-3 text-right">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Check-In Time</div>
-          <div className="mt-1 text-2xl font-black">{checkinTime}</div>
-          <div className="text-sm font-bold text-white/75">{checkinDate}</div>
+          <div className="mt-1 text-xl font-black">{checkinTime}</div>
+          <div className="text-xs font-bold text-white/75">{checkinDate}</div>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr_1.1fr]">
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
+      <div className="mt-3 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/14 p-3">
+        <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Encouragement</div>
+        <div className="mt-1 text-base font-black leading-snug text-white">{selectedEncouragement.message}</div>
+        <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Theme: {selectedEncouragement.theme.replaceAll("_", " ")}</div>
+      </div>
+
+      <div className="mt-3 grid gap-2 lg:grid-cols-[0.95fr_0.95fr_1.1fr]">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity + Attendance</div>
-          <div className="mt-3 grid gap-3">
+          <div className="mt-2 grid gap-2">
             <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={youth.map((y) => y.participant_id)} />
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6">
+            <div className="rounded-xl border border-white/10 bg-white/10 p-3 text-xs leading-5">
               <div className="font-black text-white">{profileName(selectedProfile)}</div>
               <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth selected"}</div>
               <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
-              <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance will save as PRESENT when Start My Day is pressed.</div>
+              <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-[11px] font-black text-black">Start My Day = Present</div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE Check</div>
-          <div className="mt-3 grid gap-2">
+          <div className="mt-2 grid gap-1.5">
             <Toggle label="Closed-toe shoes / boots" checked={closedToeShoes} setChecked={setClosedToeShoes} />
             <Toggle label="Water bottle" checked={waterBottle} setChecked={setWaterBottle} />
             <Toggle label="Work gloves" checked={workGloves} setChecked={setWorkGloves} />
             <Toggle label="Appropriate outdoor clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
+          <div className="mt-2 grid gap-1.5 md:grid-cols-2">
             <Toggle label="Sunscreen" checked={sunscreen} setChecked={setSunscreen} />
             <Toggle label="Hat / weather protection" checked={hatWeatherProtection} setChecked={setHatWeatherProtection} />
           </div>
-          <div className={`mt-3 rounded-2xl p-3 text-center text-sm font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{readinessStatus}</div>
+          <div className={`mt-2 rounded-xl p-2 text-center text-xs font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{readinessStatus}</div>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
             <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
             <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
             <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
           </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-5">
+          <div className="mt-2 grid gap-1.5 md:grid-cols-5">
             <Slider label="Hope" value={hope} setValue={setHope} />
             <Slider label="Belonging" value={belonging} setValue={setBelonging} />
             <Slider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
@@ -1692,13 +1732,20 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="mt-3 grid gap-2 md:grid-cols-4">
         <Field label="Equipment Needed" value={equipmentNeeded} onChange={setEquipmentNeeded} placeholder="None, gloves, water bottle, etc." />
-        <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What do you want to accomplish today?" />
-        <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. A supervisor can check in privately." />
-      </div>
-      <div className="mt-4">
-        <TextArea label="Private note for approved staff" value={privateNote} onChange={setPrivateNote} />
+        <label className="block md:col-span-1">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Daily Goal</span>
+          <textarea value={dailyGoal} placeholder="Goal for today" onChange={(e) => setDailyGoal(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
+        </label>
+        <label className="block md:col-span-1">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Supervisor Support</span>
+          <textarea value={support} placeholder="Optional" onChange={(e) => setSupport(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
+        </label>
+        <label className="block md:col-span-1">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Private Staff Note</span>
+          <textarea value={privateNote} placeholder="Approved staff only" onChange={(e) => setPrivateNote(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
+        </label>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
@@ -1709,7 +1756,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           void save();
         }}
         disabled={saving}
-        className="mt-5 w-full rounded-full bg-emerald-300 px-7 py-4 text-lg font-black text-black disabled:opacity-60"
+        className="mt-3 w-full rounded-full bg-emerald-300 px-7 py-3 text-base font-black text-black disabled:opacity-60"
       >
         {saving ? "Saving..." : "Start My Day"}
       </button>
@@ -2249,50 +2296,39 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
   );
 }
 
-
-function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
-  const youth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
-  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
-  const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
-  const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
-  const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
-  const parentSummaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
-
+function SimplePathway({
+  title,
+  text,
+  image,
+  setScreen,
+  extra,
+}: {
+  title: string;
+  text: string;
+  image: string;
+  setScreen: (screen: Screen) => void;
+  extra?: React.ReactNode;
+}) {
   return (
-    <SupervisorReports
-      profiles={profiles}
-      youth={youth}
-      attendance={attendance}
-      assessments={assessments}
-      wellness={wellness}
-      incidents={incidents}
-      parentSummaries={parentSummaries}
-    />
-  );
-}
-
-function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
-        {[
-          ["Beginning of Day", "QR/manual check-in, PPE, water, daily proverb, weather awareness, assignments."],
-          ["During Program", "Supervisor observations, wellness support, safety follow-up, task completion, incident documentation."],
-          ["End of Day", "Youth reflection, supervisor assessment, parent-safe summary, reports."],
-        ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-xl font-black">{title}</div>
-            <p className="mt-3 text-sm leading-7 text-white/82">{text}</p>
-          </div>
-        ))}
+    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
+        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          {extra}
+          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+          <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+        </div>
+      </Card>
+      <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
+        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
       </div>
-      <button onClick={() => setScreen("supervisor")} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
-    </Card>
+    </div>
   );
 }
+
 
 type GrowerWeather = {
   currentTemp?: number;
@@ -2560,7 +2596,6 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
   );
 }
 
-
 function SimplePathway({
   title,
   text,
@@ -2593,5 +2628,6 @@ function SimplePathway({
     </div>
   );
 }
+
 
 export default App;
