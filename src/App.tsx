@@ -1740,6 +1740,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     }
   };
 
+  const runStartMyDay = (e?: React.MouseEvent | React.PointerEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    void save();
+  };
+
   const Toggle = ({ label, checked, setChecked }: { label: string; checked: boolean; setChecked: (v: boolean) => void }) => (
     <label className={checkboxClass}>
       <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="h-5 w-5" />
@@ -1784,7 +1790,13 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
               <div className="font-black text-white">{profileName(selectedProfile)}</div>
               <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth selected"}</div>
               <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
-              <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-[11px] font-black text-black">Start My Day = Present</div>
+              <button
+                type="button"
+                onClick={runStartMyDay}
+                className="mt-2 w-full rounded-full bg-emerald-300 px-3 py-1 text-center text-[11px] font-black text-black"
+              >
+                Check In Now = Present
+              </button>
             </div>
           </div>
         </div>
@@ -1801,7 +1813,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Sunscreen" checked={sunscreen} setChecked={setSunscreen} />
             <Toggle label="Hat / weather protection" checked={hatWeatherProtection} setChecked={setHatWeatherProtection} />
           </div>
-          <div className={`mt-2 rounded-xl p-2 text-center text-xs font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{readinessStatus}</div>
+          <div className={`mt-2 rounded-xl p-2 text-center text-xs font-black ${allRequiredPPE ? "bg-emerald-300/85 text-black" : "bg-amber-300/85 text-black"}`}>PPE Status: {readinessStatus}</div>
         </div>
 
         <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
@@ -1841,10 +1853,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
       <button
         type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          void save();
-        }}
+        onClick={runStartMyDay}
+        onPointerUp={runStartMyDay}
         disabled={saving}
         className="mt-3 w-full rounded-full bg-emerald-300 px-7 py-3 text-base font-black text-black disabled:opacity-60"
       >
