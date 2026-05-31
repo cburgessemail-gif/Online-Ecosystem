@@ -525,6 +525,7 @@ function Shell({
     { label: "Youth", screen: "youth" },
     { label: "Supervisor", screen: "supervisor" },
     { label: "Parent", screen: "parent" },
+    { label: "Grower", screen: "grower" },
     { label: "Market", screen: "marketplace" },
     { label: "Wellness", screen: "wellness" },
     { label: "Reports", screen: "reports" },
@@ -934,19 +935,108 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
+  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
+  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
+  const [encouragements, setEncouragements] = useState<YouthEncouragement[]>(() => safeRead<YouthEncouragement[]>(YOUTH_ENCOURAGEMENT_KEY, DEFAULT_YOUTH_ENCOURAGEMENTS));
+
+  useEffect(() => {
+    const load = async () => {
+      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
+      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
+      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
+      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
+      const loadedEncouragements = await loadSupabaseRows<YouthEncouragement>("youth_encouragements", YOUTH_ENCOURAGEMENT_KEY);
+      setEncouragements(loadedEncouragements.length ? loadedEncouragements : DEFAULT_YOUTH_ENCOURAGEMENTS);
+    };
+    void load();
+  }, []);
+
+  const currentYouth = youth[0];
+  const currentProfile = profiles.find((p) => p.id === currentYouth?.profile_id);
+  const name = activeUser?.name || profileName(currentProfile) || "Cultivator";
+  const today = todayISO();
+  const todayAttendance = currentYouth ? attendance.find((a) => a.participant_id === currentYouth.participant_id && a.date === today) : undefined;
+  const todayWellness = currentYouth ? wellness.find((w) => w.profile_id === currentYouth.profile_id && w.created_at.slice(0, 10) === today) : undefined;
+  const encouragement = encouragementForYouth(encouragements, currentYouth?.participant_id || activeUser?.id || "youth", today);
+
+  const ActionCard = ({ title, text, button, target, primary = false }: { title: string; text: string; button: string; target: Screen; primary?: boolean }) => {
+    const openTarget = (e?: React.MouseEvent) => {
+      e?.preventDefault();
+      e?.stopPropagation();
+      setScreen(target);
+    };
+
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={openTarget}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") openTarget(e as unknown as React.MouseEvent);
+        }}
+        className={`rounded-[1.5rem] border p-4 text-left transition hover:-translate-y-0.5 ${primary ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/18"}`}
+      >
+        <div className="text-lg font-black leading-tight">{title}</div>
+        <p className="mt-2 min-h-[42px] text-xs leading-5 opacity-85">{text}</p>
+        <button
+          type="button"
+          onClick={openTarget}
+          className={`mt-3 rounded-full px-4 py-2 text-xs font-black ${primary ? "bg-black text-white" : "bg-emerald-300 text-black"}`}
+        >
+          {button}
+        </button>
+      </div>
+    );
+  };
+
   return (
-    <SimplePathway
-      title="Youth Workforce Pathway"
-      image={IMG.youth}
-      text="Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress."
-      setScreen={setScreen}
-      extra={
-        <>
-          <button onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Morning Check-In</button>
-          <button onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Supervisor Review</button>
-        </>
-      }
-    />
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workspace</div>
+      <div className="mt-3 grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
+        <div>
+          <h1 className="text-4xl font-black leading-tight md:text-6xl">Good morning, {name}.</h1>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-white/84">
+            Start your day, learn what the farm needs, see where the food is going, and share your voice before you leave.
+          </p>
+        </div>
+        <div className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/14 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Encouragement</div>
+          <div className="mt-2 text-xl font-black leading-snug text-white">{encouragement.message}</div>
+          <div className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Theme: {encouragement.theme.replaceAll("_", " ")}</div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
+          <div className="mt-2 text-2xl font-black">{todayAttendance ? "Checked In" : "Not Checked In"}</div>
+          <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "Press Start My Day first."}</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">PPE</div>
+          <div className="mt-2 text-2xl font-black capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</div>
+          <div className="mt-1 text-sm text-white/70">Shoes, water, gloves, clothing.</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
+          <div className="mt-2 text-2xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
+          <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support.</div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <ActionCard primary title="Start My Day" text="Attendance, PPE, readiness, wellness, goal, and support request in one screen." button="Open Check-In" target="wellness" />
+        <ActionCard title="Farm Information" text="See grower information: weather, daily field word, farm conditions, and field priorities." button="Open Grower Info" target="grower" />
+        <ActionCard title="Marketplace Impact" text="See how food moves to customers, GrownBy, direct sales, pickups, and community access." button="Open Marketplace" target="marketplace" />
+        <ActionCard title="Youth Voice" text="Share feedback, reflection, and what would make tomorrow better." button="Share Feedback" target="feedback" />
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-7 text-white/84">
+        Youth do not need supervisor-only buttons here. Supervisor notes, incident logs, parent summaries, and private wellness review stay in the Supervisor Center.
+      </div>
+    </Card>
   );
 }
 
