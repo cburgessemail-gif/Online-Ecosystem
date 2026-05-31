@@ -32,7 +32,6 @@ type Screen =
   | "marketplace"
   | "wellness"
   | "myDayStatus"
-  | "assignment"
   | "reports"
   | "operations"
   | "feedback";
@@ -176,34 +175,6 @@ type PPECheckIn = {
   created_at: string;
 };
 
-
-
-type YouthAssignmentStatus = {
-  id: string;
-  participant_id: string;
-  profile_id?: string;
-  assignment_date: string;
-  assignment_title: string;
-  crew: string;
-  work_area: string;
-  supervisor_name?: string;
-  status: "assigned" | "working" | "needs_help" | "safety_issue" | "complete";
-  started_at?: string;
-  completed_at?: string;
-  notes?: string;
-  created_at: string;
-};
-
-type AttendanceCommunication = {
-  id: string;
-  participant_id: string;
-  profile_id?: string;
-  communication_type: "need_supervisor" | "safety_issue" | "question" | "ready";
-  message: string;
-  status: "open" | "reviewed" | "closed";
-  created_at: string;
-};
-
 type YouthEncouragement = {
   id: string;
   message: string;
@@ -304,8 +275,6 @@ const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
 const WELLNESS_KEY = "bff.launch.wellness";
 const PPE_KEY = "bff.launch.ppeCheckins";
-const YOUTH_ASSIGNMENT_STATUS_KEY = "bff.launch.youth.assignment.status";
-const ATTENDANCE_COMMUNICATIONS_KEY = "bff.launch.attendance.communications";
 const YOUTH_ENCOURAGEMENT_KEY = "bff.launch.youthEncouragements";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
@@ -487,7 +456,7 @@ function App() {
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
-      setMessage("Protected area. Switch workspace/access to Supervisor / Staff, Administrator, or Board / Funder first.");
+      setMessage("Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.");
       setScreenState("roles");
       return;
     }
@@ -530,7 +499,6 @@ function App() {
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "myDayStatus" && <MyDayStatus setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "assignment" && <DailyAssignmentBoard setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
@@ -567,24 +535,24 @@ function Shell({
   ];
 
   return (
-    <div className="relative h-screen overflow-hidden bg-black text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-black text-white">
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
       <div className="fixed inset-0 bg-black/54" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.34),rgba(0,0,0,.68)),radial-gradient(circle_at_top_left,rgba(52,211,153,.22),transparent_32%)]" />
-      <div className="relative z-10 mx-auto flex h-screen max-w-[1500px] flex-col px-2 py-2 md:px-4">
-        <div className="z-40 mb-2 rounded-2xl border border-white/10 bg-black/60 p-1.5 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button onClick={() => setScreen("portal")} className="mr-1 min-w-[170px] px-2 text-left">
-              <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="text-sm font-black leading-tight">Online Ecosystem</div>
+      <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
+        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
+              <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
+              <div className="text-base font-black leading-tight">Online Ecosystem</div>
             </button>
             {nav.map((item) => (
               <button
                 key={item.screen}
                 onClick={() => setScreen(item.screen)}
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
                   screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
@@ -592,29 +560,29 @@ function Shell({
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">
-              <div className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[10px] font-bold">
+              <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-bold">
                 {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Public / Guest"}
               </div>
               {activeUser && (
-                <button onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-black">
+                <button onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
                   Sign Out
                 </button>
               )}
             </div>
           </div>
         </div>
-        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
+        {children}
       </div>
     </div>
   );
 }
 
 function Notice({ text }: { text: string }) {
-  return <div className="mb-3 rounded-xl border border-amber-200/30 bg-amber-300/15 p-2.5 text-xs font-black text-amber-50">{text}</div>;
+  return <div className="mb-3 rounded-2xl border border-amber-200/30 bg-amber-300/15 p-4 text-sm font-black text-amber-50">{text}</div>;
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-[1.35rem] border border-white/10 bg-black/46 p-3 shadow-[0_20px_60px_rgba(0,0,0,.42)] backdrop-blur-2xl ${className}`}>{children}</div>;
+  return <div className={`rounded-[2rem] border border-white/10 bg-black/46 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
 }
 
 function Field(props: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
@@ -626,7 +594,7 @@ function Field(props: { label: string; value: string; onChange: (v: string) => v
         type={props.type || "text"}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
-        className="mt-1 w-full rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
+        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
       />
     </label>
   );
@@ -636,7 +604,7 @@ function SelectField(props: { label: string; value: string; onChange: (v: string
   return (
     <label className="block">
       <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{props.label}</span>
-      <select value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-1 w-full rounded-xl border border-white/10 bg-black/65 px-3 py-2 text-white outline-none focus:border-emerald-200">
+      <select value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
         {props.options.map((option) => (
           <option key={option} value={option} className="bg-black">
             {option}
@@ -655,8 +623,8 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
         value={props.value}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
-        rows={2}
-        className="mt-1 w-full rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
+        rows={4}
+        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
       />
     </label>
   );
@@ -686,7 +654,7 @@ function Portal({ setScreen, activeUser }: { setScreen: (screen: Screen) => void
           "Incident and support flags stay staff-facing.",
           "Reports convert daily records into launch readiness and program impact.",
         ].map((item) => (
-          <div key={item} className="mt-3 rounded-xl border border-white/10 bg-white/10 p-2.5 text-sm leading-6 text-white/86">{item}</div>
+          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
       </Card>
     </div>
@@ -778,7 +746,7 @@ function MyWorkspace({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Workspace</div>
-      <h1 className="mt-4 text-3xl font-black md:text-4xl">
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">
         {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
       </h1>
       <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
@@ -824,7 +792,7 @@ function MyWorkspace({
                 <button
                   key={role}
                   onClick={() => signIn(role, name)}
-                  className="rounded-xl border border-white/10 bg-white/10 p-2.5 text-left transition hover:bg-emerald-300 hover:text-black"
+                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
                 >
                   <div className="text-lg font-black">{role}</div>
                   <div className="mt-2 text-sm opacity-85">Opens: {routeForRole(role)}</div>
@@ -933,7 +901,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Registration Center</div>
-      <h1 className="mt-4 text-3xl font-black md:text-4xl">Create the profile once. Reuse it everywhere.</h1>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Create the profile once. Reuse it everywhere.</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Role / Registration Type" value={role} onChange={(v) => setRole(v as Role)} options={roles} />
         <Field label="Preferred Name" value={preferredName} onChange={setPreferredName} />
@@ -1030,7 +998,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workspace</div>
       <div className="mt-3 grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
         <div>
-          <h1 className="text-3xl font-black leading-tight md:text-6xl">Good morning, {name}.</h1>
+          <h1 className="text-4xl font-black leading-tight md:text-6xl">Good morning, {name}.</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-white/84">
             Start your day, learn what the farm needs, see where the food is going, and share your voice before you leave.
           </p>
@@ -1067,7 +1035,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
         <ActionCard title="Youth Voice" text="Share feedback, reflection, and what would make tomorrow better." button="Share Feedback" target="feedback" />
       </div>
 
-      <div className="mt-5 rounded-xl border border-white/10 bg-white/10 p-2.5 text-sm leading-7 text-white/84">
+      <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-7 text-white/84">
         Youth do not need supervisor-only buttons here. Supervisor notes, incident logs, parent summaries, and private wellness review stay in the Supervisor Center.
       </div>
     </Card>
@@ -1126,7 +1094,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
             </button>
           ))}
         </div>
-        <div className="mt-5 rounded-xl border border-white/10 bg-white/10 p-2.5 text-sm leading-6 text-white/84">
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/84">
           Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.
         </div>
         <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Data</button>
@@ -1184,11 +1152,11 @@ function SupervisorDashboard({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
-      <h2 className="mt-3 text-3xl font-black">Orientation-day operating picture.</h2>
+      <h2 className="mt-3 text-4xl font-black">Orientation-day operating picture.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <button key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
-            <div className="text-3xl font-black">{stat.value}</div>
+            <div className="text-4xl font-black">{stat.value}</div>
             <div className="mt-2 text-sm font-bold opacity-85">{stat.title}</div>
           </button>
         ))}
@@ -1233,7 +1201,7 @@ function YouthRosterModule({
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Roster</div>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black">Active youth participants.</h2>
+          <h2 className="text-4xl font-black">Active youth participants.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.</p>
         </div>
         <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
@@ -1318,7 +1286,7 @@ function AttendanceTool({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Attendance / PPE</div>
-      <h2 className="mt-3 text-3xl font-black">Check youth in and document readiness.</h2>
+      <h2 className="mt-3 text-4xl font-black">Check youth in and document readiness.</h2>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
         <SelectField label="Attendance Status" value={status} onChange={(v) => setStatus(v as AttendanceRecord["status"])} options={["present", "absent", "late", "excused"]} />
@@ -1336,7 +1304,7 @@ function WellnessReview({ wellness, profiles }: { wellness: WellnessCheckIn[]; p
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Wellness Review</div>
-      <h2 className="mt-3 text-3xl font-black">Staff-facing support awareness.</h2>
+      <h2 className="mt-3 text-4xl font-black">Staff-facing support awareness.</h2>
       <p className="mt-4 max-w-3xl text-sm leading-6 text-white/80">
         This is not a diagnosis. It is a staff-only way to notice urgent need, isolation, food insecurity, stress, or safety concerns.
       </p>
@@ -1398,7 +1366,7 @@ function AssessmentTool({
   };
 
   const Slider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="block rounded-xl border border-white/10 bg-white/10 p-2.5">
+    <label className="block rounded-2xl border border-white/10 bg-white/10 p-4">
       <div className="flex justify-between text-sm font-black"><span>{label}</span><span>{value}/5</span></div>
       <input className="mt-3 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
     </label>
@@ -1407,7 +1375,7 @@ function AssessmentTool({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Assessment</div>
-      <h2 className="mt-3 text-3xl font-black">Track skill growth, responsibility, and readiness.</h2>
+      <h2 className="mt-3 text-4xl font-black">Track skill growth, responsibility, and readiness.</h2>
       <div className="mt-6">
         <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
       </div>
@@ -1465,17 +1433,17 @@ function IncidentTool({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-red-100/75">Staff-Only Incident / Support Log</div>
-      <h2 className="mt-3 text-3xl font-black">Document safety, behavior, conflict, wellness, or parent contact.</h2>
+      <h2 className="mt-3 text-4xl font-black">Document safety, behavior, conflict, wellness, or parent contact.</h2>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
         <SelectField label="Incident Type" value={incidentType} onChange={(v) => setIncidentType(v as IncidentRecord["incident_type"])} options={["injury", "behavior", "conflict", "wellness", "safety", "transportation", "parent_contact", "other"]} />
         <SelectField label="Urgency" value={urgency} onChange={(v) => setUrgency(v as IncidentRecord["urgency"])} options={["low", "medium", "high", "emergency"]} />
-        <label className="mt-8 flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-2.5 font-black">
+        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
           <input type="checkbox" checked={parentContacted} onChange={(e) => setParentContacted(e.target.checked)} />
           Parent / guardian contacted
         </label>
       </div>
-      <div className="mt-2 grid gap-2 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
         <TextArea label="What happened?" value={summary} onChange={setSummary} />
         <TextArea label="Action taken / next step" value={action} onChange={setAction} />
       </div>
@@ -1538,11 +1506,11 @@ function ParentSummaryTool({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent-Safe Summary Generator</div>
-      <h2 className="mt-3 text-3xl font-black">Share progress without exposing private youth reflection.</h2>
+      <h2 className="mt-3 text-4xl font-black">Share progress without exposing private youth reflection.</h2>
       <div className="mt-6">
         <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
       </div>
-      <div className="mt-2 grid gap-2 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
         <TextArea label="Strengths to share with parent" value={strengths} onChange={setStrengths} />
         <TextArea label="Progress today" value={progress} onChange={setProgress} />
         <TextArea label="Support / next goal parent can encourage" value={needs} onChange={setNeeds} />
@@ -1586,7 +1554,7 @@ function SupervisorReports({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Reports</div>
-      <h2 className="mt-3 text-3xl font-black">Supervisor report snapshot.</h2>
+      <h2 className="mt-3 text-4xl font-black">Supervisor report snapshot.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
           ["Youth Registered", youth.length],
@@ -1817,11 +1785,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   );
 
   return (
-    <Card className="h-[calc(100vh-74px)] overflow-hidden">
+    <Card>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-1 text-2xl font-black md:text-3xl">Start My Day</h1>
+          <h1 className="mt-1 text-3xl font-black md:text-4xl">Start My Day</h1>
           <p className="mt-1 max-w-3xl text-xs leading-5 text-white/78">Attendance, PPE, wellness, goal, and support needs are recorded together.</p>
         </div>
         <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-3 text-right">
@@ -1831,14 +1799,14 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
       </div>
 
-      <div className="mt-2 rounded-xl border border-emerald-200/25 bg-emerald-300/14 p-2">
+      <div className="mt-3 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/14 p-3">
         <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Encouragement</div>
-        <div className="mt-1 text-sm font-black leading-snug text-white">{selectedEncouragement.message}</div>
+        <div className="mt-1 text-base font-black leading-snug text-white">{selectedEncouragement.message}</div>
         <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Theme: {selectedEncouragement.theme.replaceAll("_", " ")}</div>
       </div>
 
-      <div className="mt-2 grid gap-2 lg:grid-cols-[0.9fr_1fr_1.1fr]">
-        <div className="rounded-xl border border-white/10 bg-black/28 p-2">
+      <div className="mt-3 grid gap-2 lg:grid-cols-[0.95fr_0.95fr_1.1fr]">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity + Attendance</div>
           <div className="mt-2 grid gap-2">
             <div className="rounded-xl border border-white/10 bg-white/10 p-3 text-xs leading-5">
@@ -1853,7 +1821,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-black/28 p-2">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE Check</div>
           <div className="mt-2 grid gap-1.5">
             <Toggle label="Closed-toe shoes / boots" checked={closedToeShoes} setChecked={setClosedToeShoes} />
@@ -1872,7 +1840,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           </label>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-black/28 p-2">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
           <div className="mt-2 grid gap-2 md:grid-cols-2">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["Select mood", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
@@ -1922,153 +1890,6 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 }
 
 
-
-function DailyAssignmentBoard({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
-  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
-  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
-  const [ppeRows, setPpeRows] = useState<PPECheckIn[]>(() => safeRead<PPECheckIn[]>(PPE_KEY, []));
-  const [message, setMessage] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const load = async () => {
-      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
-      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
-      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
-      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
-      setPpeRows(await loadSupabaseRows<PPECheckIn>("ppe_checkins", PPE_KEY));
-    };
-    void load();
-  }, []);
-
-  const today = todayISO();
-  const selectedYouth = youth[0];
-  const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
-  const participantId = selectedYouth?.participant_id || "No participant selected";
-  const todayAttendance = attendance.find((a) => a.participant_id === participantId && a.date === today);
-  const todayWellness = wellness.find((w) => w.profile_id === selectedYouth?.profile_id && w.created_at.slice(0, 10) === today);
-  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.checkin_date || p.created_at || "").slice(0, 10) === today);
-  const checkedIn = Boolean(todayAttendance && todayWellness && todayPpe);
-  const ready = checkedIn && todayAttendance?.ppe_status === "complete" && todayPpe?.ready_for_assignment;
-  const crew = selectedYouth?.crew || "Crew A";
-
-  const assignmentTitle = "Orientation / First Workday Readiness";
-  const workArea = "Main Farm Gathering Area → assigned grow area";
-  const supervisorName = activeUser?.role === "Supervisor / Staff" ? activeUser.name : "Supervisor will confirm onsite";
-
-  const saveStatus = async (status: YouthAssignmentStatus["status"], notice: string) => {
-    if (!selectedYouth) {
-      setMessage("No youth profile is connected to this device yet. Register or choose a youth profile first.");
-      return;
-    }
-    setSaving(true);
-    const row: YouthAssignmentStatus = {
-      id: uuid(),
-      participant_id: participantId,
-      profile_id: selectedYouth.profile_id,
-      assignment_date: today,
-      assignment_title: assignmentTitle,
-      crew,
-      work_area: workArea,
-      supervisor_name: supervisorName,
-      status,
-      started_at: status === "working" ? new Date().toISOString() : undefined,
-      completed_at: status === "complete" ? new Date().toISOString() : undefined,
-      notes: notice,
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("youth_assignment_statuses", YOUTH_ASSIGNMENT_STATUS_KEY, row);
-    setMessage(result.ok ? notice : `Saved on this device, but Supabase did not accept the assignment status. ${String((result.error as any)?.message || result.error)}`);
-    setSaving(false);
-  };
-
-  const sendCommunication = async (communication_type: AttendanceCommunication["communication_type"], notice: string) => {
-    if (!selectedYouth) {
-      setMessage("No youth profile is connected to this device yet.");
-      return;
-    }
-    setSaving(true);
-    const row: AttendanceCommunication = {
-      id: uuid(),
-      participant_id: participantId,
-      profile_id: selectedYouth.profile_id,
-      communication_type,
-      message: notice,
-      status: "open",
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("attendance_communications", ATTENDANCE_COMMUNICATIONS_KEY, row);
-    setMessage(result.ok ? notice : `Saved on this device, but Supabase did not accept the support request. ${String((result.error as any)?.message || result.error)}`);
-    setSaving(false);
-  };
-
-  return (
-    <Card className="h-[calc(100vh-74px)] overflow-hidden">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today&apos;s Assignment</div>
-          <h1 className="mt-1 text-2xl font-black md:text-3xl">Good morning, {profileName(selectedProfile) || activeUser?.name || "Cultivator"}.</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/78">After Start My Day, this screen tells you where to go, what to do, and how to ask for help.</p>
-        </div>
-        <div className={`rounded-2xl px-5 py-3 text-center text-sm font-black ${ready ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
-          {ready ? "READY FOR ASSIGNMENT" : "SUPERVISOR REVIEW"}
-        </div>
-      </div>
-
-      <div className="mt-2 grid gap-2 xl:grid-cols-[.9fr_1.15fr_.9fr]">
-        <div className="rounded-xl border border-white/10 bg-black/30 p-2.5">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Identity + Check-In</div>
-          <div className="mt-2 grid gap-1.5 text-xs">
-            <div className="flex justify-between gap-2"><span className="text-white/65">Participant ID</span><b>{participantId}</b></div>
-            <div className="flex justify-between gap-2"><span className="text-white/65">Date</span><b>{new Date().toLocaleDateString()}</b></div>
-            <div className="flex justify-between gap-2"><span className="text-white/65">Check-In</span><b>{todayAttendance?.check_in_time || "Not checked in"}</b></div>
-            <div className="flex justify-between gap-2"><span className="text-white/65">Crew</span><b>{crew}</b></div>
-            <div className="flex justify-between gap-2"><span className="text-white/65">PPE</span><b className="capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</b></div>
-            <div className="flex justify-between gap-2"><span className="text-white/65">Readiness</span><b>{todayWellness ? "Submitted" : "Pending"}</b></div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-white/10 bg-white/10 p-2.5">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Assignment</div>
-          <h2 className="mt-2 text-2xl font-black">{assignmentTitle}</h2>
-          <div className="mt-2 grid gap-2 text-xs leading-5 text-white/84 md:grid-cols-2">
-            <div><b>Location:</b><br />{workArea}</div>
-            <div><b>Supervisor:</b><br />{supervisorName}</div>
-            <div><b>Mission:</b><br />Learn the site rhythm, safety flow, and first workday expectations.</div>
-            <div><b>Tools:</b><br />Water bottle, gloves, closed-toe shoes, notebook or phone if approved.</div>
-          </div>
-          <div className="mt-2 rounded-xl bg-emerald-300/12 p-2 text-xs leading-5 text-white/88">
-            <b>Learning Goal:</b> Understand how your work connects growing food, safety, teamwork, and community impact.
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-white/10 bg-black/30 p-2.5">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Safety + Next Steps</div>
-          <ul className="mt-2 space-y-1 text-xs leading-5 text-white/84">
-            <li>• Stay with your crew until released.</li>
-            <li>• Drink water before you feel thirsty.</li>
-            <li>• Report injuries, dizziness, conflict, or confusion immediately.</li>
-            <li>• Do not leave the site without approved pickup.</li>
-          </ul>
-          <div className="mt-2 rounded-xl bg-white/10 p-2 text-xs font-black text-white">Today&apos;s wisdom: A good harvest begins with good preparation.</div>
-        </div>
-      </div>
-
-      <div className="mt-2 grid gap-2 md:grid-cols-5">
-        <button disabled={!ready || saving} onClick={() => void saveStatus("working", "Assignment started. Stay with your crew and follow supervisor instructions.")} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black disabled:opacity-50">Begin Assignment</button>
-        <button disabled={saving} onClick={() => void sendCommunication("need_supervisor", "Supervisor help requested. Please stay where you are and wait for approved staff.")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Need Supervisor</button>
-        <button disabled={saving} onClick={() => void sendCommunication("safety_issue", "Safety issue reported. Stop work and wait for approved staff.")} className="rounded-full border border-red-200/30 bg-red-500/20 px-3 py-2 text-xs font-black">Report Safety Issue</button>
-        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">View Grower Notes</button>
-        <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">End My Day</button>
-      </div>
-      {message && <Notice text={message} />}
-      {!checkedIn && <Notice text="Complete Start My Day first. Assignment buttons unlock after attendance, PPE, and readiness are saved." />}
-    </Card>
-  );
-}
-
 function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
@@ -2101,7 +1922,7 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Day Status</div>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black md:text-4xl">You are checked in.</h1>
+          <h1 className="text-4xl font-black md:text-6xl">You are checked in.</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
             This is your next screen after Start My Day. Stay here until your supervisor gives the crew assignment.
           </p>
@@ -2112,23 +1933,23 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       </div>
 
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Participant</div>
           <div className="mt-2 text-xl font-black">{profileName(selectedProfile)}</div>
           <div className="mt-1 text-sm text-white/70">{participantId}</div>
           <div className="text-sm text-white/70">{selectedYouth?.crew || "Crew not assigned"}</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
           <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.status || "Not recorded"}</div>
           <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "No time recorded"}</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">PPE</div>
           <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</div>
           <div className="mt-1 text-sm text-white/70">Shoes, water, gloves, outdoor clothing</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
           <div className="mt-2 text-xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
           <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support</div>
@@ -2137,7 +1958,7 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
 
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         <button onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Back to Youth Home</button>
-        <button onClick={() => setScreen("assignment")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">View Today's Assignment</button>
+        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">See Farm Information</button>
         <button onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Youth Voice / Reflection</button>
       </div>
     </Card>
@@ -2149,13 +1970,13 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent / Guardian Portal</div>
-      <h1 className="mt-4 text-3xl font-black md:text-4xl">Progress, encouragement, and next steps.</h1>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Progress, encouragement, and next steps.</h1>
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
         Parents see attendance, accomplishments, badges, goals, and parent-safe messages. Private wellness reflections remain staff-protected.
       </p>
       <div className="mt-6 grid gap-3">
         {summaries.slice(0, 6).map((summary) => (
-          <div key={summary.id} className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+          <div key={summary.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-white/65">{summary.date} • {summary.participant_id}</div>
             <p className="mt-2 text-sm leading-7 text-white/88">{summary.parent_safe_message}</p>
           </div>
@@ -2391,7 +2212,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       unit: newUnit || "item",
       inventory: Number(newInventory) || 0,
       snap_eligible: newSnap,
-      image_url: IMG.market,
+      image_url: "",
       active: true,
       created_at: new Date().toISOString(),
       grownby_sales_enabled: newGrownByEnabled,
@@ -2444,7 +2265,17 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "command" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Marketplace Command</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">Orders become harvest instructions.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Orders become harvest instructions.</h1>
+            <div className="mt-4 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/80">GrownBy Market Connection</div>
+              <div className="mt-2 text-2xl font-black">Bronson sells through GrownBy and direct sales.</div>
+              <p className="mt-2 text-sm leading-6 text-white/82">Use GrownBy for online/SNAP-supported ordering and use this ecosystem for planning, direct sales, fulfillment, pickup, youth-safe marketplace impact, and grower demand. Food moves, not the farmer.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a href="https://grownby.com" target="_blank" rel="noreferrer" className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Open GrownBy</a>
+                <button onClick={() => setTab("storefront")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Bronson Direct Catalog</button>
+                <button onClick={() => setTab("fulfillment")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Harvest / Fulfillment</button>
+              </div>
+            </div>
             <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {[
                 ["GrownBy Orders", grownByOrders.length],
@@ -2482,21 +2313,28 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "storefront" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Text-only launch catalog connected to Bronson direct sales and GrownBy-supported fulfillment. Product photos stay in GrownBy until the farm photo library is ready.</h1>
             <div className="mt-5 flex flex-wrap gap-2">
               {categories.map((cat) => <button key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
-                <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
-                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-85" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
-                    <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
-                    <p className="mt-3 text-sm leading-6 text-white/78">{product.description}</p>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-black/35 px-3 py-1">Inventory: {product.inventory}</span>{product.snap_eligible && <span className="rounded-full bg-emerald-300 px-3 py-1 text-black">SNAP eligible</span>}{Boolean((product as any).harvest_ready) && <span className="rounded-full bg-amber-200 px-3 py-1 text-black">Harvest ready</span>}</div>
-                    <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
+                <div key={product.id} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{product.category}</div>
+                      <div className="mt-1 text-xl font-black uppercase leading-tight">{product.name}</div>
+                    </div>
+                    <div className="text-right text-xl font-black text-emerald-100">{money(product.price)}</div>
                   </div>
+                  <p className="mt-3 min-h-[48px] text-sm leading-6 text-white/78">{product.description}</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-black">
+                    <span className="rounded-xl bg-black/35 px-3 py-2">Inventory: {product.inventory}</span>
+                    <span className="rounded-xl bg-black/35 px-3 py-2">Unit: {product.unit}</span>
+                    <span className={`rounded-xl px-3 py-2 ${product.snap_eligible ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{product.snap_eligible ? "SNAP Eligible" : "Non-SNAP"}</span>
+                    <span className={`rounded-xl px-3 py-2 ${Boolean((product as any).harvest_ready) ? "bg-amber-200 text-black" : "bg-white/10 text-white"}`}>{Boolean((product as any).harvest_ready) ? "Harvest Ready" : "Available"}</span>
+                  </div>
+                  <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
                 </div>
               ))}
             </div>
@@ -2506,11 +2344,11 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "checkout" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cart / Checkout</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">Record GrownBy or Direct orders.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Record GrownBy or Direct orders.</h1>
             <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_.9fr]">
               <div className="space-y-3">
                 {cart.map((item) => (
-                  <div key={item.product.id} className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+                  <div key={item.product.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
                     <div className="flex items-center justify-between gap-4"><div><div className="font-black">{item.product.name}</div><div className="text-sm text-white/65">{money(item.product.price)} / {item.product.unit}</div></div><input type="number" min={0} max={item.product.inventory} value={item.quantity} onChange={(e) => updateQuantity(item.product.id, Number(e.target.value))} className="w-24 rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-white" /></div>
                     <div className="mt-2 text-right font-black">{money(item.product.price * item.quantity)}</div>
                   </div>
@@ -2540,11 +2378,11 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "orders" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Orders</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">Pickup and order tracking.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Pickup and order tracking.</h1>
             <div className="mt-6 grid gap-3">
               {orders.map((order) => {
                 const items = orderItems.filter((item) => item.order_id === order.id);
-                return <div key={order.id} className="rounded-xl border border-white/10 bg-white/10 p-2.5"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="flex flex-wrap items-center gap-1.5"><div className="text-lg font-black">{order.customer_name}</div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(Number(order.total || 0))}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div><div className="mt-2 text-xs text-white/60">Fulfillment: {order.fulfillment_status || "needs_harvest"} • Harvest: {order.harvest_status || "not_started"} {order.grownby_reference ? `• GrownBy: ${order.grownby_reference}` : ""}</div></div>;
+                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="flex flex-wrap items-center gap-2"><div className="text-lg font-black">{order.customer_name}</div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(Number(order.total || 0))}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div><div className="mt-2 text-xs text-white/60">Fulfillment: {order.fulfillment_status || "needs_harvest"} • Harvest: {order.harvest_status || "not_started"} {order.grownby_reference ? `• GrownBy: ${order.grownby_reference}` : ""}</div></div>;
               })}
               {!orders.length && <Notice text="No marketplace orders have been saved yet." />}
             </div>
@@ -2554,7 +2392,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "fulfillment" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-amber-100/75">Harvest / Fulfillment</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">What must be harvested, packed, and picked up?</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">What must be harvested, packed, and picked up?</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
                 <div className="text-xl font-black">Pending Fulfillment</div>
@@ -2577,7 +2415,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "catalog" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Catalog Admin</div>
-            <h1 className="mt-3 text-3xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
+            <h1 className="mt-3 text-4xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
                 <div className="text-xl font-black">Add Product</div>
@@ -2615,7 +2453,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
-      <h1 className="mt-4 text-3xl font-black md:text-4xl">Daily rhythm for launch.</h1>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, daily proverb, weather awareness, assignments."],
@@ -2657,13 +2495,13 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback</div>
-      <h1 className="mt-4 text-3xl font-black md:text-4xl">Tell us about the platform and program experience.</h1>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Tell us about the platform and program experience.</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <label className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+        <label className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="flex justify-between text-sm font-black"><span>Rating</span><span>{rating}/5</span></div>
           <input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} />
         </label>
-        <label className="mt-8 flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-2.5 font-black">
+        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
           <input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />
           I would recommend this experience.
         </label>
@@ -2688,27 +2526,20 @@ function SimplePathway({
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
 }) {
-  const isEcosystemMap = image === IMG.ecosystem;
   return (
-    <div className={isEcosystemMap ? "grid gap-4 lg:grid-cols-[0.7fr_1.3fr]" : "grid gap-5 lg:grid-cols-[1fr_.85fr]"}>
-      <Card className={isEcosystemMap ? "p-5 md:p-6" : undefined}>
+    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
+      <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
-        <h1 className={isEcosystemMap ? "mt-3 text-3xl font-black md:text-4xl" : "mt-4 text-3xl font-black md:text-4xl"}>{title}</h1>
-        <p className={isEcosystemMap ? "mt-4 max-w-3xl text-base leading-7 text-white/88" : "mt-6 max-w-3xl text-lg leading-8 text-white/88"}>{text}</p>
-        <div className={isEcosystemMap ? "mt-5 flex flex-wrap gap-3" : "mt-8 flex flex-wrap gap-3"}>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
+        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
+        <div className="mt-8 flex flex-wrap gap-3">
           {extra}
           <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Switch Workspace</button>
           <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
-      <div className={`relative flex items-center justify-center overflow-visible rounded-[2rem] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,.42)] ${isEcosystemMap ? "min-h-[560px] bg-white p-3" : "min-h-[360px] overflow-hidden bg-black"}`}>
-        <img
-          src={image}
-          alt={title}
-          className={isEcosystemMap ? "max-h-[calc(100vh-190px)] min-h-0 w-full object-contain" : "absolute inset-0 h-full w-full object-cover"}
-          onError={(e) => (e.currentTarget.src = IMG.backup)}
-        />
-        {!isEcosystemMap && <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />}
+      <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden rounded-[2rem] border border-white/10 bg-white/95 p-3 shadow-[0_35px_100px_rgba(0,0,0,.48)]">
+        <img src={image} alt={title} className="max-h-[72vh] w-full object-contain" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
     </div>
   );
@@ -2874,7 +2705,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
       <div className="space-y-5">
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Morning Farm Briefing</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight md:text-6xl">Grower live dashboard.</h2>
+          <h2 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Grower live dashboard.</h2>
           <p className="mt-4 max-w-4xl text-white/82">Food moves, not the farmer. This screen connects today’s field decisions to youth crews, product availability, marketplace demand, and community food access.</p>
         </Card>
 
