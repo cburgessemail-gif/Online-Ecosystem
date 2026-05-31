@@ -25,6 +25,7 @@ type PathwayCard = {
   secondaryTarget?: EcosystemScreen;
   colors: string;
   icon: string;
+  image: string;
 };
 
 const pathwayCards: PathwayCard[] = [
@@ -40,6 +41,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "support",
     colors: "from-emerald-900 via-sky-900 to-amber-800",
     icon: "🌲",
+    image: "/SAM_0220.JPG",
   },
   {
     id: "customer",
@@ -53,6 +55,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "grower",
     colors: "from-red-700 via-amber-600 to-lime-700",
     icon: "🥗",
+    image: "/SAM_0232.JPG",
   },
   {
     id: "marketplace",
@@ -66,6 +69,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "grower",
     colors: "from-amber-700 via-orange-700 to-red-800",
     icon: "🛒",
+    image: "/SAM_0241.JPG",
   },
   {
     id: "grower",
@@ -79,6 +83,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "marketplace",
     colors: "from-stone-900 via-amber-900 to-lime-900",
     icon: "🌱",
+    image: "/GrowArea.jpg",
   },
   {
     id: "youth",
@@ -92,6 +97,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "youth",
     colors: "from-blue-800 via-cyan-700 to-amber-600",
     icon: "🧑‍🌾",
+    image: "/SAM_0313.JPG",
   },
   {
     id: "partner",
@@ -105,6 +111,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "support",
     colors: "from-slate-900 via-teal-900 to-blue-900",
     icon: "🤝",
+    image: "/SAM_0281.JPG",
   },
   {
     id: "valueAdded",
@@ -118,6 +125,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "marketplace",
     colors: "from-purple-950 via-rose-900 to-amber-800",
     icon: "🏭",
+    image: "/SAM_0275.JPG",
   },
   {
     id: "support",
@@ -131,6 +139,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "partner",
     colors: "from-rose-900 via-emerald-900 to-amber-700",
     icon: "💚",
+    image: "/SAM_0257.JPG",
   },
   {
     id: "supervisor",
@@ -144,6 +153,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "missionControl",
     colors: "from-slate-800 via-slate-700 to-emerald-900",
     icon: "👨‍🏫",
+    image: "/SAM_0300.JPG",
   },
   {
     id: "missionControl",
@@ -157,6 +167,7 @@ const pathwayCards: PathwayCard[] = [
     secondaryTarget: "home",
     colors: "from-slate-950 via-blue-950 to-teal-900",
     icon: "📊",
+    image: "/SAM_0220.JPG",
   },
 ];
 
@@ -238,7 +249,13 @@ export default function App() {
 
 function ForestGate({ navigate }: { navigate: (screen: EcosystemScreen) => void }) {
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,.25),transparent_35%),linear-gradient(135deg,#10231b_0%,#1b2a20_38%,#4a2f1a_74%,#111827_100%)]">
+    <main
+      className="min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "linear-gradient(110deg, rgba(16,35,27,.94) 0%, rgba(16,35,27,.86) 45%, rgba(74,47,26,.72) 72%, rgba(17,24,39,.88) 100%), url('/GrowArea.jpg')",
+      }}
+    >
       <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6">
         <header className="flex items-center justify-between gap-4 text-sm text-amber-100/90">
           <div className="font-black tracking-[0.25em]">BRONSON FAMILY FARM</div>
@@ -305,6 +322,16 @@ function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: 
   const isYouth = screen === "youth";
   const isGrower = screen === "grower";
   const isMission = screen === "missionControl";
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  useEffect(() => setDetailOpen(false), [screen]);
+
+  function handlePrimary() {
+    if (screen === "customer") navigate("marketplace");
+    else if (screen === "supervisor") navigate("supervisor");
+    else if (screen === "missionControl") setDetailOpen(true);
+    else setDetailOpen(true);
+  }
 
   return (
     <main className={`min-h-screen bg-gradient-to-br ${card.colors}`}>
@@ -313,6 +340,16 @@ function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: 
           <div className="grid gap-0 lg:grid-cols-[1fr_.85fr]">
             <div className="p-6 md:p-10">
               <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-100">{card.eyebrow}</p>
+              <div className="mt-5 overflow-hidden rounded-[1.75rem] border border-white/20 bg-black/20 shadow-xl">
+                <img
+                  src={card.image}
+                  alt={`${card.title} visual`}
+                  className="h-52 w-full object-cover md:h-64"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
               <div className="mt-5 text-6xl">{card.icon}</div>
               <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight md:text-6xl">{card.title}</h1>
               <p className="mt-5 max-w-3xl text-xl leading-8 text-white/90">{card.invitation}</p>
@@ -322,12 +359,8 @@ function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: 
                   <a href="https://grownby.com/farms/bronson-family-farm" target="_blank" rel="noreferrer" className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
                     {card.primaryLabel}
                   </a>
-                ) : screen === "supervisor" ? (
-                  <button onClick={() => navigate("supervisor")} className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
-                    {card.primaryLabel}
-                  </button>
                 ) : (
-                  <button className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
+                  <button onClick={handlePrimary} className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
                     {card.primaryLabel}
                   </button>
                 )}
@@ -352,6 +385,8 @@ function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: 
                 ))}
               </div>
 
+              {detailOpen && <PathwayDetail screen={screen} navigate={navigate} />}
+
               {isYouth && <YouthRhythm />}
               {isGrower && <GrowerPortalPreview />}
               {screen === "partner" && <PartnerPortalPreview />}
@@ -367,6 +402,80 @@ function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: 
         </section>
       </div>
     </main>
+  );
+}
+
+
+function PathwayDetail({ screen, navigate }: { screen: EcosystemScreen; navigate: (screen: EcosystemScreen) => void }) {
+  const detail: Record<string, { title: string; text: string; steps: string[]; action?: string; target?: EcosystemScreen }> = {
+    guest: {
+      title: "Begin Exploration",
+      text: "Start with the story of the land, the historic Lansdowne Airport setting, the media coverage, and the regional food ecosystem being formed.",
+      steps: ["Learn why Bronson Family Farm exists", "Understand the airport-to-farm transformation", "See how growers, youth, partners, and customers connect"],
+      action: "Continue to Customer Pathway",
+      target: "customer",
+    },
+    grower: {
+      title: "Start Grower Profile",
+      text: "This pathway welcomes growers at every scale: backyard, containers, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms.",
+      steps: ["Identify your growing space type", "List what you grow or want to grow", "Share what you need and what you can offer", "Connect to marketplace opportunities"],
+      action: "Continue to Marketplace",
+      target: "marketplace",
+    },
+    youth: {
+      title: "Start My Day",
+      text: "The youth pathway begins with daily rhythm, not a supervisor screen. Young people should see purpose, safety, team assignment, encouragement, and reflection.",
+      steps: ["Today's proverb", "Morning check-in", "Safety and PPE readiness", "Team assignment", "End-of-day reflection"],
+      action: "View Supervisor Support Layer",
+      target: "supervisor",
+    },
+    partner: {
+      title: "Enter Partner Portal",
+      text: "Partners can identify how they want to collaborate, what they can offer, what they need, and how their organization can support the ecosystem.",
+      steps: ["Create organization profile", "Offer volunteers, resources, training, or funding", "Request collaboration or community connection", "View shared impact"],
+      action: "Support the Ecosystem",
+      target: "support",
+    },
+    valueAdded: {
+      title: "Develop Product",
+      text: "This is the innovation space for turning harvests, seeds, herbs, honey, and ideas into value-added products and marketplace opportunities.",
+      steps: ["Name the product", "Identify ingredients and supply needs", "Plan packaging, pricing, and readiness", "Connect to marketplace"],
+      action: "Go to Marketplace",
+      target: "marketplace",
+    },
+    support: {
+      title: "Choose Support Type",
+      text: "Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is a seed steward example of in-kind support.",
+      steps: ["Donate", "Volunteer", "Mentor", "Share seeds, compost, tools, services, or equipment"],
+      action: "View Partner Pathway",
+      target: "partner",
+    },
+    missionControl: {
+      title: "Open Mission Control",
+      text: "Mission Control is the leadership view for launch activity, reviewer feedback, people, resources, marketplace movement, recognition, and ecosystem operations.",
+      steps: ["Track launch readiness", "Review feedback", "Monitor youth, growers, partners, and supporters", "Identify priorities"],
+      action: "Return to Forest Gate",
+      target: "home",
+    },
+  };
+
+  const current = detail[screen] || detail.guest;
+
+  return (
+    <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-stone-900 shadow-sm">
+      <h3 className="text-2xl font-black">{current.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-stone-700">{current.text}</p>
+      <div className="mt-4 grid gap-2">
+        {current.steps.map((step) => (
+          <p key={step} className="rounded-2xl bg-white p-3 text-sm font-bold shadow-sm">✓ {step}</p>
+        ))}
+      </div>
+      {current.action && current.target && (
+        <button onClick={() => navigate(current.target!)} className="mt-4 rounded-full bg-stone-900 px-5 py-3 font-black text-amber-100 hover:bg-stone-800">
+          {current.action}
+        </button>
+      )}
+    </div>
   );
 }
 
