@@ -487,7 +487,7 @@ function App() {
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
-      setMessage("Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.");
+      setMessage("Protected area. Switch workspace/access to Supervisor / Staff, Administrator, or Board / Funder first.");
       setScreenState("roles");
       return;
     }
@@ -518,7 +518,7 @@ function App() {
   return (
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut}>
       {message && <div className="mt-2"><Notice text={message} /></div>}
-      {screen === "portal" && <Portal setScreen={setScreen} />}
+      {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
@@ -662,7 +662,7 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
   );
 }
 
-function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
+function Portal({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
@@ -672,7 +672,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           This platform connects youth workforce development, supervisors, parents, growers, marketplace, wellness, safety, feedback, and impact reporting.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button onClick={() => setScreen("guest")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
+          <button onClick={() => setScreen(activeUser ? routeForRole(activeUser.role) : "guest")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
           <button onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
           <button onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
@@ -2688,6 +2688,7 @@ function SimplePathway({
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
 }) {
+  const isEcosystemMap = image === IMG.ecosystem;
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
@@ -2696,13 +2697,18 @@ function SimplePathway({
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           {extra}
-          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Switch Workspace</button>
           <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
-      <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_20px_60px_rgba(0,0,0,.42)]">
-        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+      <div className={`relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,.42)] ${isEcosystemMap ? "bg-white p-4" : "bg-black"}`}>
+        <img
+          src={image}
+          alt={title}
+          className={isEcosystemMap ? "h-full max-h-[520px] w-full object-contain" : "absolute inset-0 h-full w-full object-cover"}
+          onError={(e) => (e.currentTarget.src = IMG.backup)}
+        />
+        {!isEcosystemMap && <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />}
       </div>
     </div>
   );
