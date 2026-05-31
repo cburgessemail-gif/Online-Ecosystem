@@ -2690,22 +2690,22 @@ function SimplePathway({
 }) {
   const isEcosystemMap = image === IMG.ecosystem;
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
-      <Card>
+    <div className={isEcosystemMap ? "grid gap-4 lg:grid-cols-[0.7fr_1.3fr]" : "grid gap-5 lg:grid-cols-[1fr_.85fr]"}>
+      <Card className={isEcosystemMap ? "p-5 md:p-6" : undefined}>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
-        <h1 className="mt-4 text-3xl font-black md:text-4xl">{title}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <h1 className={isEcosystemMap ? "mt-3 text-3xl font-black md:text-4xl" : "mt-4 text-3xl font-black md:text-4xl"}>{title}</h1>
+        <p className={isEcosystemMap ? "mt-4 max-w-3xl text-base leading-7 text-white/88" : "mt-6 max-w-3xl text-lg leading-8 text-white/88"}>{text}</p>
+        <div className={isEcosystemMap ? "mt-5 flex flex-wrap gap-3" : "mt-8 flex flex-wrap gap-3"}>
           {extra}
           <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Switch Workspace</button>
           <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
-      <div className={`relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,.42)] ${isEcosystemMap ? "bg-white p-4" : "bg-black"}`}>
+      <div className={`relative flex items-center justify-center overflow-visible rounded-[2rem] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,.42)] ${isEcosystemMap ? "min-h-[560px] bg-white p-3" : "min-h-[360px] overflow-hidden bg-black"}`}>
         <img
           src={image}
           alt={title}
-          className={isEcosystemMap ? "h-full max-h-[520px] w-full object-contain" : "absolute inset-0 h-full w-full object-cover"}
+          className={isEcosystemMap ? "max-h-[calc(100vh-190px)] min-h-0 w-full object-contain" : "absolute inset-0 h-full w-full object-cover"}
           onError={(e) => (e.currentTarget.src = IMG.backup)}
         />
         {!isEcosystemMap && <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />}
