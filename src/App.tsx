@@ -1585,22 +1585,23 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [participantId, setParticipantId] = useState("");
-  const [mood, setMood] = useState("Okay");
-  const [energy, setEnergy] = useState("Medium");
-  const [sleep, setSleep] = useState("Okay");
-  const [breakfast, setBreakfast] = useState("Yes");
+  const [mood, setMood] = useState("Select mood");
+  const [energy, setEnergy] = useState("Select energy");
+  const [sleep, setSleep] = useState("Select sleep");
+  const [breakfast, setBreakfast] = useState("Select food status");
   const [hope, setHope] = useState(3);
   const [belonging, setBelonging] = useState(3);
   const [trustedAdult, setTrustedAdult] = useState(3);
   const [confidence, setConfidence] = useState(3);
   const [stress, setStress] = useState(3);
-  const [closedToeShoes, setClosedToeShoes] = useState(true);
-  const [waterBottle, setWaterBottle] = useState(true);
-  const [workGloves, setWorkGloves] = useState(true);
-  const [appropriateClothing, setAppropriateClothing] = useState(true);
+  const [closedToeShoes, setClosedToeShoes] = useState(false);
+  const [waterBottle, setWaterBottle] = useState(false);
+  const [workGloves, setWorkGloves] = useState(false);
+  const [appropriateClothing, setAppropriateClothing] = useState(false);
   const [sunscreen, setSunscreen] = useState(false);
   const [hatWeatherProtection, setHatWeatherProtection] = useState(false);
   const [equipmentNeeded, setEquipmentNeeded] = useState("None");
+  const [ppeReviewed, setPpeReviewed] = useState(false);
   const [dailyGoal, setDailyGoal] = useState("");
   const [support, setSupport] = useState("");
   const [privateNote, setPrivateNote] = useState("");
@@ -1627,7 +1628,13 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     void load();
   }, []);
 
-  const selectedYouth = youth.find((y) => y.participant_id === participantId) || youth[0];
+  const youthForActiveUser = youth.find((y) => {
+    const p = profiles.find((profile) => profile.id === y.profile_id);
+    const activeName = (activeUser?.name || "").trim().toLowerCase();
+    const profileFullName = p ? `${p.first_name} ${p.last_name}`.trim().toLowerCase() : "";
+    return activeUser?.role === "Youth Workforce Participant" && activeName && profileFullName && activeName === profileFullName;
+  });
+  const selectedYouth = youthForActiveUser || youth.find((y) => y.participant_id === participantId) || youth[0];
   const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
   const profileId = selectedYouth?.profile_id || activeUser?.id || "anonymous";
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -1635,6 +1642,15 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const selectedEncouragement = encouragementForYouth(encouragements, selectedYouth?.participant_id || participantId, currentTime.toISOString().slice(0, 10));
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
   const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Hold for supervisor review";
+  const requiredComplete = Boolean(
+    selectedYouth?.participant_id &&
+    ppeReviewed &&
+    mood !== "Select mood" &&
+    energy !== "Select energy" &&
+    sleep !== "Select sleep" &&
+    breakfast !== "Select food status" &&
+    dailyGoal.trim().length > 0
+  );
 
   const safetyFlag =
     hope <= 1 ||
@@ -1648,7 +1664,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const save = async () => {
     if (saving) return;
     if (!selectedYouth?.participant_id) {
-      setMessage("No youth participant selected. Register or select a youth before starting the day.");
+      setMessage("No youth participant is connected to this login. Register the youth profile before starting the day.");
+      return;
+    }
+    if (!requiredComplete) {
+      setMessage("Complete the required questions first: PPE review, mood, energy, sleep, food today, and daily goal. Attendance will not save until those are complete.");
       return;
     }
 
@@ -1789,18 +1809,14 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity + Attendance</div>
           <div className="mt-2 grid gap-2">
-            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={youth.map((y) => y.participant_id)} />
             <div className="rounded-xl border border-white/10 bg-white/10 p-3 text-xs leading-5">
-              <div className="font-black text-white">{profileName(selectedProfile)}</div>
-              <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth selected"}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">This youth only</div>
+              <div className="mt-1 font-black text-white">{profileName(selectedProfile)}</div>
+              <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth connected"}</div>
               <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
-              <button
-                type="button"
-                onClick={runStartMyDay}
-                className="mt-2 w-full rounded-full bg-emerald-300 px-3 py-1 text-center text-[11px] font-black text-black"
-              >
-                Check In Now = Present
-              </button>
+              <div className="mt-2 rounded-full bg-black/35 px-3 py-2 text-center text-[11px] font-black text-white/85">
+                Attendance saves only after all required questions are complete.
+              </div>
             </div>
           </div>
         </div>
@@ -1818,15 +1834,19 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Hat / weather protection" checked={hatWeatherProtection} setChecked={setHatWeatherProtection} />
           </div>
           <div className={`mt-2 rounded-xl p-2 text-center text-xs font-black ${allRequiredPPE ? "bg-emerald-300/85 text-black" : "bg-amber-300/85 text-black"}`}>PPE Status: {readinessStatus}</div>
+          <label className="mt-2 flex min-h-[34px] items-center gap-2 rounded-xl border border-emerald-200/20 bg-emerald-300/10 px-3 py-2 text-xs font-black">
+            <input type="checkbox" checked={ppeReviewed} onChange={(e) => setPpeReviewed(e.target.checked)} className="h-5 w-5" />
+            <span>I reviewed my PPE honestly.</span>
+          </label>
         </div>
 
         <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
           <div className="mt-2 grid gap-2 md:grid-cols-2">
-            <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
-            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
-            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
-            <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
+            <SelectField label="Mood" value={mood} onChange={setMood} options={["Select mood", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
+            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["Select energy", "High", "Medium", "Low", "Very low"]} />
+            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Select sleep", "Good", "Okay", "Poor", "No sleep"]} />
+            <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Select food status", "Yes", "No", "Not enough", "Prefer not to say"]} />
           </div>
           <div className="mt-2 grid gap-1.5 md:grid-cols-5">
             <Slider label="Hope" value={hope} setValue={setHope} />
@@ -1854,14 +1874,15 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </label>
       </div>
 
+      {!requiredComplete && <Notice text="Complete required questions before check-in: PPE review, mood, energy, sleep, food today, and daily goal." />}
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
       <button
         type="button"
         onClick={runStartMyDay}
-        disabled={saving}
+        disabled={saving || !requiredComplete}
         className="mt-3 w-full rounded-full bg-emerald-300 px-7 py-3 text-base font-black text-black disabled:opacity-60"
       >
-        {saving ? "Saving..." : "Start My Day"}
+        {saving ? "Saving..." : requiredComplete ? "Start My Day" : "Complete Required Questions"}
       </button>
       {message && <Notice text={message} />}
     </Card>
@@ -1893,7 +1914,7 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
   const participantId = selectedYouth?.participant_id || "No participant selected";
   const todayAttendance = attendance.find((a) => a.participant_id === participantId && a.date === today);
   const todayWellness = wellness.find((w) => w.profile_id === selectedYouth?.profile_id && w.created_at.slice(0, 10) === today);
-  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.date || p.created_at || "").slice(0, 10) === today);
+  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.checkin_date || p.date || p.created_at || "").slice(0, 10) === today);
   const ready = todayAttendance && todayPpe && todayWellness && todayAttendance.ppe_status === "complete";
 
   return (
