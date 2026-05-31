@@ -541,18 +541,18 @@ function Shell({
       </div>
       <div className="fixed inset-0 bg-black/54" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.34),rgba(0,0,0,.68)),radial-gradient(circle_at_top_left,rgba(52,211,153,.22),transparent_32%)]" />
-      <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
-        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+      <div className="relative z-10 mx-auto max-w-[1540px] px-2 py-2 md:px-4">
+        <div className="sticky top-2 z-40 mb-2 rounded-[1.1rem] border border-white/10 bg-black/55 p-1.5 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
-              <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="text-base font-black leading-tight">Online Ecosystem</div>
+            <button onClick={() => setScreen("portal")} className="mr-1 min-w-[170px] px-2 text-left">
+              <div className="text-[9px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
+              <div className="text-sm font-black leading-tight">Online Ecosystem</div>
             </button>
             {nav.map((item) => (
               <button
                 key={item.screen}
                 onClick={() => setScreen(item.screen)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
                   screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
@@ -560,11 +560,11 @@ function Shell({
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">
-              <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-bold">
+              <div className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[10px] font-bold">
                 {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Public / Guest"}
               </div>
               {activeUser && (
-                <button onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
+                <button onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-black">
                   Sign Out
                 </button>
               )}
@@ -582,7 +582,7 @@ function Notice({ text }: { text: string }) {
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-[2rem] border border-white/10 bg-black/46 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
+  return <div className={`rounded-[1.35rem] border border-white/10 bg-black/46 p-3 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
 }
 
 function Field(props: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
@@ -594,7 +594,7 @@ function Field(props: { label: string; value: string; onChange: (v: string) => v
         type={props.type || "text"}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
-        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
+        className="mt-1 w-full rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
       />
     </label>
   );
@@ -604,7 +604,7 @@ function SelectField(props: { label: string; value: string; onChange: (v: string
   return (
     <label className="block">
       <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{props.label}</span>
-      <select value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+      <select value={props.value} onChange={(e) => props.onChange(e.target.value)} className="mt-1 w-full rounded-xl border border-white/10 bg-black/65 px-3 py-2 text-white outline-none focus:border-emerald-200">
         {props.options.map((option) => (
           <option key={option} value={option} className="bg-black">
             {option}
@@ -623,8 +623,8 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
         value={props.value}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
-        rows={4}
-        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
+        rows={2}
+        className="mt-1 w-full rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
       />
     </label>
   );
@@ -756,19 +756,19 @@ function MyWorkspace({
       {activeUser && (
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
           <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
-          <div className="mt-2 text-2xl font-black">{activeUser.role}</div>
+          <div className="mt-1 text-xl font-black">{activeUser.role}</div>
           <div className="mt-1 text-sm text-white/72">Access level: {activeUser.accessLevel}</div>
         </div>
       )}
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {visibleCards.map((card) => (
           <button
             key={card.title}
             onClick={() => setScreen(card.screen)}
             className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
           >
-            <div className="text-xl font-black">{card.title}</div>
+            <div className="text-lg font-black">{card.title}</div>
             <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
           </button>
         ))}
@@ -1013,7 +1013,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       <div className="mt-5 grid gap-3 md:grid-cols-3">
         <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
-          <div className="mt-2 text-2xl font-black">{todayAttendance ? "Checked In" : "Not Checked In"}</div>
+          <div className="mt-1 text-xl font-black">{todayAttendance ? "Checked In" : "Not Checked In"}</div>
           <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "Press Start My Day first."}</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
@@ -1023,7 +1023,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
-          <div className="mt-2 text-2xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
+          <div className="mt-1 text-xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
           <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support.</div>
         </div>
       </div>
@@ -1087,9 +1087,9 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
-        <div className="mt-5 grid gap-2">
+        <div className="mt-3 grid gap-1.5">
           {tabs.map((item) => (
-            <button key={item.key} onClick={() => setTab(item.key)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+            <button key={item.key} onClick={() => setTab(item.key)} className={`rounded-xl border px-3 py-2 text-left text-xs font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
               {item.label}
             </button>
           ))}
@@ -1097,7 +1097,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/84">
           Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.
         </div>
-        <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Data</button>
+        <button onClick={refresh} className="mt-3 w-full rounded-full border border-white/15 bg-black/35 px-4 py-2 text-sm font-black">Refresh Data</button>
       </Card>
 
       <div>
@@ -1555,7 +1555,7 @@ function SupervisorReports({
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Reports</div>
       <h2 className="mt-3 text-4xl font-black">Supervisor report snapshot.</h2>
-      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-3 grid gap-2 md:grid-cols-4">
         {[
           ["Youth Registered", youth.length],
           ["Profiles", profiles.length],
@@ -1568,8 +1568,8 @@ function SupervisorReports({
           ["Incident Logs", incidents.length],
           ["Parent Summaries", parentSummaries.length],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-3xl font-black">{value}</div>
+          <div key={label} className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-2xl font-black">{value}</div>
             <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
           </div>
         ))}
@@ -1932,7 +1932,7 @@ function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-3 grid gap-2 md:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Participant</div>
           <div className="mt-2 text-xl font-black">{profileName(selectedProfile)}</div>
@@ -2232,12 +2232,12 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   );
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[330px_1fr]">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Operations Center</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight">GrownBy + Direct Sales.</h1>
-        <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
-        <div className="mt-5 grid gap-2">
+    <div className="grid h-[calc(100vh-82px)] min-h-0 gap-3 xl:grid-cols-[285px_1fr]">
+      <Card className="h-full overflow-hidden">
+        <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/75">Marketplace Operations Center</div>
+        <h1 className="mt-2 text-2xl font-black leading-tight">GrownBy + Direct Sales.</h1>
+        <p className="mt-2 text-xs leading-5 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
+        <div className="mt-3 grid gap-1.5">
           {[
             ["command", "Operations Dashboard"],
             ["storefront", "Product Catalog"],
@@ -2246,37 +2246,37 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             ["fulfillment", "Harvest / Fulfillment"],
             ["catalog", "Catalog Admin"],
           ].map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
+            <button key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-xl border px-3 py-2 text-left text-xs font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
           ))}
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(revenueToday)}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
+        <div className="mt-3 grid grid-cols-2 gap-1.5 text-xs">
+          <div className="rounded-xl border border-white/10 bg-white/10 p-2"><div className="text-lg font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-2"><div className="text-lg font-black">{money(revenueToday)}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-2"><div className="text-lg font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-2"><div className="text-lg font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
         </div>
-        <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
-        <button onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
+        <button onClick={refresh} className="mt-3 w-full rounded-full border border-white/15 bg-black/35 px-4 py-2 text-sm font-black">Refresh Marketplace</button>
+        <button onClick={() => setScreen("grower")} className="mt-2 w-full rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Open Grower Demand</button>
       </Card>
 
-      <div>
+      <div className="min-h-0 overflow-hidden">
         {message && <Notice text={message} />}
 
         {tab === "command" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Marketplace Command</div>
-            <h1 className="mt-3 text-4xl font-black md:text-5xl">Orders become harvest instructions.</h1>
-            <div className="mt-4 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-4">
+            <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">Orders become harvest instructions.</h1>
+            <div className="mt-4 rounded-[1.2rem] border border-emerald-200/25 bg-emerald-300/12 p-3">
               <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/80">GrownBy Market Connection</div>
-              <div className="mt-2 text-2xl font-black">Bronson sells through GrownBy and direct sales.</div>
-              <p className="mt-2 text-sm leading-6 text-white/82">Use GrownBy for online/SNAP-supported ordering and use this ecosystem for planning, direct sales, fulfillment, pickup, youth-safe marketplace impact, and grower demand. Food moves, not the farmer.</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a href="https://grownby.com" target="_blank" rel="noreferrer" className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Open GrownBy</a>
-                <button onClick={() => setTab("storefront")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Bronson Direct Catalog</button>
-                <button onClick={() => setTab("fulfillment")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Harvest / Fulfillment</button>
+              <div className="mt-1 text-xl font-black">Bronson sells through GrownBy and direct sales.</div>
+              <p className="mt-1 text-xs leading-5 text-white/82">Use GrownBy for online/SNAP-supported ordering and use this ecosystem for planning, direct sales, fulfillment, pickup, youth-safe marketplace impact, and grower demand. Food moves, not the farmer.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <a href="https://grownby.com" target="_blank" rel="noreferrer" className="rounded-full bg-emerald-300 px-3 py-1.5 text-xs font-black text-black">Open GrownBy</a>
+                <button onClick={() => setTab("storefront")} className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black">Bronson Direct Catalog</button>
+                <button onClick={() => setTab("fulfillment")} className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black">Harvest / Fulfillment</button>
               </div>
             </div>
-            <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-3 grid gap-2 md:grid-cols-4">
               {[
                 ["GrownBy Orders", grownByOrders.length],
                 ["Direct Orders", directOrders.length],
@@ -2287,24 +2287,24 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                 ["Inventory Alerts", lowInventory.length],
                 ["Revenue Today", money(revenueToday)],
               ].map(([label, value]) => (
-                <div key={label as string} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                  <div className="text-3xl font-black">{value}</div>
-                  <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/65">{label}</div>
+                <div key={label as string} className="rounded-xl border border-white/10 bg-white/10 p-3">
+                  <div className="text-2xl font-black">{value}</div>
+                  <div className="mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/65">{label}</div>
                 </div>
               ))}
             </div>
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-                <div className="text-xl font-black">GrownBy Channel</div>
-                <p className="mt-3 text-sm leading-7 text-white/78">Use for sales you complete through GrownBy, especially SNAP-supported orders. Enter the GrownBy reference so harvest and pickup can be tracked here.</p>
+            <div className="mt-3 grid gap-3 lg:grid-cols-3">
+              <div className="rounded-[1.1rem] border border-white/10 bg-black/35 p-3">
+                <div className="text-lg font-black">GrownBy Channel</div>
+                <p className="mt-2 text-xs leading-5 text-white/78">Use for sales you complete through GrownBy, especially SNAP-supported orders. Enter the GrownBy reference so harvest and pickup can be tracked here.</p>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-                <div className="text-xl font-black">Direct Channel</div>
-                <p className="mt-3 text-sm leading-7 text-white/78">Use for farm gate sales, schools, businesses, churches, events, wholesale, invoices, and community orders.</p>
+              <div className="rounded-[1.1rem] border border-white/10 bg-black/35 p-3">
+                <div className="text-lg font-black">Direct Channel</div>
+                <p className="mt-2 text-xs leading-5 text-white/78">Use for farm gate sales, schools, businesses, churches, events, wholesale, invoices, and community orders.</p>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-                <div className="text-xl font-black">Youth Connection</div>
-                <p className="mt-3 text-sm leading-7 text-white/78">Youth should see safe marketplace impact: where food is going, what crops are needed, and why today’s harvest matters — not private customer data.</p>
+              <div className="rounded-[1.1rem] border border-white/10 bg-black/35 p-3">
+                <div className="text-lg font-black">Youth Connection</div>
+                <p className="mt-2 text-xs leading-5 text-white/78">Youth should see safe marketplace impact: where food is going, what crops are needed, and why today’s harvest matters — not private customer data.</p>
               </div>
             </div>
           </Card>
@@ -2313,13 +2313,13 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         {tab === "storefront" && (
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
-            <h1 className="mt-3 text-4xl font-black md:text-5xl">Text-only launch catalog connected to Bronson direct sales and GrownBy-supported fulfillment. Product photos stay in GrownBy until the farm photo library is ready.</h1>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <h1 className="mt-2 text-2xl font-black leading-tight md:text-3xl">Text-only launch catalog connected to Bronson direct sales and GrownBy-supported fulfillment.</h1>
+            <div className="mt-3 flex flex-wrap gap-2">
               {categories.map((cat) => <button key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
             </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
-                <div key={product.id} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
+                <div key={product.id} className="rounded-[1.1rem] border border-white/10 bg-white/10 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{product.category}</div>
@@ -2327,14 +2327,14 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                     </div>
                     <div className="text-right text-xl font-black text-emerald-100">{money(product.price)}</div>
                   </div>
-                  <p className="mt-3 min-h-[48px] text-sm leading-6 text-white/78">{product.description}</p>
-                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs font-black">
+                  <p className="mt-2 min-h-[38px] text-xs leading-5 text-white/78">{product.description}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] font-black">
                     <span className="rounded-xl bg-black/35 px-3 py-2">Inventory: {product.inventory}</span>
                     <span className="rounded-xl bg-black/35 px-3 py-2">Unit: {product.unit}</span>
                     <span className={`rounded-xl px-3 py-2 ${product.snap_eligible ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{product.snap_eligible ? "SNAP Eligible" : "Non-SNAP"}</span>
                     <span className={`rounded-xl px-3 py-2 ${Boolean((product as any).harvest_ready) ? "bg-amber-200 text-black" : "bg-white/10 text-white"}`}>{Boolean((product as any).harvest_ready) ? "Harvest Ready" : "Available"}</span>
                   </div>
-                  <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
+                  <button onClick={() => addToCart(product)} className="mt-3 w-full rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Add to Cart</button>
                 </div>
               ))}
             </div>
@@ -2382,7 +2382,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <div className="mt-6 grid gap-3">
               {orders.map((order) => {
                 const items = orderItems.filter((item) => item.order_id === order.id);
-                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="flex flex-wrap items-center gap-2"><div className="text-lg font-black">{order.customer_name}</div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-xl font-black">{money(Number(order.total || 0))}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-3 text-sm leading-7 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div><div className="mt-2 text-xs text-white/60">Fulfillment: {order.fulfillment_status || "needs_harvest"} • Harvest: {order.harvest_status || "not_started"} {order.grownby_reference ? `• GrownBy: ${order.grownby_reference}` : ""}</div></div>;
+                return <div key={order.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><div className="flex flex-wrap items-center gap-2"><div className="text-lg font-black">{order.customer_name}</div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="text-xs uppercase tracking-[0.2em] text-white/60">{order.pickup_date} • {order.pickup_window} • {order.payment_method}</div></div><div className="text-right"><div className="text-lg font-black">{money(Number(order.total || 0))}</div><div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">{order.status}</div></div></div><div className="mt-2 text-xs leading-5 text-white/78">{items.map((item) => `${item.quantity} ${item.product_name}`).join(" • ") || "Order items loading from saved records."}</div><div className="mt-2 text-xs text-white/60">Fulfillment: {order.fulfillment_status || "needs_harvest"} • Harvest: {order.harvest_status || "not_started"} {order.grownby_reference ? `• GrownBy: ${order.grownby_reference}` : ""}</div></div>;
               })}
               {!orders.length && <Notice text="No marketplace orders have been saved yet." />}
             </div>
@@ -2395,14 +2395,14 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <h1 className="mt-3 text-4xl font-black md:text-5xl">What must be harvested, packed, and picked up?</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">Pending Fulfillment</div>
+                <div className="text-lg font-black">Pending Fulfillment</div>
                 <div className="mt-4 space-y-3">
                   {pendingOrders.slice(0, 8).map((order) => <div key={order.id} className="rounded-2xl bg-black/30 p-4"><div className="flex justify-between gap-3"><div><div className="font-black">{order.customer_name}</div><div className="text-xs uppercase tracking-[0.18em] text-white/55">{order.pickup_date} • {order.pickup_window}</div></div><ChannelBadge channel={order.sales_channel || "Direct"} /></div><div className="mt-2 text-sm text-white/70">{order.fulfillment_status || "needs_harvest"}</div></div>)}
                   {!pendingOrders.length && <div className="text-sm text-white/70">No pending orders.</div>}
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">Low Inventory / Harvest Attention</div>
+                <div className="text-lg font-black">Low Inventory / Harvest Attention</div>
                 <div className="mt-4 space-y-3">
                   {lowInventory.concat(harvestReady).slice(0, 10).map((product) => <div key={product.id} className="rounded-2xl bg-black/30 p-4"><div className="flex justify-between gap-3"><div className="font-black">{product.name}</div><div className="font-black">{product.inventory} {product.unit}</div></div><div className="mt-2 text-xs uppercase tracking-[0.18em] text-white/55">{product.category} {Boolean((product as any).harvest_ready) ? "• Harvest ready" : ""}</div></div>)}
                   {!lowInventory.length && !harvestReady.length && <div className="text-sm text-white/70">No current harvest alerts.</div>}
@@ -2418,7 +2418,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">Add Product</div>
+                <div className="text-lg font-black">Add Product</div>
                 <div className="mt-4 grid gap-4">
                   <Field label="Product Name" value={newName} onChange={setNewName} />
                   <SelectField label="Category" value={newCategory} onChange={(v) => setNewCategory(v as MarketplaceProduct["category"])} options={["Produce", "Seeds & Plants", "Value-Added", "Grower Marketplace", "Events"]} />
@@ -2434,7 +2434,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-                <div className="text-xl font-black">Channel Rules</div>
+                <div className="text-lg font-black">Channel Rules</div>
                 <div className="mt-4 space-y-3 text-sm leading-7 text-white/82">
                   <div className="rounded-2xl bg-black/30 p-4"><b>GrownBy:</b> sales channel for GrownBy orders and SNAP-supported order tracking. Enter order references here for harvest planning.</div>
                   <div className="rounded-2xl bg-black/30 p-4"><b>Direct:</b> Bronson direct sales for farm gate, events, schools, churches, businesses, wholesale, and invoice customers.</div>
@@ -2460,8 +2460,8 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
           ["During Program", "Supervisor observations, wellness support, safety follow-up, task completion, incident documentation."],
           ["End of Day", "Youth reflection, supervisor assessment, parent-safe summary, reports."],
         ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-xl font-black">{title}</div>
+          <div key={title} className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-lg font-black">{title}</div>
             <p className="mt-3 text-sm leading-7 text-white/82">{text}</p>
           </div>
         ))}
@@ -2693,7 +2693,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
       <Card className="lg:sticky lg:top-28 lg:self-start">
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Grower Operations Center</div>
         <h1 className="mt-5 text-3xl font-black leading-tight md:text-4xl">What does the land need today?</h1>
-        <p className="mt-4 text-sm leading-7 text-white/82">Weather, proverbs, crop plans, inventory, marketplace demand, and daily field notes for farm operations.</p>
+        <p className="mt-2 text-xs leading-5 text-white/82">Weather, proverbs, crop plans, inventory, marketplace demand, and daily field notes for farm operations.</p>
         <div className="mt-6 grid gap-3">
           <button onClick={loadGrowerData} className="rounded-2xl bg-emerald-300 px-5 py-3 font-black text-black">Refresh Grower Data</button>
           <button onClick={() => setScreen("marketplace")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Open Marketplace</button>
@@ -2721,21 +2721,21 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Live Weather</div>
-                <h3 className="mt-2 text-2xl font-black">Youngstown / Lansdowne field conditions</h3>
+                <h3 className="mt-1 text-xl font-black">Youngstown / Lansdowne field conditions</h3>
               </div>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase">{weather.source}</span>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">High / Low</div><div className="mt-2 text-2xl font-black">{weather.todayHigh ?? "—"}° / {weather.todayLow ?? "—"}°</div></div>
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Wind</div><div className="mt-2 text-2xl font-black">{weather.currentWind ?? "—"} mph</div></div>
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Rain Now</div><div className="mt-2 text-2xl font-black">{weather.currentPrecip ?? 0}</div></div>
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">High / Low</div><div className="mt-1 text-xl font-black">{weather.todayHigh ?? "—"}° / {weather.todayLow ?? "—"}°</div></div>
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Wind</div><div className="mt-1 text-xl font-black">{weather.currentWind ?? "—"} mph</div></div>
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Rain Now</div><div className="mt-1 text-xl font-black">{weather.currentPrecip ?? 0}</div></div>
             </div>
             <Notice text={`${weatherMessage} ${weatherRisk}`} />
           </Card>
 
           <Card>
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Wisdom / Proverbs</div>
-            <h3 className="mt-2 text-2xl font-black">Today’s field word</h3>
+            <h3 className="mt-1 text-xl font-black">Today’s field word</h3>
             <p className="mt-5 rounded-3xl border border-emerald-200/20 bg-emerald-200/10 p-5 text-xl font-black leading-8">“{dailyProverb}”</p>
             <p className="mt-4 text-sm leading-6 text-white/72">Use this for youth crew motivation, grower reflection, and morning huddle focus.</p>
           </Card>
@@ -2744,7 +2744,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
         <div className="grid gap-5 xl:grid-cols-2">
           <Card>
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Today’s Priorities</div>
-            <h3 className="mt-2 text-2xl font-black">Field task guidance</h3>
+            <h3 className="mt-1 text-xl font-black">Field task guidance</h3>
             <div className="mt-5 grid gap-3">
               {(cropPlans.length ? cropPlans.slice(0, 5).map((p: any) => ({ title: p.task || p.crop || p.title || "Crop plan item", priority: p.priority || p.status || "Review", detail: p.notes || p.description || p.location || "Review crop plan and assign crew action." })) : DEFAULT_GROWER_TASKS).map((task: any, idx: number) => (
                 <div key={idx} className="rounded-2xl border border-white/10 bg-white/8 p-4">
@@ -2757,7 +2757,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
 
           <Card>
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Marketplace Demand</div>
-            <h3 className="mt-2 text-2xl font-black">What the market may need</h3>
+            <h3 className="mt-1 text-xl font-black">What the market may need</h3>
             <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
               <table className="w-full text-left text-sm">
                 <thead className="bg-white/10 text-xs uppercase tracking-[0.18em] text-white/60"><tr><th className="p-3">Item</th><th className="p-3">Available</th><th className="p-3">Need</th><th className="p-3">Status</th></tr></thead>
@@ -2774,7 +2774,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
         <div className="grid gap-5 xl:grid-cols-2">
           <Card>
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Inventory / Seeds</div>
-            <h3 className="mt-2 text-2xl font-black">Available products and grower supply</h3>
+            <h3 className="mt-1 text-xl font-black">Available products and grower supply</h3>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {products.slice(0, 8).map((p) => (
                 <div key={p.id} className="rounded-2xl bg-white/8 p-4"><div className="font-black">{p.name}</div><div className="mt-1 text-sm text-white/65">{p.category} • {p.inventory} {p.unit}</div></div>
@@ -2789,7 +2789,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
 
           <Card>
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Announcements</div>
-            <h3 className="mt-2 text-2xl font-black">Program messages for growers</h3>
+            <h3 className="mt-1 text-xl font-black">Program messages for growers</h3>
             <div className="mt-5 grid gap-3">
               {(announcements.length ? announcements.slice(0, 5) : [{ title: "Launch operations", message: "Use this center for weather, field tasks, marketplace readiness, and daily notes." }]).map((a: any, idx: number) => (
                 <div key={a.id || idx} className="rounded-2xl border border-white/10 bg-white/8 p-4"><div className="font-black">{a.title || a.subject || "Announcement"}</div><div className="mt-2 text-sm leading-6 text-white/74">{a.message || a.body || a.description || "Review program update."}</div></div>
@@ -2800,7 +2800,7 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
 
         <Card>
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Field Note</div>
-          <h3 className="mt-2 text-2xl font-black">Record what changed today</h3>
+          <h3 className="mt-1 text-xl font-black">Record what changed today</h3>
           <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <TextArea label="Grower note" value={note} onChange={setNote} placeholder="Example: North row needs water; collards ready for harvest; youth crew handled mulching well." />
             <button onClick={saveGrowerNote} className="rounded-2xl bg-emerald-300 px-8 py-4 font-black text-black">Save Grower Note</button>
