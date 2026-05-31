@@ -9,120 +9,199 @@ type EcosystemScreen =
   | "youth"
   | "partner"
   | "valueAdded"
+  | "support"
   | "supervisor"
   | "missionControl";
 
 type PathwayCard = {
   id: EcosystemScreen;
+  eyebrow: string;
   title: string;
-  subtitle: string;
+  invitation: string;
   purpose: string;
   bullets: string[];
+  primaryLabel: string;
+  secondaryLabel?: string;
+  secondaryTarget?: EcosystemScreen;
+  colors: string;
+  icon: string;
 };
 
 const pathwayCards: PathwayCard[] = [
   {
     id: "guest",
-    title: "Guest",
-    subtitle: "Enter the story, land, and purpose.",
-    purpose: "Help visitors understand why Bronson Family Farm exists and how the historic Lansdowne Airport site is being transformed.",
-    bullets: ["Guided farm story", "Historic place-based context", "Tours, events, and invitations"],
+    eyebrow: "Explore the Story",
+    title: "Guest Experience",
+    invitation: "Walk into the story of the land, the airport, and the vision.",
+    purpose: "A welcoming pathway for visitors to understand Bronson Family Farm, the historic Lansdowne Airport setting, media coverage, and the larger regional ecosystem being formed.",
+    bullets: ["Historic Lansdowne Airport context", "WKBN and Business Journal story layer", "Tours, guest visits, and first-time discovery"],
+    primaryLabel: "Begin Exploration",
+    secondaryLabel: "Support the Ecosystem",
+    secondaryTarget: "support",
+    colors: "from-emerald-900 via-sky-900 to-amber-800",
+    icon: "🌲",
   },
   {
     id: "customer",
-    title: "Customer",
-    subtitle: "Fresh food, nutrition, and repeat healthy choices.",
-    purpose: "Connect families to chemical-free produce, practical food education, and purchasing pathways.",
-    bullets: ["Fresh produce access", "Nutrition education", "Return to Marketplace"],
+    eyebrow: "Fresh Food & Healthy Choices",
+    title: "Customer Pathway",
+    invitation: "Find food, learn what is available, and connect to marketplace options.",
+    purpose: "A pathway for families and community members seeking fresh produce, healthy choices, local food access, GrownBy purchasing, and ways to support regional growers.",
+    bullets: ["Fresh produce and seasonal availability", "Nutrition and healthy food choices", "Connection to Marketplace and GrownBy"],
+    primaryLabel: "Visit Marketplace",
+    secondaryLabel: "Learn to Grow",
+    secondaryTarget: "grower",
+    colors: "from-red-700 via-amber-600 to-lime-700",
+    icon: "🥗",
   },
   {
     id: "marketplace",
+    eyebrow: "Harvest, Sales & Food Movement",
     title: "Marketplace",
-    subtitle: "Food moves, not the farmer.",
-    purpose: "Show how produce, value-added goods, vendors, schools, and community buyers connect through the ecosystem.",
-    bullets: ["GrownBy connection", "SNAP-aware sales pathway", "Products from BFF and partners"],
+    invitation: "Connect products, growers, customers, and community food access.",
+    purpose: "The marketplace connects Bronson Family Farm, partner growers, value-added products, SNAP-aware purchasing, and GrownBy so food can move through the community.",
+    bullets: ["GrownBy connection", "SNAP-aware sales pathway", "Products from Bronson Family Farm and partners"],
+    primaryLabel: "Open GrownBy",
+    secondaryLabel: "Enter Grower Pathway",
+    secondaryTarget: "grower",
+    colors: "from-amber-700 via-orange-700 to-red-800",
+    icon: "🛒",
   },
   {
     id: "grower",
-    title: "Grower",
-    subtitle: "Connect producers to opportunity.",
-    purpose: "Support growers with market access, supply coordination, training, and ecosystem participation.",
-    bullets: ["Grower registration", "Crop and inventory planning", "Market participation"],
+    eyebrow: "Regional Grower Network",
+    title: "Grower Pathway",
+    invitation: "Backyard, community garden, school garden, urban farm, or market farm — all growers belong.",
+    purpose: "A practical pathway for growers of every size to register, describe their growing space, list crops, request resources, share resources, and connect to marketplace opportunities.",
+    bullets: ["Growing space type instead of acres only", "Crop and inventory planning", "Resource exchange and market participation"],
+    primaryLabel: "Start Grower Profile",
+    secondaryLabel: "Go to Marketplace",
+    secondaryTarget: "marketplace",
+    colors: "from-stone-900 via-amber-900 to-lime-900",
+    icon: "🌱",
   },
   {
     id: "youth",
+    eyebrow: "Cultivators Youth Workforce",
     title: "Youth Workforce",
-    subtitle: "Skills, responsibility, and future readiness.",
-    purpose: "Guide Cultivators through attendance, safety, teamwork, daily rhythm, reflection, and work-based learning.",
-    bullets: ["Morning check-in", "Daily assignments", "End-of-day reflection"],
+    invitation: "Start the day with purpose, safety, teamwork, and growth.",
+    purpose: "The youth pathway should guide participants through daily rhythm, proverbs, check-in, wellness, team assignment, learning, reflection, and progress — not send youth into the supervisor dashboard.",
+    bullets: ["Today’s proverb and reflection", "Morning check-in and safety readiness", "Team assignment, learning, and end-of-day reflection"],
+    primaryLabel: "Start My Day",
+    secondaryLabel: "View My Progress",
+    secondaryTarget: "youth",
+    colors: "from-blue-800 via-cyan-700 to-amber-600",
+    icon: "🧑‍🌾",
   },
   {
     id: "partner",
-    title: "Partner",
-    subtitle: "Align resources and collaboration.",
-    purpose: "Help funders, schools, agencies, and sponsors understand where they fit and how to contribute.",
-    bullets: ["Program alignment", "Support requests", "Shared outcomes"],
+    eyebrow: "Resource & Collaboration Portal",
+    title: "Partner Pathway",
+    invitation: "Offer resources, request support, collaborate, and measure community impact.",
+    purpose: "A professional pathway for schools, businesses, agencies, funders, nonprofits, faith communities, and volunteers to participate in the regional ecosystem.",
+    bullets: ["Organization profile", "What we offer / what we need", "Collaboration opportunities and shared outcomes"],
+    primaryLabel: "Enter Partner Portal",
+    secondaryLabel: "Support the Ecosystem",
+    secondaryTarget: "support",
+    colors: "from-slate-900 via-teal-900 to-blue-900",
+    icon: "🤝",
   },
   {
     id: "valueAdded",
+    eyebrow: "Innovation & Product Development",
     title: "Value-Added Producer",
-    subtitle: "Turn harvest into products.",
-    purpose: "Support producers making sauces, herbs, teas, prepared foods, bundles, and community food products.",
-    bullets: ["Product readiness", "Kitchen and labeling needs", "Marketplace connection"],
+    invitation: "Turn harvests, seeds, herbs, honey, and ideas into products.",
+    purpose: "A pathway for product development, packaging, labeling, market readiness, and connecting value-added goods to the marketplace.",
+    bullets: ["Product readiness", "Packaging, labeling, and pricing needs", "Marketplace connection"],
+    primaryLabel: "Develop Product",
+    secondaryLabel: "Go to Marketplace",
+    secondaryTarget: "marketplace",
+    colors: "from-purple-950 via-rose-900 to-amber-800",
+    icon: "🏭",
+  },
+  {
+    id: "support",
+    eyebrow: "Give, Volunteer, Mentor, Share",
+    title: "Support the Ecosystem",
+    invitation: "Support youth, growers, food access, infrastructure, education, and the regional ecosystem.",
+    purpose: "A pathway for donors, volunteers, mentors, and in-kind contributors. This is where seeds, compost, equipment, professional services, volunteer time, and financial gifts are recognized as ecosystem support.",
+    bullets: ["Donate or sponsor an outcome", "Volunteer, mentor, or teach", "Share resources such as seeds, compost, tools, and services"],
+    primaryLabel: "Choose Support Type",
+    secondaryLabel: "View Partner Pathway",
+    secondaryTarget: "partner",
+    colors: "from-rose-900 via-emerald-900 to-amber-700",
+    icon: "💚",
   },
   {
     id: "supervisor",
-    title: "Supervisor",
-    subtitle: "Track youth safely and responsibly.",
-    purpose: "Give aides and supervisors one place to monitor attendance, wellness, safety, skills, parent summaries, and incidents.",
-    bullets: ["Attendance and PPE", "Wellness and safety", "Parent-visible summaries"],
+    eyebrow: "Staff Operations",
+    title: "Supervisor Dashboard",
+    invitation: "Support youth safely, privately, and responsibly.",
+    purpose: "A staff-only workspace for attendance, PPE, wellness, safety, skills, private notes, parent-visible summaries, and incident follow-up.",
+    bullets: ["Attendance and PPE", "Wellness and safety", "Parent-visible summaries and private staff notes"],
+    primaryLabel: "Enter Supervisor Dashboard",
+    secondaryLabel: "Mission Control",
+    secondaryTarget: "missionControl",
+    colors: "from-slate-800 via-slate-700 to-emerald-900",
+    icon: "👨‍🏫",
   },
   {
     id: "missionControl",
+    eyebrow: "Leadership View",
     title: "Mission Control",
-    subtitle: "Launch-day operating view.",
-    purpose: "Give leadership a fast view of attendance, alerts, program flow, teams, and follow-up priorities.",
-    bullets: ["Daily counts", "Wellness alerts", "Team readiness"],
+    invitation: "See the ecosystem pulse, launch priorities, feedback, and operations.",
+    purpose: "A leadership workspace for daily launch awareness: people, growers, youth, partners, marketplace, support, recognition, and feedback priorities.",
+    bullets: ["Launch dashboard", "Feedback command center", "Ecosystem operations and recognition"],
+    primaryLabel: "Open Mission Control",
+    secondaryLabel: "Return Home",
+    secondaryTarget: "home",
+    colors: "from-slate-950 via-blue-950 to-teal-900",
+    icon: "📊",
   },
+];
+
+const navItems: { id: EcosystemScreen; label: string }[] = [
+  { id: "home", label: "Forest Gate" },
+  { id: "guest", label: "Guest" },
+  { id: "customer", label: "Customer" },
+  { id: "marketplace", label: "Marketplace" },
+  { id: "grower", label: "Grower" },
+  { id: "youth", label: "Youth" },
+  { id: "partner", label: "Partner" },
+  { id: "valueAdded", label: "Value-Added" },
+  { id: "support", label: "Support" },
+  { id: "supervisor", label: "Supervisor" },
+  { id: "missionControl", label: "Mission Control" },
 ];
 
 function labelFor(screen: EcosystemScreen) {
   const found = pathwayCards.find((p) => p.id === screen);
-  return found?.title || "Home";
+  return found?.title || "Forest Gate";
+}
+
+function getCard(screen: EcosystemScreen) {
+  return pathwayCards.find((p) => p.id === screen) || pathwayCards[0];
 }
 
 function EcosystemNav({ current, navigate }: { current: EcosystemScreen; navigate: (screen: EcosystemScreen) => void }) {
-  const navItems: { id: EcosystemScreen; label: string }[] = [
-    { id: "home", label: "Home" },
-    { id: "guest", label: "Guest" },
-    { id: "customer", label: "Customer" },
-    { id: "marketplace", label: "Marketplace" },
-    { id: "grower", label: "Grower" },
-    { id: "youth", label: "Youth Workforce" },
-    { id: "partner", label: "Partner" },
-    { id: "valueAdded", label: "Value-Added" },
-    { id: "supervisor", label: "Supervisor" },
-    { id: "missionControl", label: "Mission Control" },
-  ];
-
   return (
-    <div className="sticky top-0 z-50 border-b border-emerald-200/70 bg-white/95 px-4 py-3 text-emerald-950 shadow-sm backdrop-blur">
+    <div className="sticky top-0 z-50 border-b border-stone-200/70 bg-stone-50/95 px-4 py-3 text-stone-950 shadow-sm backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <button
           onClick={() => navigate("home")}
-          className="w-fit rounded-2xl bg-emerald-800 px-4 py-2 text-sm font-black text-white shadow hover:bg-emerald-700"
+          className="w-fit rounded-full bg-stone-900 px-4 py-2 text-sm font-black text-amber-100 shadow hover:bg-stone-800"
         >
-          ← Return to Ecosystem
+          🌲 Forest Gate
         </button>
         <div className="flex flex-wrap gap-2">
-          {navItems.map((item) => (
+          {navItems.slice(1).map((item) => (
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
-              className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
+              className={`rounded-full border px-3 py-2 text-xs font-bold transition ${
                 current === item.id
-                  ? "border-amber-300 bg-amber-200 text-emerald-950"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-950 hover:bg-emerald-100"
+                  ? "border-amber-400 bg-amber-200 text-stone-950"
+                  : "border-stone-200 bg-white text-stone-700 hover:bg-amber-50"
               }`}
             >
               {item.label}
@@ -136,8 +215,10 @@ function EcosystemNav({ current, navigate }: { current: EcosystemScreen; navigat
 
 export default function App() {
   const [screen, setScreen] = useState<EcosystemScreen>("home");
+  const [entered, setEntered] = useState(false);
 
   function navigate(next: EcosystemScreen) {
+    setEntered(true);
     setScreen(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -147,135 +228,212 @@ export default function App() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-emerald-950 via-emerald-900 to-lime-950 text-white">
-      <EcosystemNav current={screen} navigate={navigate} />
-
-      {screen === "home" ? (
-        <main className="mx-auto max-w-7xl px-4 py-8">
-          <div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur md:p-10">
-            <p className="text-sm uppercase tracking-[0.3em] text-amber-200">Bronson Family Farm</p>
-            <h1 className="mt-3 text-3xl font-black md:text-6xl">Online Ecosystem Launch Hub</h1>
-            <p className="mt-4 max-w-4xl text-lg text-emerald-50">
-              Enter the connected food ecosystem through any role. No pathway should trap the user. Every pathway can return home, move to Marketplace, connect to Growers, or enter Supervisor operations.
-            </p>
-
-            <div className="mt-6 grid gap-3 md:grid-cols-4">
-              <LaunchMetric label="Core Navigation" value="Restored" />
-              <LaunchMetric label="Supervisor" value="Connected" />
-              <LaunchMetric label="Role Pathways" value="Open" />
-              <LaunchMetric label="Launch Status" value="Testing" />
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {pathwayCards.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => navigate(card.id)}
-                className="rounded-3xl border border-white/15 bg-white/10 p-5 text-left shadow-xl transition hover:-translate-y-1 hover:bg-white/15"
-              >
-                <p className="text-xs uppercase tracking-[0.25em] text-amber-200">{card.subtitle}</p>
-                <h2 className="mt-2 text-2xl font-black">{card.title}</h2>
-                <p className="mt-3 text-sm text-emerald-50/90">{card.purpose}</p>
-                <div className="mt-4 space-y-2">
-                  {card.bullets.map((bullet) => (
-                    <p key={bullet} className="rounded-2xl bg-white/10 px-3 py-2 text-sm">✓ {bullet}</p>
-                  ))}
-                </div>
-              </button>
-            ))}
-          </div>
-        </main>
-      ) : (
-        <PathwayPage screen={screen} navigate={navigate} />
-      )}
+    <section className="min-h-screen bg-stone-950 text-white">
+      {entered && <EcosystemNav current={screen} navigate={navigate} />}
+      {screen === "home" ? <ForestGate navigate={navigate} /> : <PathwayPage screen={screen} navigate={navigate} />}
+      {entered && <FeedbackPanel />}
     </section>
   );
 }
 
-function LaunchMetric({ label, value }: { label: string; value: string }) {
+function ForestGate({ navigate }: { navigate: (screen: EcosystemScreen) => void }) {
   return (
-    <div className="rounded-3xl border border-white/15 bg-white/10 p-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-emerald-100">{label}</p>
-      <p className="mt-1 text-2xl font-black text-amber-200">{value}</p>
-    </div>
-  );
-}
+    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,.25),transparent_35%),linear-gradient(135deg,#10231b_0%,#1b2a20_38%,#4a2f1a_74%,#111827_100%)]">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6">
+        <header className="flex items-center justify-between gap-4 text-sm text-amber-100/90">
+          <div className="font-black tracking-[0.25em]">BRONSON FAMILY FARM</div>
+          <button onClick={() => navigate("missionControl")} className="rounded-full border border-white/20 bg-white/10 px-4 py-2 font-bold hover:bg-white/15">
+            Mission Control
+          </button>
+        </header>
 
-function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: (screen: EcosystemScreen) => void }) {
-  const card = pathwayCards.find((p) => p.id === screen);
-  if (!card) return null;
-
-  const actionMap: Record<EcosystemScreen, { primary: EcosystemScreen; secondary: EcosystemScreen; note: string }> = {
-    home: { primary: "guest", secondary: "marketplace", note: "Choose a pathway to begin." },
-    guest: { primary: "marketplace", secondary: "partner", note: "Guests learn the story, then move toward buying, volunteering, or partnering." },
-    customer: { primary: "marketplace", secondary: "grower", note: "Customers can purchase produce or learn where food comes from." },
-    marketplace: { primary: "customer", secondary: "grower", note: "Marketplace connects buyers, produce, growers, value-added products, and GrownBy." },
-    grower: { primary: "marketplace", secondary: "valueAdded", note: "Growers connect inventory, crops, supply, and market participation." },
-    youth: { primary: "supervisor", secondary: "missionControl", note: "Youth Workforce connects daily rhythm to supervisor tracking and mission control." },
-    partner: { primary: "missionControl", secondary: "marketplace", note: "Partners see needs, outcomes, support opportunities, and shared impact." },
-    valueAdded: { primary: "marketplace", secondary: "grower", note: "Value-added producers connect products to growers and marketplace opportunities." },
-    supervisor: { primary: "missionControl", secondary: "youth", note: "Supervisors track safety, attendance, wellness, and progress." },
-    missionControl: { primary: "supervisor", secondary: "marketplace", note: "Mission Control watches daily operations, alerts, teams, and launch readiness." },
-  };
-
-  const actions = actionMap[screen];
-
-  return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur md:p-10">
-        <p className="text-sm uppercase tracking-[0.3em] text-amber-200">Bronson Family Farm Pathway</p>
-        <h1 className="mt-3 text-3xl font-black md:text-5xl">{card.title}</h1>
-        <p className="mt-2 text-xl text-emerald-100">{card.subtitle}</p>
-        <p className="mt-4 max-w-4xl text-base text-emerald-50/90">{card.purpose}</p>
-
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
-          <div className="rounded-3xl bg-white p-5 text-emerald-950">
-            <h2 className="text-2xl font-black">What this pathway does</h2>
-            <div className="mt-4 grid gap-3">
-              {card.bullets.map((bullet) => (
-                <div key={bullet} className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3 font-bold">✓ {bullet}</div>
-              ))}
+        <section className="grid flex-1 items-center gap-8 py-10 lg:grid-cols-[1.15fr_.85fr]">
+          <div>
+            <p className="mb-4 inline-flex rounded-full border border-amber-200/30 bg-amber-100/10 px-4 py-2 text-sm font-bold text-amber-100">
+              Historic Lansdowne Airport • Youngstown, Ohio
+            </p>
+            <h1 className="max-w-5xl text-5xl font-black leading-[0.95] tracking-tight md:text-7xl">
+              Welcome to the Bronson Family Farm Ecosystem.
+            </h1>
+            <p className="mt-6 max-w-3xl text-xl leading-8 text-stone-100/90">
+              A regional ecosystem connecting people, food, growers, youth workforce development, marketplace opportunities, supporters, and community partners.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button onClick={() => setTimeout(() => navigate("guest"), 0)} className="rounded-full bg-amber-300 px-7 py-4 text-lg font-black text-stone-950 shadow-2xl hover:bg-amber-200">
+                Enter Ecosystem
+              </button>
+              <button onClick={() => navigate("support")} className="rounded-full border border-white/25 bg-white/10 px-7 py-4 text-lg font-black text-white hover:bg-white/15">
+                Support the Ecosystem
+              </button>
             </div>
-            {screen === "marketplace" && (
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm">
-                <b>GrownBy connection:</b> Use this pathway to direct customers to Bronson Family Farm products and SNAP-aware purchasing.
-                <div className="mt-3">
-                  <a
-                    href="https://grownby.com/farms/bronson-family-farm"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-block rounded-xl bg-emerald-800 px-4 py-2 font-black text-white"
-                  >
-                    Open Bronson Family Farm on GrownBy
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/10 p-5">
-            <h2 className="text-2xl font-black">Next Move</h2>
-            <p className="mt-3 text-sm text-emerald-50/90">{actions.note}</p>
+          <aside className="rounded-[2rem] border border-white/15 bg-stone-50/95 p-5 text-stone-950 shadow-2xl md:p-7">
+            <p className="text-sm font-black uppercase tracking-[0.25em] text-amber-700">Choose Your Journey</p>
             <div className="mt-5 grid gap-3">
-              <button onClick={() => navigate(actions.primary)} className="rounded-2xl bg-amber-300 px-5 py-3 font-black text-emerald-950 shadow hover:bg-amber-200">
-                Continue to {labelFor(actions.primary)}
-              </button>
-              <button onClick={() => navigate(actions.secondary)} className="rounded-2xl border border-white/20 bg-white/10 px-5 py-3 font-black text-white hover:bg-white/15">
-                Go to {labelFor(actions.secondary)}
-              </button>
-              <button onClick={() => navigate("home")} className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 font-black text-emerald-950 hover:bg-white">
-                Return Home
-              </button>
+              <JourneyButton icon="👣" title="Explore" text="Story, place, media, and vision" onClick={() => navigate("guest")} />
+              <JourneyButton icon="🥗" title="Access Food" text="Fresh food, marketplace, and healthy choices" onClick={() => navigate("customer")} />
+              <JourneyButton icon="🌱" title="Grow Food" text="Backyard, community garden, school garden, urban farm, or market farm" onClick={() => navigate("grower")} />
+              <JourneyButton icon="🧑‍🌾" title="Learn & Work" text="Youth Workforce daily rhythm, teams, and progress" onClick={() => navigate("youth")} />
+              <JourneyButton icon="🤝" title="Collaborate" text="Partners, resources, volunteers, and shared outcomes" onClick={() => navigate("partner")} />
+              <JourneyButton icon="💚" title="Support" text="Donate, volunteer, mentor, or share resources" onClick={() => navigate("support")} />
             </div>
-          </div>
-        </div>
+          </aside>
+        </section>
       </div>
     </main>
   );
 }
 
+function JourneyButton({ icon, title, text, onClick }: { icon: string; title: string; text: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="group rounded-3xl border border-stone-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50">
+      <div className="flex gap-4">
+        <div className="text-3xl">{icon}</div>
+        <div>
+          <h3 className="text-lg font-black text-stone-950">{title}</h3>
+          <p className="text-sm leading-5 text-stone-600">{text}</p>
+        </div>
+      </div>
+    </button>
+  );
+}
 
+function PathwayPage({ screen, navigate }: { screen: EcosystemScreen; navigate: (screen: EcosystemScreen) => void }) {
+  const card = getCard(screen);
+  const isMarketplace = screen === "marketplace";
+  const isYouth = screen === "youth";
+  const isGrower = screen === "grower";
+  const isMission = screen === "missionControl";
+
+  return (
+    <main className={`min-h-screen bg-gradient-to-br ${card.colors}`}>
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <section className="overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 shadow-2xl backdrop-blur">
+          <div className="grid gap-0 lg:grid-cols-[1fr_.85fr]">
+            <div className="p-6 md:p-10">
+              <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-100">{card.eyebrow}</p>
+              <div className="mt-5 text-6xl">{card.icon}</div>
+              <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight md:text-6xl">{card.title}</h1>
+              <p className="mt-5 max-w-3xl text-xl leading-8 text-white/90">{card.invitation}</p>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-white/80">{card.purpose}</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                {isMarketplace ? (
+                  <a href="https://grownby.com/farms/bronson-family-farm" target="_blank" rel="noreferrer" className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
+                    {card.primaryLabel}
+                  </a>
+                ) : screen === "supervisor" ? (
+                  <button onClick={() => navigate("supervisor")} className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
+                    {card.primaryLabel}
+                  </button>
+                ) : (
+                  <button className="rounded-full bg-amber-300 px-6 py-3 font-black text-stone-950 shadow hover:bg-amber-200">
+                    {card.primaryLabel}
+                  </button>
+                )}
+                {card.secondaryTarget && (
+                  <button onClick={() => navigate(card.secondaryTarget!)} className="rounded-full border border-white/25 bg-white/10 px-6 py-3 font-black text-white hover:bg-white/15">
+                    {card.secondaryLabel || `Go to ${labelFor(card.secondaryTarget)}`}
+                  </button>
+                )}
+                <button onClick={() => navigate("home")} className="rounded-full border border-white/25 bg-white/10 px-6 py-3 font-black text-white hover:bg-white/15">
+                  Return to Forest Gate
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 p-5 text-stone-950 md:p-8">
+              <h2 className="text-2xl font-black">What you can do here</h2>
+              <div className="mt-5 grid gap-3">
+                {card.bullets.map((bullet) => (
+                  <div key={bullet} className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+                    <p className="font-bold">✓ {bullet}</p>
+                  </div>
+                ))}
+              </div>
+
+              {isYouth && <YouthRhythm />}
+              {isGrower && <GrowerPortalPreview />}
+              {screen === "partner" && <PartnerPortalPreview />}
+              {screen === "support" && <SupportPreview />}
+              {isMission && <MissionPreview />}
+              {isMarketplace && (
+                <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-stone-800">
+                  <b>Marketplace connection:</b> Reviewers can use this button to reach the Bronson Family Farm GrownBy marketplace while the full product catalog continues to mature.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function YouthRhythm() {
+  return (
+    <div className="mt-5 rounded-3xl border border-blue-100 bg-blue-50 p-4">
+      <h3 className="text-xl font-black">Today’s Youth Rhythm</h3>
+      <p className="mt-2 text-sm text-stone-700"><b>Proverb:</b> Those who work their land will have abundant food.</p>
+      <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+        <p className="rounded-2xl bg-white p-3">Morning Check-In</p>
+        <p className="rounded-2xl bg-white p-3">Safety & PPE</p>
+        <p className="rounded-2xl bg-white p-3">Team Assignment</p>
+        <p className="rounded-2xl bg-white p-3">End-of-Day Reflection</p>
+      </div>
+    </div>
+  );
+}
+
+function GrowerPortalPreview() {
+  return (
+    <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-4">
+      <h3 className="text-xl font-black">Grower Profile Starts Here</h3>
+      <p className="mt-2 text-sm text-stone-700">Not just acres. The ecosystem welcomes backyard gardens, raised beds, community gardens, school gardens, church gardens, urban lots, greenhouses, homesteads, and farms.</p>
+    </div>
+  );
+}
+
+function PartnerPortalPreview() {
+  return (
+    <div className="mt-5 rounded-3xl border border-teal-200 bg-teal-50 p-4">
+      <h3 className="text-xl font-black">Resource & Collaboration Portal</h3>
+      <p className="mt-2 text-sm text-stone-700">Partners identify what they can offer, what they need, and how they want to collaborate in the ecosystem.</p>
+    </div>
+  );
+}
+
+function SupportPreview() {
+  return (
+    <div className="mt-5 rounded-3xl border border-rose-200 bg-rose-50 p-4">
+      <h3 className="text-xl font-black">Support Can Be Financial or In-Kind</h3>
+      <p className="mt-2 text-sm text-stone-700">Jubilee Gardens, Inc. is an example of ecosystem support through abundant seed contributions over the past two years.</p>
+    </div>
+  );
+}
+
+function MissionPreview() {
+  return (
+    <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-100 p-4">
+      <h3 className="text-xl font-black">Launch Dashboard</h3>
+      <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+        <p className="rounded-2xl bg-white p-3">Reviewer Feedback</p>
+        <p className="rounded-2xl bg-white p-3">Youth Workforce</p>
+        <p className="rounded-2xl bg-white p-3">Growers</p>
+        <p className="rounded-2xl bg-white p-3">Partners & Supporters</p>
+      </div>
+    </div>
+  );
+}
+
+function FeedbackPanel() {
+  return (
+    <div className="fixed bottom-4 right-4 z-50 hidden max-w-xs rounded-3xl border border-stone-200 bg-stone-50 p-4 text-stone-950 shadow-2xl md:block">
+      <p className="font-black">Reviewer Feedback</p>
+      <p className="mt-1 text-xs text-stone-600">What excited you? What confused you? What would you improve?</p>
+    </div>
+  );
+}
 
 type YouthStatus = "Present" | "Absent" | "Late" | "Excused";
 type MoodStatus = "Ready" | "Okay" | "Tired" | "Concerned" | "Needs Support";
