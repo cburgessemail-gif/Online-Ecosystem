@@ -31,6 +31,7 @@ type Screen =
   | "valueAdded"
   | "marketplace"
   | "wellness"
+  | "myDayStatus"
   | "reports"
   | "operations"
   | "feedback";
@@ -497,6 +498,7 @@ function App() {
       {screen === "valueAdded" && <SimplePathway title="Value-Added Producer Pathway" image={IMG.market} setScreen={setScreen} text="Value-added producers connect products, kitchen readiness, licensing awareness, and marketplace participation." />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "myDayStatus" && <MyDayStatus setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
@@ -1732,6 +1734,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           ? `Start My Day saved. ${selectedYouth.participant_id} checked in at ${time}. Attendance, PPE, and readiness are recorded.`
           : `Check-in saved at ${time}. PPE is incomplete, so supervisor review is required before assignment.`
       );
+
+      window.setTimeout(() => setScreen("myDayStatus"), 650);
     } catch (error) {
       console.error("Start My Day save failed:", error);
       setMessage("The Start My Day button ran, but an app error stopped the live save. Check Console for the exact error.");
@@ -1854,13 +1858,88 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <button
         type="button"
         onClick={runStartMyDay}
-        onPointerUp={runStartMyDay}
         disabled={saving}
         className="mt-3 w-full rounded-full bg-emerald-300 px-7 py-3 text-base font-black text-black disabled:opacity-60"
       >
         {saving ? "Saving..." : "Start My Day"}
       </button>
       {message && <Notice text={message} />}
+    </Card>
+  );
+}
+
+
+function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
+  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
+  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
+  const [ppeRows, setPpeRows] = useState<any[]>(() => safeRead<any[]>(PPE_KEY, []));
+
+  useEffect(() => {
+    const load = async () => {
+      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
+      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
+      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
+      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
+      setPpeRows(await loadSupabaseRows<any>("ppe_checkins", PPE_KEY));
+    };
+    void load();
+  }, []);
+
+  const today = todayISO();
+  const selectedYouth = youth[0];
+  const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
+  const participantId = selectedYouth?.participant_id || "No participant selected";
+  const todayAttendance = attendance.find((a) => a.participant_id === participantId && a.date === today);
+  const todayWellness = wellness.find((w) => w.profile_id === selectedYouth?.profile_id && w.created_at.slice(0, 10) === today);
+  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.date || p.created_at || "").slice(0, 10) === today);
+  const ready = todayAttendance && todayPpe && todayWellness && todayAttendance.ppe_status === "complete";
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Day Status</div>
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black md:text-6xl">You are checked in.</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
+            This is your next screen after Start My Day. Stay here until your supervisor gives the crew assignment.
+          </p>
+        </div>
+        <div className={`rounded-2xl px-5 py-4 text-center font-black ${ready ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
+          {ready ? "READY FOR ASSIGNMENT" : "SUPERVISOR REVIEW"}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Participant</div>
+          <div className="mt-2 text-xl font-black">{profileName(selectedProfile)}</div>
+          <div className="mt-1 text-sm text-white/70">{participantId}</div>
+          <div className="text-sm text-white/70">{selectedYouth?.crew || "Crew not assigned"}</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
+          <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.status || "Not recorded"}</div>
+          <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "No time recorded"}</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">PPE</div>
+          <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</div>
+          <div className="mt-1 text-sm text-white/70">Shoes, water, gloves, outdoor clothing</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
+          <div className="mt-2 text-xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
+          <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support</div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <button onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Back to Youth Home</button>
+        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">See Farm Information</button>
+        <button onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Youth Voice / Reflection</button>
+      </div>
     </Card>
   );
 }
