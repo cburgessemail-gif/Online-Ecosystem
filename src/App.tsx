@@ -682,7 +682,6 @@ function MyWorkspace({
   setScreen: (screen: Screen) => void;
 }) {
   const [name, setName] = useState("");
-  const [showAccessTools, setShowAccessTools] = useState(false);
 
   const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
   const isYouth = activeUser?.role === "Youth Workforce Participant";
@@ -693,43 +692,43 @@ function MyWorkspace({
   const workspaceCards: { title: string; subtitle: string; screen: Screen; show: boolean }[] = [
     {
       title: "Youth Daily Check-In",
-      subtitle: "Start My Day: attendance, date/time, PPE, wellness, goal, and support request.",
+      subtitle: "Attendance, PPE, wellness, goal, encouragement, and Start My Day.",
       screen: "youth",
       show: isYouth || isStaff,
     },
     {
       title: "Supervisor Operations Center",
-      subtitle: "Attendance, PPE, wellness review, assessments, incidents, parent summaries, and reports.",
+      subtitle: "Attendance, PPE exceptions, support flags, assessments, parent summaries, and reports.",
       screen: "supervisor",
       show: isStaff,
     },
     {
       title: "Parent Portal",
-      subtitle: "Parent-safe attendance, progress notes, announcements, and family updates.",
+      subtitle: "Parent-safe attendance, progress notes, messages, and achievements.",
       screen: "parent",
       show: isParent || isStaff,
     },
     {
       title: "Grower Operations Center",
-      subtitle: "Weather, crop plans, grower tasks, field notes, inventory, and marketplace demand.",
+      subtitle: "Weather, tasks, crop plans, grow notes, inventory, marketplace demand, and proverb.",
       screen: "grower",
       show: isGrower || isStaff,
     },
     {
       title: "Marketplace Operations",
-      subtitle: "GrownBy + direct sales, products, inventory, orders, SNAP awareness, and fulfillment.",
+      subtitle: "GrownBy + direct sales, text-only products, cart, orders, pickup, and fulfillment.",
       screen: "marketplace",
       show: isMarketplace || isGrower || isStaff || !activeUser,
     },
     {
       title: "Executive Reports",
-      subtitle: "Program metrics, workforce status, youth readiness, marketplace activity, and impact reporting.",
+      subtitle: "Program metrics, workforce status, marketplace activity, and impact reporting.",
       screen: "reports",
       show: isStaff,
     },
     {
       title: "Guest Experience",
-      subtitle: "Public story, farm ecosystem, historic place, and community pathway.",
+      subtitle: "Public story, full connected food ecosystem diagram, and community pathway.",
       screen: "guest",
       show: !activeUser,
     },
@@ -743,64 +742,86 @@ function MyWorkspace({
 
   const visibleCards = workspaceCards.filter((card) => card.show);
 
+  const snapshot = isGrower
+    ? [
+        ["Weather", "Live / fallback"],
+        ["Tasks Due", "4"],
+        ["Inventory", "Connected"],
+        ["Demand", "Marketplace"],
+        ["Harvest", "Ready"],
+        ["Orders", "GrownBy + Direct"],
+      ]
+    : isYouth
+      ? [["Today", "Check in"], ["PPE", "Required"], ["Assignment", "After check-in"], ["Reflection", "End day"]]
+      : isStaff
+        ? [["Attendance", "Live"], ["PPE", "Exceptions"], ["Support", "Flags"], ["Reports", "Daily"]]
+        : [["Access", "Choose once"], ["Profile", "Reusable"], ["Market", "Available"], ["Guest", "Open"]];
+
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Workspace</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">
-        {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
-      </h1>
-      <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
-        Roles stay in the background as permissions. This page shows the workspaces available for the person who is signed in.
-      </p>
-
-      {activeUser && (
-        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
-          <div className="mt-1 text-xl font-black">{activeUser.role}</div>
-          <div className="mt-1 text-sm text-white/72">Access level: {activeUser.accessLevel}</div>
+    <Card className="h-[calc(100vh-92px)] overflow-hidden">
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="shrink-0">
+          <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">My Workspace</div>
+          <h1 className="mt-2 text-3xl font-black leading-tight md:text-5xl">
+            {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
+          </h1>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-white/78">
+            Roles stay in the background as permissions. This page shows only the workspaces available for the person signed in.
+          </p>
         </div>
-      )}
 
-      <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {visibleCards.map((card) => (
-          <button
-            key={card.title}
-            onClick={() => setScreen(card.screen)}
-            className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
-          >
-            <div className="text-lg font-black">{card.title}</div>
-            <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
-          </button>
-        ))}
-      </div>
+        {activeUser ? (
+          <>
+            <div className="mt-3 shrink-0 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/12 p-3">
+              <div className="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Current Access</div>
+              <div className="mt-1 text-xl font-black">{activeUser.role}</div>
+              <div className="text-xs text-white/70">Access level: {activeUser.accessLevel}</div>
+            </div>
 
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-        <button
-          type="button"
-          onClick={() => setShowAccessTools((value) => !value)}
-          className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
-        >
-          {showAccessTools ? "Hide Access Tools" : "First-Time / Testing Access"}
-        </button>
-        {showAccessTools && (
-          <div className="mt-5">
-            <div className="max-w-xl">
+            <div className="mt-3 grid shrink-0 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {visibleCards.map((card) => (
+                <button
+                  key={card.title}
+                  onClick={() => setScreen(card.screen)}
+                  className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
+                >
+                  <div className="text-lg font-black">{card.title}</div>
+                  <div className="mt-2 text-sm leading-5 opacity-85">{card.subtitle}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-3 shrink-0 rounded-[1.25rem] border border-white/10 bg-black/32 p-3">
+              <div className="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-100/75">
+                {isGrower ? "Today's Grower Snapshot" : isYouth ? "Youth Daily Snapshot" : isStaff ? "Supervisor Snapshot" : "Workspace Snapshot"}
+              </div>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                {snapshot.map(([label, value]) => (
+                  <div key={label} className="rounded-xl border border-white/10 bg-white/10 p-2.5">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-white/55">{label}</div>
+                    <div className="mt-1 text-sm font-black">{value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="mt-4 min-h-0 flex-1 rounded-[1.25rem] border border-white/10 bg-black/30 p-4">
+            <div className="text-sm font-black">First-Time / Testing Access</div>
+            <div className="mt-3 max-w-xl">
               <Field label="Name for this session" value={name} onChange={setName} placeholder="Example: Supervisor Aide" />
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
               {roles.map((role) => (
                 <button
                   key={role}
                   onClick={() => signIn(role, name)}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
+                  className="rounded-xl border border-white/10 bg-white/10 p-3 text-left transition hover:bg-emerald-300 hover:text-black"
                 >
-                  <div className="text-lg font-black">{role}</div>
-                  <div className="mt-2 text-sm opacity-85">Opens: {routeForRole(role)}</div>
+                  <div className="text-base font-black">{role}</div>
+                  <div className="mt-1 text-xs opacity-85">Opens: {routeForRole(role)}</div>
                 </button>
               ))}
-            </div>
-            <div className="mt-4 text-xs leading-6 text-white/60">
-              These access buttons are for launch testing and first-time entry only. In daily use, registered users should come back to My Workspace and open only their assigned workspaces.
             </div>
           </div>
         )}
