@@ -43,6 +43,6 @@ async function saveTodayToSupabase() {
         : "Supervisor follow-up needed",
     });
   }
-export default RealSupervisorDashboard;
+
   alert("Saved to Bronson Family Farm Supabase database.");
 }
