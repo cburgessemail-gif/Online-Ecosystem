@@ -5,7 +5,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * Bronson Family Farm Online Ecosystem
  * REAL SUPERVISOR + MARKETPLACE OPERATIONS CENTER
  *
- * Complete React/Vite App.tsx replacement focused on launch operations.
+ * Complete React/Vite App.tsx replacement focused on orientation operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
  * - Role access
  * - Youth roster
@@ -463,7 +463,7 @@ function App() {
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
       {screen === "parent" && <ParentScreen setScreen={setScreen} />}
-      {screen === "grower" && <SimplePathway title="Grower Pathway" image={IMG.grow} setScreen={setScreen} text="Growers connect crop plans, production notes, marketplace opportunity, and community food movement." />}
+      {screen === "grower" && <GrowerOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
       {screen === "valueAdded" && <SimplePathway title="Value-Added Producer Pathway" image={IMG.market} setScreen={setScreen} text="Value-added producers connect products, kitchen readiness, licensing awareness, and marketplace participation." />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
@@ -613,13 +613,13 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
       </Card>
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Orientation Focus</div>
         {[
           "Supervisor Operations Center is now the working control room.",
           "Youth check-ins and supervisor records save to Supabase when connected.",
           "Parents receive progress summaries, not private raw youth reflections.",
           "Incident and support flags stay staff-facing.",
-          "Reports convert daily records into launch readiness and program impact.",
+          "Reports convert daily records into orientation readiness and program impact.",
         ].map((item) => (
           <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
@@ -1030,7 +1030,7 @@ function SupervisorDashboard({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
-      <h2 className="mt-3 text-4xl font-black">Launch-day operating picture.</h2>
+      <h2 className="mt-3 text-4xl font-black">Orientation-day operating picture.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <button key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
@@ -1453,7 +1453,7 @@ function SupervisorReports({
         ))}
       </div>
       <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-sm leading-7 text-white/84">
-        This report is designed for launch operations, staff briefings, parent-safe updates, partner accountability, and future funder reporting.
+        This report is designed for orientation operations, staff briefings, parent-safe updates, partner accountability, and future funder reporting.
       </div>
     </Card>
   );
@@ -2248,6 +2248,318 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
     </Card>
   );
 }
+
+
+function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
+  const youth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
+  const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
+  const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
+  const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
+  const parentSummaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
+
+  return (
+    <SupervisorReports
+      profiles={profiles}
+      youth={youth}
+      attendance={attendance}
+      assessments={assessments}
+      wellness={wellness}
+      incidents={incidents}
+      parentSummaries={parentSummaries}
+    />
+  );
+}
+
+function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        {[
+          ["Beginning of Day", "QR/manual check-in, PPE, water, daily proverb, weather awareness, assignments."],
+          ["During Program", "Supervisor observations, wellness support, safety follow-up, task completion, incident documentation."],
+          ["End of Day", "Youth reflection, supervisor assessment, parent-safe summary, reports."],
+        ].map(([title, text]) => (
+          <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+            <div className="text-xl font-black">{title}</div>
+            <p className="mt-3 text-sm leading-7 text-white/82">{text}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={() => setScreen("supervisor")} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
+    </Card>
+  );
+}
+
+type GrowerWeather = {
+  currentTemp?: number;
+  currentWind?: number;
+  currentPrecip?: number;
+  todayHigh?: number;
+  todayLow?: number;
+  rainChance?: number;
+  source: "live" | "fallback";
+};
+
+const DEFAULT_PROVERBS = [
+  "A garden grows where attention goes.",
+  "The best fertilizer is the grower's shadow.",
+  "Plant in hope, tend with patience, harvest with gratitude.",
+  "Food moves, not the farmer.",
+  "Small daily care becomes a season of abundance.",
+];
+
+const DEFAULT_GROWER_TASKS = [
+  { title: "Walk the grow area", priority: "High", detail: "Check water, pests, fencing, crop stress, and safety before assigning crews." },
+  { title: "Review marketplace demand", priority: "High", detail: "Compare available products with orders and likely pickup needs." },
+  { title: "Assign youth crews", priority: "Medium", detail: "Match harvest, weeding, irrigation, and packing tasks to crew readiness." },
+  { title: "Document crop notes", priority: "Medium", detail: "Record what changed today so the farm can learn over time." },
+];
+
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
+      <div className="text-3xl font-black text-white">{value}</div>
+      <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+    </div>
+  );
+}
+
+function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [weather, setWeather] = useState<GrowerWeather>({ source: "fallback" });
+  const [weatherMessage, setWeatherMessage] = useState("Loading Youngstown farm weather...");
+  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
+  const [orders, setOrders] = useState<MarketplaceOrder[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [wisdom, setWisdom] = useState<any[]>([]);
+  const [cropPlans, setCropPlans] = useState<any[]>([]);
+  const [seeds, setSeeds] = useState<any[]>([]);
+  const [note, setNote] = useState("");
+  const [saveStatus, setSaveStatus] = useState("");
+
+  const loadGrowerData = async () => {
+    const [loadedProducts, loadedOrders] = await Promise.all([
+      loadSupabaseRows<MarketplaceProduct>("marketplace_products", MARKET_PRODUCTS_KEY),
+      loadSupabaseRows<MarketplaceOrder>("marketplace_orders", MARKET_ORDERS_KEY),
+    ]);
+    setProducts(loadedProducts.filter((p) => p.active !== false));
+    setOrders(loadedOrders);
+
+    if (supabase) {
+      const loadOptional = async (table: string) => {
+        try {
+          const { data, error } = await supabase.from(table).select("*").limit(20);
+          if (error || !data) return [];
+          return data;
+        } catch {
+          return [];
+        }
+      };
+      const [loadedAnnouncements, loadedWisdom, loadedCropPlans, loadedSeeds] = await Promise.all([
+        loadOptional("program_announcements"),
+        loadOptional("wisdom_entries"),
+        loadOptional("crop_plans"),
+        loadOptional("daily_seeds"),
+      ]);
+      setAnnouncements(loadedAnnouncements);
+      setWisdom(loadedWisdom);
+      setCropPlans(loadedCropPlans);
+      setSeeds(loadedSeeds);
+    }
+  };
+
+  const loadWeather = async () => {
+    try {
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=41.0998&longitude=-80.6495&current=temperature_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=3";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Weather request failed");
+      const data = await res.json();
+      setWeather({
+        currentTemp: Math.round(data.current?.temperature_2m ?? 0),
+        currentWind: Math.round(data.current?.wind_speed_10m ?? 0),
+        currentPrecip: data.current?.precipitation ?? 0,
+        todayHigh: Math.round(data.daily?.temperature_2m_max?.[0] ?? 0),
+        todayLow: Math.round(data.daily?.temperature_2m_min?.[0] ?? 0),
+        rainChance: Math.round(data.daily?.precipitation_probability_max?.[0] ?? 0),
+        source: "live",
+      });
+      setWeatherMessage("Live weather for Youngstown / Lansdowne area.");
+    } catch {
+      setWeather({ currentTemp: 72, currentWind: 6, todayHigh: 78, todayLow: 58, rainChance: 25, source: "fallback" });
+      setWeatherMessage("Weather service unavailable. Showing planning fallback until live feed responds.");
+    }
+  };
+
+  useEffect(() => {
+    loadGrowerData();
+    loadWeather();
+  }, []);
+
+  const todaysOrders = orders.filter((o) => (o.pickup_date || "").slice(0, 10) === todayISO());
+  const pendingOrders = orders.filter((o) => ["pending", "confirmed"].includes(o.status));
+  const lowInventory = products.filter((p) => Number(p.inventory || 0) <= 5);
+  const availableProduce = products.filter((p) => p.category === "Produce");
+  const dailyProverb = (wisdom[0]?.text || wisdom[0]?.proverb || wisdom[0]?.message || DEFAULT_PROVERBS[new Date().getDate() % DEFAULT_PROVERBS.length]) as string;
+
+  const demandRows = products.slice(0, 6).map((p) => {
+    const requested = pendingOrders.length ? pendingOrders.length * 3 : 0;
+    const available = Number(p.inventory || 0);
+    return { name: p.name, available, requested, gap: Math.max(0, requested - available), surplus: Math.max(0, available - requested) };
+  });
+
+  const weatherRisk = weather.rainChance && weather.rainChance >= 60
+    ? "Rain risk: prioritize harvest, covers, drainage checks, and safe footing."
+    : weather.todayHigh && weather.todayHigh >= 85
+      ? "Heat risk: prioritize water, shade breaks, and lighter crew rotations."
+      : "Normal field conditions: complete walk-through, water check, weed pressure, and harvest readiness.";
+
+  const saveGrowerNote = async () => {
+    if (!note.trim()) {
+      setSaveStatus("Add a grower note before saving.");
+      return;
+    }
+    setSaveStatus("Saving grower note...");
+    const row = {
+      id: uuid(),
+      note_date: todayISO(),
+      author: activeUser?.name || "Grower / Staff",
+      note_type: "daily_field_note",
+      note: note.trim(),
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("grower_notes", "bff.launch.grower.notes", row);
+    setSaveStatus(result.ok ? `Saved grower note to ${result.mode}.` : `Could not save to Supabase. Saved locally. ${String((result.error as any)?.message || "")}`);
+    setNote("");
+  };
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+      <Card className="lg:sticky lg:top-28 lg:self-start">
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Grower Operations Center</div>
+        <h1 className="mt-5 text-3xl font-black leading-tight md:text-4xl">What does the land need today?</h1>
+        <p className="mt-4 text-sm leading-7 text-white/82">Weather, proverbs, crop plans, inventory, marketplace demand, and daily field notes for farm operations.</p>
+        <div className="mt-6 grid gap-3">
+          <button onClick={loadGrowerData} className="rounded-2xl bg-emerald-300 px-5 py-3 font-black text-black">Refresh Grower Data</button>
+          <button onClick={() => setScreen("marketplace")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Open Marketplace</button>
+          <button onClick={() => setScreen("supervisor")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Crew / Supervisor Center</button>
+          <button onClick={() => setScreen("reports")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Reports</button>
+        </div>
+      </Card>
+
+      <div className="space-y-5">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Morning Farm Briefing</div>
+          <h2 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Grower live dashboard.</h2>
+          <p className="mt-4 max-w-4xl text-white/82">Food moves, not the farmer. This screen connects today’s field decisions to youth crews, product availability, marketplace demand, and community food access.</p>
+        </Card>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          <Metric label="Current Temp" value={weather.currentTemp !== undefined ? `${weather.currentTemp}°F` : "—"} />
+          <Metric label="Rain Chance" value={weather.rainChance !== undefined ? `${weather.rainChance}%` : "—"} />
+          <Metric label="Products Available" value={String(products.length)} />
+          <Metric label="Pending Orders" value={String(pendingOrders.length)} />
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-[1.05fr_.95fr]">
+          <Card>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Live Weather</div>
+                <h3 className="mt-2 text-2xl font-black">Youngstown / Lansdowne field conditions</h3>
+              </div>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase">{weather.source}</span>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">High / Low</div><div className="mt-2 text-2xl font-black">{weather.todayHigh ?? "—"}° / {weather.todayLow ?? "—"}°</div></div>
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Wind</div><div className="mt-2 text-2xl font-black">{weather.currentWind ?? "—"} mph</div></div>
+              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Rain Now</div><div className="mt-2 text-2xl font-black">{weather.currentPrecip ?? 0}</div></div>
+            </div>
+            <Notice text={`${weatherMessage} ${weatherRisk}`} />
+          </Card>
+
+          <Card>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Wisdom / Proverbs</div>
+            <h3 className="mt-2 text-2xl font-black">Today’s field word</h3>
+            <p className="mt-5 rounded-3xl border border-emerald-200/20 bg-emerald-200/10 p-5 text-xl font-black leading-8">“{dailyProverb}”</p>
+            <p className="mt-4 text-sm leading-6 text-white/72">Use this for youth crew motivation, grower reflection, and morning huddle focus.</p>
+          </Card>
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <Card>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Today’s Priorities</div>
+            <h3 className="mt-2 text-2xl font-black">Field task guidance</h3>
+            <div className="mt-5 grid gap-3">
+              {(cropPlans.length ? cropPlans.slice(0, 5).map((p: any) => ({ title: p.task || p.crop || p.title || "Crop plan item", priority: p.priority || p.status || "Review", detail: p.notes || p.description || p.location || "Review crop plan and assign crew action." })) : DEFAULT_GROWER_TASKS).map((task: any, idx: number) => (
+                <div key={idx} className="rounded-2xl border border-white/10 bg-white/8 p-4">
+                  <div className="flex items-center justify-between gap-3"><div className="font-black">{task.title}</div><span className="rounded-full bg-black/35 px-3 py-1 text-xs font-black">{task.priority}</span></div>
+                  <div className="mt-2 text-sm leading-6 text-white/74">{task.detail}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Marketplace Demand</div>
+            <h3 className="mt-2 text-2xl font-black">What the market may need</h3>
+            <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-white/10 text-xs uppercase tracking-[0.18em] text-white/60"><tr><th className="p-3">Item</th><th className="p-3">Available</th><th className="p-3">Need</th><th className="p-3">Status</th></tr></thead>
+                <tbody>
+                  {demandRows.length ? demandRows.map((row) => (
+                    <tr key={row.name} className="border-t border-white/10"><td className="p-3 font-bold">{row.name}</td><td className="p-3">{row.available}</td><td className="p-3">{row.requested}</td><td className="p-3 font-black">{row.gap > 0 ? `Short ${row.gap}` : `Surplus ${row.surplus}`}</td></tr>
+                  )) : <tr><td className="p-4 text-white/70" colSpan={4}>No marketplace products loaded yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <Card>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Inventory / Seeds</div>
+            <h3 className="mt-2 text-2xl font-black">Available products and grower supply</h3>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {products.slice(0, 8).map((p) => (
+                <div key={p.id} className="rounded-2xl bg-white/8 p-4"><div className="font-black">{p.name}</div><div className="mt-1 text-sm text-white/65">{p.category} • {p.inventory} {p.unit}</div></div>
+              ))}
+              {seeds.slice(0, 4).map((s: any, idx: number) => (
+                <div key={s.id || idx} className="rounded-2xl bg-white/8 p-4"><div className="font-black">{s.seed_name || s.name || "Seed item"}</div><div className="mt-1 text-sm text-white/65">{s.quantity || s.status || "Review inventory"}</div></div>
+              ))}
+              {!products.length && !seeds.length && <div className="text-white/70">No inventory loaded yet.</div>}
+            </div>
+            {lowInventory.length > 0 && <Notice text={`Inventory alert: ${lowInventory.map((p) => p.name).join(", ")} need review.`} />}
+          </Card>
+
+          <Card>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Announcements</div>
+            <h3 className="mt-2 text-2xl font-black">Program messages for growers</h3>
+            <div className="mt-5 grid gap-3">
+              {(announcements.length ? announcements.slice(0, 5) : [{ title: "Launch operations", message: "Use this center for weather, field tasks, marketplace readiness, and daily notes." }]).map((a: any, idx: number) => (
+                <div key={a.id || idx} className="rounded-2xl border border-white/10 bg-white/8 p-4"><div className="font-black">{a.title || a.subject || "Announcement"}</div><div className="mt-2 text-sm leading-6 text-white/74">{a.message || a.body || a.description || "Review program update."}</div></div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Field Note</div>
+          <h3 className="mt-2 text-2xl font-black">Record what changed today</h3>
+          <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+            <TextArea label="Grower note" value={note} onChange={setNote} placeholder="Example: North row needs water; collards ready for harvest; youth crew handled mulching well." />
+            <button onClick={saveGrowerNote} className="rounded-2xl bg-emerald-300 px-8 py-4 font-black text-black">Save Grower Note</button>
+          </div>
+          {saveStatus && <Notice text={saveStatus} />}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 
 function SimplePathway({
   title,
