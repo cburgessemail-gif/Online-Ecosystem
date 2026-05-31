@@ -2686,38 +2686,5 @@ function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen:
   );
 }
 
-function SimplePathway({
-  title,
-  text,
-  image,
-  setScreen,
-  extra,
-}: {
-  title: string;
-  text: string;
-  image: string;
-  setScreen: (screen: Screen) => void;
-  extra?: React.ReactNode;
-}) {
-  return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          {extra}
-          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-          <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
-        </div>
-      </Card>
-      <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
-        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-      </div>
-    </div>
-  );
-}
-
 
 export default App;
