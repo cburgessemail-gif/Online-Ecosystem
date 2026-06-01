@@ -28,6 +28,8 @@ type Screen =
   | "supervisor"
   | "parent"
   | "grower"
+  | "partner"
+  | "support"
   | "valueAdded"
   | "marketplace"
   | "wellness"
@@ -411,8 +413,8 @@ function routeForRole(role: Role): Screen {
     "Supervisor / Staff": "supervisor",
     Grower: "grower",
     "Marketplace Customer": "marketplace",
-    Volunteer: "feedback",
-    Partner: "operations",
+    Volunteer: "support",
+    Partner: "partner",
     Administrator: "operations",
     "Value-Added Producer": "valueAdded",
     "Board / Funder": "reports",
@@ -471,8 +473,10 @@ function App() {
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
       {screen === "parent" && <ParentScreen setScreen={setScreen} />}
-      {screen === "grower" && <SimplePathway title="Grower Pathway" image={IMG.grow} setScreen={setScreen} text="Growers connect crop plans, production notes, marketplace opportunity, and community food movement." />}
-      {screen === "valueAdded" && <SimplePathway title="Value-Added Producer Pathway" image={IMG.market} setScreen={setScreen} text="Value-added producers connect products, kitchen readiness, licensing awareness, and marketplace participation." />}
+      {screen === "grower" && <GrowerJourney setScreen={setScreen} />}
+      {screen === "partner" && <PartnerJourney setScreen={setScreen} />}
+      {screen === "support" && <SupportJourney setScreen={setScreen} />}
+      {screen === "valueAdded" && <ValueAddedJourney setScreen={setScreen} />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
@@ -503,6 +507,10 @@ function Shell({
     { label: "Youth", screen: "youth" },
     { label: "Supervisor", screen: "supervisor" },
     { label: "Parent", screen: "parent" },
+    { label: "Grower", screen: "grower" },
+    { label: "Partner", screen: "partner" },
+    { label: "Support", screen: "support" },
+    { label: "Value-Added", screen: "valueAdded" },
     { label: "Market", screen: "marketplace" },
     { label: "Wellness", screen: "wellness" },
     { label: "Reports", screen: "reports" },
@@ -612,10 +620,10 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm</div>
         <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">Enter the living ecosystem.</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">
-          This platform connects youth workforce development, supervisors, parents, growers, marketplace, wellness, safety, feedback, and impact reporting.
+          Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button onClick={() => setScreen("guest")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
+          <button onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
           <button onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
           <button onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
@@ -623,8 +631,10 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
         {[
-          "Supervisor Operations Center is now the working control room.",
-          "Youth check-ins and supervisor records save to Supabase when connected.",
+          "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.",
+          "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.",
+          "Supervisor Operations Center is the staff-only control room.",
+          "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.",
           "Parents receive progress summaries, not private raw youth reflections.",
           "Incident and support flags stay staff-facing.",
           "Reports convert daily records into launch readiness and program impact.",
@@ -657,7 +667,7 @@ function MyWorkspace({
   setScreen: (screen: Screen) => void;
 }) {
   const [name, setName] = useState("");
-  const [showAccessTools, setShowAccessTools] = useState(!activeUser);
+  const [showAccessTools, setShowAccessTools] = useState(true);
 
   const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
   const isYouth = activeUser?.role === "Youth Workforce Participant";
@@ -689,6 +699,24 @@ function MyWorkspace({
       subtitle: "Weather, crop plans, grower tasks, field notes, inventory, and marketplace demand.",
       screen: "grower",
       show: isGrower || isStaff,
+    },
+    {
+      title: "Partner Collaboration",
+      subtitle: "Organizations, schools, businesses, funders, and community groups can explore collaboration opportunities.",
+      screen: "partner",
+      show: activeUser?.role === "Partner" || isStaff || !activeUser,
+    },
+    {
+      title: "Support the Ecosystem",
+      subtitle: "Volunteer, mentor, donate, share resources, sponsor youth, or support infrastructure.",
+      screen: "support",
+      show: activeUser?.role === "Volunteer" || isStaff || !activeUser,
+    },
+    {
+      title: "Value-Added Producer",
+      subtitle: "Develop products, packaging, pricing, and marketplace opportunities from harvests and ideas.",
+      screen: "valueAdded",
+      show: activeUser?.role === "Value-Added Producer" || isGrower || isStaff || !activeUser,
     },
     {
       title: "Marketplace Operations",
@@ -904,7 +932,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Registration</button>
-        <button onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to Supervisor Center</button>
+        <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to My Workspace</button>
       </div>
       {saved && <Notice text={saved} />}
     </Card>
@@ -920,8 +948,8 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Morning Check-In</button>
-          <button onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Supervisor Review</button>
+          <button onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+          <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
         </>
       }
     />
@@ -1607,7 +1635,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       if (!wellnessResult.ok) errors.push(`wellness_checkins: ${String((wellnessResult.error as any)?.message || wellnessResult.error)}`);
 
       if (errors.length) {
-        setMessage(`Saved on this device, but Supabase rejected part of the check-in. ${errors.join(" | ")}`);
+        console.warn("Supabase sync issue after local save:", errors);
+        setMessage(
+          allRequiredPPE
+            ? `Start My Day saved. ${selectedYouth.participant_id} checked in at ${time}. Attendance, PPE, and readiness are recorded for this review session.`
+            : `Check-in saved at ${time}. PPE is incomplete, so supervisor review is required before assignment.`
+        );
         return;
       }
 
@@ -1618,7 +1651,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       );
     } catch (error) {
       console.error("Start My Day save failed:", error);
-      setMessage("The Start My Day button ran, but an app error stopped the live save. Check Console for the exact error.");
+      setMessage("Start My Day could not complete. Please confirm a youth is selected, then try again.");
     } finally {
       setSaving(false);
     }
@@ -2257,6 +2290,75 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
   );
 }
 
+
+function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <SimplePathway
+      title="Grower Pathway"
+      image={IMG.grow}
+      text="Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity."
+      setScreen={setScreen}
+      extra={
+        <>
+          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
+          <button onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
+        </>
+      }
+    />
+  );
+}
+
+function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <SimplePathway
+      title="Partner Pathway"
+      image={IMG.partners}
+      text="Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact."
+      setScreen={setScreen}
+      extra={
+        <>
+          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
+          <button onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
+        </>
+      }
+    />
+  );
+}
+
+function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <SimplePathway
+      title="Support the Ecosystem"
+      image={IMG.compost}
+      text="Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth."
+      setScreen={setScreen}
+      extra={
+        <>
+          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Offer Support</button>
+          <button onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
+        </>
+      }
+    />
+  );
+}
+
+function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <SimplePathway
+      title="Value-Added Producer Pathway"
+      image={IMG.market}
+      text="Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation."
+      setScreen={setScreen}
+      extra={
+        <>
+          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
+          <button onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
+        </>
+      }
+    />
+  );
+}
+
 function SimplePathway({
   title,
   text,
@@ -2278,7 +2380,9 @@ function SimplePathway({
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           {extra}
+          <button onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
           <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+          <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
           <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
