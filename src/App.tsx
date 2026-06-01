@@ -31,7 +31,6 @@ type Screen =
   | "valueAdded"
   | "marketplace"
   | "wellness"
-  | "myDayStatus"
   | "reports"
   | "operations"
   | "feedback";
@@ -175,14 +174,6 @@ type PPECheckIn = {
   created_at: string;
 };
 
-type YouthEncouragement = {
-  id: string;
-  message: string;
-  theme: "growing" | "confidence" | "learning" | "teamwork" | "responsibility" | "resilience" | "self_discovery";
-  active: boolean;
-  created_at: string;
-};
-
 type IncidentRecord = {
   id: string;
   participant_id?: string;
@@ -275,7 +266,6 @@ const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
 const WELLNESS_KEY = "bff.launch.wellness";
 const PPE_KEY = "bff.launch.ppeCheckins";
-const YOUTH_ENCOURAGEMENT_KEY = "bff.launch.youthEncouragements";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
 const FEEDBACK_KEY = "bff.launch.feedback";
@@ -295,27 +285,6 @@ const IMG = {
   partners: "/images/Partners.png",
   queens: "/images/Queens Village.png",
 };
-
-const DEFAULT_YOUTH_ENCOURAGEMENTS: YouthEncouragement[] = [
-  { id: "enc-001", theme: "growing", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Good morning, Cultivator. Today is another chance to grow food, grow skills, and grow yourself." },
-  { id: "enc-002", theme: "learning", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Every row, seed, and task can teach you something. Stay curious and keep learning." },
-  { id: "enc-003", theme: "confidence", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "You do not have to know everything today. Show up, ask questions, and grow stronger one step at a time." },
-  { id: "enc-004", theme: "responsibility", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Your work matters. The food you help grow can feed families, build community, and open doors." },
-  { id: "enc-005", theme: "self_discovery", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "As you learn the land, also learn yourself: your strengths, your choices, your voice, and your future." },
-  { id: "enc-006", theme: "teamwork", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Great farms are built by teams. Encourage someone today and let someone encourage you." },
-  { id: "enc-007", theme: "resilience", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Growth takes patience. Plants grow little by little, and so do people." },
-  { id: "enc-008", theme: "growing", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "We Grow Green to Harvest Dreams. Today, you are part of that dream becoming real." },
-  { id: "enc-009", theme: "learning", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "Pay attention to the weather, the soil, the plants, and your own growth. All of them are speaking." },
-  { id: "enc-010", theme: "confidence", active: true, created_at: "2026-06-08T00:00:00.000Z", message: "You belong here. Your effort, your questions, and your ideas are part of this farm." },
-];
-
-function encouragementForYouth(entries: YouthEncouragement[], participantId: string, dateSeed: string) {
-  const active = entries.filter((entry) => entry.active && entry.message.trim());
-  const source = active.length ? active : DEFAULT_YOUTH_ENCOURAGEMENTS;
-  const seed = `${participantId || "cultivator"}-${dateSeed}`;
-  const index = Array.from(seed).reduce((sum, char) => sum + char.charCodeAt(0), 0) % source.length;
-  return source[index];
-}
 
 const roles: Role[] = [
   "Guest",
@@ -486,7 +455,7 @@ function App() {
 
   return (
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut}>
-      {message && <div className="mt-2"><Notice text={message} /></div>}
+      {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -494,11 +463,10 @@ function App() {
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
       {screen === "parent" && <ParentScreen setScreen={setScreen} />}
-      {screen === "grower" && <GrowerOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "grower" && <SimplePathway title="Grower Pathway" image={IMG.grow} setScreen={setScreen} text="Growers connect crop plans, production notes, marketplace opportunity, and community food movement." />}
       {screen === "valueAdded" && <SimplePathway title="Value-Added Producer Pathway" image={IMG.market} setScreen={setScreen} text="Value-added producers connect products, kitchen readiness, licensing awareness, and marketplace participation." />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "myDayStatus" && <MyDayStatus setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
@@ -527,7 +495,6 @@ function Shell({
     { label: "Youth", screen: "youth" },
     { label: "Supervisor", screen: "supervisor" },
     { label: "Parent", screen: "parent" },
-    { label: "Grower", screen: "grower" },
     { label: "Market", screen: "marketplace" },
     { label: "Wellness", screen: "wellness" },
     { label: "Reports", screen: "reports" },
@@ -937,108 +904,19 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
-  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
-  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
-  const [encouragements, setEncouragements] = useState<YouthEncouragement[]>(() => safeRead<YouthEncouragement[]>(YOUTH_ENCOURAGEMENT_KEY, DEFAULT_YOUTH_ENCOURAGEMENTS));
-
-  useEffect(() => {
-    const load = async () => {
-      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
-      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
-      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
-      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
-      const loadedEncouragements = await loadSupabaseRows<YouthEncouragement>("youth_encouragements", YOUTH_ENCOURAGEMENT_KEY);
-      setEncouragements(loadedEncouragements.length ? loadedEncouragements : DEFAULT_YOUTH_ENCOURAGEMENTS);
-    };
-    void load();
-  }, []);
-
-  const currentYouth = youth[0];
-  const currentProfile = profiles.find((p) => p.id === currentYouth?.profile_id);
-  const name = activeUser?.name || profileName(currentProfile) || "Cultivator";
-  const today = todayISO();
-  const todayAttendance = currentYouth ? attendance.find((a) => a.participant_id === currentYouth.participant_id && a.date === today) : undefined;
-  const todayWellness = currentYouth ? wellness.find((w) => w.profile_id === currentYouth.profile_id && w.created_at.slice(0, 10) === today) : undefined;
-  const encouragement = encouragementForYouth(encouragements, currentYouth?.participant_id || activeUser?.id || "youth", today);
-
-  const ActionCard = ({ title, text, button, target, primary = false }: { title: string; text: string; button: string; target: Screen; primary?: boolean }) => {
-    const openTarget = (e?: React.MouseEvent) => {
-      e?.preventDefault();
-      e?.stopPropagation();
-      setScreen(target);
-    };
-
-    return (
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={openTarget}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") openTarget(e as unknown as React.MouseEvent);
-        }}
-        className={`rounded-[1.5rem] border p-4 text-left transition hover:-translate-y-0.5 ${primary ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/18"}`}
-      >
-        <div className="text-lg font-black leading-tight">{title}</div>
-        <p className="mt-2 min-h-[42px] text-xs leading-5 opacity-85">{text}</p>
-        <button
-          type="button"
-          onClick={openTarget}
-          className={`mt-3 rounded-full px-4 py-2 text-xs font-black ${primary ? "bg-black text-white" : "bg-emerald-300 text-black"}`}
-        >
-          {button}
-        </button>
-      </div>
-    );
-  };
-
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workspace</div>
-      <div className="mt-3 grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
-        <div>
-          <h1 className="text-4xl font-black leading-tight md:text-6xl">Good morning, {name}.</h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-white/84">
-            Start your day, learn what the farm needs, see where the food is going, and share your voice before you leave.
-          </p>
-        </div>
-        <div className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/14 p-4">
-          <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Encouragement</div>
-          <div className="mt-2 text-xl font-black leading-snug text-white">{encouragement.message}</div>
-          <div className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Theme: {encouragement.theme.replaceAll("_", " ")}</div>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
-          <div className="mt-2 text-2xl font-black">{todayAttendance ? "Checked In" : "Not Checked In"}</div>
-          <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "Press Start My Day first."}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">PPE</div>
-          <div className="mt-2 text-2xl font-black capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</div>
-          <div className="mt-1 text-sm text-white/70">Shoes, water, gloves, clothing.</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-black/32 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
-          <div className="mt-2 text-2xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
-          <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support.</div>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <ActionCard primary title="Start My Day" text="Attendance, PPE, readiness, wellness, goal, and support request in one screen." button="Open Check-In" target="wellness" />
-        <ActionCard title="Farm Information" text="See grower information: weather, daily field word, farm conditions, and field priorities." button="Open Grower Info" target="grower" />
-        <ActionCard title="Marketplace Impact" text="See how food moves to customers, GrownBy, direct sales, pickups, and community access." button="Open Marketplace" target="marketplace" />
-        <ActionCard title="Youth Voice" text="Share feedback, reflection, and what would make tomorrow better." button="Share Feedback" target="feedback" />
-      </div>
-
-      <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-7 text-white/84">
-        Youth do not need supervisor-only buttons here. Supervisor notes, incident logs, parent summaries, and private wellness review stay in the Supervisor Center.
-      </div>
-    </Card>
+    <SimplePathway
+      title="Youth Workforce Pathway"
+      image={IMG.youth}
+      text="Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress."
+      setScreen={setScreen}
+      extra={
+        <>
+          <button onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Morning Check-In</button>
+          <button onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Supervisor Review</button>
+        </>
+      }
+    />
   );
 }
 
@@ -1152,7 +1030,7 @@ function SupervisorDashboard({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
-      <h2 className="mt-3 text-4xl font-black">Orientation-day operating picture.</h2>
+      <h2 className="mt-3 text-4xl font-black">Launch-day operating picture.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <button key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
@@ -1585,29 +1463,27 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [participantId, setParticipantId] = useState("");
-  const [mood, setMood] = useState("Select mood");
-  const [energy, setEnergy] = useState("Select energy");
-  const [sleep, setSleep] = useState("Select sleep");
-  const [breakfast, setBreakfast] = useState("Select food status");
+  const [mood, setMood] = useState("Okay");
+  const [energy, setEnergy] = useState("Medium");
+  const [sleep, setSleep] = useState("Okay");
+  const [breakfast, setBreakfast] = useState("Yes");
   const [hope, setHope] = useState(3);
   const [belonging, setBelonging] = useState(3);
   const [trustedAdult, setTrustedAdult] = useState(3);
   const [confidence, setConfidence] = useState(3);
   const [stress, setStress] = useState(3);
-  const [closedToeShoes, setClosedToeShoes] = useState(false);
-  const [waterBottle, setWaterBottle] = useState(false);
-  const [workGloves, setWorkGloves] = useState(false);
-  const [appropriateClothing, setAppropriateClothing] = useState(false);
+  const [closedToeShoes, setClosedToeShoes] = useState(true);
+  const [waterBottle, setWaterBottle] = useState(true);
+  const [workGloves, setWorkGloves] = useState(true);
+  const [appropriateClothing, setAppropriateClothing] = useState(true);
   const [sunscreen, setSunscreen] = useState(false);
   const [hatWeatherProtection, setHatWeatherProtection] = useState(false);
   const [equipmentNeeded, setEquipmentNeeded] = useState("None");
-  const [ppeReviewed, setPpeReviewed] = useState(false);
   const [dailyGoal, setDailyGoal] = useState("");
   const [support, setSupport] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const [encouragements, setEncouragements] = useState<YouthEncouragement[]>(() => safeRead<YouthEncouragement[]>(YOUTH_ENCOURAGEMENT_KEY, DEFAULT_YOUTH_ENCOURAGEMENTS));
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -1619,38 +1495,20 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     const load = async () => {
       const loadedProfiles = await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY);
       const loadedYouth = await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY);
-      const loadedEncouragements = await loadSupabaseRows<YouthEncouragement>("youth_encouragements", YOUTH_ENCOURAGEMENT_KEY);
       setProfiles(loadedProfiles);
       setYouth(loadedYouth);
-      setEncouragements(loadedEncouragements.length ? loadedEncouragements : DEFAULT_YOUTH_ENCOURAGEMENTS);
       if (!participantId && loadedYouth[0]?.participant_id) setParticipantId(loadedYouth[0].participant_id);
     };
     void load();
   }, []);
 
-  const youthForActiveUser = youth.find((y) => {
-    const p = profiles.find((profile) => profile.id === y.profile_id);
-    const activeName = (activeUser?.name || "").trim().toLowerCase();
-    const profileFullName = p ? `${p.first_name} ${p.last_name}`.trim().toLowerCase() : "";
-    return activeUser?.role === "Youth Workforce Participant" && activeName && profileFullName && activeName === profileFullName;
-  });
-  const selectedYouth = youthForActiveUser || youth.find((y) => y.participant_id === participantId) || youth[0];
+  const selectedYouth = youth.find((y) => y.participant_id === participantId) || youth[0];
   const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
   const profileId = selectedYouth?.profile_id || activeUser?.id || "anonymous";
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   const checkinTime = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const selectedEncouragement = encouragementForYouth(encouragements, selectedYouth?.participant_id || participantId, currentTime.toISOString().slice(0, 10));
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
   const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Hold for supervisor review";
-  const requiredComplete = Boolean(
-    selectedYouth?.participant_id &&
-    ppeReviewed &&
-    mood !== "Select mood" &&
-    energy !== "Select energy" &&
-    sleep !== "Select sleep" &&
-    breakfast !== "Select food status" &&
-    dailyGoal.trim().length > 0
-  );
 
   const safetyFlag =
     hope <= 1 ||
@@ -1659,16 +1517,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     !allRequiredPPE ||
     /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(`${support} ${privateNote}`);
 
-  const checkboxClass = "flex min-h-[34px] items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-black";
+  const checkboxClass = "flex min-h-[44px] items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black";
 
   const save = async () => {
     if (saving) return;
     if (!selectedYouth?.participant_id) {
-      setMessage("No youth participant is connected to this login. Register the youth profile before starting the day.");
-      return;
-    }
-    if (!requiredComplete) {
-      setMessage("Complete the required questions first: PPE review, mood, energy, sleep, food today, and daily goal. Attendance will not save until those are complete.");
+      setMessage("No youth participant selected. Register or select a youth before starting the day.");
       return;
     }
 
@@ -1691,7 +1545,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         status: "present",
         ppe_status: ppeStatus,
         qr_method: "manual",
-        notes: `${readinessStatus}. Encouragement: ${selectedEncouragement.message} ${dailyGoal ? `Goal: ${dailyGoal}. ` : ""}${equipmentNeeded && equipmentNeeded !== "None" ? `Equipment needed: ${equipmentNeeded}.` : ""}`,
+        notes: `${readinessStatus}. ${dailyGoal ? `Goal: ${dailyGoal}. ` : ""}${equipmentNeeded && equipmentNeeded !== "None" ? `Equipment needed: ${equipmentNeeded}.` : ""}`,
         created_at: iso,
       };
 
@@ -1754,20 +1608,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           ? `Start My Day saved. ${selectedYouth.participant_id} checked in at ${time}. Attendance, PPE, and readiness are recorded.`
           : `Check-in saved at ${time}. PPE is incomplete, so supervisor review is required before assignment.`
       );
-
-      window.setTimeout(() => setScreen("myDayStatus"), 650);
     } catch (error) {
       console.error("Start My Day save failed:", error);
       setMessage("The Start My Day button ran, but an app error stopped the live save. Check Console for the exact error.");
     } finally {
       setSaving(false);
     }
-  };
-
-  const runStartMyDay = (e?: React.MouseEvent | React.PointerEvent) => {
-    e?.preventDefault();
-    e?.stopPropagation();
-    void save();
   };
 
   const Toggle = ({ label, checked, setChecked }: { label: string; checked: boolean; setChecked: (v: boolean) => void }) => (
@@ -1778,77 +1624,65 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   );
 
   const Slider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="rounded-xl border border-white/10 bg-white/10 p-2">
-      <div className="flex justify-between text-[11px] font-black leading-tight"><span>{label}</span><span>{value}/5</span></div>
-      <input className="mt-1 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+    <label className="rounded-2xl border border-white/10 bg-white/10 p-3">
+      <div className="flex justify-between text-xs font-black"><span>{label}</span><span>{value}/5</span></div>
+      <input className="mt-2 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
     </label>
   );
 
   return (
     <Card>
-      <div className="flex flex-wrap items-start justify-between gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-1 text-3xl font-black md:text-4xl">Start My Day</h1>
-          <p className="mt-1 max-w-3xl text-xs leading-5 text-white/78">Attendance, PPE, wellness, goal, and support needs are recorded together.</p>
+          <h1 className="mt-3 text-3xl font-black md:text-5xl">Start My Day</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/80">One screen records attendance, PPE readiness, basic wellness, and support needs.</p>
         </div>
-        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-3 text-right">
+        <div className="rounded-3xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-right">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Check-In Time</div>
-          <div className="mt-1 text-xl font-black">{checkinTime}</div>
-          <div className="text-xs font-bold text-white/75">{checkinDate}</div>
+          <div className="mt-1 text-2xl font-black">{checkinTime}</div>
+          <div className="text-sm font-bold text-white/75">{checkinDate}</div>
         </div>
       </div>
 
-      <div className="mt-3 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/14 p-3">
-        <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Encouragement</div>
-        <div className="mt-1 text-base font-black leading-snug text-white">{selectedEncouragement.message}</div>
-        <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Theme: {selectedEncouragement.theme.replaceAll("_", " ")}</div>
-      </div>
-
-      <div className="mt-3 grid gap-2 lg:grid-cols-[0.95fr_0.95fr_1.1fr]">
-        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
+      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr_1.1fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity + Attendance</div>
-          <div className="mt-2 grid gap-2">
-            <div className="rounded-xl border border-white/10 bg-white/10 p-3 text-xs leading-5">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">This youth only</div>
-              <div className="mt-1 font-black text-white">{profileName(selectedProfile)}</div>
-              <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth connected"}</div>
+          <div className="mt-3 grid gap-3">
+            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={youth.map((y) => y.participant_id)} />
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6">
+              <div className="font-black text-white">{profileName(selectedProfile)}</div>
+              <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth selected"}</div>
               <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
-              <div className="mt-2 rounded-full bg-black/35 px-3 py-2 text-center text-[11px] font-black text-white/85">
-                Attendance saves only after all required questions are complete.
-              </div>
+              <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance will save as PRESENT when Start My Day is pressed.</div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE Check</div>
-          <div className="mt-2 grid gap-1.5">
+          <div className="mt-3 grid gap-2">
             <Toggle label="Closed-toe shoes / boots" checked={closedToeShoes} setChecked={setClosedToeShoes} />
             <Toggle label="Water bottle" checked={waterBottle} setChecked={setWaterBottle} />
             <Toggle label="Work gloves" checked={workGloves} setChecked={setWorkGloves} />
             <Toggle label="Appropriate outdoor clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <div className="mt-2 grid gap-1.5 md:grid-cols-2">
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
             <Toggle label="Sunscreen" checked={sunscreen} setChecked={setSunscreen} />
             <Toggle label="Hat / weather protection" checked={hatWeatherProtection} setChecked={setHatWeatherProtection} />
           </div>
-          <div className={`mt-2 rounded-xl p-2 text-center text-xs font-black ${allRequiredPPE ? "bg-emerald-300/85 text-black" : "bg-amber-300/85 text-black"}`}>PPE Status: {readinessStatus}</div>
-          <label className="mt-2 flex min-h-[34px] items-center gap-2 rounded-xl border border-emerald-200/20 bg-emerald-300/10 px-3 py-2 text-xs font-black">
-            <input type="checkbox" checked={ppeReviewed} onChange={(e) => setPpeReviewed(e.target.checked)} className="h-5 w-5" />
-            <span>I reviewed my PPE honestly.</span>
-          </label>
+          <div className={`mt-3 rounded-2xl p-3 text-center text-sm font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{readinessStatus}</div>
         </div>
 
-        <div className="rounded-[1.25rem] border border-white/10 bg-black/28 p-3">
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
           <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
-          <div className="mt-2 grid gap-2 md:grid-cols-2">
-            <SelectField label="Mood" value={mood} onChange={setMood} options={["Select mood", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
-            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["Select energy", "High", "Medium", "Low", "Very low"]} />
-            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Select sleep", "Good", "Okay", "Poor", "No sleep"]} />
-            <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Select food status", "Yes", "No", "Not enough", "Prefer not to say"]} />
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
+            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
+            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
+            <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
           </div>
-          <div className="mt-2 grid gap-1.5 md:grid-cols-5">
+          <div className="mt-3 grid gap-2 md:grid-cols-5">
             <Slider label="Hope" value={hope} setValue={setHope} />
             <Slider label="Belonging" value={belonging} setValue={setBelonging} />
             <Slider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
@@ -1858,109 +1692,28 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
       </div>
 
-      <div className="mt-3 grid gap-2 md:grid-cols-4">
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
         <Field label="Equipment Needed" value={equipmentNeeded} onChange={setEquipmentNeeded} placeholder="None, gloves, water bottle, etc." />
-        <label className="block md:col-span-1">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Daily Goal</span>
-          <textarea value={dailyGoal} placeholder="Goal for today" onChange={(e) => setDailyGoal(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
-        </label>
-        <label className="block md:col-span-1">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Supervisor Support</span>
-          <textarea value={support} placeholder="Optional" onChange={(e) => setSupport(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
-        </label>
-        <label className="block md:col-span-1">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Private Staff Note</span>
-          <textarea value={privateNote} placeholder="Approved staff only" onChange={(e) => setPrivateNote(e.target.value)} rows={2} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-2 text-white outline-none placeholder:text-white/35 focus:border-emerald-200" />
-        </label>
+        <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What do you want to accomplish today?" />
+        <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. A supervisor can check in privately." />
+      </div>
+      <div className="mt-4">
+        <TextArea label="Private note for approved staff" value={privateNote} onChange={setPrivateNote} />
       </div>
 
-      {!requiredComplete && <Notice text="Complete required questions before check-in: PPE review, mood, energy, sleep, food today, and daily goal." />}
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
       <button
         type="button"
-        onClick={runStartMyDay}
-        disabled={saving || !requiredComplete}
-        className="mt-3 w-full rounded-full bg-emerald-300 px-7 py-3 text-base font-black text-black disabled:opacity-60"
+        onClick={(e) => {
+          e.preventDefault();
+          void save();
+        }}
+        disabled={saving}
+        className="mt-5 w-full rounded-full bg-emerald-300 px-7 py-4 text-lg font-black text-black disabled:opacity-60"
       >
-        {saving ? "Saving..." : requiredComplete ? "Start My Day" : "Complete Required Questions"}
+        {saving ? "Saving..." : "Start My Day"}
       </button>
       {message && <Notice text={message} />}
-    </Card>
-  );
-}
-
-
-function MyDayStatus({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
-  const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
-  const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
-  const [ppeRows, setPpeRows] = useState<any[]>(() => safeRead<any[]>(PPE_KEY, []));
-
-  useEffect(() => {
-    const load = async () => {
-      setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
-      setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
-      setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
-      setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
-      setPpeRows(await loadSupabaseRows<any>("ppe_checkins", PPE_KEY));
-    };
-    void load();
-  }, []);
-
-  const today = todayISO();
-  const selectedYouth = youth[0];
-  const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
-  const participantId = selectedYouth?.participant_id || "No participant selected";
-  const todayAttendance = attendance.find((a) => a.participant_id === participantId && a.date === today);
-  const todayWellness = wellness.find((w) => w.profile_id === selectedYouth?.profile_id && w.created_at.slice(0, 10) === today);
-  const todayPpe = ppeRows.find((p) => p.participant_id === participantId && String(p.checkin_date || p.date || p.created_at || "").slice(0, 10) === today);
-  const ready = todayAttendance && todayPpe && todayWellness && todayAttendance.ppe_status === "complete";
-
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Day Status</div>
-      <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-black md:text-6xl">You are checked in.</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-            This is your next screen after Start My Day. Stay here until your supervisor gives the crew assignment.
-          </p>
-        </div>
-        <div className={`rounded-2xl px-5 py-4 text-center font-black ${ready ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
-          {ready ? "READY FOR ASSIGNMENT" : "SUPERVISOR REVIEW"}
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Participant</div>
-          <div className="mt-2 text-xl font-black">{profileName(selectedProfile)}</div>
-          <div className="mt-1 text-sm text-white/70">{participantId}</div>
-          <div className="text-sm text-white/70">{selectedYouth?.crew || "Crew not assigned"}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Attendance</div>
-          <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.status || "Not recorded"}</div>
-          <div className="mt-1 text-sm text-white/70">{todayAttendance?.check_in_time || "No time recorded"}</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">PPE</div>
-          <div className="mt-2 text-xl font-black capitalize">{todayAttendance?.ppe_status?.replaceAll("_", " ") || "Pending"}</div>
-          <div className="mt-1 text-sm text-white/70">Shoes, water, gloves, outdoor clothing</div>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Readiness</div>
-          <div className="mt-2 text-xl font-black">{todayWellness ? "Submitted" : "Pending"}</div>
-          <div className="mt-1 text-sm text-white/70">Mood, energy, goal, support</div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
-        <button onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Back to Youth Home</button>
-        <button onClick={() => setScreen("grower")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">See Farm Information</button>
-        <button onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Youth Voice / Reflection</button>
-      </div>
     </Card>
   );
 }
@@ -2528,273 +2281,5 @@ function SimplePathway({
     </div>
   );
 }
-
-
-type GrowerWeather = {
-  currentTemp?: number;
-  currentWind?: number;
-  currentPrecip?: number;
-  todayHigh?: number;
-  todayLow?: number;
-  rainChance?: number;
-  source: "live" | "fallback";
-};
-
-const DEFAULT_PROVERBS = [
-  "A garden grows where attention goes.",
-  "The best fertilizer is the grower's shadow.",
-  "Plant in hope, tend with patience, harvest with gratitude.",
-  "Food moves, not the farmer.",
-  "Small daily care becomes a season of abundance.",
-];
-
-const DEFAULT_GROWER_TASKS = [
-  { title: "Walk the grow area", priority: "High", detail: "Check water, pests, fencing, crop stress, and safety before assigning crews." },
-  { title: "Review marketplace demand", priority: "High", detail: "Compare available products with orders and likely pickup needs." },
-  { title: "Assign youth crews", priority: "Medium", detail: "Match harvest, weeding, irrigation, and packing tasks to crew readiness." },
-  { title: "Document crop notes", priority: "Medium", detail: "Record what changed today so the farm can learn over time." },
-];
-
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,.25)]">
-      <div className="text-3xl font-black text-white">{value}</div>
-      <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-    </div>
-  );
-}
-
-function GrowerOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [weather, setWeather] = useState<GrowerWeather>({ source: "fallback" });
-  const [weatherMessage, setWeatherMessage] = useState("Loading Youngstown farm weather...");
-  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-  const [orders, setOrders] = useState<MarketplaceOrder[]>([]);
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [wisdom, setWisdom] = useState<any[]>([]);
-  const [cropPlans, setCropPlans] = useState<any[]>([]);
-  const [seeds, setSeeds] = useState<any[]>([]);
-  const [note, setNote] = useState("");
-  const [saveStatus, setSaveStatus] = useState("");
-
-  const loadGrowerData = async () => {
-    const [loadedProducts, loadedOrders] = await Promise.all([
-      loadSupabaseRows<MarketplaceProduct>("marketplace_products", MARKET_PRODUCTS_KEY),
-      loadSupabaseRows<MarketplaceOrder>("marketplace_orders", MARKET_ORDERS_KEY),
-    ]);
-    setProducts(loadedProducts.filter((p) => p.active !== false));
-    setOrders(loadedOrders);
-
-    if (supabase) {
-      const loadOptional = async (table: string) => {
-        try {
-          const { data, error } = await supabase.from(table).select("*").limit(20);
-          if (error || !data) return [];
-          return data;
-        } catch {
-          return [];
-        }
-      };
-      const [loadedAnnouncements, loadedWisdom, loadedCropPlans, loadedSeeds] = await Promise.all([
-        loadOptional("program_announcements"),
-        loadOptional("wisdom_entries"),
-        loadOptional("crop_plans"),
-        loadOptional("daily_seeds"),
-      ]);
-      setAnnouncements(loadedAnnouncements);
-      setWisdom(loadedWisdom);
-      setCropPlans(loadedCropPlans);
-      setSeeds(loadedSeeds);
-    }
-  };
-
-  const loadWeather = async () => {
-    try {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=41.0998&longitude=-80.6495&current=temperature_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=3";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Weather request failed");
-      const data = await res.json();
-      setWeather({
-        currentTemp: Math.round(data.current?.temperature_2m ?? 0),
-        currentWind: Math.round(data.current?.wind_speed_10m ?? 0),
-        currentPrecip: data.current?.precipitation ?? 0,
-        todayHigh: Math.round(data.daily?.temperature_2m_max?.[0] ?? 0),
-        todayLow: Math.round(data.daily?.temperature_2m_min?.[0] ?? 0),
-        rainChance: Math.round(data.daily?.precipitation_probability_max?.[0] ?? 0),
-        source: "live",
-      });
-      setWeatherMessage("Live weather for Youngstown / Lansdowne area.");
-    } catch {
-      setWeather({ currentTemp: 72, currentWind: 6, todayHigh: 78, todayLow: 58, rainChance: 25, source: "fallback" });
-      setWeatherMessage("Weather service unavailable. Showing planning fallback until live feed responds.");
-    }
-  };
-
-  useEffect(() => {
-    loadGrowerData();
-    loadWeather();
-  }, []);
-
-  const todaysOrders = orders.filter((o) => (o.pickup_date || "").slice(0, 10) === todayISO());
-  const pendingOrders = orders.filter((o) => ["pending", "confirmed"].includes(o.status));
-  const lowInventory = products.filter((p) => Number(p.inventory || 0) <= 5);
-  const availableProduce = products.filter((p) => p.category === "Produce");
-  const dailyProverb = (wisdom[0]?.text || wisdom[0]?.proverb || wisdom[0]?.message || DEFAULT_PROVERBS[new Date().getDate() % DEFAULT_PROVERBS.length]) as string;
-
-  const demandRows = products.slice(0, 6).map((p) => {
-    const requested = pendingOrders.length ? pendingOrders.length * 3 : 0;
-    const available = Number(p.inventory || 0);
-    return { name: p.name, available, requested, gap: Math.max(0, requested - available), surplus: Math.max(0, available - requested) };
-  });
-
-  const weatherRisk = weather.rainChance && weather.rainChance >= 60
-    ? "Rain risk: prioritize harvest, covers, drainage checks, and safe footing."
-    : weather.todayHigh && weather.todayHigh >= 85
-      ? "Heat risk: prioritize water, shade breaks, and lighter crew rotations."
-      : "Normal field conditions: complete walk-through, water check, weed pressure, and harvest readiness.";
-
-  const saveGrowerNote = async () => {
-    if (!note.trim()) {
-      setSaveStatus("Add a grower note before saving.");
-      return;
-    }
-    setSaveStatus("Saving grower note...");
-    const row = {
-      id: uuid(),
-      note_date: todayISO(),
-      author: activeUser?.name || "Grower / Staff",
-      note_type: "daily_field_note",
-      note: note.trim(),
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("grower_notes", "bff.launch.grower.notes", row);
-    setSaveStatus(result.ok ? `Saved grower note to ${result.mode}.` : `Could not save to Supabase. Saved locally. ${String((result.error as any)?.message || "")}`);
-    setNote("");
-  };
-
-  return (
-    <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
-      <Card className="lg:sticky lg:top-28 lg:self-start">
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Grower Operations Center</div>
-        <h1 className="mt-5 text-3xl font-black leading-tight md:text-4xl">What does the land need today?</h1>
-        <p className="mt-4 text-sm leading-7 text-white/82">Weather, proverbs, crop plans, inventory, marketplace demand, and daily field notes for farm operations.</p>
-        <div className="mt-6 grid gap-3">
-          <button onClick={loadGrowerData} className="rounded-2xl bg-emerald-300 px-5 py-3 font-black text-black">Refresh Grower Data</button>
-          <button onClick={() => setScreen("marketplace")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Open Marketplace</button>
-          <button onClick={() => setScreen("supervisor")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Crew / Supervisor Center</button>
-          <button onClick={() => setScreen("reports")} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-left font-black">Reports</button>
-        </div>
-      </Card>
-
-      <div className="space-y-5">
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Morning Farm Briefing</div>
-          <h2 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Grower live dashboard.</h2>
-          <p className="mt-4 max-w-4xl text-white/82">Food moves, not the farmer. This screen connects today’s field decisions to youth crews, product availability, marketplace demand, and community food access.</p>
-        </Card>
-
-        <div className="grid gap-4 md:grid-cols-4">
-          <Metric label="Current Temp" value={weather.currentTemp !== undefined ? `${weather.currentTemp}°F` : "—"} />
-          <Metric label="Rain Chance" value={weather.rainChance !== undefined ? `${weather.rainChance}%` : "—"} />
-          <Metric label="Products Available" value={String(products.length)} />
-          <Metric label="Pending Orders" value={String(pendingOrders.length)} />
-        </div>
-
-        <div className="grid gap-5 xl:grid-cols-[1.05fr_.95fr]">
-          <Card>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Live Weather</div>
-                <h3 className="mt-2 text-2xl font-black">Youngstown / Lansdowne field conditions</h3>
-              </div>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase">{weather.source}</span>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">High / Low</div><div className="mt-2 text-2xl font-black">{weather.todayHigh ?? "—"}° / {weather.todayLow ?? "—"}°</div></div>
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Wind</div><div className="mt-2 text-2xl font-black">{weather.currentWind ?? "—"} mph</div></div>
-              <div className="rounded-2xl bg-white/10 p-4"><div className="text-xs uppercase tracking-[0.2em] text-white/55">Rain Now</div><div className="mt-2 text-2xl font-black">{weather.currentPrecip ?? 0}</div></div>
-            </div>
-            <Notice text={`${weatherMessage} ${weatherRisk}`} />
-          </Card>
-
-          <Card>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Wisdom / Proverbs</div>
-            <h3 className="mt-2 text-2xl font-black">Today’s field word</h3>
-            <p className="mt-5 rounded-3xl border border-emerald-200/20 bg-emerald-200/10 p-5 text-xl font-black leading-8">“{dailyProverb}”</p>
-            <p className="mt-4 text-sm leading-6 text-white/72">Use this for youth crew motivation, grower reflection, and morning huddle focus.</p>
-          </Card>
-        </div>
-
-        <div className="grid gap-5 xl:grid-cols-2">
-          <Card>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Today’s Priorities</div>
-            <h3 className="mt-2 text-2xl font-black">Field task guidance</h3>
-            <div className="mt-5 grid gap-3">
-              {(cropPlans.length ? cropPlans.slice(0, 5).map((p: any) => ({ title: p.task || p.crop || p.title || "Crop plan item", priority: p.priority || p.status || "Review", detail: p.notes || p.description || p.location || "Review crop plan and assign crew action." })) : DEFAULT_GROWER_TASKS).map((task: any, idx: number) => (
-                <div key={idx} className="rounded-2xl border border-white/10 bg-white/8 p-4">
-                  <div className="flex items-center justify-between gap-3"><div className="font-black">{task.title}</div><span className="rounded-full bg-black/35 px-3 py-1 text-xs font-black">{task.priority}</span></div>
-                  <div className="mt-2 text-sm leading-6 text-white/74">{task.detail}</div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Marketplace Demand</div>
-            <h3 className="mt-2 text-2xl font-black">What the market may need</h3>
-            <div className="mt-5 overflow-hidden rounded-2xl border border-white/10">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-white/10 text-xs uppercase tracking-[0.18em] text-white/60"><tr><th className="p-3">Item</th><th className="p-3">Available</th><th className="p-3">Need</th><th className="p-3">Status</th></tr></thead>
-                <tbody>
-                  {demandRows.length ? demandRows.map((row) => (
-                    <tr key={row.name} className="border-t border-white/10"><td className="p-3 font-bold">{row.name}</td><td className="p-3">{row.available}</td><td className="p-3">{row.requested}</td><td className="p-3 font-black">{row.gap > 0 ? `Short ${row.gap}` : `Surplus ${row.surplus}`}</td></tr>
-                  )) : <tr><td className="p-4 text-white/70" colSpan={4}>No marketplace products loaded yet.</td></tr>}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid gap-5 xl:grid-cols-2">
-          <Card>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Inventory / Seeds</div>
-            <h3 className="mt-2 text-2xl font-black">Available products and grower supply</h3>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {products.slice(0, 8).map((p) => (
-                <div key={p.id} className="rounded-2xl bg-white/8 p-4"><div className="font-black">{p.name}</div><div className="mt-1 text-sm text-white/65">{p.category} • {p.inventory} {p.unit}</div></div>
-              ))}
-              {seeds.slice(0, 4).map((s: any, idx: number) => (
-                <div key={s.id || idx} className="rounded-2xl bg-white/8 p-4"><div className="font-black">{s.seed_name || s.name || "Seed item"}</div><div className="mt-1 text-sm text-white/65">{s.quantity || s.status || "Review inventory"}</div></div>
-              ))}
-              {!products.length && !seeds.length && <div className="text-white/70">No inventory loaded yet.</div>}
-            </div>
-            {lowInventory.length > 0 && <Notice text={`Inventory alert: ${lowInventory.map((p) => p.name).join(", ")} need review.`} />}
-          </Card>
-
-          <Card>
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Announcements</div>
-            <h3 className="mt-2 text-2xl font-black">Program messages for growers</h3>
-            <div className="mt-5 grid gap-3">
-              {(announcements.length ? announcements.slice(0, 5) : [{ title: "Launch operations", message: "Use this center for weather, field tasks, marketplace readiness, and daily notes." }]).map((a: any, idx: number) => (
-                <div key={a.id || idx} className="rounded-2xl border border-white/10 bg-white/8 p-4"><div className="font-black">{a.title || a.subject || "Announcement"}</div><div className="mt-2 text-sm leading-6 text-white/74">{a.message || a.body || a.description || "Review program update."}</div></div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-100/75">Daily Field Note</div>
-          <h3 className="mt-2 text-2xl font-black">Record what changed today</h3>
-          <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
-            <TextArea label="Grower note" value={note} onChange={setNote} placeholder="Example: North row needs water; collards ready for harvest; youth crew handled mulching well." />
-            <button onClick={saveGrowerNote} className="rounded-2xl bg-emerald-300 px-8 py-4 font-black text-black">Save Grower Note</button>
-          </div>
-          {saveStatus && <Notice text={saveStatus} />}
-        </Card>
-      </div>
-    </div>
-  );
-}
-
 
 export default App;
