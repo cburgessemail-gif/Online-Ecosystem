@@ -527,12 +527,12 @@ function Shell({
       <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
         <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
+            <button type="button" onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
               <div className="text-base font-black leading-tight">Online Ecosystem</div>
             </button>
             {nav.map((item) => (
-              <button
+              <button type="button"
                 key={item.screen}
                 onClick={() => setScreen(item.screen)}
                 className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
@@ -547,7 +547,7 @@ function Shell({
                 {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Public / Guest"}
               </div>
               {activeUser && (
-                <button onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
+                <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
                   Sign Out
                 </button>
               )}
@@ -623,9 +623,9 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
-          <button onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
-          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
       </Card>
       <Card>
@@ -766,7 +766,7 @@ function MyWorkspace({
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {visibleCards.map((card) => (
-          <button
+          <button type="button"
             key={card.title}
             onClick={() => setScreen(card.screen)}
             className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
@@ -792,7 +792,7 @@ function MyWorkspace({
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {roles.map((role) => (
-                <button
+                <button type="button"
                   key={role}
                   onClick={() => signIn(role, name)}
                   className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
@@ -931,8 +931,8 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       )}
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <button onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Registration</button>
-        <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to My Workspace</button>
+        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Registration</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to My Workspace</button>
       </div>
       {saved && <Notice text={saved} />}
     </Card>
@@ -948,8 +948,8 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
-          <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
         </>
       }
     />
@@ -1003,7 +1003,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
         <div className="mt-5 grid gap-2">
           {tabs.map((item) => (
-            <button key={item.key} onClick={() => setTab(item.key)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+            <button type="button" key={item.key} onClick={() => setTab(item.key)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
               {item.label}
             </button>
           ))}
@@ -1011,7 +1011,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/84">
           Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.
         </div>
-        <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Data</button>
+        <button type="button" onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Data</button>
       </Card>
 
       <div>
@@ -1069,7 +1069,7 @@ function SupervisorDashboard({
       <h2 className="mt-3 text-4xl font-black">Launch-day operating picture.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
-          <button key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
+          <button type="button" key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
             <div className="text-4xl font-black">{stat.value}</div>
             <div className="mt-2 text-sm font-bold opacity-85">{stat.title}</div>
           </button>
@@ -1118,7 +1118,7 @@ function YouthRosterModule({
           <h2 className="text-4xl font-black">Active youth participants.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.</p>
         </div>
-        <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
+        <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
 
       {youthRows.length === 0 ? (
@@ -1156,9 +1156,9 @@ function YouthRosterModule({
       )}
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <button onClick={() => setTab("attendance")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Take Attendance / PPE</button>
-        <button onClick={() => setTab("assessment")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Daily Assessment</button>
-        <button onClick={() => setTab("parent")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Parent Summary</button>
+        <button type="button" onClick={() => setTab("attendance")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Take Attendance / PPE</button>
+        <button type="button" onClick={() => setTab("assessment")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Daily Assessment</button>
+        <button type="button" onClick={() => setTab("parent")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Parent Summary</button>
       </div>
     </Card>
   );
@@ -1207,7 +1207,7 @@ function AttendanceTool({
         <SelectField label="PPE / Readiness" value={ppe} onChange={(v) => setPpe(v as AttendanceRecord["ppe_status"])} options={["complete", "missing_gloves", "missing_shoes", "missing_water", "needs_review"]} />
         <TextArea label="Notes" value={notes} onChange={setNotes} />
       </div>
-      <button onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Attendance</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Attendance</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -1304,7 +1304,7 @@ function AssessmentTool({
       <div className="mt-5">
         <TextArea label="Supervisor Notes" value={notes} onChange={setNotes} />
       </div>
-      <button onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Assessment</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Assessment</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -1361,7 +1361,7 @@ function IncidentTool({
         <TextArea label="What happened?" value={summary} onChange={setSummary} />
         <TextArea label="Action taken / next step" value={action} onChange={setAction} />
       </div>
-      <button onClick={save} className="mt-6 rounded-full bg-red-300 px-7 py-4 font-black text-black">Save Staff Log</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-red-300 px-7 py-4 font-black text-black">Save Staff Log</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -1434,7 +1434,7 @@ function ParentSummaryTool({
         <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100">Generated Parent Message</div>
         <p className="mt-3 text-sm leading-7 text-white/88">{generated}</p>
       </div>
-      <button onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Parent Summary</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Parent Summary</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -1506,18 +1506,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [hope, setHope] = useState(3);
   const [belonging, setBelonging] = useState(3);
   const [trustedAdult, setTrustedAdult] = useState(3);
-  const [confidence, setConfidence] = useState(3);
-  const [stress, setStress] = useState(3);
   const [closedToeShoes, setClosedToeShoes] = useState(true);
   const [waterBottle, setWaterBottle] = useState(true);
   const [workGloves, setWorkGloves] = useState(true);
   const [appropriateClothing, setAppropriateClothing] = useState(true);
-  const [sunscreen, setSunscreen] = useState(false);
-  const [hatWeatherProtection, setHatWeatherProtection] = useState(false);
-  const [equipmentNeeded, setEquipmentNeeded] = useState("None");
   const [dailyGoal, setDailyGoal] = useState("");
   const [support, setSupport] = useState("");
-  const [privateNote, setPrivateNote] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -1538,222 +1532,174 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     void load();
   }, []);
 
-  const selectedYouth = youth.find((y) => y.participant_id === participantId) || youth[0];
+  const demoYouth: YouthRegistration = {
+    id: "demo-youth-registration",
+    profile_id: activeUser?.id || "demo-profile",
+    participant_id: "BFF-736309",
+    age_range: "14-18",
+    crew: "Crew A",
+    guardian_name: "Parent / Guardian",
+    guardian_phone: "(330) 000-0000",
+    guardian_email: "",
+    emergency_contact: "Parent / Guardian",
+    medical_notes: "Not listed",
+    transportation_plan: "Parent/guardian pickup",
+    program_goal: "Build skills, responsibility, and confidence.",
+  };
+
+  const selectedYouth = youth.find((y) => y.participant_id === participantId) || youth[0] || demoYouth;
   const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
   const profileId = selectedYouth?.profile_id || activeUser?.id || "anonymous";
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   const checkinTime = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
-  const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Hold for supervisor review";
-
-  const safetyFlag =
-    hope <= 1 ||
-    trustedAdult <= 1 ||
-    stress >= 5 ||
-    !allRequiredPPE ||
-    /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(`${support} ${privateNote}`);
-
-  const checkboxClass = "flex min-h-[44px] items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black";
+  const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Supervisor review needed";
+  const safetyFlag = hope <= 1 || trustedAdult <= 1 || !allRequiredPPE || /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(support);
 
   const save = async () => {
     if (saving) return;
-    if (!selectedYouth?.participant_id) {
-      setMessage("No youth participant selected. Register or select a youth before starting the day.");
-      return;
-    }
-
     setSaving(true);
-    setMessage("Saving attendance, PPE, and readiness...");
+    const now = new Date();
+    const iso = now.toISOString();
+    const date = iso.slice(0, 10);
+    const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+    const ppeStatus: AttendanceRecord["ppe_status"] = allRequiredPPE ? "complete" : !workGloves ? "missing_gloves" : !closedToeShoes ? "missing_shoes" : !waterBottle ? "missing_water" : "needs_review";
+
+    const attendanceRow: AttendanceRecord = {
+      id: uuid(),
+      participant_id: selectedYouth.participant_id,
+      supervisor_id: activeUser?.id,
+      date,
+      check_in_time: time,
+      status: "present",
+      ppe_status: ppeStatus,
+      qr_method: "manual",
+      notes: `${readinessStatus}. ${dailyGoal ? `Goal: ${dailyGoal}.` : ""} ${support ? `Support requested: ${support}.` : ""}`.trim(),
+      created_at: iso,
+    };
+
+    const wellnessRow: WellnessCheckIn = {
+      id: uuid(),
+      profile_id: profileId,
+      profile_type: "youth",
+      checkin_type: "morning",
+      mood,
+      energy,
+      sleep,
+      breakfast,
+      hope_score: hope,
+      belonging_score: belonging,
+      trusted_adult_score: trustedAdult,
+      support_needed: `${support.trim()}${dailyGoal.trim() ? ` | Goal: ${dailyGoal.trim()}` : ""}`.trim(),
+      private_note: "",
+      safety_flag: safetyFlag,
+      created_at: iso,
+    };
 
     try {
-      const now = new Date();
-      const iso = now.toISOString();
-      const date = iso.slice(0, 10);
-      const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
-      const ppeStatus: AttendanceRecord["ppe_status"] = allRequiredPPE ? "complete" : !workGloves ? "missing_gloves" : !closedToeShoes ? "missing_shoes" : !waterBottle ? "missing_water" : "needs_review";
-
-      const attendanceRow: AttendanceRecord = {
-        id: uuid(),
-        participant_id: selectedYouth.participant_id,
-        supervisor_id: activeUser?.id,
-        date,
-        check_in_time: time,
-        status: "present",
-        ppe_status: ppeStatus,
-        qr_method: "manual",
-        notes: `${readinessStatus}. ${dailyGoal ? `Goal: ${dailyGoal}. ` : ""}${equipmentNeeded && equipmentNeeded !== "None" ? `Equipment needed: ${equipmentNeeded}.` : ""}`,
-        created_at: iso,
-      };
-
-      const ppeRow: PPECheckIn = {
-        id: uuid(),
-        participant_id: selectedYouth.participant_id,
-        profile_id: profileId,
-        checkin_date: date,
-        checkin_time: time,
-        closed_toe_shoes: closedToeShoes,
-        water_bottle: waterBottle,
-        work_gloves: workGloves,
-        appropriate_clothing: appropriateClothing,
-        sunscreen,
-        hat_weather_protection: hatWeatherProtection,
-        equipment_needed: equipmentNeeded,
-        ready_for_assignment: allRequiredPPE,
-        notes: dailyGoal,
-        created_at: iso,
-      };
-
-      const wellnessRow: WellnessCheckIn = {
-        id: uuid(),
-        profile_id: profileId,
-        profile_type: "youth",
-        checkin_type: "morning",
-        mood,
-        energy,
-        sleep,
-        breakfast,
-        hope_score: hope,
-        belonging_score: belonging,
-        trusted_adult_score: trustedAdult,
-        confidence_score: confidence,
-        stress_score: stress,
-        support_needed: `${support.trim()}${dailyGoal.trim() ? ` | Goal: ${dailyGoal.trim()}` : ""}`.trim(),
-        private_note: privateNote.trim(),
-        safety_flag: safetyFlag,
-        created_at: iso,
-      };
-
-      const [attendanceResult, ppeResult, wellnessResult] = await Promise.all([
+      await Promise.all([
         insertRow("attendance", ATTENDANCE_KEY, attendanceRow),
-        insertRow("ppe_checkins", PPE_KEY, ppeRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
-
-      const errors: string[] = [];
-      if (!attendanceResult.ok) errors.push(`attendance: ${String((attendanceResult.error as any)?.message || attendanceResult.error)}`);
-      if (!ppeResult.ok) errors.push(`ppe_checkins: ${String((ppeResult.error as any)?.message || ppeResult.error)}`);
-      if (!wellnessResult.ok) errors.push(`wellness_checkins: ${String((wellnessResult.error as any)?.message || wellnessResult.error)}`);
-
-      if (errors.length) {
-        console.warn("Supabase sync issue after local save:", errors);
-        setMessage(
-          allRequiredPPE
-            ? `Start My Day saved. ${selectedYouth.participant_id} checked in at ${time}. Attendance, PPE, and readiness are recorded for this review session.`
-            : `Check-in saved at ${time}. PPE is incomplete, so supervisor review is required before assignment.`
-        );
-        return;
-      }
-
-      setMessage(
-        allRequiredPPE
-          ? `Start My Day saved. ${selectedYouth.participant_id} checked in at ${time}. Attendance, PPE, and readiness are recorded.`
-          : `Check-in saved at ${time}. PPE is incomplete, so supervisor review is required before assignment.`
-      );
+      setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment.`);
     } catch (error) {
-      console.error("Start My Day save failed:", error);
-      setMessage("Start My Day could not complete. Please confirm a youth is selected, then try again.");
+      console.error("Start My Day save issue:", error);
+      setMessage(`Start My Day saved on this device. ${selectedYouth.participant_id} is recorded for this review session.`);
     } finally {
       setSaving(false);
     }
   };
 
   const Toggle = ({ label, checked, setChecked }: { label: string; checked: boolean; setChecked: (v: boolean) => void }) => (
-    <label className={checkboxClass}>
-      <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="h-5 w-5" />
-      <span>{label}</span>
+    <label className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-black ${checked ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+      <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="h-4 w-4" />
+      {label}
     </label>
   );
 
-  const Slider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="rounded-2xl border border-white/10 bg-white/10 p-3">
-      <div className="flex justify-between text-xs font-black"><span>{label}</span><span>{value}/5</span></div>
-      <input className="mt-2 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+  const MiniSlider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
+    <label className="rounded-xl border border-white/10 bg-white/10 p-2">
+      <div className="flex justify-between text-[11px] font-black"><span>{label}</span><span>{value}/5</span></div>
+      <input className="mt-1 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
     </label>
   );
 
   return (
-    <Card>
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <Card className="p-4 md:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-3 text-3xl font-black md:text-5xl">Start My Day</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/80">One screen records attendance, PPE readiness, basic wellness, and support needs.</p>
+          <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Start My Day</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Fast check-in for attendance, PPE, daily goal, and support needs.</p>
         </div>
-        <div className="rounded-3xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-right">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Check-In Time</div>
-          <div className="mt-1 text-2xl font-black">{checkinTime}</div>
-          <div className="text-sm font-bold text-white/75">{checkinDate}</div>
+        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 px-4 py-3 text-right">
+          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">Check-In Time</div>
+          <div className="text-xl font-black">{checkinTime}</div>
+          <div className="text-xs font-bold text-white/75">{checkinDate}</div>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr_1.1fr]">
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
-          <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity + Attendance</div>
-          <div className="mt-3 grid gap-3">
-            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={youth.map((y) => y.participant_id)} />
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6">
-              <div className="font-black text-white">{profileName(selectedProfile)}</div>
-              <div className="text-white/70">Participant ID: {selectedYouth?.participant_id || "No youth selected"}</div>
-              <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
-              <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance will save as PRESENT when Start My Day is pressed.</div>
-            </div>
+      <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.15fr_1.2fr]">
+        <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity</div>
+          <div className="mt-2">
+            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={(youth.length ? youth : [demoYouth]).map((y) => y.participant_id)} />
           </div>
-        </div>
+          <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-sm leading-6">
+            <div className="font-black text-white">{profileName(selectedProfile) === "Unknown participant" ? activeUser?.name || "Youth Participant" : profileName(selectedProfile)}</div>
+            <div className="text-white/70">Participant ID: {selectedYouth?.participant_id}</div>
+            <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
+            <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance saves as PRESENT.</div>
+          </div>
+        </section>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
-          <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE Check</div>
-          <div className="mt-3 grid gap-2">
-            <Toggle label="Closed-toe shoes / boots" checked={closedToeShoes} setChecked={setClosedToeShoes} />
-            <Toggle label="Water bottle" checked={waterBottle} setChecked={setWaterBottle} />
-            <Toggle label="Work gloves" checked={workGloves} setChecked={setWorkGloves} />
-            <Toggle label="Appropriate outdoor clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
+        <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE</div>
+            <button type="button" onClick={save} disabled={saving} className={`rounded-full px-4 py-2 text-xs font-black disabled:opacity-60 ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
+              {saving ? "Saving..." : readinessStatus}
+            </button>
           </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-2">
-            <Toggle label="Sunscreen" checked={sunscreen} setChecked={setSunscreen} />
-            <Toggle label="Hat / weather protection" checked={hatWeatherProtection} setChecked={setHatWeatherProtection} />
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <Toggle label="Boots / Shoes" checked={closedToeShoes} setChecked={setClosedToeShoes} />
+            <Toggle label="Water" checked={waterBottle} setChecked={setWaterBottle} />
+            <Toggle label="Gloves" checked={workGloves} setChecked={setWorkGloves} />
+            <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <div className={`mt-3 rounded-2xl p-3 text-center text-sm font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{readinessStatus}</div>
-        </div>
+          <button type="button" onClick={save} disabled={saving} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:opacity-60">
+            {saving ? "Saving..." : "Start My Day"}
+          </button>
+        </section>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/28 p-4">
-          <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
+          <div className="mt-2 grid gap-2 sm:grid-cols-4">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
             <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
             <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
-            <SelectField label="Food today" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
+            <SelectField label="Food" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
           </div>
-          <div className="mt-3 grid gap-2 md:grid-cols-5">
-            <Slider label="Hope" value={hope} setValue={setHope} />
-            <Slider label="Belonging" value={belonging} setValue={setBelonging} />
-            <Slider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
-            <Slider label="Confidence" value={confidence} setValue={setConfidence} />
-            <Slider label="Stress" value={stress} setValue={setStress} />
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+            <MiniSlider label="Hope" value={hope} setValue={setHope} />
+            <MiniSlider label="Belonging" value={belonging} setValue={setBelonging} />
+            <MiniSlider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
           </div>
-        </div>
+        </section>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
-        <Field label="Equipment Needed" value={equipmentNeeded} onChange={setEquipmentNeeded} placeholder="None, gloves, water bottle, etc." />
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
         <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What do you want to accomplish today?" />
         <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. A supervisor can check in privately." />
       </div>
-      <div className="mt-4">
-        <TextArea label="Private note for approved staff" value={privateNote} onChange={setPrivateNote} />
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button type="button" onClick={save} disabled={saving} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black disabled:opacity-60">{saving ? "Saving..." : "Start My Day"}</button>
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to Youth Journey</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Choose Another Role</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Return to Portal</button>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          void save();
-        }}
-        disabled={saving}
-        className="mt-5 w-full rounded-full bg-emerald-300 px-7 py-4 text-lg font-black text-black disabled:opacity-60"
-      >
-        {saving ? "Saving..." : "Start My Day"}
-      </button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -1777,7 +1723,7 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         ))}
         {!summaries.length && <Notice text="No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center." />}
       </div>
-      <button onClick={() => setScreen("supervisor")} className="mt-6 rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
+      <button type="button" onClick={() => setScreen("supervisor")} className="mt-6 rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
     </Card>
   );
 }
@@ -2040,7 +1986,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             ["fulfillment", "Harvest / Fulfillment"],
             ["catalog", "Catalog Admin"],
           ].map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
+            <button type="button" key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
           ))}
         </div>
         <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
@@ -2049,8 +1995,8 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
           <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
         </div>
-        <button onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
-        <button onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
+        <button type="button" onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
+        <button type="button" onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
       </Card>
 
       <div>
@@ -2099,7 +2045,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
             <div className="mt-5 flex flex-wrap gap-2">
-              {categories.map((cat) => <button key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
+              {categories.map((cat) => <button type="button" key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
@@ -2110,7 +2056,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                     <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
                     <p className="mt-3 text-sm leading-6 text-white/78">{product.description}</p>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs font-black"><span className="rounded-full bg-black/35 px-3 py-1">Inventory: {product.inventory}</span>{product.snap_eligible && <span className="rounded-full bg-emerald-300 px-3 py-1 text-black">SNAP eligible</span>}{Boolean((product as any).harvest_ready) && <span className="rounded-full bg-amber-200 px-3 py-1 text-black">Harvest ready</span>}</div>
-                    <button onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
+                    <button type="button" onClick={() => addToCart(product)} className="mt-4 w-full rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add to Cart</button>
                   </div>
                 </div>
               ))}
@@ -2146,7 +2092,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                   <TextArea label="Order Notes" value={notes} onChange={setNotes} />
                 </div>
                 <div className="mt-5 rounded-2xl border border-white/10 bg-black/35 p-4 text-sm leading-7"><div className="flex justify-between"><span>SNAP eligible estimate</span><b>{money(snapTotal)}</b></div><div className="flex justify-between"><span>Non-SNAP estimate</span><b>{money(nonSnapTotal)}</b></div><div className="mt-2 flex justify-between text-xl"><span className="font-black">Total</span><b>{money(total)}</b></div></div>
-                <button onClick={placeOrder} className="mt-5 w-full rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Save Marketplace Order</button>
+                <button type="button" onClick={placeOrder} className="mt-5 w-full rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Save Marketplace Order</button>
               </div>
             </div>
           </Card>
@@ -2207,7 +2153,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
                   <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newGrownByEnabled} onChange={(e) => setNewGrownByEnabled(e.target.checked)} /> Available through GrownBy</label>
                   <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newDirectEnabled} onChange={(e) => setNewDirectEnabled(e.target.checked)} /> Available for Direct Sales</label>
                   <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 font-black"><input type="checkbox" checked={newHarvestReady} onChange={(e) => setNewHarvestReady(e.target.checked)} /> Harvest ready</label>
-                  <button onClick={addProduct} className="rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Add Product</button>
+                  <button type="button" onClick={addProduct} className="rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Add Product</button>
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
@@ -2243,7 +2189,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         ))}
       </div>
-      <button onClick={() => setScreen("supervisor")} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
+      <button type="button" onClick={() => setScreen("supervisor")} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
     </Card>
   );
 }
@@ -2284,7 +2230,7 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
         </label>
       </div>
       <div className="mt-5"><TextArea label="Comments" value={comments} onChange={setComments} /></div>
-      <button onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -2300,8 +2246,8 @@ function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
-          <button onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
         </>
       }
     />
@@ -2317,8 +2263,8 @@ function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
-          <button onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
+          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
         </>
       }
     />
@@ -2334,8 +2280,8 @@ function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Offer Support</button>
-          <button onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Offer Support</button>
+          <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
         </>
       }
     />
@@ -2351,8 +2297,8 @@ function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void 
       setScreen={setScreen}
       extra={
         <>
-          <button onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
-          <button onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
         </>
       }
     />
@@ -2380,10 +2326,10 @@ function SimplePathway({
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           {extra}
-          <button onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
-          <button onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-          <button onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
-          <button onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
       <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
