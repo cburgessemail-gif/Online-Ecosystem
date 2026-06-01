@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.0 - JOURNEY REPAIR + LAUNCH STABILIZATION
+ * LAUNCH CANDIDATE 1.2 - GROUPED NAV + IMAGE VISIBILITY + JUNE 8 INTEGRATION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -300,13 +300,13 @@ const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 
 const IMG = {
-  // Image names match the files currently uploaded in the public folder.
-  // Keep spaces/capitalization exactly as shown here; Vercel paths are case-sensitive.
+  // Public-folder image paths. Files are in /public, so they are referenced from the site root.
+  // Keep spaces/capitalization exactly as the uploaded file names; Vercel is case-sensitive.
   forest: "/Grow Area.png",
   backup: "/GrowArea2.jpg",
   youth: "/Fence_volunteers.png",
   supervisor: "/large (15).jpg",
-  market: "/large (11).jpg",
+  market: "/large.jpg",
   ecosystem: "/ConnectFoodEcosystem_withimages.png",
   grow: "/Grow Area.png",
   compost: "/Compost_ElliottGarden.png",
@@ -315,6 +315,10 @@ const IMG = {
   seeds: "/Seeds_Jubilee Gardens.png",
   fencing: "/Deer Fencing.png",
   interview: "/WKBN Interview.png",
+  compostElliott: "/Compost_Elliott.png",
+  deerFencing: "/Deer Fencing.png",
+  volunteers: "/Fence_volunteers.png",
+  culinaryFlowers: "/culniary_edibleflowers.jpeg",
 };
 
 const launchEvents = [
@@ -390,6 +394,54 @@ const coolingCenterReflectionQuestions = [
   "What career pathway interested you most today?",
   "What are you proud of today?",
 ];
+
+
+type LaunchVideo = {
+  title: string;
+  purpose: string;
+  file: string;
+  fallback: string;
+  tags: string[];
+};
+
+const launchVideos: LaunchVideo[] = [
+  {
+    title: "June 5 Staff & Supervisor Orientation Video",
+    purpose: "Staff orientation, site rules, safety expectations, youth support, emergency procedures, and platform training.",
+    file: "/videos/june5-staff-supervisor-orientation.mp4",
+    fallback: "Upload the June 5 orientation video to public/videos/june5-staff-supervisor-orientation.mp4 or replace this placeholder with a link.",
+    tags: ["Orientation", "Staff", "Safety"],
+  },
+  {
+    title: "June 8 Cooling Station Challenge Introduction Video",
+    purpose: "Introduces youth to the farm worker heat-safety problem, the four-team production flow, and the connection to real farm operations.",
+    file: "/videos/june8-cooling-station-introduction.mp4",
+    fallback: "Upload the intro video to public/videos/june8-cooling-station-introduction.mp4 or replace this placeholder with a link.",
+    tags: ["Youth", "Cooling Station", "Farm Safety"],
+  },
+  {
+    title: "Fan Template & Design Demonstration Video",
+    purpose: "Shows how the Design Team creates and tests fan templates before Engineering lays them out on cardboard.",
+    file: "/videos/fan-template-design-demo.mp4",
+    fallback: "Upload the fan/template design video to public/videos/fan-template-design-demo.mp4 or replace this placeholder with a link.",
+    tags: ["Fan Video", "Design", "Templates"],
+  },
+  {
+    title: "Manufacturing: Assemble, Paint, Personalize, and Quality Check",
+    purpose: "Documents the Manufacturing Team assembling, painting, branding, personalizing, and quality-checking the fans.",
+    file: "/videos/fan-manufacturing-painting.mp4",
+    fallback: "Upload the manufacturing/painting video to public/videos/fan-manufacturing-painting.mp4 or replace this placeholder with a link.",
+    tags: ["Fan Video", "Manufacturing", "Painting"],
+  },
+  {
+    title: "Final Cooling Station Completion Video",
+    purpose: "Shows the Contractor Team collecting fans, building the cooling station, and presenting the final farm heat-safety solution.",
+    file: "/videos/cooling-station-completion.mp4",
+    fallback: "Upload the completion video to public/videos/cooling-station-completion.mp4 or replace this placeholder with a link.",
+    tags: ["Completion", "Contractor", "Farm Infrastructure"],
+  },
+];
+
 
 
 const languageOptions: LanguageOption[] = [
@@ -1077,10 +1129,10 @@ function Shell({
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
-      <div className="fixed inset-0 bg-black/54" />
-      <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.34),rgba(0,0,0,.68)),radial-gradient(circle_at_top_left,rgba(52,211,153,.22),transparent_32%)]" />
+      <div className="fixed inset-0 bg-black/25" />
+      <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
       <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
-        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/55 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/48 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
@@ -1142,7 +1194,7 @@ function Notice({ text }: { text: string }) {
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-[2rem] border border-white/10 bg-black/46 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
+  return <div className={`rounded-[2rem] border border-white/10 bg-black/32 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
 }
 
 function Field(props: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
@@ -2677,7 +2729,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
                 <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
-                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-85" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
+                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-95" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
                     <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
@@ -2833,10 +2885,57 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+function VideoLibrary({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="mt-7 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
+      <h2 className="mt-3 text-2xl font-black">June 5 and June 8 media documentation</h2>
+      <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78">
+        This section is ready for the staff orientation video, fan demonstration video, manufacturing/painting video, youth interviews, and the final Cooling Station completion video. Video boxes show a placeholder until files are uploaded into the public/videos folder.
+      </p>
+      <div className={`mt-5 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}>
+        {launchVideos.map((video) => (
+          <div key={video.title} className="overflow-hidden rounded-[1.35rem] border border-white/10 bg-black/35">
+            <video
+              controls
+              preload="metadata"
+              className="aspect-video w-full bg-black/70 object-cover"
+              onError={(event) => {
+                const wrapper = event.currentTarget.parentElement?.querySelector("[data-video-fallback]") as HTMLElement | null;
+                if (wrapper) wrapper.style.display = "block";
+              }}
+            >
+              <source src={video.file} type="video/mp4" />
+            </video>
+            <div data-video-fallback style={{ display: "none" }} className="border-y border-amber-200/15 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-amber-50">
+              {video.fallback}
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-black">{video.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-white/74">{video.purpose}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {video.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-emerald-300/15 px-3 py-1 text-[11px] font-black text-emerald-50">{tag}</span>
+                ))}
+              </div>
+              <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] leading-5 text-white/62">
+                Expected file: <span className="font-black text-white/80">{video.file}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const folders = [
-    ["June 5 Staff Orientation", "Staff and supervisor training, site rules, safety expectations, platform use, and emergency procedures."],
-    ["June 8 Cooling Station Challenge", "Full project documentation for the farm worker heat-safety challenge."],
+    ["June 5 Staff Orientation Video", "Staff and supervisor training, site rules, safety expectations, platform use, and emergency procedures."],
+    ["June 8 Cooling Station Challenge Video", "Full project documentation for the farm worker heat-safety challenge."],
+    ["Fan Template & Design Video", "The fan template process, design decisions, and prototype demonstration."],
+    ["Manufacturing Fan Painting Video", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
     ["Design Team Gallery", "Templates, prototypes, design sketches, signage, and worker instructions."],
     ["Engineering Team Gallery", "Cardboard layout planning, material efficiency, tracing, cutting, and waste-reduction documentation."],
     ["Manufacturing Team Gallery", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
@@ -2862,6 +2961,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         ))}
       </div>
+      <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
@@ -2899,7 +2999,9 @@ function CoolingCenterProjectModule({
     "Cooling station built",
     "Final presentation completed",
     "Project photos captured",
-    "Project video captured",
+    "Fan template/design video captured",
+    "Manufacturing fan painting video captured",
+    "Final cooling station video captured",
     "Youth reflections submitted",
     "Supervisor assessments completed",
   ];
@@ -2912,6 +3014,8 @@ function CoolingCenterProjectModule({
       <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5 text-sm leading-7 text-white/84">
         <b>Farm connection:</b> {featuredProject.farmConnection}
       </div>
+
+      {!compact && <VideoLibrary compact />}
 
       <div className="mt-7 grid gap-4 lg:grid-cols-4">
         {coolingCenterTeams.map((team) => (
@@ -3000,6 +3104,9 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
     ["Featured Project", featuredProject.shortTitle],
     ["Project Teams", "Design | Engineering | Manufacturing | Contractor"],
     ["Photo / Video Documentation", "Media Center Ready"],
+    ["Fan Template / Design Video", "Ready for upload"],
+    ["Manufacturing Fan Painting Video", "Ready for upload"],
+    ["Cooling Station Completion Video", "Ready for upload"],
     ["Translation Coverage", "Audit In Progress"],
     ["Launch Decision", "Validate Pathways + Launch"],
   ];
@@ -3039,6 +3146,7 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <p className="text-sm text-white/80">Youth Workforce Launch: June 8, 2026 — 8:00 AM</p>
         <p className="mt-4 text-xl font-black">We Grow Green to Harvest Dreams.</p>
       </div>
+      <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
