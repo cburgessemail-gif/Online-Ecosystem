@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -347,6 +347,43 @@ function languageDir(language: LanguageCode) {
   return languageOptions.find((option) => option.code === language)?.dir || "ltr";
 }
 
+
+const screenText: Record<LanguageCode, Record<string, string>> = {
+  en: {
+    protectedMessage: "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.",
+    portalBrand: "Bronson Family Farm",
+    portalTitle: "Enter the living ecosystem.",
+    portalIntro: "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.",
+    startGuidedDemo: "Start Guided Demo", enterEcosystem: "Enter The Ecosystem", registerCheckIn: "Register / Check In", launchFocus: "Launch Focus",
+    focus1: "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.", focus2: "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.", focus3: "Supervisor Operations Center is the staff-only control room.", focus4: "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.", focus5: "Parents receive progress summaries, not private raw youth reflections.", focus6: "Incident and support flags stay staff-facing.", focus7: "Reports convert daily records into launch readiness and program impact.",
+    journeyMemory: "Welcome Back / Journey Memory", pathway: "Pathway",
+    guestPathwayTitle: "Guest Pathway", guestPathwayText: "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.",
+    growerPathwayTitle: "Grower Pathway", growerPathwayText: "Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity.",
+    partnerPathwayTitle: "Partner Pathway", partnerPathwayText: "Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact.",
+    supportPathwayTitle: "Support the Ecosystem", supportPathwayText: "Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth.",
+    valueAddedTitle: "Value-Added Producer Pathway", valueAddedText: "Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation.",
+    createGrowerProfile: "Create Grower Profile", marketplaceOpportunities: "Marketplace Opportunities", createPartnerProfile: "Create Partner Profile", supportOptions: "Support Options", offerSupport: "Offer Support", becomePartner: "Become a Partner", createProducerProfile: "Create Producer Profile", connectMarketplace: "Connect to Marketplace",
+    returnPortal: "Return to Portal", chooseAnotherRole: "Choose Another Role", commentScreen: "Comment on This Screen", completeJourney: "Complete Journey", goMarketplace: "Go to Marketplace",
+    feedbackTitle: "Tell us about the platform and program experience.", rating: "Rating", recommend: "I would recommend this experience.", excited: "What excited you?", confused: "What confused you?", improve: "What would you improve?", opportunityInterest: "What opportunity interests you?", additionalComments: "Additional Comments", saveFeedback: "Save Feedback / Comments", returnDemo: "Return to Guided Demo", feedbackSaved: "Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.",
+    completionLabel: "Journey Completion", ecosystemExplorer: "Ecosystem Explorer", completionIntro: "Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.", certificateTitle: "Completion Certificate", nameCertificate: "Name for certificate", enterName: "Enter name", certifies: "This certifies that", certText: "completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.", saveCompletion: "Save Completion", completionSaved: "Journey completion saved on this device. You can continue exploring or share feedback.", impactInterests: "Impact Interests", interestGrow: "Growing food / grower resources", interestYouth: "Youth workforce development", interestPartner: "Partnership or collaboration", interestVolunteer: "Volunteer, mentor, or support", interestMarketplace: "Marketplace / GrownBy"
+  },
+  es: {
+    protectedMessage: "Área protegida. Primero ingrese como Supervisor / Personal, Administrador o Junta / Financiador.", portalBrand: "Bronson Family Farm", portalTitle: "Entre al ecosistema vivo.", portalIntro: "Bienvenido al Ecosistema Regional de Alimentos de Mahoning y Trumbull. Centros regionales actuales: Youngstown — Bronson Family Farm y Warren — Parker Farms. Esta plataforma conecta desarrollo laboral juvenil, padres, productores, aliados, colaboradores, mercado, bienestar, seguridad, comentarios e informes de impacto.", startGuidedDemo: "Iniciar recorrido guiado", enterEcosystem: "Entrar al ecosistema", registerCheckIn: "Registrarse / Check-in", launchFocus: "Enfoque de lanzamiento", focus1: "Centros regionales: Youngstown — Bronson Family Farm y Warren — Parker Farms.", focus2: "Elija un rol y siga una ruta guiada con recursos, oportunidades y próximos pasos.", focus3: "El Centro de Operaciones de Supervisores es el espacio de control solo para el personal.", focus4: "Los registros de jóvenes y supervisores se guardan localmente primero y luego se sincronizan con Supabase cuando está conectado.", focus5: "Los padres reciben resúmenes de progreso, no reflexiones privadas sin procesar de los jóvenes.", focus6: "Los incidentes y señales de apoyo permanecen para el personal.", focus7: "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.", journeyMemory: "Bienvenido de nuevo / Memoria del recorrido", pathway: "Ruta", guestPathwayTitle: "Ruta de visitante", guestPathwayText: "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo se mueven juntos jóvenes, productores, familias y aliados.", growerPathwayTitle: "Ruta del productor", growerPathwayText: "Todo productor pertenece aquí: patios, camas elevadas, jardines comunitarios, jardines escolares, iglesias, granjas urbanas, invernaderos y granjas de mercado. Los productores conectan planificación de cultivos, necesidades, inventario, capacitación y mercado.", partnerPathwayTitle: "Ruta de aliados", partnerPathwayText: "Los aliados incluyen escuelas, empresas, organizaciones sin fines de lucro, agencias, financiadores, comunidades de fe, universidades y voluntarios. Esta ruta muestra lo que el ecosistema ofrece, lo que necesita y cómo colaborar con impacto medible.", supportPathwayTitle: "Apoyar el ecosistema", supportPathwayText: "El apoyo puede ser financiero, voluntario, mentoría o en especie. Jubilee Gardens, Inc. es reconocido como Guardián de Semillas por aportar abundantes semillas durante dos años. Los colaboradores apoyan jóvenes, productores, acceso a alimentos, infraestructura, educación y crecimiento regional.", valueAddedTitle: "Ruta de productor de valor agregado", valueAddedText: "Los productores de valor agregado convierten cosechas, hierbas, miel, semillas, flores e ideas en productos. Esta ruta conecta preparación, empaque, precios, etiquetado y participación en el mercado.", createGrowerProfile: "Crear perfil de productor", marketplaceOpportunities: "Oportunidades de mercado", createPartnerProfile: "Crear perfil de aliado", supportOptions: "Opciones de apoyo", offerSupport: "Ofrecer apoyo", becomePartner: "Convertirse en aliado", createProducerProfile: "Crear perfil de productor", connectMarketplace: "Conectar al mercado", returnPortal: "Volver al portal", chooseAnotherRole: "Elegir otro rol", commentScreen: "Comentar esta pantalla", completeJourney: "Completar recorrido", goMarketplace: "Ir al mercado", feedbackTitle: "Cuéntenos sobre la experiencia de la plataforma y el programa.", rating: "Calificación", recommend: "Recomendaría esta experiencia.", excited: "¿Qué le emocionó?", confused: "¿Qué le confundió?", improve: "¿Qué mejoraría?", opportunityInterest: "¿Qué oportunidad le interesa?", additionalComments: "Comentarios adicionales", saveFeedback: "Guardar comentarios", returnDemo: "Volver al recorrido guiado", feedbackSaved: "Comentarios guardados en este dispositivo y enviados a Supabase cuando la tabla los acepte.", completionLabel: "Finalización del recorrido", ecosystemExplorer: "Explorador del ecosistema", completionIntro: "Gracias por explorar el Ecosistema Regional de Alimentos de Mahoning y Trumbull: Youngstown — Bronson Family Farm y Warren — Parker Farms.", certificateTitle: "Certificado de finalización", nameCertificate: "Nombre para el certificado", enterName: "Ingrese el nombre", certifies: "Esto certifica que", certText: "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.", saveCompletion: "Guardar finalización", completionSaved: "Finalización guardada en este dispositivo. Puede seguir explorando o compartir comentarios.", impactInterests: "Intereses de impacto", interestGrow: "Cultivar alimentos / recursos para productores", interestYouth: "Desarrollo laboral juvenil", interestPartner: "Alianza o colaboración", interestVolunteer: "Voluntariado, mentoría o apoyo", interestMarketplace: "Mercado / GrownBy"
+  },
+  tl: { portalTitle: "Pumasok sa buhay na ecosystem.", startGuidedDemo: "Simulan ang Guided Demo", enterEcosystem: "Pumasok sa Ecosystem", registerCheckIn: "Magrehistro / Check In", returnPortal: "Bumalik sa Portal", chooseAnotherRole: "Pumili ng Ibang Role", commentScreen: "Magkomento sa Screen na Ito", completeJourney: "Kumpletuhin ang Journey", goMarketplace: "Pumunta sa Marketplace", feedbackTitle: "Ikuwento ang karanasan sa platform at programa.", saveFeedback: "I-save ang Feedback / Comments", ecosystemExplorer: "Ecosystem Explorer" },
+  it: { portalTitle: "Entra nell'ecosistema vivo.", startGuidedDemo: "Avvia tour guidato", enterEcosystem: "Entra nell'ecosistema", registerCheckIn: "Registrati / Check-in", returnPortal: "Ritorna al portale", chooseAnotherRole: "Scegli un altro ruolo", commentScreen: "Commenta questa schermata", completeJourney: "Completa percorso", goMarketplace: "Vai al mercato", feedbackTitle: "Raccontaci l'esperienza della piattaforma e del programma.", saveFeedback: "Salva feedback / commenti", ecosystemExplorer: "Esploratore dell'ecosistema" },
+  he: { portalTitle: "היכנסו לאקוסיסטם החי.", startGuidedDemo: "התחל סיור מודרך", enterEcosystem: "היכנס לאקוסיסטם", registerCheckIn: "הרשמה / צ'ק-אין", returnPortal: "חזרה לשער", chooseAnotherRole: "בחר תפקיד אחר", commentScreen: "תגובה על המסך הזה", completeJourney: "סיום המסע", goMarketplace: "לשוק", feedbackTitle: "ספרו לנו על חוויית הפלטפורמה והתוכנית.", saveFeedback: "שמור משוב / תגובות", ecosystemExplorer: "חוקר האקוסיסטם" },
+  fr: { portalTitle: "Entrez dans l'écosystème vivant.", startGuidedDemo: "Démarrer la visite guidée", enterEcosystem: "Entrer dans l'écosystème", registerCheckIn: "S'inscrire / Pointage", returnPortal: "Retour au portail", chooseAnotherRole: "Choisir un autre rôle", commentScreen: "Commenter cet écran", completeJourney: "Terminer le parcours", goMarketplace: "Aller au marché", feedbackTitle: "Parlez-nous de l'expérience de la plateforme et du programme.", saveFeedback: "Enregistrer les commentaires", ecosystemExplorer: "Explorateur de l'écosystème" }
+};
+
+function tx(language: LanguageCode, key: string) {
+  return screenText[language]?.[key] || screenText.en[key] || t(language, key);
+}
+
+const LanguageContext = createContext<LanguageCode>("en");
+function useLanguage() { return useContext(LanguageContext); }
+function useTx(key: string) { return tx(useLanguage(), key); }
+
 const roles: Role[] = [
   "Guest",
   "Youth Workforce Participant",
@@ -574,7 +611,7 @@ function App() {
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
-      setMessage("Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.");
+      setMessage(tx(language, "protectedMessage"));
       setScreenState("roles");
       return;
     }
@@ -606,6 +643,7 @@ function App() {
   };
 
   return (
+    <LanguageContext.Provider value={language}>
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
@@ -627,6 +665,7 @@ function App() {
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
     </Shell>
+    </LanguageContext.Provider>
   );
 }
 
@@ -781,11 +820,12 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 
 
 function JourneyMemoryPreview() {
+  const language = useLanguage();
   const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 4);
   if (!events.length) return null;
   return (
     <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Welcome Back / Journey Memory</div>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{tx(language, "journeyMemory")}</div>
       <div className="mt-3 grid gap-2 md:grid-cols-2">
         {events.map((event) => (
           <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
@@ -796,46 +836,39 @@ function JourneyMemoryPreview() {
 }
 
 function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const language = useLanguage();
+  const launchItems = ["focus1", "focus2", "focus3", "focus4", "focus5", "focus6", "focus7"];
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm</div>
-        <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">Enter the living ecosystem.</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">
-          Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
-        </p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "portalBrand")}</div>
+        <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">{tx(language, "portalTitle")}</h1>
+        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{tx(language, "portalIntro")}</p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Start Guided Demo</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Enter The Ecosystem</button>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
+          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">{tx(language, "startGuidedDemo")}</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">{tx(language, "enterEcosystem")}</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">{tx(language, "registerCheckIn")}</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">{t(language, "workspace")}</button>
         </div>
         <JourneyMemoryPreview />
       </Card>
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
-        {[
-          "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.",
-          "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.",
-          "Supervisor Operations Center is the staff-only control room.",
-          "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.",
-          "Parents receive progress summaries, not private raw youth reflections.",
-          "Incident and support flags stay staff-facing.",
-          "Reports convert daily records into launch readiness and program impact.",
-        ].map((item) => (
-          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{tx(language, "launchFocus")}</div>
+        {launchItems.map((item) => (
+          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{tx(language, item)}</div>
         ))}
       </Card>
     </div>
   );
 }
 
+
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title="Guest Pathway"
+      title={useTx("guestPathwayTitle")}
       image={IMG.ecosystem}
-      text="Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together."
+      text={useTx("guestPathwayText")}
       setScreen={setScreen}
     />
   );
@@ -2447,6 +2480,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const language = useLanguage();
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
   const [excited, setExcited] = useState("");
@@ -2458,51 +2492,28 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 
   const save = async () => {
     const row: FeedbackRecord = {
-      id: uuid(),
-      profile_id: activeUser?.id,
-      profile_type: activeUser ? roleToProfileType(activeUser.role) : "customer",
-      feedback_type: "platform",
-      rating,
-      comments,
-      would_recommend: recommend,
-      screen: "feedback",
-      pathway: activeUser?.role || "Public / Guest",
-      role: activeUser?.role || "Public / Guest",
-      excited,
-      confused,
-      improve,
-      opportunity_interest: opportunity,
-      created_at: new Date().toISOString(),
+      id: uuid(), profile_id: activeUser?.id, profile_type: activeUser ? roleToProfileType(activeUser.role) : "customer", feedback_type: "platform", rating, comments, would_recommend: recommend, screen: "feedback", pathway: activeUser?.role || "Public / Guest", role: activeUser?.role || "Public / Guest", excited, confused, improve, opportunity_interest: opportunity, created_at: new Date().toISOString(),
     };
     await insertRow("feedback", FEEDBACK_KEY, row);
-    setMessage("Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.");
+    setMessage(tx(language, "feedbackSaved"));
   };
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Tell us about the platform and program experience.</h1>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{t(language, "feedback")}</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">{tx(language, "feedbackTitle")}</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <label className="rounded-2xl border border-white/10 bg-white/10 p-4">
-          <div className="flex justify-between text-sm font-black"><span>Rating</span><span>{rating}/5</span></div>
-          <input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} />
-        </label>
-        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
-          <input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />
-          I would recommend this experience.
-        </label>
+        <label className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex justify-between text-sm font-black"><span>{tx(language, "rating")}</span><span>{rating}/5</span></div><input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} /></label>
+        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black"><input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />{tx(language, "recommend")}</label>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <TextArea label="What excited you?" value={excited} onChange={setExcited} />
-        <TextArea label="What confused you?" value={confused} onChange={setConfused} />
-        <TextArea label="What would you improve?" value={improve} onChange={setImprove} />
-        <TextArea label="What opportunity interests you?" value={opportunity} onChange={setOpportunity} />
+        <TextArea label={tx(language, "excited")} value={excited} onChange={setExcited} />
+        <TextArea label={tx(language, "confused")} value={confused} onChange={setConfused} />
+        <TextArea label={tx(language, "improve")} value={improve} onChange={setImprove} />
+        <TextArea label={tx(language, "opportunityInterest")} value={opportunity} onChange={setOpportunity} />
       </div>
-      <div className="mt-5"><TextArea label="Additional Comments" value={comments} onChange={setComments} /></div>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback / Comments</button>
-        <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to Guided Demo</button>
-      </div>
+      <div className="mt-5"><TextArea label={tx(language, "additionalComments")} value={comments} onChange={setComments} /></div>
+      <div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{tx(language, "saveFeedback")}</button><button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">{tx(language, "returnDemo")}</button></div>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -2512,14 +2523,14 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title="Grower Pathway"
+      title={useTx("growerPathwayTitle")}
       image={IMG.grow}
-      text="Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity."
+      text={useTx("growerPathwayText")}
       setScreen={setScreen}
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createGrowerProfile")}</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("marketplaceOpportunities")}</button>
         </>
       }
     />
@@ -2529,14 +2540,14 @@ function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title="Partner Pathway"
+      title={useTx("partnerPathwayTitle")}
       image={IMG.partners}
-      text="Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact."
+      text={useTx("partnerPathwayText")}
       setScreen={setScreen}
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
-          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createPartnerProfile")}</button>
+          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("supportOptions")}</button>
         </>
       }
     />
@@ -2546,14 +2557,14 @@ function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
 function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title="Support the Ecosystem"
+      title={useTx("supportPathwayTitle")}
       image={IMG.compost}
-      text="Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth."
+      text={useTx("supportPathwayText")}
       setScreen={setScreen}
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Offer Support</button>
-          <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("offerSupport")}</button>
+          <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("becomePartner")}</button>
         </>
       }
     />
@@ -2563,14 +2574,14 @@ function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
 function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title="Value-Added Producer Pathway"
+      title={useTx("valueAddedTitle")}
       image={IMG.market}
-      text="Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation."
+      text={useTx("valueAddedText")}
       setScreen={setScreen}
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createProducerProfile")}</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("connectMarketplace")}</button>
         </>
       }
     />
@@ -2590,19 +2601,20 @@ function SimplePathway({
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
 }) {
+  const language = useLanguage();
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "pathway")}</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           {extra}
-          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Complete Journey</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">{tx(language, "returnPortal")}</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "chooseAnotherRole")}</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "commentScreen")}</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "completeJourney")}</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{tx(language, "goMarketplace")}</button>
         </div>
       </Card>
       <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
@@ -2615,6 +2627,7 @@ function SimplePathway({
 
 
 function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const language = useLanguage();
   const [name, setName] = useState(activeUser?.name || "");
   const [interestGrow, setInterestGrow] = useState(false);
   const [interestYouth, setInterestYouth] = useState(false);
@@ -2624,62 +2637,37 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
   const [message, setMessage] = useState("");
   const journey = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
   const recent = journey.slice(0, 6);
-
-  const complete = () => {
-    const pathway = recent[0]?.label || screenLabel("completion");
-    recordCompletion(pathway, activeUser);
-    setMessage("Journey completion saved on this device. You can continue exploring or share feedback.");
-  };
-
+  const complete = () => { const pathway = recent[0]?.label || screenLabel("completion"); recordCompletion(pathway, activeUser); setMessage(tx(language, "completionSaved")); };
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Ecosystem Explorer</h1>
-      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
-        Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
-      </p>
-
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "completionLabel")}</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">{tx(language, "ecosystemExplorer")}</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">{tx(language, "completionIntro")}</p>
       <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_.85fr]">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <h2 className="text-2xl font-black">Completion Certificate</h2>
-          <Field label="Name for certificate" value={name} onChange={setName} placeholder="Enter name" />
+          <h2 className="text-2xl font-black">{tx(language, "certificateTitle")}</h2>
+          <Field label={tx(language, "nameCertificate")} value={name} onChange={setName} placeholder={tx(language, "enterName")} />
           <div className="mt-5 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-5 text-center">
-            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">This certifies that</div>
-            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Ecosystem Explorer"}</div>
-            <p className="mt-3 text-sm leading-6 text-white/82">
-              completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
-            </p>
+            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">{tx(language, "certifies")}</div>
+            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || tx(language, "ecosystemExplorer")}</div>
+            <p className="mt-3 text-sm leading-6 text-white/82">{tx(language, "certText")}</p>
             <div className="mt-4 text-sm font-black">{new Date().toLocaleDateString()}</div>
           </div>
-          <button type="button" onClick={complete} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Completion</button>
-          {message && <Notice text={message} />}
+          <button type="button" onClick={complete} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{tx(language, "saveCompletion")}</button>{message && <Notice text={message} />}
         </div>
-
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <h2 className="text-2xl font-black">Impact Interests</h2>
+          <h2 className="text-2xl font-black">{tx(language, "impactInterests")}</h2>
           <div className="mt-4 grid gap-2">
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestGrow} onChange={(e) => setInterestGrow(e.target.checked)} /> Growing food / grower resources</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestYouth} onChange={(e) => setInterestYouth(e.target.checked)} /> Youth workforce development</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestPartner} onChange={(e) => setInterestPartner(e.target.checked)} /> Partnership or collaboration</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestVolunteer} onChange={(e) => setInterestVolunteer(e.target.checked)} /> Volunteer, mentor, or support</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestMarketplace} onChange={(e) => setInterestMarketplace(e.target.checked)} /> Marketplace / GrownBy</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestGrow} onChange={(e) => setInterestGrow(e.target.checked)} /> {tx(language, "interestGrow")}</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestYouth} onChange={(e) => setInterestYouth(e.target.checked)} /> {tx(language, "interestYouth")}</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestPartner} onChange={(e) => setInterestPartner(e.target.checked)} /> {tx(language, "interestPartner")}</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestVolunteer} onChange={(e) => setInterestVolunteer(e.target.checked)} /> {tx(language, "interestVolunteer")}</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestMarketplace} onChange={(e) => setInterestMarketplace(e.target.checked)} /> {tx(language, "interestMarketplace")}</label>
           </div>
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
-            <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Recently Viewed</div>
-            <div className="mt-3 grid gap-2">
-              {recent.length ? recent.map((event) => <div key={event.id} className="rounded-xl bg-white/10 p-3 text-sm">{event.label}</div>) : <div className="rounded-xl bg-white/10 p-3 text-sm">No journey activity recorded yet.</div>}
-            </div>
-          </div>
+          <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{t(language, "feedback")}</button><button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "returnPortal")}</button></div>
         </div>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Leave Feedback</button>
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
       </div>
     </Card>
   );
 }
 
-export default App;
