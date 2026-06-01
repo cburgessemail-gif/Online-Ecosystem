@@ -39,6 +39,15 @@ type Screen =
   | "feedback"
   | "completion";
 
+type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
+
+type LanguageOption = {
+  code: LanguageCode;
+  label: string;
+  shortLabel: string;
+  dir?: "ltr" | "rtl";
+};
+
 type Role =
   | "Guest"
   | "Youth Workforce Participant"
@@ -285,6 +294,7 @@ const MARKET_ORDERS_KEY = "bff.launch.market.orders";
 const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
 const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
+const LANGUAGE_KEY = "bff.launch.language";
 
 const IMG = {
   forest: "/images/SAM_0384.JPG",
@@ -298,6 +308,44 @@ const IMG = {
   partners: "/images/Partners.png",
   queens: "/images/Queens Village.png",
 };
+
+const languageOptions: LanguageOption[] = [
+  { code: "en", label: "English", shortLabel: "EN" },
+  { code: "es", label: "Español", shortLabel: "ES" },
+  { code: "tl", label: "Tagalog", shortLabel: "TL" },
+  { code: "it", label: "Italiano", shortLabel: "IT" },
+  { code: "he", label: "עברית", shortLabel: "HE", dir: "rtl" },
+  { code: "fr", label: "Français", shortLabel: "FR" },
+];
+
+const languageText: Record<LanguageCode, Record<string, string>> = {
+  en: {
+    language: "Language", portal: "Portal", demo: "Demo", guest: "Guest", register: "Register", workspace: "My Workspace", youth: "Youth", supervisor: "Supervisor", parent: "Parent", grower: "Grower", partner: "Partner", support: "Support", valueAdded: "Value-Added", market: "Market", wellness: "Wellness", reports: "Reports", ops: "Ops", feedback: "Feedback", complete: "Complete", publicGuest: "Public / Guest", signOut: "Sign Out", onlineEcosystem: "Online Ecosystem"
+  },
+  es: {
+    language: "Idioma", portal: "Portal", demo: "Demo", guest: "Visitante", register: "Registro", workspace: "Mi espacio", youth: "Jóvenes", supervisor: "Supervisor", parent: "Padres", grower: "Productor", partner: "Aliado", support: "Apoyar", valueAdded: "Valor agregado", market: "Mercado", wellness: "Bienestar", reports: "Reportes", ops: "Operaciones", feedback: "Comentarios", complete: "Completar", publicGuest: "Público / Visitante", signOut: "Salir", onlineEcosystem: "Ecosistema en línea"
+  },
+  tl: {
+    language: "Wika", portal: "Portal", demo: "Demo", guest: "Bisita", register: "Magrehistro", workspace: "Aking Workspace", youth: "Kabataan", supervisor: "Supervisor", parent: "Magulang", grower: "Magtatanim", partner: "Katuwang", support: "Suporta", valueAdded: "Value-Added", market: "Merkado", wellness: "Kalusugan", reports: "Ulat", ops: "Operasyon", feedback: "Komento", complete: "Kumpleto", publicGuest: "Publiko / Bisita", signOut: "Mag-sign Out", onlineEcosystem: "Online Ecosystem"
+  },
+  it: {
+    language: "Lingua", portal: "Portale", demo: "Demo", guest: "Ospite", register: "Registrati", workspace: "Il mio spazio", youth: "Giovani", supervisor: "Supervisore", parent: "Genitori", grower: "Coltivatore", partner: "Partner", support: "Sostieni", valueAdded: "Valore aggiunto", market: "Mercato", wellness: "Benessere", reports: "Report", ops: "Operazioni", feedback: "Feedback", complete: "Completa", publicGuest: "Pubblico / Ospite", signOut: "Esci", onlineEcosystem: "Ecosistema online"
+  },
+  he: {
+    language: "שפה", portal: "שער", demo: "הדגמה", guest: "אורח", register: "הרשמה", workspace: "המרחב שלי", youth: "נוער", supervisor: "מדריך", parent: "הורה", grower: "מגדל", partner: "שותף", support: "תמיכה", valueAdded: "מוצרי ערך מוסף", market: "שוק", wellness: "רווחה", reports: "דוחות", ops: "תפעול", feedback: "משוב", complete: "סיום", publicGuest: "ציבור / אורח", signOut: "יציאה", onlineEcosystem: "אקוסיסטם מקוון"
+  },
+  fr: {
+    language: "Langue", portal: "Portail", demo: "Démo", guest: "Invité", register: "S'inscrire", workspace: "Mon espace", youth: "Jeunes", supervisor: "Superviseur", parent: "Parent", grower: "Producteur", partner: "Partenaire", support: "Soutenir", valueAdded: "Valeur ajoutée", market: "Marché", wellness: "Bien-être", reports: "Rapports", ops: "Opérations", feedback: "Commentaires", complete: "Terminer", publicGuest: "Public / Invité", signOut: "Déconnexion", onlineEcosystem: "Écosystème en ligne"
+  },
+};
+
+function t(language: LanguageCode, key: string) {
+  return languageText[language]?.[key] || languageText.en[key] || key;
+}
+
+function languageDir(language: LanguageCode) {
+  return languageOptions.find((option) => option.code === language)?.dir || "ltr";
+}
 
 const roles: Role[] = [
   "Guest",
@@ -510,6 +558,19 @@ function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
   const [message, setMessage] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>(() => safeRead<LanguageCode>(LANGUAGE_KEY, "en"));
+
+  const changeLanguage = (next: LanguageCode) => {
+    setLanguage(next);
+    safeWrite(LANGUAGE_KEY, next);
+    document.documentElement.lang = next;
+    document.documentElement.dir = languageDir(next);
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = languageDir(language);
+  }, [language]);
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
@@ -545,7 +606,7 @@ function App() {
   };
 
   return (
-    <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut}>
+    <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
@@ -575,36 +636,40 @@ function Shell({
   setScreen,
   activeUser,
   signOut,
+  language,
+  changeLanguage,
 }: {
   children: React.ReactNode;
   screen: Screen;
   setScreen: (screen: Screen) => void;
   activeUser: EcosystemUser | null;
   signOut: () => void;
+  language: LanguageCode;
+  changeLanguage: (language: LanguageCode) => void;
 }) {
-  const nav: { label: string; screen: Screen }[] = [
-    { label: "Portal", screen: "portal" },
-    { label: "Demo", screen: "demo" },
-    { label: "Guest", screen: "guest" },
-    { label: "Register", screen: "registration" },
-    { label: "My Workspace", screen: "roles" },
-    { label: "Youth", screen: "youth" },
-    { label: "Supervisor", screen: "supervisor" },
-    { label: "Parent", screen: "parent" },
-    { label: "Grower", screen: "grower" },
-    { label: "Partner", screen: "partner" },
-    { label: "Support", screen: "support" },
-    { label: "Value-Added", screen: "valueAdded" },
-    { label: "Market", screen: "marketplace" },
-    { label: "Wellness", screen: "wellness" },
-    { label: "Reports", screen: "reports" },
-    { label: "Ops", screen: "operations" },
-    { label: "Feedback", screen: "feedback" },
-    { label: "Complete", screen: "completion" },
+  const nav: { key: string; screen: Screen }[] = [
+    { key: "portal", screen: "portal" },
+    { key: "demo", screen: "demo" },
+    { key: "guest", screen: "guest" },
+    { key: "register", screen: "registration" },
+    { key: "workspace", screen: "roles" },
+    { key: "youth", screen: "youth" },
+    { key: "supervisor", screen: "supervisor" },
+    { key: "parent", screen: "parent" },
+    { key: "grower", screen: "grower" },
+    { key: "partner", screen: "partner" },
+    { key: "support", screen: "support" },
+    { key: "valueAdded", screen: "valueAdded" },
+    { key: "market", screen: "marketplace" },
+    { key: "wellness", screen: "wellness" },
+    { key: "reports", screen: "reports" },
+    { key: "ops", screen: "operations" },
+    { key: "feedback", screen: "feedback" },
+    { key: "complete", screen: "completion" },
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-black text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
@@ -615,7 +680,7 @@ function Shell({
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="text-base font-black leading-tight">Online Ecosystem</div>
+              <div className="text-base font-black leading-tight">{t(language, "onlineEcosystem")}</div>
             </button>
             {nav.map((item) => (
               <button type="button"
@@ -625,16 +690,31 @@ function Shell({
                   screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
-                {item.label}
+                {t(language, item.key)}
               </button>
             ))}
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
+                <span>🌎 {t(language, "language")}</span>
+                <select
+                  value={language}
+                  onChange={(event) => changeLanguage(event.target.value as LanguageCode)}
+                  className="rounded-full border border-white/10 bg-black/65 px-2 py-1 text-[11px] font-black text-white outline-none"
+                  aria-label="Language selector"
+                >
+                  {languageOptions.map((option) => (
+                    <option key={option.code} value={option.code} className="bg-black text-white">
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-bold">
-                {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Public / Guest"}
+                {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
               </div>
               {activeUser && (
                 <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
-                  Sign Out
+                  {t(language, "signOut")}
                 </button>
               )}
             </div>
