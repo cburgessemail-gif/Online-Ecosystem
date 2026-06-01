@@ -299,16 +299,38 @@ const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 
+const FALLBACK_IMAGE =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#0b2a1a"/>
+          <stop offset="0.45" stop-color="#123a25"/>
+          <stop offset="1" stop-color="#0b0f0c"/>
+        </linearGradient>
+        <radialGradient id="r" cx="35%" cy="25%" r="70%">
+          <stop offset="0" stop-color="#6ee7b7" stop-opacity="0.28"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1600" height="1000" fill="url(#g)"/>
+      <rect width="1600" height="1000" fill="url(#r)"/>
+      <text x="80" y="820" fill="#ecfdf5" font-family="Arial, sans-serif" font-size="52" font-weight="700">Bronson Family Farm</text>
+      <text x="80" y="885" fill="#a7f3d0" font-family="Arial, sans-serif" font-size="30" letter-spacing="8">ONLINE ECOSYSTEM</text>
+    </svg>
+  `);
+
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
-  // Keep spaces/capitalization exactly as the uploaded file names; Vercel is case-sensitive.
-  forest: "/Grow Area.png",
-  backup: "/Grow Area.png",
+  // IMPORTANT: rename "Grow Area.png" in GitHub/Vercel public folder to "GrowArea.png" to avoid space-related 404s.
+  forest: "/GrowArea.png",
+  backup: FALLBACK_IMAGE,
   youth: "/Fence_volunteers.png",
   supervisor: "/large (15).jpg",
-  market: "/large.jpg",
+  market: "",
   ecosystem: "/ConnectFoodEcosystem_withimages.png",
-  grow: "/Grow Area.png",
+  grow: "/GrowArea.png",
   compost: "/Compost_ElliottGarden.png",
   partners: "/Queens Village.png",
   queens: "/Queens Village.png",
@@ -1227,7 +1249,7 @@ function Shell({
   return (
     <div data-bff-app-root className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
       <div className="fixed inset-0">
-        <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+        <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMG.backup; }} />
       </div>
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
@@ -2874,7 +2896,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       unit: newUnit || "item",
       inventory: Number(newInventory) || 0,
       snap_eligible: newSnap,
-      image_url: IMG.market,
+      image_url: "",
       active: true,
       created_at: new Date().toISOString(),
       grownby_sales_enabled: newGrownByEnabled,
@@ -2966,9 +2988,6 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
-            <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm font-bold text-emerald-50">
-              Marketplace is intentionally text-based for soft launch so products, pricing, inventory, SNAP eligibility, and pickup ordering stay accurate without mismatched images.
-            </div>
             <div className="mt-5 flex flex-wrap gap-2">
               {categories.map((cat) => <button type="button" key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
             </div>
@@ -2976,8 +2995,9 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
               {visibleProducts.map((product) => (
                 <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
                   <div className="border-b border-white/10 bg-black/35 p-4">
-                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/70">{product.category}</div>
-                    <div className="mt-2 text-sm font-bold text-white/70">Text-based marketplace card — product photos intentionally disabled for soft launch.</div>
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{product.category}</div>
+                    <div className="mt-2 text-2xl font-black leading-tight">{product.name}</div>
+                    <div className="mt-2 text-sm text-white/70">Text-based launch card • no mismatched product image</div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
@@ -3709,7 +3729,7 @@ function SimplePathway({
         </div>
       </Card>
       <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
-        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMG.backup; }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
       </div>
     </div>
