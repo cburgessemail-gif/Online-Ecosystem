@@ -2671,3 +2671,5 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
   );
 }
 
+
+export default App;
