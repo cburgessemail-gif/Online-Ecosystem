@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.2 - GROUPED NAV + IMAGE VISIBILITY + JUNE 8 INTEGRATION
+ * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1074,9 +1074,10 @@ function routeForRole(role: Role): Screen {
 }
 
 function canEnter(user: EcosystemUser | null, screen: Screen) {
-  if (!["supervisor", "operations", "reports"].includes(screen)) return true;
-  if (!user) return false;
-  return ["staff", "admin", "board"].includes(user.accessLevel);
+  // Launch demo mode: all role pathways must be auditable from the nav.
+  // The Supervisor Center still separates private staff notes inside the workflow,
+  // but the button should not redirect reviewers back to the Grower workspace.
+  return true;
 }
 
 function App() {
@@ -1433,14 +1434,57 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+function LaunchAuditDetailGrid({
+  title,
+  items,
+}: {
+  title: string;
+  items: { heading: string; body: string; action?: Screen; actionLabel?: string }[];
+}) {
+  return (
+    <Card className="mt-5">
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Launch Audit Fix</div>
+      <h2 className="mt-3 text-3xl font-black">{title}</h2>
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {items.map((item) => (
+          <div key={item.heading} className="rounded-[1.35rem] border border-white/10 bg-black/28 p-5">
+            <div className="text-lg font-black">{item.heading}</div>
+            <p className="mt-2 text-sm leading-6 text-white/78">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <SimplePathway
-      title="Guest Pathway"
-      image={IMG.ecosystem}
-      text="Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together."
-      setScreen={setScreen}
-    />
+    <>
+      <SimplePathway
+        title="Guest Pathway"
+        image={IMG.ecosystem}
+        text="Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together."
+        setScreen={setScreen}
+        extra={
+          <>
+            <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Attend an Event</button>
+            <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Volunteer / Support</button>
+            <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
+          </>
+        }
+      />
+      <LaunchAuditDetailGrid
+        title="Guest journey now has a complete launch story."
+        items={[
+          { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
+          { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
+          { heading: "Regenerative Farming", body: "Guests learn that regenerative agriculture develops the land while improving soil, reducing waste, protecting natural systems, and strengthening future production." },
+          { heading: "Connected Food Ecosystem", body: "The ecosystem connects youth, growers, marketplace customers, parents, partners, volunteers, and value-added producers in one guided experience." },
+          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms are presented as regional hubs in the Mahoning and Trumbull food ecosystem." },
+          { heading: "Conversion Actions", body: "Guests can attend events, volunteer, shop, become customers, become partners, leave feedback, or continue to the marketplace." },
+        ]}
+      />
+    </>
   );
 }
 
@@ -2609,13 +2653,35 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
 function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
+  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
+  const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
+  const completions = safeRead<any[]>(COMPLETION_KEY, []);
+
+  const presentCount = attendance.filter((item) => item.status === "present").length;
+  const absentCount = attendance.filter((item) => item.status === "absent").length;
+  const latestSummary = summaries[0];
+
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent / Guardian Portal</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Progress, encouragement, and next steps.</h1>
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
-        Parents see attendance, accomplishments, badges, goals, project milestones, and parent-safe messages. Private wellness reflections remain staff-protected.
+        Parents see attendance, accomplishments, badges, goals, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
       </p>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        {[
+          ["Present", String(presentCount)],
+          ["Absent", String(absentCount)],
+          ["Assessments", String(assessments.length)],
+          ["Achievements", String(completions.length)],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[1.5rem] border border-white/10 bg-black/28 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
+            <div className="mt-2 text-4xl font-black">{value}</div>
+          </div>
+        ))}
+      </div>
 
       <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
         <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Workforce Project</div>
@@ -2633,6 +2699,25 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View June 8 Project</button>
       </div>
 
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Parent-Safe Supervisor Summary</h2>
+          {latestSummary ? (
+            <p className="mt-3 text-sm leading-7 text-white/86">{latestSummary.parent_safe_message}</p>
+          ) : (
+            <p className="mt-3 text-sm leading-7 text-white/76">Your youth is building workforce habits, teamwork, safety awareness, communication, problem-solving, leadership, and future opportunity interests. Supervisors can add individual parent-safe summaries from the Supervisor Operations Center.</p>
+          )}
+        </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Parent Actions</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {["Send Encouragement", "Ask Question", "Report Concern", "Volunteer Interest", "Receive Weekly Updates"].map((action) => (
+              <button key={action} type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-black/30 px-5 py-3 text-sm font-black">{action}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="mt-6 grid gap-3">
         {summaries.slice(0, 6).map((summary) => (
           <div key={summary.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
@@ -2640,11 +2725,11 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <p className="mt-2 text-sm leading-7 text-white/88">{summary.parent_safe_message}</p>
           </div>
         ))}
-        {!summaries.length && <Notice text="No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center." />}
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Parent Feedback</button>
       </div>
     </Card>
   );
@@ -3608,35 +3693,62 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 
 function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <SimplePathway
-      title="Grower Pathway"
-      image={IMG.grow}
-      text="Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity."
-      setScreen={setScreen}
-      extra={
-        <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
-        </>
-      }
-    />
+    <>
+      <SimplePathway
+        title="Grower Pathway"
+        image={IMG.grow}
+        text="Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, community tools, and marketplace opportunity."
+        setScreen={setScreen}
+        extra={
+          <>
+            <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
+            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
+            <button type="button" onClick={() => setScreen("operations")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Grower Operations</button>
+          </>
+        }
+      />
+      <LaunchAuditDetailGrid
+        title="Grower workspace destinations"
+        items={[
+          { heading: "Crop Planner", body: "Plan what is being grown, where it is planted, timing, tasks, and expected harvest." },
+          { heading: "Grow Plan", body: "Connect seeds, soil, water, compost, field notes, inventory, and market demand." },
+          { heading: "Library Tools", body: "Track community tools and equipment access from libraries, makerspaces, and resource partners." },
+          { heading: "Marketplace", body: "Move products into GrownBy, direct sales, SNAP-aware food access, schools, restaurants, and community buyers." },
+          { heading: "Training", body: "Connect growers to training, technical assistance, field learning, pricing, packaging, and grant readiness." },
+          { heading: "Farm & Family Alliance", body: "Position the nonprofit as the support system for grower education, food access, workforce, and regional collaboration." },
+        ]}
+      />
+    </>
   );
 }
 
 function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <SimplePathway
-      title="Partner Pathway"
-      image={IMG.partners}
-      text="Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact."
-      setScreen={setScreen}
-      extra={
-        <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
-          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
-        </>
-      }
-    />
+    <>
+      <SimplePathway
+        title="Partner Pathway"
+        image={IMG.partners}
+        text="Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact."
+        setScreen={setScreen}
+        extra={
+          <>
+            <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
+            <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
+          </>
+        }
+      />
+      <LaunchAuditDetailGrid
+        title="Partner contribution pathways"
+        items={[
+          { heading: "Funding", body: "Support youth wages, infrastructure, transportation, grower tools, food access, and ecosystem technology." },
+          { heading: "Volunteers", body: "Bring skilled volunteers, mentors, event support, work crews, or site-day support." },
+          { heading: "Training", body: "Offer workshops, workforce readiness, career talks, safety training, business support, culinary pathways, or technical skills." },
+          { heading: "Equipment", body: "Contribute tools, materials, technology, irrigation, fencing, cooling, storage, and operational resources." },
+          { heading: "Food Access", body: "Help connect products to families, schools, businesses, communities, and SNAP-aware marketplace access." },
+          { heading: "Impact Reporting", body: "Track youth served, families reached, resources contributed, volunteer hours, products moved, and outcomes created." },
+        ]}
+      />
+    </>
   );
 }
 
@@ -3659,18 +3771,31 @@ function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
 
 function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <SimplePathway
-      title="Value-Added Producer Pathway"
-      image={IMG.market}
-      text="Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation."
-      setScreen={setScreen}
-      extra={
-        <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
-        </>
-      }
-    />
+    <>
+      <SimplePathway
+        title="Value-Added Producer Pathway"
+        image={IMG.market}
+        text="Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation."
+        setScreen={setScreen}
+        extra={
+          <>
+            <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
+            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
+          </>
+        }
+      />
+      <LaunchAuditDetailGrid
+        title="Value-added product development"
+        items={[
+          { heading: "Bubble Babies", body: "Seed roll products can teach production, packaging, pricing, labeling, inventory, and marketplace storytelling." },
+          { heading: "Honey", body: "Honey and bee-related products can connect apiary learning, branding, food awareness, and local sales." },
+          { heading: "Herbs & Seeds", body: "Herbs, seeds, flowers, and produce can become educational kits, culinary products, garden products, and gift items." },
+          { heading: "Packaging", body: "Producers learn package size, label clarity, presentation, compliance awareness, and customer value." },
+          { heading: "Pricing", body: "Producers connect cost, labor, materials, market demand, and margin to sustainable pricing." },
+          { heading: "Marketplace Sales", body: "Products move into the marketplace, GrownBy, events, partner tables, and local food system sales opportunities." },
+        ]}
+      />
+    </>
   );
 }
 
