@@ -1025,28 +1025,51 @@ function Shell({
   language: LanguageCode;
   changeLanguage: (language: LanguageCode) => void;
 }) {
-  const nav: { key: string; screen: Screen }[] = [
-    { key: "portal", screen: "portal" },
-    { key: "demo", screen: "demo" },
-    { key: "guest", screen: "guest" },
-    { key: "register", screen: "registration" },
-    { key: "workspace", screen: "roles" },
-    { key: "youth", screen: "youth" },
-    { key: "supervisor", screen: "supervisor" },
-    { key: "parent", screen: "parent" },
-    { key: "grower", screen: "grower" },
-    { key: "partner", screen: "partner" },
-    { key: "support", screen: "support" },
-    { key: "valueAdded", screen: "valueAdded" },
-    { key: "market", screen: "marketplace" },
-    { key: "wellness", screen: "wellness" },
-    { key: "reports", screen: "reports" },
-    { key: "ops", screen: "operations" },
-    { key: "events", screen: "events" },
-    { key: "media", screen: "media" },
-    { key: "project", screen: "launchProject" },
-    { key: "feedback", screen: "feedback" },
-    { key: "complete", screen: "completion" },
+  const navGroups: { label: string; items: { key: string; screen: Screen; label?: string }[] }[] = [
+    {
+      label: "Home",
+      items: [
+        { key: "portal", screen: "portal" },
+        { key: "demo", screen: "demo" },
+        { key: "events", screen: "events" },
+        { key: "media", screen: "media" },
+        { key: "feedback", screen: "feedback" },
+        { key: "complete", screen: "completion" },
+      ],
+    },
+    {
+      label: "Pathways",
+      items: [
+        { key: "guest", screen: "guest" },
+        { key: "youth", screen: "youth" },
+        { key: "parent", screen: "parent" },
+        { key: "grower", screen: "grower" },
+        { key: "partner", screen: "partner" },
+        { key: "support", screen: "support" },
+        { key: "valueAdded", screen: "valueAdded" },
+      ],
+    },
+    {
+      label: "Marketplace",
+      items: [{ key: "market", screen: "marketplace" }],
+    },
+    {
+      label: "Workspace",
+      items: [
+        { key: "register", screen: "registration" },
+        { key: "workspace", screen: "roles" },
+        { key: "wellness", screen: "wellness", label: "My Day" },
+        { key: "project", screen: "launchProject", label: "6/8 Project" },
+      ],
+    },
+    {
+      label: "Operations",
+      items: [
+        { key: "supervisor", screen: "supervisor" },
+        { key: "reports", screen: "reports" },
+        { key: "ops", screen: "operations" },
+      ],
+    },
   ];
 
   return (
@@ -1063,16 +1086,23 @@ function Shell({
               <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
               <div className="text-base font-black leading-tight">{t(language, "onlineEcosystem")}</div>
             </button>
-            {nav.map((item) => (
-              <button type="button"
-                key={item.screen}
-                onClick={() => setScreen(item.screen)}
-                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                  screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
-                }`}
-              >
-                {t(language, item.key)}
-              </button>
+            {navGroups.map((group) => (
+              <div key={group.label} className="flex flex-wrap items-center gap-1 rounded-2xl border border-white/8 bg-white/[0.035] px-2 py-1">
+                <span className="px-2 text-[9px] font-black uppercase tracking-[0.22em] text-emerald-100/55">{group.label}</span>
+                {group.items.map((item) => (
+                  <button
+                    type="button"
+                    key={`${group.label}-${item.screen}`}
+                    onClick={() => setScreen(item.screen)}
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                      screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                    title={`${group.label}: ${item.label || t(language, item.key)}`}
+                  >
+                    {item.label || t(language, item.key)}
+                  </button>
+                ))}
+              </div>
             ))}
             <div className="ml-auto flex flex-wrap items-center gap-2">
               <label className="flex items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
@@ -1369,7 +1399,7 @@ function MyWorkspace({
                   className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
                 >
                   <div className="text-lg font-black">{role}</div>
-                  <div className="mt-2 text-sm opacity-85">Opens: {routeForRole(role)}</div>
+                  <div className="mt-2 text-sm opacity-85">Workspace: {screenLabel(routeForRole(role))}</div>
                 </button>
               ))}
             </div>
@@ -2176,10 +2206,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("attendance", ATTENDANCE_KEY, attendanceRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
-      setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment.`);
+      setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
+      window.setTimeout(() => setScreen("launchProject"), 650);
     } catch (error) {
       console.error("Start My Day save issue:", error);
-      setMessage(`Start My Day saved on this device. ${selectedYouth.participant_id} is recorded for this review session.`);
+      setMessage(`Start My Day saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
+      window.setTimeout(() => setScreen("launchProject"), 650);
     } finally {
       setSaving(false);
     }
