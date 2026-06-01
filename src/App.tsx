@@ -508,6 +508,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Incident and support flags stay staff-facing.": "Los incidentes y señales de apoyo permanecen para el personal.",
     "Reports convert daily records into launch readiness and program impact.": "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.",
     "Welcome Back / Journey Memory": "Bienvenido de nuevo / Memoria del recorrido",
+    "🌞 My Day": "🌞 Mi Día",
+    "June 8 Launch Assignment": "Asignación de lanzamiento del 8 de junio",
     "Pathway": "Ruta",
     "Guest Pathway": "Ruta de visitante",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados avanzan juntos.",
@@ -587,6 +589,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Incident and support flags stay staff-facing.": "Ang incident at support flags ay nananatiling para sa staff.",
     "Reports convert daily records into launch readiness and program impact.": "Ginagawang launch readiness at program impact ng reports ang daily records.",
     "Welcome Back / Journey Memory": "Welcome Back / Journey Memory",
+    "🌞 My Day": "🌞 Aking Araw",
+    "June 8 Launch Assignment": "June 8 Launch Assignment",
     "Pathway": "Landas",
     "Guest Pathway": "Landas ng Bisita",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
@@ -1246,17 +1250,57 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 }
 
 
-function JourneyMemoryPreview() {
-  const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 4);
-  if (!events.length) return null;
+function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 3);
+  const completions = safeRead<CompletionRecord[]>(COMPLETION_KEY, []).slice(0, 2);
+
   return (
     <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Welcome Back / Journey Memory</div>
-      <div className="mt-3 grid gap-2 md:grid-cols-2">
-        {events.map((event) => (
-          <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
-        ))}
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">🌞 My Day</div>
+      <div className="mt-2 text-2xl font-black">June 8 Launch Assignment</div>
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82">
+        Start here for the Youth Workforce launch. Check in, watch the cardboard fan demonstration, meet your team, complete the Farm Worker Heat Safety & Cooling Station Challenge, and submit your reflection.
+      </p>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Project</div>
+          <div className="mt-1 text-sm font-black">Cooling Station Challenge</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Teams</div>
+          <div className="mt-1 text-sm font-black">Design • Engineering • Manufacturing • Contractor</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Next Step</div>
+          <div className="mt-1 text-sm font-black">Start My Day</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Goal</div>
+          <div className="mt-1 text-sm font-black">Farm worker heat safety</div>
+        </div>
       </div>
+
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
+      </div>
+
+      {(events.length > 0 || completions.length > 0) && (
+        <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Recent Activity</div>
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
+            {events.map((event) => (
+              <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
+            ))}
+            {completions.map((completion) => (
+              <div key={completion.id} className="rounded-xl bg-emerald-300/15 p-3 text-sm font-bold">Completed: {completion.pathway}</div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1276,7 +1320,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
-        <JourneyMemoryPreview />
+        <MyDayPreview setScreen={setScreen} />
       </Card>
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
