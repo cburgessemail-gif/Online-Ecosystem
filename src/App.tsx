@@ -3,11 +3,11 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * REAL SUPERVISOR + MARKETPLACE OPERATIONS CENTER
+ * LAUNCH CANDIDATE 1.0 - JOURNEY REPAIR + LAUNCH STABILIZATION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
- * - Role accessa
+ * - Role access
  * - Youth roster
  * - Attendance and PPE
  * - Morning wellness review
@@ -36,7 +36,8 @@ type Screen =
   | "wellness"
   | "reports"
   | "operations"
-  | "feedback";
+  | "feedback"
+  | "completion";
 
 type Role =
   | "Guest"
@@ -282,6 +283,8 @@ const FEEDBACK_KEY = "bff.launch.feedback";
 const MARKET_PRODUCTS_KEY = "bff.launch.market.products";
 const MARKET_ORDERS_KEY = "bff.launch.market.orders";
 const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
+const JOURNEY_KEY = "bff.launch.journey.events";
+const COMPLETION_KEY = "bff.launch.completions";
 
 const IMG = {
   forest: "/images/SAM_0384.JPG",
@@ -354,6 +357,73 @@ function safeWrite<T>(key: string, value: T) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {}
+}
+
+
+type JourneyEvent = {
+  id: string;
+  user_id?: string;
+  role?: string;
+  screen: Screen;
+  label: string;
+  created_at: string;
+};
+
+type CompletionRecord = {
+  id: string;
+  user_id?: string;
+  role?: string;
+  pathway: string;
+  completed_at: string;
+};
+
+function screenLabel(screen: Screen) {
+  const labels: Record<Screen, string> = {
+    portal: "Portal / Forest Gate",
+    demo: "Guided Demo",
+    guest: "Guest Pathway",
+    registration: "Registration",
+    roles: "My Workspace / Choose Role",
+    youth: "Youth Pathway",
+    supervisor: "Supervisor Operations",
+    parent: "Parent Portal",
+    grower: "Grower Pathway",
+    partner: "Partner Pathway",
+    support: "Support Pathway",
+    valueAdded: "Value-Added Pathway",
+    marketplace: "Marketplace",
+    wellness: "Youth Morning Check-In",
+    reports: "Reports",
+    operations: "Operations",
+    feedback: "Feedback / Comments",
+    completion: "Journey Completion",
+  };
+  return labels[screen];
+}
+
+function recordJourney(screen: Screen, user?: EcosystemUser | null) {
+  const event: JourneyEvent = {
+    id: uuid(),
+    user_id: user?.id,
+    role: user?.role || "Public / Guest",
+    screen,
+    label: screenLabel(screen),
+    created_at: new Date().toISOString(),
+  };
+  const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
+  safeWrite(JOURNEY_KEY, [event, ...events].slice(0, 250));
+}
+
+function recordCompletion(pathway: string, user?: EcosystemUser | null) {
+  const row: CompletionRecord = {
+    id: uuid(),
+    user_id: user?.id,
+    role: user?.role || "Public / Guest",
+    pathway,
+    completed_at: new Date().toISOString(),
+  };
+  const rows = safeRead<CompletionRecord[]>(COMPLETION_KEY, []);
+  safeWrite(COMPLETION_KEY, [row, ...rows].slice(0, 250));
 }
 
 async function insertRow<T extends { id: string }>(table: string, localKey: string, row: T) {
@@ -448,6 +518,7 @@ function App() {
       return;
     }
     setMessage("");
+    recordJourney(target, activeUser);
     setScreenState(target);
   };
 
@@ -461,8 +532,10 @@ function App() {
       lastSeen: nowLabel(),
     };
     safeWrite(SESSION_KEY, user);
+    const target = routeForRole(role);
+    recordJourney(target, user);
     setActiveUser(user);
-    setScreenState(routeForRole(role));
+    setScreenState(target);
   };
 
   const signOut = () => {
@@ -491,6 +564,7 @@ function App() {
       {screen === "reports" && <Reports setScreen={setScreen} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
     </Shell>
   );
 }
@@ -525,6 +599,8 @@ function Shell({
     { label: "Wellness", screen: "wellness" },
     { label: "Reports", screen: "reports" },
     { label: "Ops", screen: "operations" },
+    { label: "Feedback", screen: "feedback" },
+    { label: "Complete", screen: "completion" },
   ];
 
   return (
@@ -623,6 +699,22 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
   );
 }
 
+
+function JourneyMemoryPreview() {
+  const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 4);
+  if (!events.length) return null;
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Welcome Back / Journey Memory</div>
+      <div className="mt-3 grid gap-2 md:grid-cols-2">
+        {events.map((event) => (
+          <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
@@ -638,6 +730,7 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
+        <JourneyMemoryPreview />
       </Card>
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
@@ -2273,7 +2366,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
-function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
   const [excited, setExcited] = useState("");
@@ -2428,6 +2521,7 @@ function SimplePathway({
           <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Complete Journey</button>
           <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
@@ -2436,6 +2530,75 @@ function SimplePathway({
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
       </div>
     </div>
+  );
+}
+
+
+function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [name, setName] = useState(activeUser?.name || "");
+  const [interestGrow, setInterestGrow] = useState(false);
+  const [interestYouth, setInterestYouth] = useState(false);
+  const [interestPartner, setInterestPartner] = useState(false);
+  const [interestVolunteer, setInterestVolunteer] = useState(false);
+  const [interestMarketplace, setInterestMarketplace] = useState(false);
+  const [message, setMessage] = useState("");
+  const journey = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
+  const recent = journey.slice(0, 6);
+
+  const complete = () => {
+    const pathway = recent[0]?.label || screenLabel("completion");
+    recordCompletion(pathway, activeUser);
+    setMessage("Journey completion saved on this device. You can continue exploring or share feedback.");
+  };
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Ecosystem Explorer</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
+        Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
+      </p>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_.85fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Completion Certificate</h2>
+          <Field label="Name for certificate" value={name} onChange={setName} placeholder="Enter name" />
+          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-5 text-center">
+            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">This certifies that</div>
+            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Ecosystem Explorer"}</div>
+            <p className="mt-3 text-sm leading-6 text-white/82">
+              completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
+            </p>
+            <div className="mt-4 text-sm font-black">{new Date().toLocaleDateString()}</div>
+          </div>
+          <button type="button" onClick={complete} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Completion</button>
+          {message && <Notice text={message} />}
+        </div>
+
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Impact Interests</h2>
+          <div className="mt-4 grid gap-2">
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestGrow} onChange={(e) => setInterestGrow(e.target.checked)} /> Growing food / grower resources</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestYouth} onChange={(e) => setInterestYouth(e.target.checked)} /> Youth workforce development</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestPartner} onChange={(e) => setInterestPartner(e.target.checked)} /> Partnership or collaboration</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestVolunteer} onChange={(e) => setInterestVolunteer(e.target.checked)} /> Volunteer, mentor, or support</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestMarketplace} onChange={(e) => setInterestMarketplace(e.target.checked)} /> Marketplace / GrownBy</label>
+          </div>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+            <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Recently Viewed</div>
+            <div className="mt-3 grid gap-2">
+              {recent.length ? recent.map((event) => <div key={event.id} className="rounded-xl bg-white/10 p-3 text-sm">{event.label}</div>) : <div className="rounded-xl bg-white/10 p-3 text-sm">No journey activity recorded yet.</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Leave Feedback</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+      </div>
+    </Card>
   );
 }
 
