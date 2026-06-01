@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -326,376 +326,313 @@ const languageText: Record<LanguageCode, Record<string, string>> = {
     language: "Idioma", portal: "Portal", demo: "Demo", guest: "Visitante", register: "Registro", workspace: "Mi espacio", youth: "Jóvenes", supervisor: "Supervisor", parent: "Padres", grower: "Productor", partner: "Aliado", support: "Apoyar", valueAdded: "Valor agregado", market: "Mercado", wellness: "Bienestar", reports: "Reportes", ops: "Operaciones", feedback: "Comentarios", complete: "Completar", publicGuest: "Público / Visitante", signOut: "Salir", onlineEcosystem: "Ecosistema en línea"
   },
   tl: {
-    "protectedMessage": "Protektadong lugar. Pumasok muna bilang Supervisor / Staff, Administrator, o Board / Funder.",
-    "portalBrand": "Bronson Family Farm",
-    "portalTitle": "Pumasok sa buhay na ecosystem.",
-    "portalIntro": "Maligayang pagdating sa Mahoning at Trumbull Regional Food Ecosystem. Kasalukuyang regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms. Pinag-uugnay ng platform na ito ang youth workforce development, mga magulang, growers, partners, supporters, marketplace, wellness, safety, feedback, at impact reporting.",
-    "startGuidedDemo": "Simulan ang Guided Demo",
-    "enterEcosystem": "Pumasok sa Ecosystem",
-    "registerCheckIn": "Magrehistro / Check In",
-    "launchFocus": "Pokus sa Launch",
-    "focus1": "Regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms.",
-    "focus2": "Pumili ng role, pagkatapos ay sundan ang guided pathway na may resources, opportunities, at next steps.",
-    "focus3": "Ang Supervisor Operations Center ay control room para lamang sa staff.",
-    "focus4": "Ang youth check-ins at supervisor records ay unang nase-save locally, pagkatapos ay nagsi-sync sa Supabase kapag connected.",
-    "focus5": "Ang mga magulang ay tumatanggap ng progress summaries, hindi private raw youth reflections.",
-    "focus6": "Ang incident at support flags ay nananatiling staff-facing.",
-    "focus7": "Ginagawang launch readiness at program impact ng reports ang daily records.",
-    "journeyMemory": "Welcome Back / Journey Memory",
-    "pathway": "Pathway",
-    "guestPathwayTitle": "Guest Pathway",
-    "guestPathwayText": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
-    "growerPathwayTitle": "Grower Pathway",
-    "growerPathwayText": "Lahat ng grower ay kabilang dito: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, at market farms. Maaaring ikonekta ng growers ang crop planning, resource needs, inventory, training, at marketplace opportunity.",
-    "partnerPathwayTitle": "Partner Pathway",
-    "partnerPathwayText": "Kasama sa partners ang schools, businesses, nonprofits, agencies, funders, faith communities, universities, at volunteer groups. Tinutulungan ng journey na ito ang partners na maunawaan kung ano ang iniaalok ng ecosystem, ano ang kailangan nito, at paano lumikha ng measurable community impact sa collaboration.",
-    "supportPathwayTitle": "Suportahan ang Ecosystem",
-    "supportPathwayText": "Ang suporta ay maaaring financial, volunteer-based, mentorship-based, o in-kind. Kinilala ang Jubilee Gardens, Inc. bilang Seed Steward dahil sa pagbibigay ng maraming seeds sa nakaraang dalawang taon. Maaaring tumulong ang supporters sa youth, growers, food access, infrastructure, education, at regional growth.",
-    "valueAddedTitle": "Value-Added Producer Pathway",
-    "valueAddedText": "Ginagawang produkto ng value-added producers ang harvests, herbs, honey, seeds, flowers, at ideas. Ikinokonekta ng pathway na ito ang product readiness, packaging, pricing, labeling awareness, at marketplace participation.",
-    "createGrowerProfile": "Gumawa ng Grower Profile",
-    "marketplaceOpportunities": "Marketplace Opportunities",
-    "createPartnerProfile": "Gumawa ng Partner Profile",
-    "supportOptions": "Support Options",
-    "offerSupport": "Mag-alok ng Suporta",
-    "becomePartner": "Maging Partner",
-    "createProducerProfile": "Gumawa ng Producer Profile",
-    "connectMarketplace": "Ikonekta sa Marketplace",
-    "returnPortal": "Bumalik sa Portal",
-    "chooseAnotherRole": "Pumili ng Ibang Role",
-    "commentScreen": "Magkomento sa Screen na Ito",
-    "completeJourney": "Kumpletuhin ang Journey",
-    "goMarketplace": "Pumunta sa Marketplace",
-    "feedbackTitle": "Ikuwento sa amin ang karanasan sa platform at programa.",
-    "rating": "Rating",
-    "recommend": "Irerekomenda ko ang karanasang ito.",
-    "excited": "Ano ang nagpa-excite sa iyo?",
-    "confused": "Ano ang nakalito sa iyo?",
-    "improve": "Ano ang papahusayin mo?",
-    "opportunityInterest": "Anong opportunity ang interesado ka?",
-    "additionalComments": "Karagdagang Komento",
-    "saveFeedback": "I-save ang Feedback / Comments",
-    "returnDemo": "Bumalik sa Guided Demo",
-    "feedbackSaved": "Na-save ang feedback/comments sa device na ito at ipinapadala sa Supabase kapag tinanggap ng feedback table ang row.",
-    "completionLabel": "Journey Completion",
-    "ecosystemExplorer": "Ecosystem Explorer",
-    "completionIntro": "Salamat sa pag-explore ng Mahoning at Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm at Warren — Parker Farms.",
-    "certificateTitle": "Completion Certificate",
-    "nameCertificate": "Pangalan para sa certificate",
-    "enterName": "Ilagay ang pangalan",
-    "certifies": "Pinatutunayan nito na",
-    "certText": "nakumpleto ang isang journey sa Mahoning at Trumbull Regional Food Ecosystem at tumulong na palakasin ang launch experience.",
-    "saveCompletion": "I-save ang Completion",
-    "completionSaved": "Na-save ang journey completion sa device na ito. Maaari kang magpatuloy mag-explore o magbahagi ng feedback.",
-    "impactInterests": "Impact Interests",
-    "interestGrow": "Growing food / grower resources",
-    "interestYouth": "Youth workforce development",
-    "interestPartner": "Partnership o collaboration",
-    "interestVolunteer": "Volunteer, mentor, o support",
-    "interestMarketplace": "Marketplace / GrownBy",
-},
+    language: "Wika", portal: "Portal", demo: "Demo", guest: "Bisita", register: "Magrehistro", workspace: "Aking Workspace", youth: "Kabataan", supervisor: "Supervisor", parent: "Magulang", grower: "Magtatanim", partner: "Katuwang", support: "Suporta", valueAdded: "Value-Added", market: "Merkado", wellness: "Kalusugan", reports: "Ulat", ops: "Operasyon", feedback: "Komento", complete: "Kumpleto", publicGuest: "Publiko / Bisita", signOut: "Mag-sign Out", onlineEcosystem: "Online Ecosystem"
+  },
   it: {
-    "protectedMessage": "Area protetta. Entra prima come Supervisore / Staff, Amministratore o Consiglio / Finanziatore.",
-    "portalBrand": "Bronson Family Farm",
-    "portalTitle": "Entra nell’ecosistema vivente.",
-    "portalIntro": "Benvenuto nell’Ecosistema Alimentare Regionale di Mahoning e Trumbull. Hub regionali attuali: Youngstown — Bronson Family Farm e Warren — Parker Farms. Questa piattaforma collega sviluppo della forza lavoro giovanile, genitori, produttori, partner, sostenitori, mercato, benessere, sicurezza, feedback e report di impatto.",
-    "startGuidedDemo": "Avvia demo guidata",
-    "enterEcosystem": "Entra nell’ecosistema",
-    "registerCheckIn": "Registrati / Check-in",
-    "launchFocus": "Focus del lancio",
-    "focus1": "Hub regionali: Youngstown — Bronson Family Farm e Warren — Parker Farms.",
-    "focus2": "Scegli un ruolo, poi segui un percorso guidato con risorse, opportunità e prossimi passi.",
-    "focus3": "Il Centro Operativo Supervisori è la sala di controllo riservata allo staff.",
-    "focus4": "I check-in dei giovani e i registri dei supervisori vengono salvati localmente e poi sincronizzati con Supabase quando connesso.",
-    "focus5": "I genitori ricevono riepiloghi dei progressi, non riflessioni private grezze dei giovani.",
-    "focus6": "Le segnalazioni di incidenti e supporto restano visibili allo staff.",
-    "focus7": "I report trasformano i registri giornalieri in prontezza al lancio e impatto del programma.",
-    "journeyMemory": "Bentornato / Memoria del percorso",
-    "pathway": "Percorso",
-    "guestPathwayTitle": "Percorso Ospite",
-    "guestPathwayText": "Gli ospiti scoprono la storia della fattoria, l’ecosistema alimentare connesso, il contesto dell’aeroporto e come giovani, produttori, famiglie e partner si muovono insieme.",
-    "growerPathwayTitle": "Percorso Produttore",
-    "growerPathwayText": "Ogni produttore appartiene qui: giardini domestici, aiuole rialzate, orti comunitari, orti scolastici, orti di chiesa, fattorie urbane, serre, homestead e aziende di mercato.",
-    "partnerPathwayTitle": "Percorso Partner",
-    "partnerPathwayText": "I partner includono scuole, aziende, nonprofit, agenzie, finanziatori, comunità di fede, università e gruppi di volontari. Questo percorso mostra cosa offre e cosa richiede l’ecosistema.",
-    "supportPathwayTitle": "Sostieni l’ecosistema",
-    "supportPathwayText": "Il sostegno può essere finanziario, volontario, di mentoring o in natura. Jubilee Gardens, Inc. è riconosciuta come Seed Steward per i semi forniti negli ultimi due anni.",
-    "valueAddedTitle": "Percorso Produttore a Valore Aggiunto",
-    "valueAddedText": "I produttori a valore aggiunto trasformano raccolti, erbe, miele, semi, fiori e idee in prodotti.",
-    "createGrowerProfile": "Crea profilo produttore",
-    "marketplaceOpportunities": "Opportunità di mercato",
-    "createPartnerProfile": "Crea profilo partner",
-    "supportOptions": "Opzioni di supporto",
-    "offerSupport": "Offri supporto",
-    "becomePartner": "Diventa partner",
-    "createProducerProfile": "Crea profilo produttore",
-    "connectMarketplace": "Collega al mercato",
-    "returnPortal": "Ritorna al portale",
-    "chooseAnotherRole": "Scegli un altro ruolo",
-    "commentScreen": "Commenta questa schermata",
-    "completeJourney": "Completa percorso",
-    "goMarketplace": "Vai al mercato",
-    "feedbackTitle": "Raccontaci l’esperienza della piattaforma e del programma.",
-    "rating": "Valutazione",
-    "recommend": "Consiglierei questa esperienza.",
-    "excited": "Cosa ti ha entusiasmato?",
-    "confused": "Cosa ti ha confuso?",
-    "improve": "Cosa miglioreresti?",
-    "opportunityInterest": "Quale opportunità ti interessa?",
-    "additionalComments": "Commenti aggiuntivi",
-    "saveFeedback": "Salva feedback / commenti",
-    "returnDemo": "Ritorna alla demo guidata",
-    "feedbackSaved": "Feedback/commenti salvati su questo dispositivo e inviati a Supabase quando la tabella li accetta.",
-    "completionLabel": "Completamento del percorso",
-    "ecosystemExplorer": "Esploratore dell’ecosistema",
-    "completionIntro": "Grazie per aver esplorato l’Ecosistema Alimentare Regionale di Mahoning e Trumbull: Youngstown — Bronson Family Farm e Warren — Parker Farms.",
-    "certificateTitle": "Certificato di completamento",
-    "nameCertificate": "Nome per il certificato",
-    "enterName": "Inserisci nome",
-    "certifies": "Si certifica che",
-    "certText": "ha completato un percorso nell’Ecosistema Alimentare Regionale di Mahoning e Trumbull e ha aiutato a rafforzare l’esperienza di lancio.",
-    "saveCompletion": "Salva completamento",
-    "completionSaved": "Completamento salvato su questo dispositivo. Puoi continuare a esplorare o condividere feedback.",
-    "impactInterests": "Interessi di impatto",
-    "interestGrow": "Coltivazione / risorse produttori",
-    "interestYouth": "Sviluppo forza lavoro giovanile",
-    "interestPartner": "Partnership o collaborazione",
-    "interestVolunteer": "Volontariato, mentoring o supporto",
-    "interestMarketplace": "Mercato / GrownBy",
-},
+    language: "Lingua", portal: "Portale", demo: "Demo", guest: "Ospite", register: "Registrati", workspace: "Il mio spazio", youth: "Giovani", supervisor: "Supervisore", parent: "Genitori", grower: "Coltivatore", partner: "Partner", support: "Sostieni", valueAdded: "Valore aggiunto", market: "Mercato", wellness: "Benessere", reports: "Report", ops: "Operazioni", feedback: "Feedback", complete: "Completa", publicGuest: "Pubblico / Ospite", signOut: "Esci", onlineEcosystem: "Ecosistema online"
+  },
   he: {
-    "protectedMessage": "אזור מוגן. היכנס תחילה כמדריך / צוות, מנהל או חבר דירקטוריון / מממן.",
-    "portalBrand": "Bronson Family Farm",
-    "portalTitle": "היכנסו לאקוסיסטם החי.",
-    "portalIntro": "ברוכים הבאים לאקוסיסטם המזון האזורי של Mahoning ו-Trumbull. מוקדים אזוריים נוכחיים: Youngstown — Bronson Family Farm ו-Warren — Parker Farms. הפלטפורמה מחברת פיתוח כוח עבודה צעיר, הורים, מגדלים, שותפים, תומכים, שוק, רווחה, בטיחות, משוב ודיווח השפעה.",
-    "startGuidedDemo": "התחל הדגמה מודרכת",
-    "enterEcosystem": "היכנס לאקוסיסטם",
-    "registerCheckIn": "הרשמה / צ׳ק-אין",
-    "launchFocus": "מוקד ההשקה",
-    "focus1": "מוקדים אזוריים: Youngstown — Bronson Family Farm ו-Warren — Parker Farms.",
-    "focus2": "בחר תפקיד, ואז עקוב אחר מסלול מודרך עם משאבים, הזדמנויות והצעדים הבאים.",
-    "focus3": "מרכז תפעול המדריכים הוא חדר בקרה לצוות בלבד.",
-    "focus4": "צ׳ק-אין של צעירים ורשומות מדריכים נשמרים תחילה מקומית ואז מסתנכרנים עם Supabase כאשר מחובר.",
-    "focus5": "הורים מקבלים סיכומי התקדמות, לא הרהורים פרטיים גולמיים של צעירים.",
-    "focus6": "דגלי אירוע ותמיכה נשארים מול הצוות.",
-    "focus7": "דוחות ממירים רשומות יומיות למוכנות להשקה ולהשפעת התוכנית.",
-    "journeyMemory": "ברוך שובך / זיכרון מסע",
-    "pathway": "מסלול",
-    "guestPathwayTitle": "מסלול אורח",
-    "guestPathwayText": "אורחים לומדים את סיפור החווה, אקוסיסטם המזון המחובר, ההקשר של שדה התעופה, וכיצד צעירים, מגדלים, משפחות ושותפים נעים יחד.",
-    "growerPathwayTitle": "מסלול מגדלים",
-    "growerPathwayText": "כל מגדל שייך לכאן: גינות ביתיות, ערוגות מוגבהות, גינות קהילתיות, גינות בתי ספר, גינות כנסייה, חוות עירוניות, חממות, משקי בית וחוות שוק.",
-    "partnerPathwayTitle": "מסלול שותפים",
-    "partnerPathwayText": "שותפים כוללים בתי ספר, עסקים, עמותות, סוכנויות, מממנים, קהילות אמונה, אוניברסיטאות וקבוצות מתנדבים.",
-    "supportPathwayTitle": "תמיכה באקוסיסטם",
-    "supportPathwayText": "תמיכה יכולה להיות כספית, התנדבותית, חונכות או תרומה בעין. Jubilee Gardens, Inc. מוכרת כ-Seed Steward על תרומות זרעים רבות במשך שנתיים.",
-    "valueAddedTitle": "מסלול יצרן ערך מוסף",
-    "valueAddedText": "יצרני ערך מוסף הופכים יבולים, עשבי תיבול, דבש, זרעים, פרחים ורעיונות למוצרים.",
-    "createGrowerProfile": "צור פרופיל מגדל",
-    "marketplaceOpportunities": "הזדמנויות שוק",
-    "createPartnerProfile": "צור פרופיל שותף",
-    "supportOptions": "אפשרויות תמיכה",
-    "offerSupport": "הצע תמיכה",
-    "becomePartner": "הפוך לשותף",
-    "createProducerProfile": "צור פרופיל יצרן",
-    "connectMarketplace": "חבר לשוק",
-    "returnPortal": "חזרה לשער",
-    "chooseAnotherRole": "בחר תפקיד אחר",
-    "commentScreen": "הגב על המסך הזה",
-    "completeJourney": "סיים מסע",
-    "goMarketplace": "לשוק",
-    "feedbackTitle": "ספרו לנו על חוויית הפלטפורמה והתוכנית.",
-    "rating": "דירוג",
-    "recommend": "הייתי ממליץ על החוויה הזו.",
-    "excited": "מה ריגש אותך?",
-    "confused": "מה בלבל אותך?",
-    "improve": "מה היית משפר?",
-    "opportunityInterest": "איזו הזדמנות מעניינת אותך?",
-    "additionalComments": "תגובות נוספות",
-    "saveFeedback": "שמור משוב / תגובות",
-    "returnDemo": "חזרה להדגמה המודרכת",
-    "feedbackSaved": "משוב/תגובות נשמרו במכשיר זה ויישלחו ל-Supabase כאשר הטבלה תקבל את הרשומה.",
-    "completionLabel": "השלמת מסע",
-    "ecosystemExplorer": "חוקר האקוסיסטם",
-    "completionIntro": "תודה שחקרת את אקוסיסטם המזון האזורי של Mahoning ו-Trumbull: Youngstown — Bronson Family Farm ו-Warren — Parker Farms.",
-    "certificateTitle": "תעודת השלמה",
-    "nameCertificate": "שם לתעודה",
-    "enterName": "הזן שם",
-    "certifies": "זה מאשר כי",
-    "certText": "השלים מסע באקוסיסטם המזון האזורי של Mahoning ו-Trumbull וסייע לחזק את חוויית ההשקה.",
-    "saveCompletion": "שמור השלמה",
-    "completionSaved": "השלמת המסע נשמרה במכשיר זה. אפשר להמשיך לחקור או לשתף משוב.",
-    "impactInterests": "תחומי עניין להשפעה",
-    "interestGrow": "גידול מזון / משאבים למגדלים",
-    "interestYouth": "פיתוח כוח עבודה צעיר",
-    "interestPartner": "שותפות או שיתוף פעולה",
-    "interestVolunteer": "התנדבות, חונכות או תמיכה",
-    "interestMarketplace": "שוק / GrownBy",
-},
+    language: "שפה", portal: "שער", demo: "הדגמה", guest: "אורח", register: "הרשמה", workspace: "המרחב שלי", youth: "נוער", supervisor: "מדריך", parent: "הורה", grower: "מגדל", partner: "שותף", support: "תמיכה", valueAdded: "מוצרי ערך מוסף", market: "שוק", wellness: "רווחה", reports: "דוחות", ops: "תפעול", feedback: "משוב", complete: "סיום", publicGuest: "ציבור / אורח", signOut: "יציאה", onlineEcosystem: "אקוסיסטם מקוון"
+  },
   fr: {
-    "protectedMessage": "Zone protégée. Entrez d’abord comme Superviseur / Personnel, Administrateur ou Conseil / Financeur.",
-    "portalBrand": "Bronson Family Farm",
-    "portalTitle": "Entrez dans l’écosystème vivant.",
-    "portalIntro": "Bienvenue dans l’Écosystème alimentaire régional de Mahoning et Trumbull. Hubs régionaux actuels : Youngstown — Bronson Family Farm et Warren — Parker Farms. Cette plateforme relie développement de la main-d’œuvre jeunesse, parents, producteurs, partenaires, soutiens, marché, bien-être, sécurité, commentaires et rapports d’impact.",
-    "startGuidedDemo": "Démarrer la démo guidée",
-    "enterEcosystem": "Entrer dans l’écosystème",
-    "registerCheckIn": "S’inscrire / Check-in",
-    "launchFocus": "Objectif du lancement",
-    "focus1": "Hubs régionaux : Youngstown — Bronson Family Farm et Warren — Parker Farms.",
-    "focus2": "Choisissez un rôle, puis suivez un parcours guidé avec ressources, opportunités et prochaines étapes.",
-    "focus3": "Le Centre des opérations superviseurs est la salle de contrôle réservée au personnel.",
-    "focus4": "Les check-ins des jeunes et les dossiers des superviseurs sont enregistrés localement puis synchronisés avec Supabase lorsque connecté.",
-    "focus5": "Les parents reçoivent des résumés de progrès, pas les réflexions privées brutes des jeunes.",
-    "focus6": "Les incidents et demandes de soutien restent visibles au personnel.",
-    "focus7": "Les rapports transforment les dossiers quotidiens en préparation au lancement et impact du programme.",
-    "journeyMemory": "Bon retour / Mémoire du parcours",
-    "pathway": "Parcours",
-    "guestPathwayTitle": "Parcours invité",
-    "guestPathwayText": "Les invités découvrent l’histoire de la ferme, l’écosystème alimentaire connecté, le contexte de l’aéroport et comment jeunes, producteurs, familles et partenaires avancent ensemble.",
-    "growerPathwayTitle": "Parcours producteur",
-    "growerPathwayText": "Chaque producteur a sa place ici : jardins familiaux, bacs surélevés, jardins communautaires, scolaires, d’église, fermes urbaines, serres, homesteads et fermes de marché.",
-    "partnerPathwayTitle": "Parcours partenaire",
-    "partnerPathwayText": "Les partenaires comprennent écoles, entreprises, organismes sans but lucratif, agences, financeurs, communautés religieuses, universités et groupes de bénévoles.",
-    "supportPathwayTitle": "Soutenir l’écosystème",
-    "supportPathwayText": "Le soutien peut être financier, bénévole, mentorat ou en nature. Jubilee Gardens, Inc. est reconnue comme Seed Steward pour ses dons abondants de semences depuis deux ans.",
-    "valueAddedTitle": "Parcours producteur à valeur ajoutée",
-    "valueAddedText": "Les producteurs à valeur ajoutée transforment récoltes, herbes, miel, graines, fleurs et idées en produits.",
-    "createGrowerProfile": "Créer un profil producteur",
-    "marketplaceOpportunities": "Opportunités du marché",
-    "createPartnerProfile": "Créer un profil partenaire",
-    "supportOptions": "Options de soutien",
-    "offerSupport": "Offrir du soutien",
-    "becomePartner": "Devenir partenaire",
-    "createProducerProfile": "Créer un profil producteur",
-    "connectMarketplace": "Connecter au marché",
-    "returnPortal": "Retour au portail",
-    "chooseAnotherRole": "Choisir un autre rôle",
-    "commentScreen": "Commenter cet écran",
-    "completeJourney": "Terminer le parcours",
-    "goMarketplace": "Aller au marché",
-    "feedbackTitle": "Parlez-nous de l’expérience de la plateforme et du programme.",
-    "rating": "Évaluation",
-    "recommend": "Je recommanderais cette expérience.",
-    "excited": "Qu’est-ce qui vous a enthousiasmé ?",
-    "confused": "Qu’est-ce qui vous a dérouté ?",
-    "improve": "Qu’amélioreriez-vous ?",
-    "opportunityInterest": "Quelle opportunité vous intéresse ?",
-    "additionalComments": "Commentaires supplémentaires",
-    "saveFeedback": "Enregistrer commentaires / feedback",
-    "returnDemo": "Retour à la démo guidée",
-    "feedbackSaved": "Commentaires enregistrés sur cet appareil et envoyés à Supabase lorsque la table accepte la ligne.",
-    "completionLabel": "Achèvement du parcours",
-    "ecosystemExplorer": "Explorateur de l’écosystème",
-    "completionIntro": "Merci d’avoir exploré l’Écosystème alimentaire régional de Mahoning et Trumbull : Youngstown — Bronson Family Farm et Warren — Parker Farms.",
-    "certificateTitle": "Certificat d’achèvement",
-    "nameCertificate": "Nom pour le certificat",
-    "enterName": "Saisir le nom",
-    "certifies": "Ceci certifie que",
-    "certText": "a terminé un parcours dans l’Écosystème alimentaire régional de Mahoning et Trumbull et a aidé à renforcer l’expérience de lancement.",
-    "saveCompletion": "Enregistrer l’achèvement",
-    "completionSaved": "Achèvement enregistré sur cet appareil. Vous pouvez continuer à explorer ou partager vos commentaires.",
-    "impactInterests": "Intérêts d’impact",
-    "interestGrow": "Cultiver / ressources producteurs",
-    "interestYouth": "Développement de la main-d’œuvre jeunesse",
-    "interestPartner": "Partenariat ou collaboration",
-    "interestVolunteer": "Bénévolat, mentorat ou soutien",
-    "interestMarketplace": "Marché / GrownBy",
-}
+    language: "Langue", portal: "Portail", demo: "Démo", guest: "Invité", register: "S'inscrire", workspace: "Mon espace", youth: "Jeunes", supervisor: "Superviseur", parent: "Parent", grower: "Producteur", partner: "Partenaire", support: "Soutenir", valueAdded: "Valeur ajoutée", market: "Marché", wellness: "Bien-être", reports: "Rapports", ops: "Opérations", feedback: "Commentaires", complete: "Terminer", publicGuest: "Public / Invité", signOut: "Déconnexion", onlineEcosystem: "Écosystème en ligne"
+  },
 };
 
-function phraseFor(language: LanguageCode, raw: string) {
-  if (language === "en") return raw;
-  const trimmed = raw.trim();
-  return fullScreenPhrases[language]?.[trimmed] || screenText[language]?.[trimmed] || languageText[language]?.[trimmed] || trimmed;
+function t(language: LanguageCode, key: string) {
+  return languageText[language]?.[key] || languageText.en[key] || key;
 }
 
-function applyFullScreenTranslation(language: LanguageCode) {
+function languageDir(language: LanguageCode) {
+  return languageOptions.find((option) => option.code === language)?.dir || "ltr";
+}
+
+
+// Launch Candidate 1.5: translation audit layer.
+// This keeps App (46) intact, restores full-page translation without rebuilding the ecosystem,
+// and translates legacy hardcoded body text while pathways are being stabilized.
+const screenTranslations: Record<LanguageCode, Record<string, string>> = {
+  en: {},
+  es: {
+    "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.": "Área protegida. Primero ingrese como Supervisor / Personal, Administrador o Junta / Financiador.",
+    "Enter the living ecosystem.": "Entre al ecosistema vivo.",
+    "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Bienvenido al Ecosistema Regional de Alimentos de Mahoning y Trumbull. Centros regionales actuales: Youngstown — Bronson Family Farm y Warren — Parker Farms. Esta plataforma conecta desarrollo laboral juvenil, padres, productores, aliados, colaboradores, mercado, bienestar, seguridad, comentarios e informes de impacto.",
+    "Start Guided Demo": "Iniciar recorrido guiado",
+    "Enter The Ecosystem": "Entrar al ecosistema",
+    "Register / Check In": "Registrarse / Check-in",
+    "My Workspace": "Mi espacio",
+    "Launch Focus": "Enfoque de lanzamiento",
+    "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.": "Centros regionales: Youngstown — Bronson Family Farm y Warren — Parker Farms.",
+    "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.": "Elija un rol y siga una ruta guiada con recursos, oportunidades y próximos pasos.",
+    "Supervisor Operations Center is the staff-only control room.": "El Centro de Operaciones de Supervisores es el espacio de control solo para el personal.",
+    "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.": "Los registros de jóvenes y supervisores se guardan localmente primero y luego se sincronizan con Supabase cuando está conectado.",
+    "Parents receive progress summaries, not private raw youth reflections.": "Los padres reciben resúmenes de progreso, no reflexiones privadas sin procesar de los jóvenes.",
+    "Incident and support flags stay staff-facing.": "Los incidentes y señales de apoyo permanecen para el personal.",
+    "Reports convert daily records into launch readiness and program impact.": "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.",
+    "Welcome Back / Journey Memory": "Bienvenido de nuevo / Memoria del recorrido",
+    "Pathway": "Ruta",
+    "Guest Pathway": "Ruta de visitante",
+    "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados avanzan juntos.",
+    "Return to Portal": "Volver al portal",
+    "Choose Another Role": "Elegir otro rol",
+    "Comment on This Screen": "Comentar esta pantalla",
+    "Complete Journey": "Completar recorrido",
+    "Go to Marketplace": "Ir al mercado",
+    "Guided Demo": "Recorrido guiado",
+    "Experience the ecosystem in order.": "Experimente el ecosistema en orden.",
+    "This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.": "Este recorrido guiado permite que cada usuario comprenda la misma historia de lanzamiento: Youngstown — Bronson Family Farm, Warren — Parker Farms y el ecosistema regional conectado.",
+    "Choose Role": "Elegir rol",
+    "Comment / Save Feedback": "Comentar / Guardar comentarios",
+    "Tell us about the platform and program experience.": "Cuéntenos sobre la experiencia de la plataforma y el programa.",
+    "Rating": "Calificación",
+    "I would recommend this experience.": "Recomendaría esta experiencia.",
+    "What excited you?": "¿Qué le emocionó?",
+    "What confused you?": "¿Qué le confundió?",
+    "What would you improve?": "¿Qué mejoraría?",
+    "What opportunity interests you?": "¿Qué oportunidad le interesa?",
+    "Additional Comments": "Comentarios adicionales",
+    "Save Feedback / Comments": "Guardar comentarios",
+    "Return to Guided Demo": "Volver al recorrido guiado",
+    "Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.": "Comentarios guardados en este dispositivo y enviados a Supabase cuando la tabla los acepte.",
+    "Grower Pathway": "Ruta del productor",
+    "Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity.": "Todo productor pertenece aquí: patios, camas elevadas, jardines comunitarios, escolares, de iglesias, granjas urbanas, invernaderos, homesteads y granjas de mercado. Los productores conectan planificación de cultivos, necesidades de recursos, inventario, capacitación y oportunidades de mercado.",
+    "Create Grower Profile": "Crear perfil de productor",
+    "Marketplace Opportunities": "Oportunidades de mercado",
+    "Partner Pathway": "Ruta de aliados",
+    "Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact.": "Los aliados incluyen escuelas, empresas, organizaciones sin fines de lucro, agencias, financiadores, comunidades de fe, universidades y grupos de voluntarios. Esta ruta ayuda a comprender lo que ofrece el ecosistema, lo que necesita y cómo la colaboración crea impacto medible.",
+    "Create Partner Profile": "Crear perfil de aliado",
+    "Support Options": "Opciones de apoyo",
+    "Support the Ecosystem": "Apoyar el ecosistema",
+    "Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth.": "El apoyo puede ser financiero, voluntario, mentoría o en especie. Jubilee Gardens, Inc. es reconocido como Guardián de Semillas por aportar abundantes semillas durante dos años. Los colaboradores apoyan jóvenes, productores, acceso a alimentos, infraestructura, educación y crecimiento regional.",
+    "Offer Support": "Ofrecer apoyo",
+    "Become a Partner": "Convertirse en aliado",
+    "Value-Added Producer Pathway": "Ruta de productor de valor agregado",
+    "Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation.": "Los productores de valor agregado convierten cosechas, hierbas, miel, semillas, flores e ideas en productos. Esta ruta conecta preparación del producto, empaque, precios, etiquetado y participación en el mercado.",
+    "Create Producer Profile": "Crear perfil de productor",
+    "Connect to Marketplace": "Conectar al mercado",
+    "Youth Workforce Pathway": "Ruta de fuerza laboral juvenil",
+    "Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress.": "Los jóvenes comienzan con check-in, seguridad, PPE, asignaciones diarias, conciencia de bienestar, reflexión y desarrollo de habilidades. El supervisor registra el progreso operativo.",
+    "Start My Day": "Comenzar mi día",
+    "End-of-Day Reflection": "Reflexión de fin de día",
+    "Registration Center": "Centro de registro",
+    "Create the profile once. Reuse it everywhere.": "Cree el perfil una vez. Reutilícelo en todo el ecosistema.",
+    "Save Registration": "Guardar registro",
+    "Go to My Workspace": "Ir a mi espacio",
+    "Parent / Guardian Portal": "Portal de padres / tutores",
+    "Progress, encouragement, and next steps.": "Progreso, ánimo y próximos pasos.",
+    "No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center.": "Aún no se han guardado resúmenes para padres. Los supervisores pueden crearlos en el Centro de Operaciones de Supervisores.",
+    "Supervisor Center": "Centro de supervisores",
+    "Journey Completion": "Finalización del recorrido",
+    "Completion Certificate": "Certificado de finalización",
+    "This certifies that": "Esto certifica que",
+    "completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.": "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.",
+    "Save Completion": "Guardar finalización",
+    "Impact Interests": "Intereses de impacto",
+    "Leave Feedback": "Dejar comentarios",
+    "Recently Viewed": "Visto recientemente",
+    "No journey activity recorded yet.": "Aún no hay actividad registrada."
+  },
+  tl: {
+    "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.": "Protektadong lugar. Pumasok muna bilang Supervisor / Staff, Administrator, o Board / Funder.",
+    "Enter the living ecosystem.": "Pumasok sa buhay na ecosystem.",
+    "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Maligayang pagdating sa Mahoning at Trumbull Regional Food Ecosystem. Kasalukuyang regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms. Pinag-uugnay ng platform na ito ang youth workforce development, mga magulang, growers, partners, supporters, marketplace, wellness, safety, feedback, at impact reporting.",
+    "Start Guided Demo": "Simulan ang Guided Demo",
+    "Enter The Ecosystem": "Pumasok sa Ecosystem",
+    "Register / Check In": "Magrehistro / Check In",
+    "My Workspace": "Aking Workspace",
+    "Launch Focus": "Pokus sa Launch",
+    "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.": "Regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms.",
+    "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.": "Pumili ng role, pagkatapos ay sundan ang guided pathway na may resources, opportunities, at next steps.",
+    "Supervisor Operations Center is the staff-only control room.": "Ang Supervisor Operations Center ay control room para lamang sa staff.",
+    "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.": "Ang youth check-ins at supervisor records ay unang nase-save locally, pagkatapos ay nagsi-sync sa Supabase kapag connected.",
+    "Parents receive progress summaries, not private raw youth reflections.": "Ang mga magulang ay tumatanggap ng progress summaries, hindi private raw youth reflections.",
+    "Incident and support flags stay staff-facing.": "Ang incident at support flags ay nananatiling para sa staff.",
+    "Reports convert daily records into launch readiness and program impact.": "Ginagawang launch readiness at program impact ng reports ang daily records.",
+    "Welcome Back / Journey Memory": "Welcome Back / Journey Memory",
+    "Pathway": "Landas",
+    "Guest Pathway": "Landas ng Bisita",
+    "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
+    "Return to Portal": "Bumalik sa Portal",
+    "Choose Another Role": "Pumili ng Ibang Role",
+    "Comment on This Screen": "Magkomento sa Screen na Ito",
+    "Complete Journey": "Kumpletuhin ang Journey",
+    "Go to Marketplace": "Pumunta sa Marketplace",
+    "Guided Demo": "Guided Demo",
+    "Experience the ecosystem in order.": "Damhin ang ecosystem sa tamang pagkakasunod-sunod.",
+    "This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.": "Tinutulungan ng guided demo na ito ang bawat user na maunawaan ang launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, at ang connected regional ecosystem.",
+    "Choose Role": "Pumili ng Role",
+    "Comment / Save Feedback": "Magkomento / I-save ang Feedback",
+    "Tell us about the platform and program experience.": "Ikuwento sa amin ang karanasan sa platform at programa.",
+    "Rating": "Rating",
+    "I would recommend this experience.": "Irerekomenda ko ang karanasang ito.",
+    "What excited you?": "Ano ang nagpa-excite sa iyo?",
+    "What confused you?": "Ano ang nakalito sa iyo?",
+    "What would you improve?": "Ano ang papahusayin mo?",
+    "What opportunity interests you?": "Anong opportunity ang interesado ka?",
+    "Additional Comments": "Karagdagang Komento",
+    "Save Feedback / Comments": "I-save ang Feedback / Comments",
+    "Return to Guided Demo": "Bumalik sa Guided Demo",
+    "Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.": "Na-save ang feedback/comments sa device na ito at ipinapadala sa Supabase kapag tinanggap ng feedback table ang row.",
+    "Grower Pathway": "Landas ng Grower",
+    "Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity.": "Lahat ng grower ay kabilang dito: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, at market farms. Maaaring ikonekta ng growers ang crop planning, resource needs, inventory, training, at marketplace opportunity.",
+    "Create Grower Profile": "Gumawa ng Grower Profile",
+    "Marketplace Opportunities": "Marketplace Opportunities",
+    "Partner Pathway": "Landas ng Partner",
+    "Create Partner Profile": "Gumawa ng Partner Profile",
+    "Support Options": "Support Options",
+    "Support the Ecosystem": "Suportahan ang Ecosystem",
+    "Offer Support": "Mag-alok ng Suporta",
+    "Become a Partner": "Maging Partner",
+    "Value-Added Producer Pathway": "Landas ng Value-Added Producer",
+    "Create Producer Profile": "Gumawa ng Producer Profile",
+    "Connect to Marketplace": "Ikonekta sa Marketplace",
+    "Youth Workforce Pathway": "Landas ng Youth Workforce",
+    "Start My Day": "Simulan ang Araw Ko",
+    "End-of-Day Reflection": "Reflection sa Pagtatapos ng Araw",
+    "Registration Center": "Registration Center",
+    "Create the profile once. Reuse it everywhere.": "Gumawa ng profile nang isang beses. Gamitin ito saanman.",
+    "Save Registration": "I-save ang Registration",
+    "Go to My Workspace": "Pumunta sa Aking Workspace",
+    "Parent / Guardian Portal": "Portal ng Magulang / Guardian",
+    "Progress, encouragement, and next steps.": "Pag-unlad, paghihikayat, at susunod na hakbang.",
+    "Supervisor Center": "Supervisor Center",
+    "Journey Completion": "Journey Completion",
+    "Completion Certificate": "Completion Certificate",
+    "This certifies that": "Pinatutunayan nito na",
+    "Save Completion": "I-save ang Completion",
+    "Impact Interests": "Impact Interests",
+    "Leave Feedback": "Mag-iwan ng Feedback",
+    "Recently Viewed": "Kamakailang Tiningnan",
+    "No journey activity recorded yet.": "Wala pang recorded journey activity."
+  },
+  it: {
+    "Enter the living ecosystem.": "Entra nell’ecosistema vivente.",
+    "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Benvenuto nell’Ecosistema Alimentare Regionale di Mahoning e Trumbull. Hub regionali attuali: Youngstown — Bronson Family Farm e Warren — Parker Farms. Questa piattaforma collega sviluppo della forza lavoro giovanile, genitori, produttori, partner, sostenitori, mercato, benessere, sicurezza, feedback e report di impatto.",
+    "Start Guided Demo": "Avvia demo guidata",
+    "Enter The Ecosystem": "Entra nell’ecosistema",
+    "Register / Check In": "Registrati / Check-in",
+    "My Workspace": "Il mio spazio",
+    "Launch Focus": "Focus del lancio",
+    "Return to Portal": "Ritorna al portale",
+    "Choose Another Role": "Scegli un altro ruolo",
+    "Comment on This Screen": "Commenta questa schermata",
+    "Complete Journey": "Completa percorso",
+    "Go to Marketplace": "Vai al mercato",
+    "Guest Pathway": "Percorso Ospite",
+    "Grower Pathway": "Percorso Produttore",
+    "Partner Pathway": "Percorso Partner",
+    "Support the Ecosystem": "Sostieni l’ecosistema",
+    "Value-Added Producer Pathway": "Percorso Produttore a Valore Aggiunto",
+    "Youth Workforce Pathway": "Percorso Giovani",
+    "Start My Day": "Inizia la mia giornata",
+    "Tell us about the platform and program experience.": "Raccontaci l’esperienza della piattaforma e del programma.",
+    "Save Feedback / Comments": "Salva feedback / commenti",
+    "Progress, encouragement, and next steps.": "Progresso, incoraggiamento e prossimi passi.",
+    "Supervisor Center": "Centro supervisori",
+    "Journey Completion": "Completamento del percorso",
+    "Completion Certificate": "Certificato di completamento",
+    "Save Completion": "Salva completamento",
+    "Leave Feedback": "Lascia feedback"
+  },
+  he: {
+    "Enter the living ecosystem.": "היכנסו לאקוסיסטם החי.",
+    "Start Guided Demo": "התחל הדגמה מודרכת",
+    "Enter The Ecosystem": "היכנס לאקוסיסטם",
+    "Register / Check In": "הרשמה / צ׳ק-אין",
+    "My Workspace": "המרחב שלי",
+    "Launch Focus": "מוקד ההשקה",
+    "Return to Portal": "חזרה לשער",
+    "Choose Another Role": "בחר תפקיד אחר",
+    "Comment on This Screen": "הגב על המסך הזה",
+    "Complete Journey": "סיים מסע",
+    "Go to Marketplace": "לשוק",
+    "Guest Pathway": "מסלול אורח",
+    "Grower Pathway": "מסלול מגדלים",
+    "Partner Pathway": "מסלול שותפים",
+    "Support the Ecosystem": "תמיכה באקוסיסטם",
+    "Value-Added Producer Pathway": "מסלול יצרן ערך מוסף",
+    "Youth Workforce Pathway": "מסלול כוח עבודה צעיר",
+    "Start My Day": "התחל את היום שלי",
+    "Tell us about the platform and program experience.": "ספרו לנו על חוויית הפלטפורמה והתוכנית.",
+    "Save Feedback / Comments": "שמור משוב / תגובות",
+    "Progress, encouragement, and next steps.": "התקדמות, עידוד והצעדים הבאים.",
+    "Supervisor Center": "מרכז מדריכים",
+    "Journey Completion": "השלמת מסע",
+    "Completion Certificate": "תעודת השלמה",
+    "Save Completion": "שמור השלמה",
+    "Leave Feedback": "השאר משוב"
+  },
+  fr: {
+    "Enter the living ecosystem.": "Entrez dans l’écosystème vivant.",
+    "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Bienvenue dans l’Écosystème alimentaire régional de Mahoning et Trumbull. Hubs régionaux actuels : Youngstown — Bronson Family Farm et Warren — Parker Farms. Cette plateforme relie développement de la main-d’œuvre jeunesse, parents, producteurs, partenaires, soutiens, marché, bien-être, sécurité, commentaires et rapports d’impact.",
+    "Start Guided Demo": "Démarrer la démo guidée",
+    "Enter The Ecosystem": "Entrer dans l’écosystème",
+    "Register / Check In": "S’inscrire / Check-in",
+    "My Workspace": "Mon espace",
+    "Launch Focus": "Objectif du lancement",
+    "Return to Portal": "Retour au portail",
+    "Choose Another Role": "Choisir un autre rôle",
+    "Comment on This Screen": "Commenter cet écran",
+    "Complete Journey": "Terminer le parcours",
+    "Go to Marketplace": "Aller au marché",
+    "Guest Pathway": "Parcours invité",
+    "Grower Pathway": "Parcours producteur",
+    "Partner Pathway": "Parcours partenaire",
+    "Support the Ecosystem": "Soutenir l’écosystème",
+    "Value-Added Producer Pathway": "Parcours producteur à valeur ajoutée",
+    "Youth Workforce Pathway": "Parcours jeunesse",
+    "Start My Day": "Commencer ma journée",
+    "Tell us about the platform and program experience.": "Parlez-nous de l’expérience de la plateforme et du programme.",
+    "Save Feedback / Comments": "Enregistrer commentaires / feedback",
+    "Progress, encouragement, and next steps.": "Progrès, encouragement et prochaines étapes.",
+    "Supervisor Center": "Centre superviseur",
+    "Journey Completion": "Achèvement du parcours",
+    "Completion Certificate": "Certificat d’achèvement",
+    "Save Completion": "Enregistrer l’achèvement",
+    "Leave Feedback": "Laisser un commentaire"
+  }
+};
+
+function translatePhrase(language: LanguageCode, raw: string) {
+  if (language === "en") return raw;
+  const key = raw.trim();
+  return screenTranslations[language]?.[key] || languageText[language]?.[key] || key;
+}
+
+function applyScreenTranslations(language: LanguageCode) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
-  const skipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
+  const skip = new Set(["SCRIPT", "STYLE", "INPUT", "TEXTAREA", "SELECT", "OPTION"]);
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
-      if (!parent || skipTags.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
       const text = node.textContent || "";
-      if (!text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
+      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
-    }
+    },
   });
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
   nodes.forEach((node) => {
-    const original = node.parentElement?.getAttribute("data-original-text") || node.textContent || "";
-    const translated = phraseFor(language, original);
-    if (translated && translated !== original.trim()) {
-      node.parentElement?.setAttribute("data-original-text", original.trim());
-      node.textContent = node.textContent?.replace(original.trim(), translated) || translated;
-    }
+    const el = node.parentElement;
+    if (!el) return;
+    const current = node.textContent || "";
+    const original = el.getAttribute("data-bff-original-text") || current.trim();
+    el.setAttribute("data-bff-original-text", original);
+    const translated = translatePhrase(language, original);
+    node.textContent = current.replace(current.trim(), translated);
   });
-
-  const placeholders: Record<string, string> = {
-    "Example: Supervisor Aide": language === "es" ? "Ejemplo: Asistente supervisor" : language === "fr" ? "Exemple : assistant superviseur" : language === "it" ? "Esempio: assistente supervisore" : language === "tl" ? "Halimbawa: Supervisor Aide" : language === "he" ? "דוגמה: עוזר מדריך" : "Example: Supervisor Aide",
-    "What do you want to accomplish today?": language === "es" ? "¿Qué quiere lograr hoy?" : language === "fr" ? "Que voulez-vous accomplir aujourd'hui ?" : language === "it" ? "Cosa vuoi realizzare oggi?" : language === "tl" ? "Ano ang gusto mong matapos ngayon?" : language === "he" ? "מה תרצה להשיג היום?" : "What do you want to accomplish today?",
-    "Optional. A supervisor can check in privately.": language === "es" ? "Opcional. Un supervisor puede comunicarse en privado." : language === "fr" ? "Facultatif. Un superviseur peut vérifier en privé." : language === "it" ? "Facoltativo. Un supervisore può controllare privatamente." : language === "tl" ? "Opsyonal. Maaaring mag-check in nang pribado ang supervisor." : language === "he" ? "אופציונלי. מדריך יכול לבדוק בפרטיות." : "Optional. A supervisor can check in privately.",
-    "Enter name": language === "es" ? "Ingrese el nombre" : language === "fr" ? "Saisir le nom" : language === "it" ? "Inserisci nome" : language === "tl" ? "Ilagay ang pangalan" : language === "he" ? "הזן שם" : "Enter name"
+  const placeholderMap: Record<string, string> = {
+    "Example: Supervisor Aide": translatePhrase(language, "Example: Supervisor Aide"),
+    "Enter name": translatePhrase(language, "Enter name"),
   };
-  root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((element) => {
-    const el = element as HTMLInputElement | HTMLTextAreaElement;
-    const original = el.getAttribute("data-original-placeholder") || el.getAttribute("placeholder") || "";
-    el.setAttribute("data-original-placeholder", original);
-    el.setAttribute("placeholder", placeholders[original] || phraseFor(language, original));
+  root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((node) => {
+    const el = node as HTMLInputElement | HTMLTextAreaElement;
+    const original = el.getAttribute("data-bff-original-placeholder") || el.getAttribute("placeholder") || "";
+    el.setAttribute("data-bff-original-placeholder", original);
+    el.setAttribute("placeholder", placeholderMap[original] || translatePhrase(language, original));
   });
 }
-
-
-const screenText: Record<LanguageCode, Record<string, string>> = {
-  en: {
-    protectedMessage: "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.",
-    portalBrand: "Bronson Family Farm",
-    portalTitle: "Enter the living ecosystem.",
-    portalIntro: "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.",
-    startGuidedDemo: "Start Guided Demo", enterEcosystem: "Enter The Ecosystem", registerCheckIn: "Register / Check In", launchFocus: "Launch Focus",
-    focus1: "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.", focus2: "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.", focus3: "Supervisor Operations Center is the staff-only control room.", focus4: "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.", focus5: "Parents receive progress summaries, not private raw youth reflections.", focus6: "Incident and support flags stay staff-facing.", focus7: "Reports convert daily records into launch readiness and program impact.",
-    journeyMemory: "Welcome Back / Journey Memory", pathway: "Pathway",
-    guestPathwayTitle: "Guest Pathway", guestPathwayText: "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.",
-    growerPathwayTitle: "Grower Pathway", growerPathwayText: "Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity.",
-    partnerPathwayTitle: "Partner Pathway", partnerPathwayText: "Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact.",
-    supportPathwayTitle: "Support the Ecosystem", supportPathwayText: "Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth.",
-    valueAddedTitle: "Value-Added Producer Pathway", valueAddedText: "Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation.",
-    createGrowerProfile: "Create Grower Profile", marketplaceOpportunities: "Marketplace Opportunities", createPartnerProfile: "Create Partner Profile", supportOptions: "Support Options", offerSupport: "Offer Support", becomePartner: "Become a Partner", createProducerProfile: "Create Producer Profile", connectMarketplace: "Connect to Marketplace",
-    returnPortal: "Return to Portal", chooseAnotherRole: "Choose Another Role", commentScreen: "Comment on This Screen", completeJourney: "Complete Journey", goMarketplace: "Go to Marketplace",
-    feedbackTitle: "Tell us about the platform and program experience.", rating: "Rating", recommend: "I would recommend this experience.", excited: "What excited you?", confused: "What confused you?", improve: "What would you improve?", opportunityInterest: "What opportunity interests you?", additionalComments: "Additional Comments", saveFeedback: "Save Feedback / Comments", returnDemo: "Return to Guided Demo", feedbackSaved: "Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.",
-    completionLabel: "Journey Completion", ecosystemExplorer: "Ecosystem Explorer", completionIntro: "Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.", certificateTitle: "Completion Certificate", nameCertificate: "Name for certificate", enterName: "Enter name", certifies: "This certifies that", certText: "completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.", saveCompletion: "Save Completion", completionSaved: "Journey completion saved on this device. You can continue exploring or share feedback.", impactInterests: "Impact Interests", interestGrow: "Growing food / grower resources", interestYouth: "Youth workforce development", interestPartner: "Partnership or collaboration", interestVolunteer: "Volunteer, mentor, or support", interestMarketplace: "Marketplace / GrownBy"
-  },
-  es: {
-    protectedMessage: "Área protegida. Primero ingrese como Supervisor / Personal, Administrador o Junta / Financiador.", portalBrand: "Bronson Family Farm", portalTitle: "Entre al ecosistema vivo.", portalIntro: "Bienvenido al Ecosistema Regional de Alimentos de Mahoning y Trumbull. Centros regionales actuales: Youngstown — Bronson Family Farm y Warren — Parker Farms. Esta plataforma conecta desarrollo laboral juvenil, padres, productores, aliados, colaboradores, mercado, bienestar, seguridad, comentarios e informes de impacto.", startGuidedDemo: "Iniciar recorrido guiado", enterEcosystem: "Entrar al ecosistema", registerCheckIn: "Registrarse / Check-in", launchFocus: "Enfoque de lanzamiento", focus1: "Centros regionales: Youngstown — Bronson Family Farm y Warren — Parker Farms.", focus2: "Elija un rol y siga una ruta guiada con recursos, oportunidades y próximos pasos.", focus3: "El Centro de Operaciones de Supervisores es el espacio de control solo para el personal.", focus4: "Los registros de jóvenes y supervisores se guardan localmente primero y luego se sincronizan con Supabase cuando está conectado.", focus5: "Los padres reciben resúmenes de progreso, no reflexiones privadas sin procesar de los jóvenes.", focus6: "Los incidentes y señales de apoyo permanecen para el personal.", focus7: "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.", journeyMemory: "Bienvenido de nuevo / Memoria del recorrido", pathway: "Ruta", guestPathwayTitle: "Ruta de visitante", guestPathwayText: "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo se mueven juntos jóvenes, productores, familias y aliados.", growerPathwayTitle: "Ruta del productor", growerPathwayText: "Todo productor pertenece aquí: patios, camas elevadas, jardines comunitarios, jardines escolares, iglesias, granjas urbanas, invernaderos y granjas de mercado. Los productores conectan planificación de cultivos, necesidades, inventario, capacitación y mercado.", partnerPathwayTitle: "Ruta de aliados", partnerPathwayText: "Los aliados incluyen escuelas, empresas, organizaciones sin fines de lucro, agencias, financiadores, comunidades de fe, universidades y voluntarios. Esta ruta muestra lo que el ecosistema ofrece, lo que necesita y cómo colaborar con impacto medible.", supportPathwayTitle: "Apoyar el ecosistema", supportPathwayText: "El apoyo puede ser financiero, voluntario, mentoría o en especie. Jubilee Gardens, Inc. es reconocido como Guardián de Semillas por aportar abundantes semillas durante dos años. Los colaboradores apoyan jóvenes, productores, acceso a alimentos, infraestructura, educación y crecimiento regional.", valueAddedTitle: "Ruta de productor de valor agregado", valueAddedText: "Los productores de valor agregado convierten cosechas, hierbas, miel, semillas, flores e ideas en productos. Esta ruta conecta preparación, empaque, precios, etiquetado y participación en el mercado.", createGrowerProfile: "Crear perfil de productor", marketplaceOpportunities: "Oportunidades de mercado", createPartnerProfile: "Crear perfil de aliado", supportOptions: "Opciones de apoyo", offerSupport: "Ofrecer apoyo", becomePartner: "Convertirse en aliado", createProducerProfile: "Crear perfil de productor", connectMarketplace: "Conectar al mercado", returnPortal: "Volver al portal", chooseAnotherRole: "Elegir otro rol", commentScreen: "Comentar esta pantalla", completeJourney: "Completar recorrido", goMarketplace: "Ir al mercado", feedbackTitle: "Cuéntenos sobre la experiencia de la plataforma y el programa.", rating: "Calificación", recommend: "Recomendaría esta experiencia.", excited: "¿Qué le emocionó?", confused: "¿Qué le confundió?", improve: "¿Qué mejoraría?", opportunityInterest: "¿Qué oportunidad le interesa?", additionalComments: "Comentarios adicionales", saveFeedback: "Guardar comentarios", returnDemo: "Volver al recorrido guiado", feedbackSaved: "Comentarios guardados en este dispositivo y enviados a Supabase cuando la tabla los acepte.", completionLabel: "Finalización del recorrido", ecosystemExplorer: "Explorador del ecosistema", completionIntro: "Gracias por explorar el Ecosistema Regional de Alimentos de Mahoning y Trumbull: Youngstown — Bronson Family Farm y Warren — Parker Farms.", certificateTitle: "Certificado de finalización", nameCertificate: "Nombre para el certificado", enterName: "Ingrese el nombre", certifies: "Esto certifica que", certText: "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.", saveCompletion: "Guardar finalización", completionSaved: "Finalización guardada en este dispositivo. Puede seguir explorando o compartir comentarios.", impactInterests: "Intereses de impacto", interestGrow: "Cultivar alimentos / recursos para productores", interestYouth: "Desarrollo laboral juvenil", interestPartner: "Alianza o colaboración", interestVolunteer: "Voluntariado, mentoría o apoyo", interestMarketplace: "Mercado / GrownBy"
-  },
-  tl: { portalTitle: "Pumasok sa buhay na ecosystem.", startGuidedDemo: "Simulan ang Guided Demo", enterEcosystem: "Pumasok sa Ecosystem", registerCheckIn: "Magrehistro / Check In", returnPortal: "Bumalik sa Portal", chooseAnotherRole: "Pumili ng Ibang Role", commentScreen: "Magkomento sa Screen na Ito", completeJourney: "Kumpletuhin ang Journey", goMarketplace: "Pumunta sa Marketplace", feedbackTitle: "Ikuwento ang karanasan sa platform at programa.", saveFeedback: "I-save ang Feedback / Comments", ecosystemExplorer: "Ecosystem Explorer" },
-  it: { portalTitle: "Entra nell'ecosistema vivo.", startGuidedDemo: "Avvia tour guidato", enterEcosystem: "Entra nell'ecosistema", registerCheckIn: "Registrati / Check-in", returnPortal: "Ritorna al portale", chooseAnotherRole: "Scegli un altro ruolo", commentScreen: "Commenta questa schermata", completeJourney: "Completa percorso", goMarketplace: "Vai al mercato", feedbackTitle: "Raccontaci l'esperienza della piattaforma e del programma.", saveFeedback: "Salva feedback / commenti", ecosystemExplorer: "Esploratore dell'ecosistema" },
-  he: { portalTitle: "היכנסו לאקוסיסטם החי.", startGuidedDemo: "התחל סיור מודרך", enterEcosystem: "היכנס לאקוסיסטם", registerCheckIn: "הרשמה / צ'ק-אין", returnPortal: "חזרה לשער", chooseAnotherRole: "בחר תפקיד אחר", commentScreen: "תגובה על המסך הזה", completeJourney: "סיום המסע", goMarketplace: "לשוק", feedbackTitle: "ספרו לנו על חוויית הפלטפורמה והתוכנית.", saveFeedback: "שמור משוב / תגובות", ecosystemExplorer: "חוקר האקוסיסטם" },
-  fr: { portalTitle: "Entrez dans l'écosystème vivant.", startGuidedDemo: "Démarrer la visite guidée", enterEcosystem: "Entrer dans l'écosystème", registerCheckIn: "S'inscrire / Pointage", returnPortal: "Retour au portail", chooseAnotherRole: "Choisir un autre rôle", commentScreen: "Commenter cet écran", completeJourney: "Terminer le parcours", goMarketplace: "Aller au marché", feedbackTitle: "Parlez-nous de l'expérience de la plateforme et du programme.", saveFeedback: "Enregistrer les commentaires", ecosystemExplorer: "Explorateur de l'écosystème" }
-};
-
-
-// Auto-map every English screenText value to the selected language so legacy hardcoded body text also translates.
-(["es", "tl", "it", "he", "fr"] as LanguageCode[]).forEach((code) => {
-  const phraseMap = fullScreenPhrases[code] || (fullScreenPhrases[code] = {});
-  Object.keys(screenText.en).forEach((key) => {
-    const englishPhrase = screenText.en[key];
-    const translatedPhrase = screenText[code]?.[key];
-    if (englishPhrase && translatedPhrase && englishPhrase !== translatedPhrase) {
-      phraseMap[englishPhrase] = translatedPhrase;
-    }
-  });
-});
-
-function tx(language: LanguageCode, key: string) {
-  return screenText[language]?.[key] || screenText.en[key] || t(language, key);
-}
-
-const LanguageContext = createContext<LanguageCode>("en");
-function useLanguage() { return useContext(LanguageContext); }
-function useTx(key: string) { return tx(useLanguage(), key); }
 
 const roles: Role[] = [
   "Guest",
@@ -920,13 +857,13 @@ function App() {
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
-    const timer = window.setTimeout(() => applyFullScreenTranslation(language), 0);
+    const timer = window.setTimeout(() => applyScreenTranslations(language), 0);
     return () => window.clearTimeout(timer);
   }, [language, screen, message, activeUser]);
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
-      setMessage(tx(language, "protectedMessage"));
+      setMessage(translatePhrase(language, "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first."));
       setScreenState("roles");
       return;
     }
@@ -958,7 +895,6 @@ function App() {
   };
 
   return (
-    <LanguageContext.Provider value={language}>
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
@@ -980,7 +916,6 @@ function App() {
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
     </Shell>
-    </LanguageContext.Provider>
   );
 }
 
@@ -1135,12 +1070,11 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 
 
 function JourneyMemoryPreview() {
-  const language = useLanguage();
   const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 4);
   if (!events.length) return null;
   return (
     <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{tx(language, "journeyMemory")}</div>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Welcome Back / Journey Memory</div>
       <div className="mt-3 grid gap-2 md:grid-cols-2">
         {events.map((event) => (
           <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
@@ -1151,42 +1085,47 @@ function JourneyMemoryPreview() {
 }
 
 function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const language = useLanguage();
-  const launchItems = ["focus1", "focus2", "focus3", "focus4", "focus5", "focus6", "focus7"];
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "portalBrand")}</div>
-        <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">{tx(language, "portalTitle")}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{tx(language, "portalIntro")}</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm</div>
+        <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">Enter the living ecosystem.</h1>
+        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">
+          Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
+        </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">{tx(language, "startGuidedDemo")}</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">{tx(language, "enterEcosystem")}</button>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">{tx(language, "registerCheckIn")}</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">{t(language, "workspace")}</button>
+          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Start Guided Demo</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Enter The Ecosystem</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
         <JourneyMemoryPreview />
       </Card>
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{tx(language, "launchFocus")}</div>
-        {launchItems.map((item) => (
-          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{tx(language, item)}</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
+        {[
+          "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.",
+          "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.",
+          "Supervisor Operations Center is the staff-only control room.",
+          "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.",
+          "Parents receive progress summaries, not private raw youth reflections.",
+          "Incident and support flags stay staff-facing.",
+          "Reports convert daily records into launch readiness and program impact.",
+        ].map((item) => (
+          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
       </Card>
     </div>
   );
 }
 
-
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title={useTx("guestPathwayTitle")}
+      title="Guest Pathway"
       image={IMG.ecosystem}
-      text={useTx("guestPathwayText")}
+      text="Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together."
       setScreen={setScreen}
-      nextTarget="marketplace"
-      nextLabel="Next: Explore Marketplace"
     />
   );
 }
@@ -1480,9 +1419,6 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       image={IMG.youth}
       text="Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress."
       setScreen={setScreen}
-      nextTarget="completion"
-      nextLabel="Complete Youth Journey"
-      hideMarketplace
       extra={
         <>
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
@@ -2260,10 +2196,7 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         ))}
         {!summaries.length && <Notice text="No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center." />}
       </div>
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to My Workspace</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Comment on Parent Portal</button>
-      </div>
+      <button type="button" onClick={() => setScreen("supervisor")} className="mt-6 rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
     </Card>
   );
 }
@@ -2803,7 +2736,6 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const language = useLanguage();
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
   const [excited, setExcited] = useState("");
@@ -2815,28 +2747,51 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 
   const save = async () => {
     const row: FeedbackRecord = {
-      id: uuid(), profile_id: activeUser?.id, profile_type: activeUser ? roleToProfileType(activeUser.role) : "customer", feedback_type: "platform", rating, comments, would_recommend: recommend, screen: "feedback", pathway: activeUser?.role || "Public / Guest", role: activeUser?.role || "Public / Guest", excited, confused, improve, opportunity_interest: opportunity, created_at: new Date().toISOString(),
+      id: uuid(),
+      profile_id: activeUser?.id,
+      profile_type: activeUser ? roleToProfileType(activeUser.role) : "customer",
+      feedback_type: "platform",
+      rating,
+      comments,
+      would_recommend: recommend,
+      screen: "feedback",
+      pathway: activeUser?.role || "Public / Guest",
+      role: activeUser?.role || "Public / Guest",
+      excited,
+      confused,
+      improve,
+      opportunity_interest: opportunity,
+      created_at: new Date().toISOString(),
     };
     await insertRow("feedback", FEEDBACK_KEY, row);
-    setMessage(tx(language, "feedbackSaved"));
+    setMessage("Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.");
   };
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{t(language, "feedback")}</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">{tx(language, "feedbackTitle")}</h1>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Tell us about the platform and program experience.</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <label className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="flex justify-between text-sm font-black"><span>{tx(language, "rating")}</span><span>{rating}/5</span></div><input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} /></label>
-        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black"><input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />{tx(language, "recommend")}</label>
+        <label className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="flex justify-between text-sm font-black"><span>Rating</span><span>{rating}/5</span></div>
+          <input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} />
+        </label>
+        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
+          <input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />
+          I would recommend this experience.
+        </label>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <TextArea label={tx(language, "excited")} value={excited} onChange={setExcited} />
-        <TextArea label={tx(language, "confused")} value={confused} onChange={setConfused} />
-        <TextArea label={tx(language, "improve")} value={improve} onChange={setImprove} />
-        <TextArea label={tx(language, "opportunityInterest")} value={opportunity} onChange={setOpportunity} />
+        <TextArea label="What excited you?" value={excited} onChange={setExcited} />
+        <TextArea label="What confused you?" value={confused} onChange={setConfused} />
+        <TextArea label="What would you improve?" value={improve} onChange={setImprove} />
+        <TextArea label="What opportunity interests you?" value={opportunity} onChange={setOpportunity} />
       </div>
-      <div className="mt-5"><TextArea label={tx(language, "additionalComments")} value={comments} onChange={setComments} /></div>
-      <div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{tx(language, "saveFeedback")}</button><button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">{tx(language, "returnDemo")}</button></div>
+      <div className="mt-5"><TextArea label="Additional Comments" value={comments} onChange={setComments} /></div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback / Comments</button>
+        <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to Guided Demo</button>
+      </div>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -2846,16 +2801,14 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title={useTx("growerPathwayTitle")}
+      title="Grower Pathway"
       image={IMG.grow}
-      text={useTx("growerPathwayText")}
+      text="Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity."
       setScreen={setScreen}
-      nextTarget="marketplace"
-      nextLabel="Next: Marketplace Opportunities"
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createGrowerProfile")}</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("marketplaceOpportunities")}</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
         </>
       }
     />
@@ -2865,17 +2818,14 @@ function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title={useTx("partnerPathwayTitle")}
+      title="Partner Pathway"
       image={IMG.partners}
-      text={useTx("partnerPathwayText")}
+      text="Partners include schools, businesses, nonprofits, agencies, funders, faith communities, universities, and volunteer groups. This journey helps partners understand what the ecosystem offers, what it needs, and how collaboration can create measurable community impact."
       setScreen={setScreen}
-      nextTarget="support"
-      nextLabel="Next: Support & Resource Needs"
-      hideMarketplace
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createPartnerProfile")}</button>
-          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("supportOptions")}</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Partner Profile</button>
+          <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Support Options</button>
         </>
       }
     />
@@ -2885,17 +2835,14 @@ function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
 function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title={useTx("supportPathwayTitle")}
+      title="Support the Ecosystem"
       image={IMG.compost}
-      text={useTx("supportPathwayText")}
+      text="Support can be financial, volunteer-based, mentorship-based, or in-kind. Jubilee Gardens, Inc. is recognized as a Seed Steward for providing abundant seeds over the past two years. Supporters can help with youth, growers, food access, infrastructure, education, and regional growth."
       setScreen={setScreen}
-      nextTarget="completion"
-      nextLabel="Complete Support Journey"
-      hideMarketplace
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("offerSupport")}</button>
-          <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("becomePartner")}</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Offer Support</button>
+          <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
         </>
       }
     />
@@ -2905,16 +2852,14 @@ function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
 function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <SimplePathway
-      title={useTx("valueAddedTitle")}
+      title="Value-Added Producer Pathway"
       image={IMG.market}
-      text={useTx("valueAddedText")}
+      text="Value-added producers turn harvests, herbs, honey, seeds, flowers, and ideas into products. This pathway connects product readiness, packaging, pricing, labeling awareness, and marketplace participation."
       setScreen={setScreen}
-      nextTarget="marketplace"
-      nextLabel="Next: Connect Product to Marketplace"
       extra={
         <>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createProducerProfile")}</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{useTx("connectMarketplace")}</button>
+          <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
         </>
       }
     />
@@ -2927,34 +2872,26 @@ function SimplePathway({
   image,
   setScreen,
   extra,
-  nextTarget = "marketplace",
-  nextLabel,
-  hideMarketplace = false,
 }: {
   title: string;
   text: string;
   image: string;
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
-  nextTarget?: Screen;
-  nextLabel?: string;
-  hideMarketplace?: boolean;
 }) {
-  const language = useLanguage();
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "pathway")}</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           {extra}
-          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">{tx(language, "returnPortal")}</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "chooseAnotherRole")}</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "commentScreen")}</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "completeJourney")}</button>
-          {!hideMarketplace && <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "goMarketplace")}</button>}
-          <button type="button" onClick={() => setScreen(nextTarget)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{nextLabel || tx(language, "goMarketplace")}</button>
+          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Complete Journey</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
       <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
@@ -2967,7 +2904,6 @@ function SimplePathway({
 
 
 function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const language = useLanguage();
   const [name, setName] = useState(activeUser?.name || "");
   const [interestGrow, setInterestGrow] = useState(false);
   const [interestYouth, setInterestYouth] = useState(false);
@@ -2977,39 +2913,62 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
   const [message, setMessage] = useState("");
   const journey = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
   const recent = journey.slice(0, 6);
-  const complete = () => { const pathway = recent[0]?.label || screenLabel("completion"); recordCompletion(pathway, activeUser); setMessage(tx(language, "completionSaved")); };
+
+  const complete = () => {
+    const pathway = recent[0]?.label || screenLabel("completion");
+    recordCompletion(pathway, activeUser);
+    setMessage("Journey completion saved on this device. You can continue exploring or share feedback.");
+  };
+
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{tx(language, "completionLabel")}</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">{tx(language, "ecosystemExplorer")}</h1>
-      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">{tx(language, "completionIntro")}</p>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Ecosystem Explorer</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
+        Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
+      </p>
+
       <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_.85fr]">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <h2 className="text-2xl font-black">{tx(language, "certificateTitle")}</h2>
-          <Field label={tx(language, "nameCertificate")} value={name} onChange={setName} placeholder={tx(language, "enterName")} />
+          <h2 className="text-2xl font-black">Completion Certificate</h2>
+          <Field label="Name for certificate" value={name} onChange={setName} placeholder="Enter name" />
           <div className="mt-5 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-5 text-center">
-            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">{tx(language, "certifies")}</div>
-            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || tx(language, "ecosystemExplorer")}</div>
-            <p className="mt-3 text-sm leading-6 text-white/82">{tx(language, "certText")}</p>
+            <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">This certifies that</div>
+            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Ecosystem Explorer"}</div>
+            <p className="mt-3 text-sm leading-6 text-white/82">
+              completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
+            </p>
             <div className="mt-4 text-sm font-black">{new Date().toLocaleDateString()}</div>
           </div>
-          <button type="button" onClick={complete} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{tx(language, "saveCompletion")}</button>{message && <Notice text={message} />}
+          <button type="button" onClick={complete} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Completion</button>
+          {message && <Notice text={message} />}
         </div>
+
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <h2 className="text-2xl font-black">{tx(language, "impactInterests")}</h2>
+          <h2 className="text-2xl font-black">Impact Interests</h2>
           <div className="mt-4 grid gap-2">
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestGrow} onChange={(e) => setInterestGrow(e.target.checked)} /> {tx(language, "interestGrow")}</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestYouth} onChange={(e) => setInterestYouth(e.target.checked)} /> {tx(language, "interestYouth")}</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestPartner} onChange={(e) => setInterestPartner(e.target.checked)} /> {tx(language, "interestPartner")}</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestVolunteer} onChange={(e) => setInterestVolunteer(e.target.checked)} /> {tx(language, "interestVolunteer")}</label>
-            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestMarketplace} onChange={(e) => setInterestMarketplace(e.target.checked)} /> {tx(language, "interestMarketplace")}</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestGrow} onChange={(e) => setInterestGrow(e.target.checked)} /> Growing food / grower resources</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestYouth} onChange={(e) => setInterestYouth(e.target.checked)} /> Youth workforce development</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestPartner} onChange={(e) => setInterestPartner(e.target.checked)} /> Partnership or collaboration</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestVolunteer} onChange={(e) => setInterestVolunteer(e.target.checked)} /> Volunteer, mentor, or support</label>
+            <label className="flex items-center gap-3 rounded-2xl bg-black/30 p-3 font-bold"><input type="checkbox" checked={interestMarketplace} onChange={(e) => setInterestMarketplace(e.target.checked)} /> Marketplace / GrownBy</label>
           </div>
-          <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{t(language, "feedback")}</button><button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "returnPortal")}</button></div>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+            <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Recently Viewed</div>
+            <div className="mt-3 grid gap-2">
+              {recent.length ? recent.map((event) => <div key={event.id} className="rounded-xl bg-white/10 p-3 text-sm">{event.label}</div>) : <div className="rounded-xl bg-white/10 p-3 text-sm">No journey activity recorded yet.</div>}
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Leave Feedback</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
       </div>
     </Card>
   );
 }
-
 
 export default App;
