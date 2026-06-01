@@ -7,7 +7,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
- * - Role access
+ * - Role accessa
  * - Youth roster
  * - Attendance and PPE
  * - Morning wellness review
@@ -21,6 +21,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 type Screen =
   | "portal"
+  | "demo"
   | "guest"
   | "registration"
   | "roles"
@@ -209,6 +210,13 @@ type FeedbackRecord = {
   rating: number;
   comments: string;
   would_recommend: boolean;
+  screen?: string;
+  pathway?: string;
+  role?: string;
+  excited?: string;
+  confused?: string;
+  improve?: string;
+  opportunity_interest?: string;
   created_at: string;
 };
 
@@ -467,6 +475,7 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
+      {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
@@ -501,6 +510,7 @@ function Shell({
 }) {
   const nav: { label: string; screen: Screen }[] = [
     { label: "Portal", screen: "portal" },
+    { label: "Demo", screen: "demo" },
     { label: "Guest", screen: "guest" },
     { label: "Register", screen: "registration" },
     { label: "My Workspace", screen: "roles" },
@@ -623,7 +633,8 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Enter The Ecosystem</button>
+          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Start Guided Demo</button>
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Enter The Ecosystem</button>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
         </div>
@@ -2194,9 +2205,81 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const stops = [
+    {
+      title: "1. Forest Gate",
+      text: "Begin with the story of Bronson Family Farm as the Youngstown anchor of the Mahoning & Trumbull Regional Food Ecosystem.",
+      action: "Explore Guest Story",
+      target: "guest" as Screen,
+    },
+    {
+      title: "2. Connected Food Ecosystem",
+      text: "See how growers, youth workforce, partners, supporters, marketplace activity, education, and community resources connect.",
+      action: "View Marketplace",
+      target: "marketplace" as Screen,
+    },
+    {
+      title: "3. Grower Pathway",
+      text: "Backyard gardens, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms all belong.",
+      action: "Open Grower Pathway",
+      target: "grower" as Screen,
+    },
+    {
+      title: "4. Youth Workforce",
+      text: "Youth begin with daily rhythm, PPE, wellness readiness, team identity, skills, leadership, and opportunity.",
+      action: "Open Youth Pathway",
+      target: "youth" as Screen,
+    },
+    {
+      title: "5. Partner + Support",
+      text: "Partners and supporters can volunteer, mentor, teach, donate, share resources, sponsor infrastructure, and strengthen the regional ecosystem.",
+      action: "Open Support Pathway",
+      target: "support" as Screen,
+    },
+    {
+      title: "6. Leave Comments",
+      text: "Every user can save comments, ratings, what excited them, what confused them, and what should improve. Data saves locally first and syncs to Supabase when the table matches.",
+      action: "Save Feedback / Comments",
+      target: "feedback" as Screen,
+    },
+  ];
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guided Demo</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Experience the ecosystem in order.</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
+        This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.
+      </p>
+      <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {stops.map((stop) => (
+          <div key={stop.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <h2 className="text-2xl font-black">{stop.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-white/82">{stop.text}</p>
+            <button type="button" onClick={() => setScreen(stop.target)} className="mt-5 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">
+              {stop.action}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+      </div>
+    </Card>
+  );
+}
+
 function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
+  const [excited, setExcited] = useState("");
+  const [confused, setConfused] = useState("");
+  const [improve, setImprove] = useState("");
+  const [opportunity, setOpportunity] = useState("");
   const [recommend, setRecommend] = useState(true);
   const [message, setMessage] = useState("");
 
@@ -2209,10 +2292,17 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
       rating,
       comments,
       would_recommend: recommend,
+      screen: "feedback",
+      pathway: activeUser?.role || "Public / Guest",
+      role: activeUser?.role || "Public / Guest",
+      excited,
+      confused,
+      improve,
+      opportunity_interest: opportunity,
       created_at: new Date().toISOString(),
     };
     await insertRow("feedback", FEEDBACK_KEY, row);
-    setMessage("Feedback saved.");
+    setMessage("Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.");
   };
 
   return (
@@ -2229,8 +2319,17 @@ function Feedback({ activeUser }: { setScreen: (screen: Screen) => void; activeU
           I would recommend this experience.
         </label>
       </div>
-      <div className="mt-5"><TextArea label="Comments" value={comments} onChange={setComments} /></div>
-      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback</button>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <TextArea label="What excited you?" value={excited} onChange={setExcited} />
+        <TextArea label="What confused you?" value={confused} onChange={setConfused} />
+        <TextArea label="What would you improve?" value={improve} onChange={setImprove} />
+        <TextArea label="What opportunity interests you?" value={opportunity} onChange={setOpportunity} />
+      </div>
+      <div className="mt-5"><TextArea label="Additional Comments" value={comments} onChange={setComments} /></div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback / Comments</button>
+        <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to Guided Demo</button>
+      </div>
       {message && <Notice text={message} />}
     </Card>
   );
