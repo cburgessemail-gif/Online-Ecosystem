@@ -870,6 +870,8 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       image={IMG.ecosystem}
       text={useTx("guestPathwayText")}
       setScreen={setScreen}
+      nextTarget="marketplace"
+      nextLabel="Next: Explore Marketplace"
     />
   );
 }
@@ -1163,6 +1165,9 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       image={IMG.youth}
       text="Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress."
       setScreen={setScreen}
+      nextTarget="completion"
+      nextLabel="Complete Youth Journey"
+      hideMarketplace
       extra={
         <>
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
@@ -1940,7 +1945,10 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         ))}
         {!summaries.length && <Notice text="No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center." />}
       </div>
-      <button type="button" onClick={() => setScreen("supervisor")} className="mt-6 rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to My Workspace</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Comment on Parent Portal</button>
+      </div>
     </Card>
   );
 }
@@ -2527,6 +2535,8 @@ function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
       image={IMG.grow}
       text={useTx("growerPathwayText")}
       setScreen={setScreen}
+      nextTarget="marketplace"
+      nextLabel="Next: Marketplace Opportunities"
       extra={
         <>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createGrowerProfile")}</button>
@@ -2544,6 +2554,9 @@ function PartnerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
       image={IMG.partners}
       text={useTx("partnerPathwayText")}
       setScreen={setScreen}
+      nextTarget="support"
+      nextLabel="Next: Support & Resource Needs"
+      hideMarketplace
       extra={
         <>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createPartnerProfile")}</button>
@@ -2561,6 +2574,9 @@ function SupportJourney({ setScreen }: { setScreen: (screen: Screen) => void }) 
       image={IMG.compost}
       text={useTx("supportPathwayText")}
       setScreen={setScreen}
+      nextTarget="completion"
+      nextLabel="Complete Support Journey"
+      hideMarketplace
       extra={
         <>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("offerSupport")}</button>
@@ -2578,6 +2594,8 @@ function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void 
       image={IMG.market}
       text={useTx("valueAddedText")}
       setScreen={setScreen}
+      nextTarget="marketplace"
+      nextLabel="Next: Connect Product to Marketplace"
       extra={
         <>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{useTx("createProducerProfile")}</button>
@@ -2594,12 +2612,18 @@ function SimplePathway({
   image,
   setScreen,
   extra,
+  nextTarget = "marketplace",
+  nextLabel,
+  hideMarketplace = false,
 }: {
   title: string;
   text: string;
   image: string;
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
+  nextTarget?: Screen;
+  nextLabel?: string;
+  hideMarketplace?: boolean;
 }) {
   const language = useLanguage();
   return (
@@ -2614,7 +2638,8 @@ function SimplePathway({
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "chooseAnotherRole")}</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "commentScreen")}</button>
           <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "completeJourney")}</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{tx(language, "goMarketplace")}</button>
+          {!hideMarketplace && <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tx(language, "goMarketplace")}</button>}
+          <button type="button" onClick={() => setScreen(nextTarget)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{nextLabel || tx(language, "goMarketplace")}</button>
         </div>
       </Card>
       <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
