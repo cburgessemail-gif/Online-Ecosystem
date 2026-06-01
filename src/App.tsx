@@ -40,7 +40,9 @@ type Screen =
   | "media"
   | "launchProject"
   | "feedback"
-  | "completion";
+  | "completion"
+  | "reviewer"
+  | "farmConditions";
 
 type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
 
@@ -62,7 +64,8 @@ type Role =
   | "Partner"
   | "Administrator"
   | "Value-Added Producer"
-  | "Board / Funder";
+  | "Board / Funder"
+  | "Reviewer";
 
 type AccessLevel = "public" | "participant" | "family" | "staff" | "admin" | "board";
 type ProfileType = "youth" | "supervisor" | "parent" | "grower" | "value_added" | "volunteer" | "partner" | "customer" | "board";
@@ -233,6 +236,17 @@ type FeedbackRecord = {
   created_at: string;
 };
 
+type ReviewerComment = {
+  id: string;
+  screen: string;
+  role?: string;
+  rating: number;
+  worked_well: string;
+  confusing: string;
+  improvement: string;
+  created_at: string;
+};
+
 type MarketplaceProduct = {
   id: string;
   name: string;
@@ -297,6 +311,7 @@ const MARKET_ORDERS_KEY = "bff.launch.market.orders";
 const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
 const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
+const REVIEWER_KEY = "bff.launch.reviewer.comments";
 const LANGUAGE_KEY = "bff.launch.language";
 
 const IMG = {
@@ -319,6 +334,23 @@ const IMG = {
   deerFencing: "/Deer Fencing.png",
   volunteers: "/Fence_volunteers.png",
   culinaryFlowers: "/culniary_edibleflowers.jpeg",
+};
+
+const farmConditions = {
+  location: "Bronson Family Farm / Historic Lansdowne Airport, Youngstown, Ohio",
+  status: "Check live conditions before outdoor work",
+  temperature: "Live weather connection pending",
+  heatIndex: "Monitor before youth begin work",
+  rainChance: "Check morning forecast",
+  wind: "Check before tents, signs, and light structures are placed",
+  outdoorWorkStatus: "Supervisor decision required",
+  reminders: [
+    "Bring water",
+    "Wear closed-toe shoes",
+    "Use sunscreen",
+    "Take shade breaks",
+    "Watch for heat stress",
+  ],
 };
 
 const launchEvents = [
@@ -881,6 +913,7 @@ const roles: Role[] = [
   "Administrator",
   "Value-Added Producer",
   "Board / Funder",
+  "Reviewer",
 ];
 
 const roleAccess: Record<Role, AccessLevel> = {
@@ -895,6 +928,7 @@ const roleAccess: Record<Role, AccessLevel> = {
   Administrator: "admin",
   "Value-Added Producer": "participant",
   "Board / Funder": "board",
+  Reviewer: "public",
 };
 
 function uuid() {
@@ -970,6 +1004,8 @@ function screenLabel(screen: Screen) {
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
     completion: "Achievement Center",
+    reviewer: "Reviewer Mode",
+    farmConditions: "Farm Conditions",
   };
   return labels[screen];
 }
@@ -1052,6 +1088,7 @@ function roleToProfileType(role: Role): ProfileType {
     Administrator: "partner",
     "Value-Added Producer": "value_added",
     "Board / Funder": "board",
+    Reviewer: "customer",
   };
   return map[role];
 }
@@ -1069,6 +1106,7 @@ function routeForRole(role: Role): Screen {
     Administrator: "operations",
     "Value-Added Producer": "valueAdded",
     "Board / Funder": "reports",
+    Reviewer: "reviewer",
   };
   return map[role];
 }
@@ -1083,6 +1121,7 @@ function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
   const [message, setMessage] = useState("");
+  const [previousScreen, setPreviousScreen] = useState<Screen>("portal");
   const [language, setLanguage] = useState<LanguageCode>(() => safeRead<LanguageCode>(LANGUAGE_KEY, "en"));
 
   const changeLanguage = (next: LanguageCode) => {
@@ -1107,6 +1146,7 @@ function App() {
     }
     setMessage("");
     recordJourney(target, activeUser);
+    setPreviousScreen(screen);
     setScreenState(target);
   };
 
@@ -1133,7 +1173,7 @@ function App() {
   };
 
   return (
-    <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
+    <Shell screen={screen} previousScreen={previousScreen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
@@ -1156,6 +1196,8 @@ function App() {
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "reviewer" && <ReviewerMode setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "farmConditions" && <FarmConditions setScreen={setScreen} />}
     </Shell>
   );
 }
@@ -1163,6 +1205,7 @@ function App() {
 function Shell({
   children,
   screen,
+  previousScreen,
   setScreen,
   activeUser,
   signOut,
@@ -1171,6 +1214,7 @@ function Shell({
 }: {
   children: React.ReactNode;
   screen: Screen;
+  previousScreen: Screen;
   setScreen: (screen: Screen) => void;
   activeUser: EcosystemUser | null;
   signOut: () => void;
@@ -1186,6 +1230,8 @@ function Shell({
         { key: "events", screen: "events" },
         { key: "media", screen: "media" },
         { key: "feedback", screen: "feedback" },
+        { key: "reviewer", screen: "reviewer", label: "Reviewer Mode" },
+        { key: "farmConditions", screen: "farmConditions", label: "Farm Conditions" },
         { key: "complete", screen: "completion", label: "Achievements" },
       ],
     },
@@ -1284,6 +1330,13 @@ function Shell({
           </div>
         </div>
         {children}
+        {screen !== "portal" && (
+          <div className="fixed bottom-4 left-4 right-4 z-50 flex flex-wrap items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-black/70 p-2 shadow-2xl backdrop-blur-xl md:left-auto md:right-6 md:w-auto">
+            <button type="button" onClick={() => setScreen(previousScreen === screen ? "portal" : previousScreen)} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">⬅ Back</button>
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black">🏠 Portal</button>
+            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-yellow-200/25 bg-yellow-300/15 px-4 py-2 text-xs font-black text-yellow-50">💬 Comment on This Screen</button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1411,7 +1464,12 @@ function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Start Guided Demo</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Enter The Ecosystem</button>
           <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
+          <button type="button" onClick={() => setScreen("reviewer")} className="rounded-full border border-yellow-200/30 bg-yellow-300/15 px-8 py-4 font-black text-yellow-50">🔍 Reviewer Mode</button>
+          <button type="button" onClick={() => setScreen("farmConditions")} className="rounded-full border border-sky-200/25 bg-sky-300/15 px-8 py-4 font-black text-sky-50">🌤 Farm Conditions</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
+        </div>
+        <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/28">
+          <img src={IMG.ecosystem} alt="Connected Food Ecosystem" className="max-h-[360px] w-full object-contain p-3" onError={(event) => (event.currentTarget.src = IMG.backup)} />
         </div>
         <MyDayPreview setScreen={setScreen} />
       </Card>
@@ -1528,6 +1586,12 @@ function MyWorkspace({
       subtitle: "Public story, farm ecosystem, historic place, and community pathway.",
       screen: "guest",
       show: !activeUser,
+    },
+    {
+      title: "Reviewer Mode",
+      subtitle: "Use a checklist, review pathways, and leave comments on every screen for launch feedback.",
+      screen: "reviewer",
+      show: activeUser?.role === "Reviewer" || !activeUser || isStaff,
     },
     {
       title: "Registration / Profile",
@@ -2966,13 +3030,17 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
+            <p className="mt-4 max-w-4xl text-sm leading-7 text-white/78">Marketplace is text-based for soft launch so every item clearly shows name, description, price, inventory, SNAP eligibility, source, and action. Product photos can be added later when they match actual inventory.</p>
             <div className="mt-5 flex flex-wrap gap-2">
               {categories.map((cat) => <button type="button" key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
                 <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
-                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-95" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
+                  <div className="border-b border-white/10 bg-emerald-300/10 p-4">
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Text-Based Product Card</div>
+                    <div className="mt-1 text-sm text-white/70">No placeholder images until product photos match inventory.</div>
+                  </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
                     <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
@@ -3129,7 +3197,7 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 
-function VideoLibrary({ compact = false }: { compact?: boolean }) {
+function VideoLibrary({ compact = false, setScreen }: { compact?: boolean; setScreen?: (screen: Screen) => void }) {
   return (
     <div className="mt-7 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
@@ -3186,6 +3254,12 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
                   <>Expected file: <span className="font-black text-white/80">{video.file}</span></>
                 )}
               </div>
+              {setScreen && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">⬅ Return to Media</button>
+                  <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Continue to Project</button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -3225,7 +3299,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         ))}
       </div>
-      <VideoLibrary />
+      <VideoLibrary setScreen={setScreen} />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
@@ -3298,10 +3372,14 @@ function CoolingCenterProjectModule({
               className="h-full w-full"
             />
           </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">⬅ Return to My Day</button>
+            <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Continue to Team Assignments</button>
+          </div>
         </div>
       )}
 
-      {!compact && <VideoLibrary compact />}
+      {!compact && <VideoLibrary compact setScreen={setScreen} />}
 
       <div className="mt-7 grid gap-4 lg:grid-cols-4">
         {coolingCenterTeams.map((team) => (
@@ -3432,7 +3510,7 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <p className="text-sm text-white/80">Youth Workforce Launch: June 8, 2026 — 8:00 AM</p>
         <p className="mt-4 text-xl font-black">We Grow Green to Harvest Dreams.</p>
       </div>
-      <VideoLibrary />
+      <VideoLibrary setScreen={setScreen} />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
@@ -3447,6 +3525,27 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
+      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">🚦 Launch Readiness Dashboard</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {[
+            ["Portal / Forest Gate", "🟢 Ready"],
+            ["Images", "🟡 Verify on Vercel"],
+            ["Navigation", "🟡 Final button audit"],
+            ["Marketplace", "🟢 Text-only cards"],
+            ["Reviewer Mode", "🟢 Active"],
+            ["Youth 8-Week Journey", "🟢 Visible"],
+            ["Fan Video", "🟢 Embedded"],
+            ["Farm Conditions", "🟡 Manual status"],
+            ["Soft Launch", "🟢 Ready for reviewers"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="text-sm font-black">{label}</div>
+              <div className="mt-2 text-lg font-black">{value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments."],
@@ -3469,6 +3568,127 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+
+function ReviewerMode({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [rating, setRating] = useState(5);
+  const [workedWell, setWorkedWell] = useState("");
+  const [confusing, setConfusing] = useState("");
+  const [improvement, setImprovement] = useState("");
+  const [saved, setSaved] = useState("");
+  const comments = safeRead<ReviewerComment[]>(REVIEWER_KEY, []);
+  const checklist = [
+    ["Portal / Forest Gate", "portal"],
+    ["Connected Food Ecosystem", "guest"],
+    ["Youth Pathway", "youth"],
+    ["June 8 Project", "launchProject"],
+    ["Marketplace", "marketplace"],
+    ["Parent Portal", "parent"],
+    ["Supervisor Center", "supervisor"],
+    ["Grower Pathway", "grower"],
+    ["Partner Pathway", "partner"],
+    ["Media Center", "media"],
+  ] as [string, Screen][];
+
+  const save = () => {
+    const row: ReviewerComment = {
+      id: uuid(),
+      screen: "Reviewer Mode / Current Review",
+      role: activeUser?.role || "Reviewer",
+      rating,
+      worked_well: workedWell,
+      confusing,
+      improvement,
+      created_at: new Date().toISOString(),
+    };
+    safeWrite(REVIEWER_KEY, [row, ...comments].slice(0, 250));
+    setSaved("Reviewer comment saved on this device for launch review.");
+    setWorkedWell("");
+    setConfusing("");
+    setImprovement("");
+  };
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-yellow-100/75">Reviewer Mode</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Review the ecosystem before soft launch.</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
+        Use this mode to test the Portal, role pathways, Marketplace, Media Center, Youth Workforce flow, and comment on what works, what is confusing, and what should improve.
+      </p>
+
+      <div className="mt-7 grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xl font-black">Review Checklist</div>
+          <div className="mt-4 grid gap-2">
+            {checklist.map(([label, target], index) => (
+              <button type="button" key={label} onClick={() => setScreen(target)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black hover:bg-emerald-300 hover:text-black">
+                {index + 1}. {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xl font-black">Reviewer Comment</div>
+          <div className="mt-4 grid gap-4">
+            <SelectField label="Rating" value={String(rating)} onChange={(value) => setRating(Number(value))} options={["5", "4", "3", "2", "1"]} />
+            <TextArea label="What worked well?" value={workedWell} onChange={setWorkedWell} />
+            <TextArea label="What was confusing?" value={confusing} onChange={setConfusing} />
+            <TextArea label="What should be improved?" value={improvement} onChange={setImprovement} />
+          </div>
+          <button type="button" onClick={save} className="mt-5 w-full rounded-full bg-emerald-300 px-6 py-4 font-black text-black">Save Reviewer Comment</button>
+          {saved && <Notice text={saved} />}
+        </div>
+      </div>
+
+      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/25 p-5">
+        <div className="text-xl font-black">Reviewer Feedback Center</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white/10 p-4"><div className="text-3xl font-black">{comments.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Reviews Saved</div></div>
+          <div className="rounded-2xl bg-white/10 p-4"><div className="text-3xl font-black">{comments.length ? (comments.reduce((sum, item) => sum + item.rating, 0) / comments.length).toFixed(1) : "—"}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Average Rating</div></div>
+          <div className="rounded-2xl bg-white/10 p-4"><div className="text-3xl font-black">Soft Launch</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Review Phase</div></div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function FarmConditions({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-sky-100/75">🌤 Farm Conditions</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Outdoor work safety starts with conditions.</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
+        This soft-launch panel gives youth, parents, supervisors, and reviewers one place to check weather-related safety reminders before outdoor work begins.
+      </p>
+      <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {[
+          ["Location", farmConditions.location],
+          ["Temperature", farmConditions.temperature],
+          ["Heat Index", farmConditions.heatIndex],
+          ["Rain Chance", farmConditions.rainChance],
+          ["Wind", farmConditions.wind],
+          ["Outdoor Work Status", farmConditions.outdoorWorkStatus],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-sky-100/70">{label}</div>
+            <div className="mt-3 text-lg font-black">{value}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
+        <div className="text-xl font-black">Heat-Safety Reminders</div>
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {farmConditions.reminders.map((item) => <div key={item} className="rounded-2xl bg-black/25 p-3 text-sm font-black">✓ {item}</div>)}
+        </div>
+      </div>
+      <div className="mt-7 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Day</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Cooling Station Challenge</button>
+      </div>
+    </Card>
+  );
+}
 
 function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const stops = [
