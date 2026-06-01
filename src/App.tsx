@@ -399,7 +399,9 @@ const coolingCenterReflectionQuestions = [
 type LaunchVideo = {
   title: string;
   purpose: string;
-  file: string;
+  file?: string;
+  embedUrl?: string;
+  embedTitle?: string;
   fallback: string;
   tags: string[];
 };
@@ -421,10 +423,11 @@ const launchVideos: LaunchVideo[] = [
   },
   {
     title: "Fan Template & Design Demonstration Video",
-    purpose: "Shows how the Design Team creates and tests fan templates before Engineering lays them out on cardboard.",
-    file: "/videos/fan-template-design-demo.mp4",
-    fallback: "Upload the fan/template design video to public/videos/fan-template-design-demo.mp4 or replace this placeholder with a link.",
-    tags: ["Fan Video", "Design", "Templates"],
+    purpose: "Watch the cardboard fan demonstration before the June 8 Cooling Station Challenge. Youth use this to understand how the template, assembly, and hand-powered fan concept works before Design, Engineering, Manufacturing, and Contractor teams begin their work.",
+    embedUrl: "https://www.youtube.com/embed/dtYzf3avkT4",
+    embedTitle: "DIY Cardboard Fan | Cardboard Fan no motor no battery",
+    fallback: "Embedded YouTube demonstration: DIY Cardboard Fan | Cardboard Fan no motor no battery.",
+    tags: ["Fan Video", "Design", "Templates", "June 8"],
   },
   {
     title: "Manufacturing: Assemble, Paint, Personalize, and Quality Check",
@@ -2892,25 +2895,42 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
       <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
       <h2 className="mt-3 text-2xl font-black">June 5 and June 8 media documentation</h2>
       <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78">
-        This section is ready for the staff orientation video, fan demonstration video, manufacturing/painting video, youth interviews, and the final Cooling Station completion video. Video boxes show a placeholder until files are uploaded into the public/videos folder.
+        This section organizes the staff orientation video, the June 8 fan demonstration, manufacturing/painting documentation, youth interviews, and the final Cooling Station completion video. The fan demonstration is embedded for launch so youth can watch it before beginning their assignments.
       </p>
       <div className={`mt-5 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}>
         {launchVideos.map((video) => (
           <div key={video.title} className="overflow-hidden rounded-[1.35rem] border border-white/10 bg-black/35">
-            <video
-              controls
-              preload="metadata"
-              className="aspect-video w-full bg-black/70 object-cover"
-              onError={(event) => {
-                const wrapper = event.currentTarget.parentElement?.querySelector("[data-video-fallback]") as HTMLElement | null;
-                if (wrapper) wrapper.style.display = "block";
-              }}
-            >
-              <source src={video.file} type="video/mp4" />
-            </video>
-            <div data-video-fallback style={{ display: "none" }} className="border-y border-amber-200/15 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-amber-50">
-              {video.fallback}
-            </div>
+            {video.embedUrl ? (
+              <div className="aspect-video w-full overflow-hidden bg-black/80">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={video.embedUrl}
+                  title={video.embedTitle || video.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="h-full w-full"
+                />
+              </div>
+            ) : (
+              <>
+                <video
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full bg-black/70 object-cover"
+                  onError={(event) => {
+                    const wrapper = event.currentTarget.parentElement?.querySelector("[data-video-fallback]") as HTMLElement | null;
+                    if (wrapper) wrapper.style.display = "block";
+                  }}
+                >
+                  {video.file && <source src={video.file} type="video/mp4" />}
+                </video>
+                <div data-video-fallback style={{ display: "none" }} className="border-y border-amber-200/15 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-amber-50">
+                  {video.fallback}
+                </div>
+              </>
+            )}
             <div className="p-4">
               <h3 className="text-lg font-black">{video.title}</h3>
               <p className="mt-2 text-sm leading-6 text-white/74">{video.purpose}</p>
@@ -2920,7 +2940,11 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
                 ))}
               </div>
               <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] leading-5 text-white/62">
-                Expected file: <span className="font-black text-white/80">{video.file}</span>
+                {video.embedUrl ? (
+                  <>Embedded launch video: <span className="font-black text-white/80">YouTube demonstration ready</span></>
+                ) : (
+                  <>Expected file: <span className="font-black text-white/80">{video.file}</span></>
+                )}
               </div>
             </div>
           </div>
@@ -3014,6 +3038,28 @@ function CoolingCenterProjectModule({
       <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5 text-sm leading-7 text-white/84">
         <b>Farm connection:</b> {featuredProject.farmConnection}
       </div>
+
+      {!compact && (
+        <div className="mt-7 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
+          <h2 className="mt-3 text-2xl font-black">Fan Template & Design Demonstration</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
+            This demonstration supports the June 8 Farm Worker Heat Safety & Cooling Station Challenge. Youth should watch it before the Design, Engineering, Manufacturing, and Contractor teams begin their assignments.
+          </p>
+          <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/dtYzf3avkT4"
+              title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+      )}
 
       {!compact && <VideoLibrary compact />}
 
