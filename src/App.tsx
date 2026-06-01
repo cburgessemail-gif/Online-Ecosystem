@@ -348,6 +348,252 @@ function languageDir(language: LanguageCode) {
 }
 
 
+// Launch Candidate 1.4: full-screen translation safety layer.
+// This covers hardcoded legacy screen text while the app is being stabilized.
+// The menu still uses the structured translation dictionary; this layer translates
+// body text, card titles, buttons, alerts, and common placeholders visible on every screen.
+const fullScreenPhrases: Record<LanguageCode, Record<string, string>> = {
+  en: {},
+  es: {
+    "Bronson Family Farm": "Bronson Family Farm",
+    "Online Ecosystem": "Ecosistema en línea",
+    "Enter the living ecosystem.": "Entre al ecosistema vivo.",
+    "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Bienvenido al Ecosistema Regional de Alimentos de Mahoning y Trumbull. Centros regionales actuales: Youngstown — Bronson Family Farm y Warren — Parker Farms. Esta plataforma conecta desarrollo laboral juvenil, padres, productores, aliados, colaboradores, mercado, bienestar, seguridad, comentarios e informes de impacto.",
+    "Launch Focus": "Enfoque de lanzamiento",
+    "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.": "Centros regionales: Youngstown — Bronson Family Farm y Warren — Parker Farms.",
+    "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.": "Elija un rol y siga una ruta guiada con recursos, oportunidades y próximos pasos.",
+    "Supervisor Operations Center is the staff-only control room.": "El Centro de Operaciones de Supervisores es el espacio de control solo para el personal.",
+    "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.": "Los registros de jóvenes y supervisores se guardan localmente primero y luego se sincronizan con Supabase cuando está conectado.",
+    "Parents receive progress summaries, not private raw youth reflections.": "Los padres reciben resúmenes de progreso, no reflexiones privadas sin procesar de los jóvenes.",
+    "Incident and support flags stay staff-facing.": "Los incidentes y señales de apoyo permanecen para el personal.",
+    "Reports convert daily records into launch readiness and program impact.": "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.",
+    "Start Guided Demo": "Iniciar recorrido guiado",
+    "Enter The Ecosystem": "Entrar al ecosistema",
+    "Register / Check In": "Registrarse / Check-in",
+    "My Workspace": "Mi espacio",
+    "Welcome Back / Journey Memory": "Bienvenido de nuevo / Memoria del recorrido",
+    "Journey Completion": "Finalización del recorrido",
+    "Guest Pathway": "Ruta de visitante",
+    "Guided Demo": "Recorrido guiado",
+    "Pathway": "Ruta",
+    "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados se mueven juntos.",
+    "Return to Portal": "Volver al portal",
+    "Choose Another Role": "Elegir otro rol",
+    "Comment on This Screen": "Comentar esta pantalla",
+    "Go to Marketplace": "Ir al mercado",
+    "Complete Journey": "Completar recorrido",
+    "Parent / Guardian Portal": "Portal de padres / tutores",
+    "Progress, encouragement, and next steps.": "Progreso, ánimo y próximos pasos.",
+    "Parents see attendance, accomplishments, badges, goals, and parent-safe messages. Private wellness reflections remain staff-protected.": "Los padres ven asistencia, logros, insignias, metas y mensajes seguros para la familia. Las reflexiones privadas de bienestar permanecen protegidas por el personal.",
+    "No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center.": "Aún no se han guardado resúmenes para padres. Los supervisores pueden crearlos en el Centro de Operaciones de Supervisores.",
+    "Supervisor Center": "Centro de supervisores",
+    "Registration Center": "Centro de registro",
+    "Create the profile once. Reuse it everywhere.": "Cree el perfil una vez. Reutilícelo en todo el ecosistema.",
+    "Role / Registration Type": "Rol / Tipo de registro",
+    "Preferred Name": "Nombre preferido",
+    "First Name": "Nombre",
+    "Last Name": "Apellido",
+    "Email": "Correo electrónico",
+    "Phone": "Teléfono",
+    "Youth Workforce Details": "Detalles del programa juvenil",
+    "Crew": "Equipo",
+    "Guardian Name": "Nombre del tutor",
+    "Guardian Phone": "Teléfono del tutor",
+    "Guardian Email": "Correo del tutor",
+    "Medical / allergy notes": "Notas médicas / alergias",
+    "Youth program goal": "Meta del joven en el programa",
+    "Save Registration": "Guardar registro",
+    "Go to Supervisor Center": "Ir al centro de supervisores",
+    "Youth Morning Readiness Check-In": "Check-in matutino de preparación juvenil",
+    "Start My Day": "Comenzar mi día",
+    "One screen records attendance, PPE readiness, basic wellness, and support needs.": "Una pantalla registra asistencia, preparación de PPE, bienestar básico y necesidades de apoyo.",
+    "Identity + Attendance": "Identidad + asistencia",
+    "Youth Participant": "Participante joven",
+    "PPE Check": "Revisión de PPE",
+    "Closed-toe shoes / boots": "Zapatos cerrados / botas",
+    "Water bottle": "Botella de agua",
+    "Work gloves": "Guantes de trabajo",
+    "Appropriate outdoor clothing": "Ropa adecuada para el exterior",
+    "Sunscreen": "Protector solar",
+    "Hat / weather protection": "Sombrero / protección climática",
+    "Ready for assignment": "Listo para la asignación",
+    "Readiness + Support": "Preparación + apoyo",
+    "Mood": "Ánimo",
+    "Energy": "Energía",
+    "Sleep": "Sueño",
+    "Food Today": "Comida hoy",
+    "Hope": "Esperanza",
+    "Belonging": "Pertenencia",
+    "Trusted Adult": "Adulto de confianza",
+    "Confidence": "Confianza",
+    "Stress": "Estrés",
+    "Equipment Needed": "Equipo necesario",
+    "Daily Goal": "Meta del día",
+    "Need Supervisor Support?": "¿Necesita apoyo del supervisor?",
+    "Private Note for Approved Staff": "Nota privada para personal autorizado",
+    "Back to Youth Journey": "Volver a la ruta juvenil",
+    "Feedback": "Comentarios",
+    "Tell us about the platform and program experience.": "Cuéntenos sobre la experiencia de la plataforma y el programa.",
+    "Rating": "Calificación",
+    "I would recommend this experience.": "Recomendaría esta experiencia.",
+    "Comments": "Comentarios",
+    "Save Feedback": "Guardar comentarios",
+    "Save Feedback / Comments": "Guardar comentarios",
+    "Feedback saved.": "Comentarios guardados.",
+    "Marketplace Operations Center": "Centro de operaciones del mercado",
+    "GrownBy + Direct Sales.": "GrownBy + ventas directas.",
+    "Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.": "Las ventas pueden realizarse por GrownBy o directamente por Bronson. Este centro convierte pedidos en planificación de cosecha, empaque, recogida e informes.",
+    "Operations Dashboard": "Panel de operaciones",
+    "Product Catalog": "Catálogo de productos",
+    "Cart / Checkout": "Carrito / pago",
+    "Orders": "Pedidos",
+    "Harvest / Fulfillment": "Cosecha / cumplimiento",
+    "Catalog Admin": "Administración del catálogo",
+    "Orders Today": "Pedidos de hoy",
+    "Sales Today": "Ventas de hoy",
+    "Live Marketplace Command": "Comando del mercado en vivo",
+    "Orders become harvest instructions.": "Los pedidos se convierten en instrucciones de cosecha.",
+    "GrownBy Orders": "Pedidos de GrownBy",
+    "Direct Orders": "Pedidos directos",
+    "Pending Pickups": "Recogidas pendientes",
+    "SNAP Products": "Productos SNAP",
+    "Harvest Ready": "Listo para cosecha",
+    "Needs Fulfillment": "Necesita cumplimiento",
+    "Inventory Alerts": "Alertas de inventario",
+    "Revenue Today": "Ingresos de hoy",
+    "GrownBy Channel": "Canal GrownBy",
+    "Direct Channel": "Canal directo",
+    "Youth Connection": "Conexión juvenil",
+    "Use for sales you complete through GrownBy, especially SNAP-supported orders. Enter the GrownBy reference so harvest and pickup can be tracked here.": "Use para ventas completadas por GrownBy, especialmente pedidos con apoyo SNAP. Ingrese la referencia de GrownBy para rastrear cosecha y recogida.",
+    "Use for farm gate sales, schools, businesses, churches, events, wholesale, invoices, and community orders.": "Use para ventas en la granja, escuelas, negocios, iglesias, eventos, mayoreo, facturas y pedidos comunitarios.",
+    "Youth should see safe marketplace impact: where food is going, what crops are needed, and why today’s harvest matters — not private customer data.": "Los jóvenes deben ver el impacto seguro del mercado: a dónde va la comida, qué cultivos se necesitan y por qué la cosecha de hoy importa — no datos privados de clientes.",
+    "Grower Pathway": "Ruta del productor",
+    "Every grower belongs here: backyard gardens, raised beds, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms. Growers can connect crop planning, resource needs, inventory, training, and marketplace opportunity.": "Todo productor pertenece aquí: patios, camas elevadas, jardines comunitarios, escolares, de iglesias, granjas urbanas, invernaderos y granjas de mercado. Los productores conectan planificación de cultivos, necesidades de recursos, inventario, capacitación y oportunidades de mercado.",
+    "Partner Pathway": "Ruta de aliados",
+    "Support the Ecosystem": "Apoyar el ecosistema",
+    "Value-Added Producer Pathway": "Ruta de productor de valor agregado",
+    "Ecosystem Explorer": "Explorador del ecosistema",
+    "Completion Certificate": "Certificado de finalización",
+    "Impact Interests": "Intereses de impacto",
+    "Save Completion": "Guardar finalización",
+    "Public / Guest": "Público / Visitante",
+    "Sign Out": "Salir"
+  },
+  tl: {
+    "Enter the living ecosystem.": "Pumasok sa buhay na ecosystem.",
+    "Start Guided Demo": "Simulan ang guided demo",
+    "Enter The Ecosystem": "Pumasok sa ecosystem",
+    "Register / Check In": "Magrehistro / check-in",
+    "My Workspace": "Aking workspace",
+    "Guest Pathway": "Landas ng bisita",
+    "Progress, encouragement, and next steps.": "Pag-unlad, paghihikayat, at susunod na hakbang.",
+    "Supervisor Center": "Sentro ng supervisor",
+    "Start My Day": "Simulan ang araw ko",
+    "Save Feedback": "I-save ang feedback",
+    "Feedback saved.": "Na-save ang feedback.",
+    "Return to Portal": "Bumalik sa portal",
+    "Choose Another Role": "Pumili ng ibang role",
+    "Go to Marketplace": "Pumunta sa marketplace",
+    "Complete Journey": "Kumpletuhin ang journey"
+  },
+  it: {
+    "Enter the living ecosystem.": "Entra nell'ecosistema vivo.",
+    "Start Guided Demo": "Avvia tour guidato",
+    "Enter The Ecosystem": "Entra nell'ecosistema",
+    "Register / Check In": "Registrati / check-in",
+    "My Workspace": "Il mio spazio",
+    "Guest Pathway": "Percorso ospite",
+    "Progress, encouragement, and next steps.": "Progresso, incoraggiamento e prossimi passi.",
+    "Supervisor Center": "Centro supervisori",
+    "Start My Day": "Inizia la mia giornata",
+    "Save Feedback": "Salva feedback",
+    "Feedback saved.": "Feedback salvato.",
+    "Return to Portal": "Ritorna al portale",
+    "Choose Another Role": "Scegli un altro ruolo",
+    "Go to Marketplace": "Vai al mercato",
+    "Complete Journey": "Completa il percorso"
+  },
+  he: {
+    "Enter the living ecosystem.": "היכנסו לאקוסיסטם החי.",
+    "Start Guided Demo": "התחל סיור מודרך",
+    "Enter The Ecosystem": "היכנס לאקוסיסטם",
+    "Register / Check In": "הרשמה / צ'ק-אין",
+    "My Workspace": "המרחב שלי",
+    "Guest Pathway": "מסלול אורח",
+    "Progress, encouragement, and next steps.": "התקדמות, עידוד והצעדים הבאים.",
+    "Supervisor Center": "מרכז מדריכים",
+    "Start My Day": "התחל את היום שלי",
+    "Save Feedback": "שמור משוב",
+    "Feedback saved.": "המשוב נשמר.",
+    "Return to Portal": "חזרה לשער",
+    "Choose Another Role": "בחר תפקיד אחר",
+    "Go to Marketplace": "לשוק",
+    "Complete Journey": "סיום המסע"
+  },
+  fr: {
+    "Enter the living ecosystem.": "Entrez dans l'écosystème vivant.",
+    "Start Guided Demo": "Démarrer la visite guidée",
+    "Enter The Ecosystem": "Entrer dans l'écosystème",
+    "Register / Check In": "S'inscrire / pointage",
+    "My Workspace": "Mon espace",
+    "Guest Pathway": "Parcours invité",
+    "Progress, encouragement, and next steps.": "Progrès, encouragement et prochaines étapes.",
+    "Supervisor Center": "Centre superviseur",
+    "Start My Day": "Commencer ma journée",
+    "Save Feedback": "Enregistrer les commentaires",
+    "Feedback saved.": "Commentaires enregistrés.",
+    "Return to Portal": "Retour au portail",
+    "Choose Another Role": "Choisir un autre rôle",
+    "Go to Marketplace": "Aller au marché",
+    "Complete Journey": "Terminer le parcours"
+  }
+};
+
+function phraseFor(language: LanguageCode, raw: string) {
+  if (language === "en") return raw;
+  const trimmed = raw.trim();
+  return fullScreenPhrases[language]?.[trimmed] || screenText[language]?.[trimmed] || languageText[language]?.[trimmed] || trimmed;
+}
+
+function applyFullScreenTranslation(language: LanguageCode) {
+  if (typeof document === "undefined") return;
+  const root = document.querySelector("[data-bff-app-root]") || document.body;
+  const skipTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "INPUT", "SELECT", "OPTION"]);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || skipTags.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
+      const text = node.textContent || "";
+      if (!text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  nodes.forEach((node) => {
+    const original = node.parentElement?.getAttribute("data-original-text") || node.textContent || "";
+    const translated = phraseFor(language, original);
+    if (translated && translated !== original.trim()) {
+      node.parentElement?.setAttribute("data-original-text", original.trim());
+      node.textContent = node.textContent?.replace(original.trim(), translated) || translated;
+    }
+  });
+
+  const placeholders: Record<string, string> = {
+    "Example: Supervisor Aide": language === "es" ? "Ejemplo: Asistente supervisor" : language === "fr" ? "Exemple : assistant superviseur" : language === "it" ? "Esempio: assistente supervisore" : language === "tl" ? "Halimbawa: Supervisor Aide" : language === "he" ? "דוגמה: עוזר מדריך" : "Example: Supervisor Aide",
+    "What do you want to accomplish today?": language === "es" ? "¿Qué quiere lograr hoy?" : language === "fr" ? "Que voulez-vous accomplir aujourd'hui ?" : language === "it" ? "Cosa vuoi realizzare oggi?" : language === "tl" ? "Ano ang gusto mong matapos ngayon?" : language === "he" ? "מה תרצה להשיג היום?" : "What do you want to accomplish today?",
+    "Optional. A supervisor can check in privately.": language === "es" ? "Opcional. Un supervisor puede comunicarse en privado." : language === "fr" ? "Facultatif. Un superviseur peut vérifier en privé." : language === "it" ? "Facoltativo. Un supervisore può controllare privatamente." : language === "tl" ? "Opsyonal. Maaaring mag-check in nang pribado ang supervisor." : language === "he" ? "אופציונלי. מדריך יכול לבדוק בפרטיות." : "Optional. A supervisor can check in privately.",
+    "Enter name": language === "es" ? "Ingrese el nombre" : language === "fr" ? "Saisir le nom" : language === "it" ? "Inserisci nome" : language === "tl" ? "Ilagay ang pangalan" : language === "he" ? "הזן שם" : "Enter name"
+  };
+  root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((element) => {
+    const el = element as HTMLInputElement | HTMLTextAreaElement;
+    const original = el.getAttribute("data-original-placeholder") || el.getAttribute("placeholder") || "";
+    el.setAttribute("data-original-placeholder", original);
+    el.setAttribute("placeholder", placeholders[original] || phraseFor(language, original));
+  });
+}
+
+
 const screenText: Record<LanguageCode, Record<string, string>> = {
   en: {
     protectedMessage: "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.",
@@ -607,7 +853,9 @@ function App() {
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
-  }, [language]);
+    const timer = window.setTimeout(() => applyFullScreenTranslation(language), 0);
+    return () => window.clearTimeout(timer);
+  }, [language, screen, message, activeUser]);
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
@@ -708,7 +956,7 @@ function Shell({
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
+    <div data-bff-app-root className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
