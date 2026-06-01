@@ -396,6 +396,99 @@ const coolingCenterReflectionQuestions = [
 ];
 
 
+const youthCurriculumWeeks = [
+  {
+    week: 1,
+    title: "Workplace Foundations & Safety",
+    focus: "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.",
+    project: "Farm Worker Heat Safety & Cooling Station Challenge",
+    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Following Instructions"],
+    badge: "🏅 Workplace Foundations",
+    status: "Current Week",
+  },
+  {
+    week: 2,
+    title: "Regenerative Agriculture",
+    focus: "Soil health, compost, planting, biodiversity, food systems, and caring for land as a living ecosystem.",
+    project: "Regenerative growing and soil stewardship activities",
+    skills: ["Observation", "Soil Health", "Plant Care", "Environmental Stewardship"],
+    badge: "🌱 Regenerative Agriculture",
+    status: "Upcoming",
+  },
+  {
+    week: 3,
+    title: "Farm Infrastructure",
+    focus: "Fencing, water, shade, tools, work zones, field layout, safety zones, and farm operations support.",
+    project: "Farm infrastructure and site-readiness project",
+    skills: ["Construction", "Tool Safety", "Planning", "Logistics"],
+    badge: "🏗 Infrastructure Builder",
+    status: "Upcoming",
+  },
+  {
+    week: 4,
+    title: "Production & Harvest",
+    focus: "Crop care, harvesting, washing, sorting, handling, quality, and food safety awareness.",
+    project: "Production and harvest readiness activities",
+    skills: ["Harvest", "Quality Control", "Food Safety", "Responsibility"],
+    badge: "🥕 Production Specialist",
+    status: "Upcoming",
+  },
+  {
+    week: 5,
+    title: "Marketplace & Entrepreneurship",
+    focus: "Customer service, pricing, product presentation, GrownBy, SNAP awareness, and farm-based entrepreneurship.",
+    project: "Marketplace and customer experience project",
+    skills: ["Customer Service", "Sales", "Pricing", "Entrepreneurship"],
+    badge: "🛒 Marketplace Explorer",
+    status: "Upcoming",
+  },
+  {
+    week: 6,
+    title: "Leadership & Community",
+    focus: "Team leadership, communication, service, visitor support, community impact, and peer responsibility.",
+    project: "Leadership and community service activity",
+    skills: ["Leadership", "Service", "Communication", "Accountability"],
+    badge: "🤝 Community Leader",
+    status: "Upcoming",
+  },
+  {
+    week: 7,
+    title: "Career Exploration",
+    focus: "Agriculture, construction, engineering, culinary, tourism, marketing, environmental science, and public safety careers.",
+    project: "Career pathway exploration and portfolio development",
+    skills: ["Career Awareness", "Interviewing", "Goal Setting", "Professional Identity"],
+    badge: "🧭 Career Pathfinder",
+    status: "Upcoming",
+  },
+  {
+    week: 8,
+    title: "Capstone & Achievement",
+    focus: "Final project presentation, portfolio review, supervisor recognition, skills summary, and achievement certificate.",
+    project: "Cultivator capstone and achievement showcase",
+    skills: ["Presentation", "Reflection", "Portfolio", "Readiness"],
+    badge: "🏆 Cultivator Achievement",
+    status: "Upcoming",
+  },
+];
+
+const youthAchievementBadges = youthCurriculumWeeks.map((week) => ({
+  title: week.badge,
+  week: `Week ${week.week}`,
+  earned: week.week === 1,
+  description: week.focus,
+}));
+
+const youthPortfolioEntries = [
+  {
+    title: "Cooling Station Challenge",
+    date: "June 8, 2026",
+    team: "Design • Engineering • Manufacturing • Contractor",
+    evidence: "Check-in, fan demonstration video, project photos, team deliverables, reflection, and supervisor assessment.",
+    skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Farm Operations"],
+  },
+];
+
+
 type LaunchVideo = {
   title: string;
   purpose: string;
@@ -516,7 +609,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Return to Portal": "Volver al portal",
     "Choose Another Role": "Elegir otro rol",
     "Comment on This Screen": "Comentar esta pantalla",
-    "Complete Journey": "Completar recorrido",
+    "Record Achievement": "Completar recorrido",
     "Go to Marketplace": "Ir al mercado",
     "Guided Demo": "Recorrido guiado",
     "Experience the ecosystem in order.": "Experimente el ecosistema en orden.",
@@ -562,10 +655,10 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Progress, encouragement, and next steps.": "Progreso, ánimo y próximos pasos.",
     "No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center.": "Aún no se han guardado resúmenes para padres. Los supervisores pueden crearlos en el Centro de Operaciones de Supervisores.",
     "Supervisor Center": "Centro de supervisores",
-    "Journey Completion": "Finalización del recorrido",
-    "Completion Certificate": "Certificado de finalización",
+    "Achievement Center": "Finalización del recorrido",
+    "Cultivator Achievement Certificate": "Certificado de finalización",
     "This certifies that": "Esto certifica que",
-    "completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.": "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.",
+    "documented achievement through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.": "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.",
     "Save Completion": "Guardar finalización",
     "Impact Interests": "Intereses de impacto",
     "Leave Feedback": "Dejar comentarios",
@@ -597,7 +690,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Return to Portal": "Bumalik sa Portal",
     "Choose Another Role": "Pumili ng Ibang Role",
     "Comment on This Screen": "Magkomento sa Screen na Ito",
-    "Complete Journey": "Kumpletuhin ang Journey",
+    "Record Achievement": "Kumpletuhin ang Journey",
     "Go to Marketplace": "Pumunta sa Marketplace",
     "Guided Demo": "Guided Demo",
     "Experience the ecosystem in order.": "Damhin ang ecosystem sa tamang pagkakasunod-sunod.",
@@ -638,8 +731,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Parent / Guardian Portal": "Portal ng Magulang / Guardian",
     "Progress, encouragement, and next steps.": "Pag-unlad, paghihikayat, at susunod na hakbang.",
     "Supervisor Center": "Supervisor Center",
-    "Journey Completion": "Journey Completion",
-    "Completion Certificate": "Completion Certificate",
+    "Achievement Center": "Achievement Center",
+    "Cultivator Achievement Certificate": "Cultivator Achievement Certificate",
     "This certifies that": "Pinatutunayan nito na",
     "Save Completion": "I-save ang Completion",
     "Impact Interests": "Impact Interests",
@@ -658,7 +751,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Return to Portal": "Ritorna al portale",
     "Choose Another Role": "Scegli un altro ruolo",
     "Comment on This Screen": "Commenta questa schermata",
-    "Complete Journey": "Completa percorso",
+    "Record Achievement": "Completa percorso",
     "Go to Marketplace": "Vai al mercato",
     "Guest Pathway": "Percorso Ospite",
     "Grower Pathway": "Percorso Produttore",
@@ -671,8 +764,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "Salva feedback / commenti",
     "Progress, encouragement, and next steps.": "Progresso, incoraggiamento e prossimi passi.",
     "Supervisor Center": "Centro supervisori",
-    "Journey Completion": "Completamento del percorso",
-    "Completion Certificate": "Certificato di completamento",
+    "Achievement Center": "Completamento del percorso",
+    "Cultivator Achievement Certificate": "Certificato di completamento",
     "Save Completion": "Salva completamento",
     "Leave Feedback": "Lascia feedback"
   },
@@ -686,7 +779,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Return to Portal": "חזרה לשער",
     "Choose Another Role": "בחר תפקיד אחר",
     "Comment on This Screen": "הגב על המסך הזה",
-    "Complete Journey": "סיים מסע",
+    "Record Achievement": "סיים מסע",
     "Go to Marketplace": "לשוק",
     "Guest Pathway": "מסלול אורח",
     "Grower Pathway": "מסלול מגדלים",
@@ -699,8 +792,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "שמור משוב / תגובות",
     "Progress, encouragement, and next steps.": "התקדמות, עידוד והצעדים הבאים.",
     "Supervisor Center": "מרכז מדריכים",
-    "Journey Completion": "השלמת מסע",
-    "Completion Certificate": "תעודת השלמה",
+    "Achievement Center": "השלמת מסע",
+    "Cultivator Achievement Certificate": "תעודת השלמה",
     "Save Completion": "שמור השלמה",
     "Leave Feedback": "השאר משוב"
   },
@@ -715,7 +808,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Return to Portal": "Retour au portail",
     "Choose Another Role": "Choisir un autre rôle",
     "Comment on This Screen": "Commenter cet écran",
-    "Complete Journey": "Terminer le parcours",
+    "Record Achievement": "Terminer le parcours",
     "Go to Marketplace": "Aller au marché",
     "Guest Pathway": "Parcours invité",
     "Grower Pathway": "Parcours producteur",
@@ -728,8 +821,8 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "Enregistrer commentaires / feedback",
     "Progress, encouragement, and next steps.": "Progrès, encouragement et prochaines étapes.",
     "Supervisor Center": "Centre superviseur",
-    "Journey Completion": "Achèvement du parcours",
-    "Completion Certificate": "Certificat d’achèvement",
+    "Achievement Center": "Achèvement du parcours",
+    "Cultivator Achievement Certificate": "Certificat d’achèvement",
     "Save Completion": "Enregistrer l’achèvement",
     "Leave Feedback": "Laisser un commentaire"
   }
@@ -876,7 +969,7 @@ function screenLabel(screen: Screen) {
     media: "Media Center",
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
-    completion: "Journey Completion",
+    completion: "Achievement Center",
   };
   return labels[screen];
 }
@@ -1093,7 +1186,7 @@ function Shell({
         { key: "events", screen: "events" },
         { key: "media", screen: "media" },
         { key: "feedback", screen: "feedback" },
-        { key: "complete", screen: "completion" },
+        { key: "complete", screen: "completion", label: "Achievements" },
       ],
     },
     {
@@ -1640,22 +1733,125 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const currentWeek = youthCurriculumWeeks[0];
+  const completionPercent = 12.5;
+
   return (
-    <SimplePathway
-      title="Youth Workforce Pathway"
-      image={IMG.youth}
-      text="Youth begin with check-in, farm safety, heat-safety awareness, PPE, daily assignments, team identity, wellness awareness, reflection, and skill-building. The June 8 launch project connects youth work directly to real farm operations by building a Farm Worker Heat Safety & Cooling Station."
-      setScreen={setScreen}
-      extra={
-        <>
+    <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
+        <p className="mt-5 text-base leading-8 text-white/86">
+          Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
+        </p>
+
+        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
+          <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.objective}</p>
+          <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Date:</strong> {featuredProject.launchDate}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Start:</strong> {featuredProject.startTime}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Week:</strong> Week 1</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Badge:</strong> {currentWeek.badge}</div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">June 8 Cooling Station Challenge</button>
-          <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Events & Orientation</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Media Center</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
-        </>
-      }
-    />
+          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
+        </div>
+      </Card>
+
+      <div className="grid gap-5">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
+          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
+              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
+            </div>
+          </div>
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {currentWeek.skills.map((skill) => (
+              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
+          <h2 className="mt-3 text-3xl font-black">Cultivator Workforce Development Roadmap</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {youthCurriculumWeeks.map((week) => (
+              <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
+                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
+                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
+            <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated.</p>
+            <div className="mt-5 grid gap-3">
+              {youthPortfolioEntries.map((entry) => (
+                <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                  <div className="text-lg font-black">{entry.title}</div>
+                  <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
+                  <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.skills.map((skill) => (
+                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🏆 My Achievements</div>
+            <h2 className="mt-3 text-3xl font-black">Skills, Badges, and Recognition</h2>
+            <div className="mt-5 grid gap-3">
+              {youthAchievementBadges.map((badge) => (
+                <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg font-black">{badge.title}</div>
+                      <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
+                    </div>
+                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black">{badge.earned ? "Available Week 1" : "Upcoming"}</span>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -3502,7 +3698,7 @@ function SimplePathway({
           <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
           <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Complete Journey</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
           <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
         </div>
       </Card>
@@ -3529,12 +3725,12 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
   const complete = () => {
     const pathway = recent[0]?.label || screenLabel("completion");
     recordCompletion(pathway, activeUser);
-    setMessage("Journey completion saved on this device. You can continue exploring or share feedback.");
+    setMessage("Achievement progress saved on this device. You can continue exploring or share feedback.");
   };
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Achievement Center</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Ecosystem Explorer</h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
         Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
@@ -3542,13 +3738,13 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_.85fr]">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <h2 className="text-2xl font-black">Completion Certificate</h2>
+          <h2 className="text-2xl font-black">Cultivator Achievement Certificate</h2>
           <Field label="Name for certificate" value={name} onChange={setName} placeholder="Enter name" />
           <div className="mt-5 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-5 text-center">
             <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">This certifies that</div>
             <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Ecosystem Explorer"}</div>
             <p className="mt-3 text-sm leading-6 text-white/82">
-              completed a journey through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
+              documented achievement through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
             </p>
             <div className="mt-4 text-sm font-black">{new Date().toLocaleDateString()}</div>
           </div>
