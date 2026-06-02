@@ -340,45 +340,67 @@ const launchEvents = [
 
 const featuredProject = {
   id: "cooling-center-2026",
-  title: "Farm Worker Heat Safety & Cooling Station Challenge",
-  shortTitle: "Cooling Station Challenge",
+  title: "June 8 Workforce Production Challenge",
+  shortTitle: "63 Cooling Fan Challenge",
   launchDate: "June 8, 2026",
   startTime: "8:00 AM",
   status: "Launch Ready",
   objective:
-    "Youth will design and build a farm cooling station that helps protect farm workers, youth, volunteers, and visitors from heat stress during outdoor summer programming.",
+    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.",
   farmConnection:
-    "Bronson Family Farm is an outdoor workplace and agritourism site. Heat safety, shade, hydration, airflow, rest areas, worker wellness, and visitor comfort are real farm operations needs.",
+    "Bronson Family Farm is the customer that needs a cooling station. A contractor is hired to build it. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce. This teaches the business cycle, production, value creation, and how farm operations connect to real work.",
 };
 
 const coolingCenterTeams = [
   {
     name: "Design Team",
     icon: "🎨",
-    mission: "Create the fan template, prototype, cooling station layout, signage concept, and worker instructions.",
-    deliverables: ["Master fan template", "Prototype", "Cooling station layout", "Heat-safety signage concept"],
-    skills: ["Design thinking", "Creativity", "Measurement", "Visualization", "Communication"],
+    identity: "We help people see possibilities.",
+    recommendedShare: "Small team: 6–8 youth",
+    mission: "Create the visual direction for the 63-fan customer order and help the team imagine how simple materials can become useful products.",
+    deliverables: ["Color ideas", "Fan design standards", "Signs or labels", "Presentation support"],
+    skills: ["Creativity", "Branding", "Communication", "Design Thinking"],
+    careers: ["Graphic Designer", "Product Designer", "Architect", "Marketing Specialist", "Brand Designer"],
   },
   {
     name: "Engineering Team",
     icon: "📐",
-    mission: "Place templates on cardboard strategically, maximize material use, reduce waste, trace components, and cut the design safely under supervision.",
-    deliverables: ["Material layout plan", "Cardboard utilization plan", "Cut fan components", "Waste-reduction notes"],
-    skills: ["Engineering", "Geometry", "Resource stewardship", "Efficiency", "Critical thinking"],
+    identity: "We improve ideas.",
+    recommendedShare: "Small team: 5–7 youth",
+    mission: "Review how the fan works, improve the process, reduce waste, and help the production teams meet quality and safety standards.",
+    deliverables: ["Quality checklist", "Process improvements", "Material-use recommendations", "Safety review"],
+    skills: ["Problem Solving", "Testing", "Measurement", "Process Improvement"],
+    careers: ["Engineer", "Technician", "Quality Specialist", "Construction Planner", "Process Improvement Specialist"],
   },
   {
     name: "Manufacturing Team",
     icon: "🔧",
-    mission: "Assemble, paint, personalize, finish, and quality-check the fans before delivery to the Contractor Team.",
-    deliverables: ["Assembled fans", "Painted fans", "Personalized fans", "Quality-approved fans"],
-    skills: ["Production", "Assembly", "Finishing", "Branding", "Quality control", "Teamwork"],
+    identity: "We turn ideas into products.",
+    recommendedShare: "Largest team: 25–30 youth",
+    mission: "Produce the customer order by measuring, assembling, and preparing 63 cooling fans for finishing and delivery.",
+    deliverables: ["63 assembled fans", "Production count", "Safe assembly process", "Completed components"],
+    skills: ["Production", "Assembly", "Following Instructions", "Teamwork", "Responsibility"],
+    careers: ["Manufacturing Technician", "Fabricator", "Production Manager", "Machine Operator", "Assembler"],
   },
   {
-    name: "Contractor Team",
-    icon: "🏗",
-    mission: "Collect completed fans, construct the cooling station, install fan display, prepare the presentation area, and complete final site setup.",
-    deliverables: ["Cooling station built", "Fans installed", "Presentation area ready", "Final site cleanup"],
-    skills: ["Construction", "Logistics", "Project management", "Installation", "Leadership"],
+    name: "Finishing & Creative Team",
+    icon: "🖌",
+    identity: "We create value through quality and presentation.",
+    recommendedShare: "Medium team: 10–12 youth",
+    mission: "Paint, personalize, and prepare the fans so the final products look finished, intentional, and ready for the customer.",
+    deliverables: ["Painted fans", "Personalized designs", "Finished appearance", "Quality-ready products"],
+    skills: ["Painting", "Attention to Detail", "Creativity", "Quality Control"],
+    careers: ["Painter", "Finishing Specialist", "Product Inspector", "Quality Control Technician"],
+  },
+  {
+    name: "Logistics & Contractor Team",
+    icon: "📦",
+    identity: "We connect products to people.",
+    recommendedShare: "Medium team: 8–10 youth",
+    mission: "Organize materials, track inventory, manage drying and delivery staging, and help the contractor prepare the fans for the cooling station.",
+    deliverables: ["Materials organized", "Inventory count", "Drying area managed", "Delivery-ready order"],
+    skills: ["Logistics", "Inventory", "Project Management", "Customer Service"],
+    careers: ["Supply Chain Manager", "Warehouse Manager", "Transportation Coordinator", "Project Manager", "Operations Specialist"],
   },
 ];
 
@@ -600,7 +622,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Farm Worker Heat Safety & Cooling Station Challenge": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
-    "Youth will design and build a farm cooling station that helps protect farm workers, youth, volunteers, and visitors from heat stress during outdoor summer programming.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
+    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
     "Today's Project": "Proyecto de Hoy",
   },
   tl: {
@@ -630,7 +652,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Farm Worker Heat Safety & Cooling Station Challenge": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang June 8 Cooling Station Challenge.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang portfolio at mga nakamit.",
-    "Youth will design and build a farm cooling station that helps protect farm workers, youth, volunteers, and visitors from heat stress during outdoor summer programming.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
+    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
     "Today's Project": "Proyekto Ngayon",
   },
   it: {
@@ -1593,7 +1615,7 @@ function LaunchAuditDetailGrid({
 }) {
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Ecosystem Journey</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Launch Audit Fix</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
@@ -1701,14 +1723,14 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         }
       />
       <LaunchAuditDetailGrid
-        title="Explore the Connected Food Ecosystem"
+        title="Guest journey now has a complete launch story."
         items={[
-          { heading: "Farm Story", body: "Bronson Family Farm combines regenerative agriculture, workforce development, agritourism, food access, and community partnerships to create opportunity throughout the Mahoning Valley." },
-          { heading: "Historic Place", body: "Located at the historic Lansdowne Airport property, the farm demonstrates how community assets can be transformed into places of learning, production, recreation, and economic opportunity." },
-          { heading: "Regenerative Farming", body: "Regenerative agriculture strengthens soil health, biodiversity, environmental stewardship, and long-term food production for future generations." },
-          { heading: "Connected Food Ecosystem", body: "Youth, growers, customers, volunteers, families, educators, and partners all contribute to a stronger local food economy through one connected ecosystem." },
-          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms work together to strengthen workforce development, food access, and regional collaboration." },
-          { heading: "Get Involved", body: "Attend events, volunteer, shop the marketplace, become a grower, join the workforce program, become a partner, or support the mission." },
+          { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
+          { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
+          { heading: "Regenerative Farming", body: "Guests learn that regenerative agriculture develops the land while improving soil, reducing waste, protecting natural systems, and strengthening future production." },
+          { heading: "Connected Food Ecosystem", body: "The ecosystem connects youth, growers, marketplace customers, parents, partners, volunteers, and value-added producers in one guided experience." },
+          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms are presented as regional hubs in the Mahoning and Trumbull food ecosystem." },
+          { heading: "Conversion Actions", body: "Guests can attend events, volunteer, shop, become customers, become partners, leave feedback, or continue to the marketplace." },
         ]}
       />
     </>
@@ -3700,85 +3722,274 @@ function CoolingCenterProjectModule({
   compact?: boolean;
 }) {
   const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.coolingCenterProgress", []));
+  const [selectedTeam, setSelectedTeam] = useState<string>("Manufacturing Team");
+  const [contributions, setContributions] = useState<string[]>(() => safeRead<string[]>("bff.launch.myContributions", []));
+  const [learning, setLearning] = useState<string[]>(() => safeRead<string[]>("bff.launch.whatILearned", []));
+  const [visionBefore, setVisionBefore] = useState(() => safeRead<string>("bff.launch.visionBefore", ""));
+  const [visionAfter, setVisionAfter] = useState(() => safeRead<string>("bff.launch.visionAfter", ""));
+  const [oneAcre, setOneAcre] = useState(() => safeRead<string>("bff.launch.oneAcre", ""));
+
+  const selectedTeamInfo = coolingCenterTeams.find((team) => team.name === selectedTeam) || coolingCenterTeams[2];
+
   const toggleSaved = (item: string) => {
     const next = savedItems.includes(item) ? savedItems.filter((x) => x !== item) : [item, ...savedItems];
     setSavedItems(next);
     safeWrite("bff.launch.coolingCenterProgress", next);
   };
+
+  const toggleContribution = (item: string) => {
+    const next = contributions.includes(item) ? contributions.filter((x) => x !== item) : [item, ...contributions];
+    setContributions(next);
+    safeWrite("bff.launch.myContributions", next);
+  };
+
+  const toggleLearning = (item: string) => {
+    const next = learning.includes(item) ? learning.filter((x) => x !== item) : [item, ...learning];
+    setLearning(next);
+    safeWrite("bff.launch.whatILearned", next);
+  };
+
+  const saveVision = () => {
+    safeWrite("bff.launch.visionBefore", visionBefore);
+    safeWrite("bff.launch.visionAfter", visionAfter);
+    safeWrite("bff.launch.oneAcre", oneAcre);
+  };
+
+  const contributionItems = [
+    "Creating ideas",
+    "Solving problems",
+    "Building products",
+    "Supporting my team",
+    "Helping a customer",
+    "Creating value",
+    "Learning a new skill",
+    "Improving a process",
+    "Helping someone succeed",
+    "Demonstrating leadership",
+    "Showing creativity",
+    "Practicing responsibility",
+    "Completing assigned tasks",
+    "Maintaining quality standards",
+    "Supporting safety",
+  ];
+
+  const learningItems = [
+    "How businesses work",
+    "How customers and contractors work together",
+    "How products are manufactured",
+    "How quality affects customer satisfaction",
+    "How creativity creates value",
+    "How teamwork improves results",
+    "How communication helps projects succeed",
+    "How planning saves time and money",
+    "How ideas become products",
+    "How products create opportunities",
+    "How entrepreneurs identify opportunities",
+    "How money is earned by solving problems",
+    "How food moves from farms to customers",
+    "How rising costs affect businesses and families",
+    "How workforce skills prepare me for future opportunities",
+    "How Bronson Family Farm creates value for the community",
+    "That I am capable of more than I realized",
+  ];
+
   const productionItems = [
     "Youth checked in",
     "PPE and water confirmed",
-    "Heat-safety lesson completed",
-    "Design templates approved",
-    "Engineering layout completed",
-    "Cardboard components cut",
+    "Why this project matters lesson completed",
+    "Entrepreneur example discussed",
+    "Vision challenge completed",
+    "My Contribution selected",
+    "Teams assigned",
+    "Customer order explained: 63 fans",
+    "Business cycle explained",
+    "Design standards approved",
+    "Engineering quality checklist completed",
+    "Manufacturing stations active",
     "Fans assembled",
     "Fans painted and personalized",
     "Quality check completed",
+    "Fans counted for delivery",
     "Fans delivered to Contractor Team",
-    "Cooling station built",
-    "Final presentation completed",
-    "Project photos captured",
-    "Fan template/design video captured",
-    "Manufacturing fan painting video captured",
-    "Final cooling station video captured",
-    "Youth reflections submitted",
-    "Supervisor assessments completed",
+    "Reflection completed",
+    "What I Learned completed",
+    "Career interest selected",
+    "Achievement celebrated",
+  ];
+
+  const productionMetrics = [
+    ["Customer Order", "63 fans"],
+    ["Material Cost", "$0.06 each"],
+    ["Markup", "20%"],
+    ["Sale Price", "$0.072 each"],
+    ["Material Cost Total", "$3.78"],
+    ["Contract Value", "$4.54"],
   ];
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Project Module</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">{featuredProject.title}</h1>
-      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">{featuredProject.objective}</p>
-      <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5 text-sm leading-7 text-white/84">
-        <b>Farm connection:</b> {featuredProject.farmConnection}
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
+      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
+        Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.
+      </p>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Business Story</div>
+          <p className="mt-3 text-sm leading-7 text-white/84">
+            Bronson Family Farm is the customer. A contractor is hired to build the cooling station. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce.
+          </p>
+          <div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-7 text-white/86">
+            Bronson Family Farm ↓ Contractor ↓ Youth Manufacturing Workforce ↓ Product Delivery ↓ Installation ↓ Customer Satisfaction
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">The Money Side</div>
+          <div className="mt-3 grid gap-2">
+            {productionMetrics.map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
+                <span className="text-white/72">{label}</span>
+                <b>{value}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-white/65">Why It Matters</div>
+          <p className="mt-3 text-sm leading-7 text-white/82">
+            Food prices are rising because every step costs money: growing, harvesting, packaging, transportation, labor, storage, marketing, and selling. This project helps youth understand how solving problems creates value, income, careers, and stronger communities.
+          </p>
+        </div>
       </div>
 
       {!compact && (
-        <div className="mt-7 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
-          <h2 className="mt-3 text-2xl font-black">Fan Template & Design Demonstration</h2>
-          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
-            This demonstration supports the June 8 Farm Worker Heat Safety & Cooling Station Challenge. Youth should watch it before the Design, Engineering, Manufacturing, and Contractor teams begin their assignments.
-          </p>
-          <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/dtYzf3avkT4"
-              title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-              className="h-full w-full"
-            />
+        <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.95fr]">
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
+            <h2 className="mt-3 text-2xl font-black">Fan Prototype Demonstration</h2>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
+              Watch how a simple fan idea can become a product. Youth should look for ideas they can improve, paint, personalize, and prepare for the contractor's order.
+            </p>
+            <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/dtYzf3avkT4"
+                title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Entrepreneurship Example</div>
+            <h2 className="mt-3 text-2xl font-black">A 13-Year-Old Saw Opportunity</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">
+              Use the young entrepreneur snack-selling example to start the conversation. The lesson is not snacks. The lesson is that opportunity begins when someone sees a need, creates value, and serves a customer.
+            </p>
+            <a
+              href="https://www.tiktok.com/@kasi_hustlers/video/7610048087100362002"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 block rounded-2xl bg-emerald-300 px-5 py-4 text-center font-black text-black"
+            >
+              Open Inspiration Video
+            </a>
+            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-6 text-white/78">
+              Discussion: What problem was he solving? Who was his customer? What opportunity could you create at Bronson Family Farm?
+            </div>
           </div>
         </div>
       )}
 
-      {!compact && <VideoLibrary compact />}
+      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Vision Challenge</div>
+        <h2 className="mt-3 text-2xl font-black">What Opportunity Do You See?</h2>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">This morning I see...</span>
+            <textarea value={visionBefore} onChange={(e) => setVisionBefore(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Example: I see a fan, a tomato, a field, or a problem." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">If I had one acre at Bronson Family Farm, I would...</span>
+            <textarea value={oneAcre} onChange={(e) => setOneAcre(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Grow, build, sell, host, teach, create..." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">Now I see...</span>
+            <textarea value={visionAfter} onChange={(e) => setVisionAfter(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="What opportunity do you see now?" />
+          </label>
+        </div>
+        <button type="button" onClick={saveVision} className="mt-4 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save My Vision</button>
+      </div>
 
-      <div className="mt-7 grid gap-4 lg:grid-cols-4">
-        {coolingCenterTeams.map((team) => (
-          <div key={team.name} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-3xl">{team.icon}</div>
-            <h2 className="mt-3 text-xl font-black">{team.name}</h2>
-            <p className="mt-3 text-sm leading-6 text-white/78">{team.mission}</p>
-            <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
-            <ul className="mt-2 space-y-1 text-sm text-white/78">
-              {team.deliverables.map((item) => <li key={item}>• {item}</li>)}
-            </ul>
-            <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {team.skills.map((skill) => <span key={skill} className="rounded-full bg-black/35 px-3 py-1 text-xs font-bold">{skill}</span>)}
+      <div className="mt-7 grid gap-5 lg:grid-cols-[.8fr_1fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Choose / View My Team</div>
+          <div className="mt-4 grid gap-2">
+            {coolingCenterTeams.map((team) => (
+              <button
+                type="button"
+                key={team.name}
+                onClick={() => setSelectedTeam(team.name)}
+                className={`rounded-2xl border p-4 text-left transition ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}
+              >
+                <div className="text-lg font-black">{team.icon} {team.name}</div>
+                <div className="mt-1 text-sm font-bold opacity-80">{team.identity}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-4xl">{selectedTeamInfo.icon}</div>
+          <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.name}</h2>
+          <p className="mt-2 text-lg font-black text-emerald-100">{selectedTeamInfo.identity}</p>
+          <p className="mt-3 text-sm font-bold text-white/70">Recommended assignment: {selectedTeamInfo.recommendedShare}</p>
+          <p className="mt-4 text-sm leading-7 text-white/82">{selectedTeamInfo.mission}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.skills.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Careers</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.careers.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
       {!compact && (
         <>
+          <div className="mt-7 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+              <h2 className="text-2xl font-black">My Contribution</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Choose the ways you will contribute today. This becomes part of your achievement record.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {contributionItems.map((item) => {
+                  const active = contributions.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleContribution(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
+            </div>
+            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
+              <h2 className="text-2xl font-black">What Did I Learn?</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Complete this at the end of the project.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {learningItems.map((item) => {
+                  const active = learning.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleLearning(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-amber-200 bg-amber-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
+            </div>
+          </div>
+
           <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.85fr]">
             <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
               <h2 className="text-2xl font-black">Production Board</h2>
@@ -3794,24 +4005,29 @@ function CoolingCenterProjectModule({
                 })}
               </div>
             </div>
-            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-              <h2 className="text-2xl font-black">Youth Reflection Questions</h2>
-              <div className="mt-4 space-y-2">
-                {coolingCenterReflectionQuestions.map((question) => (
-                  <div key={question} className="rounded-2xl bg-black/25 p-3 text-sm leading-6 text-white/82">{question}</div>
-                ))}
-              </div>
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+              <h2 className="text-2xl font-black">Supervisor Role Today</h2>
+              <p className="mt-3 text-sm leading-7 text-white/82">Supervisors guide youth success. They do not do the work for the youth.</p>
+              {[
+                "Safety Leader: PPE, hydration, heat awareness, tool safety, emergency response.",
+                "Workforce Coach: encouragement, problem solving, positive behavior, conflict resolution.",
+                "Team Facilitator: keep time, organize teams, support deliverables, keep youth focused.",
+                "Assessor: observe communication, teamwork, responsibility, problem solving, participation.",
+                "Wellness Observer: notice fatigue, frustration, withdrawal, escalation, or need for support.",
+              ].map((item) => <div key={item} className="mt-3 rounded-2xl bg-white/10 p-3 text-sm leading-6 text-white/80">✓ {item}</div>)}
             </div>
           </div>
 
           <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-            <h2 className="text-2xl font-black">Launch-Day Message for Youth</h2>
+            <h2 className="text-2xl font-black">Celebration & Achievement</h2>
             <p className="mt-4 text-lg leading-8 text-white/88">
-              Today you are not just building a fan. You are learning how people identify a real farm problem, work together, design a solution, use materials wisely, produce a finished product, and build infrastructure that helps protect farm workers, volunteers, and visitors during hot summer days.
+              Today we are not just building fans. We are learning how to see opportunity, imagine solutions, design ideas, build products, deliver value, take ownership, and connect our work to future careers.
             </p>
-            <p className="mt-4 text-lg leading-8 text-white/88">
-              Designers create plans. Engineers improve efficiency. Manufacturers assemble, finish, brand, and quality-check the product. Contractors build and deliver the final solution. Every team matters. Every team depends on another team.
-            </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {["Opportunity Seeker", "Problem Solver", "Team Builder", "Creative Thinker", "Quality Champion", "Workforce Ready", "Entrepreneurial Mindset", "Value Creator", "Future Builder"].map((badge) => (
+                <div key={badge} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-black">🏆 {badge}</div>
+              ))}
+            </div>
           </div>
         </>
       )}
