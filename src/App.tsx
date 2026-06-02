@@ -570,6 +570,156 @@ const languageText: Record<LanguageCode, Record<string, string>> = {
   },
 };
 
+
+const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
+  en: {},
+  es: {
+    "My Day": "Mi Día",
+    "My Week": "Mi Semana",
+    "Current Project": "Proyecto Actual",
+    "Progress": "Progreso",
+    "Achievement": "Logro",
+    "My 8-Week Journey": "Mi Recorrido de 8 Semanas",
+    "Cultivator Workforce Development Roadmap": "Ruta de Desarrollo Laboral de Cultivadores",
+    "Week": "Semana",
+    "Current Week": "Semana Actual",
+    "Upcoming": "Próximo",
+    "Workplace Foundations & Safety": "Fundamentos del Lugar de Trabajo y Seguridad",
+    "Regenerative Agriculture": "Agricultura Regenerativa",
+    "Farm Infrastructure": "Infraestructura de la Granja",
+    "Production & Harvest": "Producción y Cosecha",
+    "Marketplace & Entrepreneurship": "Mercado y Emprendimiento",
+    "Leadership & Community": "Liderazgo y Comunidad",
+    "Career Exploration": "Exploración de Carreras",
+    "Capstone & Achievement": "Proyecto Final y Logro",
+    "Safety": "Seguridad",
+    "Teamwork": "Trabajo en Equipo",
+    "Communication": "Comunicación",
+    "Problem Solving": "Resolución de Problemas",
+    "Following Instructions": "Seguir Instrucciones",
+    "Farm Worker Heat Safety & Cooling Station Challenge": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
+    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
+    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
+    "Youth will design and build a farm cooling station that helps protect farm workers, youth, volunteers, and visitors from heat stress during outdoor summer programming.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
+    "Today's Project": "Proyecto de Hoy",
+  },
+  tl: {
+    "My Day": "Aking Araw",
+    "My Week": "Aking Linggo",
+    "Current Project": "Kasalukuyang Proyekto",
+    "Progress": "Progreso",
+    "Achievement": "Nakamit",
+    "My 8-Week Journey": "Aking 8-Linggong Paglalakbay",
+    "Cultivator Workforce Development Roadmap": "Roadmap ng Pag-unlad sa Trabaho ng Cultivator",
+    "Week": "Linggo",
+    "Current Week": "Kasalukuyang Linggo",
+    "Upcoming": "Paparating",
+    "Workplace Foundations & Safety": "Pundasyon sa Trabaho at Kaligtasan",
+    "Regenerative Agriculture": "Regenerative na Pagsasaka",
+    "Farm Infrastructure": "Imprastraktura ng Bukid",
+    "Production & Harvest": "Produksyon at Ani",
+    "Marketplace & Entrepreneurship": "Merkado at Pagnenegosyo",
+    "Leadership & Community": "Pamumuno at Komunidad",
+    "Career Exploration": "Pagkilala sa mga Karera",
+    "Capstone & Achievement": "Pangwakas na Proyekto at Nakamit",
+    "Safety": "Kaligtasan",
+    "Teamwork": "Pagtutulungan",
+    "Communication": "Komunikasyon",
+    "Problem Solving": "Paglutas ng Problema",
+    "Following Instructions": "Pagsunod sa Panuto",
+    "Farm Worker Heat Safety & Cooling Station Challenge": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
+    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang June 8 Cooling Station Challenge.",
+    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang portfolio at mga nakamit.",
+    "Youth will design and build a farm cooling station that helps protect farm workers, youth, volunteers, and visitors from heat stress during outdoor summer programming.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
+    "Today's Project": "Proyekto Ngayon",
+  },
+  it: {
+    "My Day": "La Mia Giornata",
+    "My Week": "La Mia Settimana",
+    "Current Project": "Progetto Attuale",
+    "Progress": "Progresso",
+    "Achievement": "Risultato",
+    "My 8-Week Journey": "Il Mio Percorso di 8 Settimane",
+    "Cultivator Workforce Development Roadmap": "Percorso di Sviluppo Lavorativo dei Coltivatori",
+    "Week": "Settimana",
+    "Current Week": "Settimana Attuale",
+    "Upcoming": "In Arrivo",
+    "Workplace Foundations & Safety": "Fondamenti del Lavoro e Sicurezza",
+    "Regenerative Agriculture": "Agricoltura Rigenerativa",
+    "Farm Infrastructure": "Infrastruttura Agricola",
+    "Production & Harvest": "Produzione e Raccolto",
+    "Marketplace & Entrepreneurship": "Mercato e Imprenditorialità",
+    "Leadership & Community": "Leadership e Comunità",
+    "Career Exploration": "Esplorazione delle Carriere",
+    "Capstone & Achievement": "Progetto Finale e Risultato",
+    "Safety": "Sicurezza",
+    "Teamwork": "Lavoro di Squadra",
+    "Communication": "Comunicazione",
+    "Problem Solving": "Risoluzione dei Problemi",
+    "Following Instructions": "Seguire le Istruzioni",
+    "Farm Worker Heat Safety & Cooling Station Challenge": "Sfida per la Sicurezza dal Calore e Stazione di Raffreddamento dei Lavoratori Agricoli",
+    "Today's Project": "Progetto di Oggi",
+  },
+  he: {
+    "My Day": "היום שלי",
+    "My Week": "השבוע שלי",
+    "Current Project": "הפרויקט הנוכחי",
+    "Progress": "התקדמות",
+    "Achievement": "הישג",
+    "My 8-Week Journey": "המסע שלי בן 8 שבועות",
+    "Cultivator Workforce Development Roadmap": "מפת דרכים לפיתוח כוח עבודה",
+    "Week": "שבוע",
+    "Current Week": "השבוע הנוכחי",
+    "Upcoming": "בקרוב",
+    "Workplace Foundations & Safety": "יסודות העבודה ובטיחות",
+    "Regenerative Agriculture": "חקלאות מתחדשת",
+    "Farm Infrastructure": "תשתיות החווה",
+    "Production & Harvest": "ייצור וקציר",
+    "Marketplace & Entrepreneurship": "שוק ויזמות",
+    "Leadership & Community": "מנהיגות וקהילה",
+    "Career Exploration": "חקר קריירות",
+    "Capstone & Achievement": "פרויקט מסכם והישג",
+    "Safety": "בטיחות",
+    "Teamwork": "עבודת צוות",
+    "Communication": "תקשורת",
+    "Problem Solving": "פתרון בעיות",
+    "Following Instructions": "ציות להוראות",
+    "Farm Worker Heat Safety & Cooling Station Challenge": "אתגר בטיחות מחום ותחנת קירור לעובדי חווה",
+    "Today's Project": "הפרויקט של היום",
+  },
+  fr: {
+    "My Day": "Ma Journée",
+    "My Week": "Ma Semaine",
+    "Current Project": "Projet Actuel",
+    "Progress": "Progrès",
+    "Achievement": "Réussite",
+    "My 8-Week Journey": "Mon Parcours de 8 Semaines",
+    "Cultivator Workforce Development Roadmap": "Feuille de Route du Développement des Cultivateurs",
+    "Week": "Semaine",
+    "Current Week": "Semaine Actuelle",
+    "Upcoming": "À Venir",
+    "Workplace Foundations & Safety": "Bases du Travail et Sécurité",
+    "Regenerative Agriculture": "Agriculture Régénératrice",
+    "Farm Infrastructure": "Infrastructure de la Ferme",
+    "Production & Harvest": "Production et Récolte",
+    "Marketplace & Entrepreneurship": "Marché et Entrepreneuriat",
+    "Leadership & Community": "Leadership et Communauté",
+    "Career Exploration": "Exploration des Carrières",
+    "Capstone & Achievement": "Projet Final et Réussite",
+    "Safety": "Sécurité",
+    "Teamwork": "Travail d'Équipe",
+    "Communication": "Communication",
+    "Problem Solving": "Résolution de Problèmes",
+    "Following Instructions": "Suivre les Instructions",
+    "Farm Worker Heat Safety & Cooling Station Challenge": "Défi de Sécurité Contre la Chaleur et Station de Refroidissement des Travailleurs Agricoles",
+    "Today's Project": "Projet d’Aujourd’hui",
+  },
+};
+
+function lt(language: LanguageCode, phrase: string) {
+  return launchPhraseTranslations[language]?.[phrase] || screenTranslations[language]?.[phrase] || phrase;
+}
+
 function t(language: LanguageCode, key: string) {
   return languageText[language]?.[key] || languageText.en[key] || key;
 }
@@ -1813,12 +1963,12 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       <div className="grid gap-5">
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+          <h2 className="mt-3 text-3xl font-black">Week 1: {lt(language, currentWeek.title)}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{lt(language, currentWeek.focus)}</p>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
+              <div className="mt-2 text-sm font-black">{lt(language, currentWeek.project)}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
@@ -1834,21 +1984,21 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
-              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+              <span key={lt(language, skill)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{lt(language, skill)}</span>
             ))}
           </div>
         </Card>
 
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
-          <h2 className="mt-3 text-3xl font-black">Cultivator Workforce Development Roadmap</h2>
+          <h2 className="mt-3 text-3xl font-black">{lt(language, "Cultivator Workforce Development Roadmap")}</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {youthCurriculumWeeks.map((week) => (
               <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
-                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
-                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
+                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{lt(language, "Week")} {week.week}</div>
+                <h3 className="mt-2 text-lg font-black">{lt(language, week.title)}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{lt(language, week.focus)}</p>
+                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{lt(language, week.status)}</div>
               </div>
             ))}
           </div>
@@ -1867,7 +2017,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
                   <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {entry.skills.map((skill) => (
-                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
+                      <span key={lt(language, skill)} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{lt(language, skill)}</span>
                     ))}
                   </div>
                 </div>
@@ -1970,6 +2120,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
             setScreen={setScreen}
           />
         )}
+        {tab === "project" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
         {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
@@ -3400,7 +3551,7 @@ function CoolingCenterProjectModule({
             </ul>
             <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
             <div className="mt-2 flex flex-wrap gap-2">
-              {team.skills.map((skill) => <span key={skill} className="rounded-full bg-black/35 px-3 py-1 text-xs font-bold">{skill}</span>)}
+              {team.skills.map((skill) => <span key={lt(language, skill)} className="rounded-full bg-black/35 px-3 py-1 text-xs font-bold">{lt(language, skill)}</span>)}
             </div>
           </div>
         ))}
