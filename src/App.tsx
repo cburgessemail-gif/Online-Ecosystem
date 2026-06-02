@@ -1707,35 +1707,302 @@ function JourneyCompletionCard({
 
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [step, setStep] = useState(0);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [opportunity, setOpportunity] = useState("");
+
+  const guestSteps = [
+    {
+      eyebrow: "Guest Journey • Step 1 of 12",
+      title: "Welcome to Bronson Family Farm",
+      subtitle: "Enter the Bronson Family Farm Ecosystem.",
+      image: IMG.forest,
+      body:
+        "Bronson Family Farm is more than a farm. It is a connected ecosystem where food, youth workforce development, agritourism, growers, families, partners, and marketplace opportunities work together to strengthen the community.",
+      bullets: [
+        "Explore the farm story",
+        "Understand why this place matters",
+        "See how people move through the ecosystem",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 2 of 12",
+      title: "The Farm Story",
+      subtitle: "Growing food. Growing people. Growing opportunity.",
+      image: IMG.ecosystem,
+      body:
+        "Bronson Family Farm was created to transform land, family legacy, agriculture, education, workforce development, and community partnerships into a place where people can learn, contribute, and create opportunity.",
+      bullets: [
+        "Regenerative agriculture powers the work",
+        "Youth and families are part of the mission",
+        "The farm connects history, food, and future opportunity",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 3 of 12",
+      title: "Historic Lansdowne Airport",
+      subtitle: "A historic place reimagined for community use.",
+      image: IMG.grow,
+      body:
+        "The farm is rooted at the historic Lansdowne Airport property in Youngstown. The place carries aviation, land-use, military, and community history while becoming a new space for agriculture, learning, tourism, and workforce development.",
+      bullets: [
+        "Historic location",
+        "Agritourism destination",
+        "A place where old infrastructure can support new opportunity",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 4 of 12",
+      title: "Why Food Prices Matter",
+      subtitle: "Food does not begin at the grocery store.",
+      image: IMG.market,
+      body:
+        "Families are feeling the rising cost of food. Before food reaches a shelf, it must be grown, harvested, packaged, transported, marketed, and sold. When any step costs more, food can become more expensive.",
+      bullets: [
+        "Growing food locally builds resilience",
+        "Workforce skills help communities solve problems",
+        "Bronson Family Farm helps people understand the food system",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 5 of 12",
+      title: "Regenerative Agriculture",
+      subtitle: "Restoring land while growing food.",
+      image: IMG.compost,
+      body:
+        "Regenerative agriculture means improving soil health, reducing waste, increasing biodiversity, and caring for the land so it can remain productive for future generations.",
+      bullets: [
+        "Healthy soil supports healthy food",
+        "Compost and natural systems strengthen the land",
+        "Farm work becomes environmental stewardship",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 6 of 12",
+      title: "Connected Food Ecosystem",
+      subtitle: "Every pathway strengthens the whole system.",
+      image: IMG.ecosystem,
+      body:
+        "The ecosystem connects guests, customers, growers, youth, parents, supervisors, marketplace partners, volunteers, value-added producers, and community supporters through one guided experience.",
+      bullets: [
+        "Guests learn the story",
+        "Customers support the marketplace",
+        "Growers and partners expand opportunity",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 7 of 12",
+      title: "Youth Workforce Program",
+      subtitle: "Youth are not just participants. They are Cultivators.",
+      image: IMG.youth,
+      body:
+        "Youth enter a workforce pathway where they check in, learn safety, join teams, solve real problems, reflect on their growth, and build evidence of achievement.",
+      bullets: [
+        "Daily check-in and PPE awareness",
+        "Team assignments and supervisor support",
+        "Reflection, achievement, and career discovery",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 8 of 12",
+      title: "June 8 Production Challenge",
+      subtitle: "See It → Imagine It → Design It → Build It → Deliver It → Create Value → Own It.",
+      image: IMG.volunteers,
+      body:
+        "On June 8, youth will complete a real workforce production challenge. Bronson Family Farm needs a cooling station. A contractor is hired to build it. The contractor orders 63 cooling fans, and the youth workforce becomes the manufacturer.",
+      bullets: [
+        "63 cooling fans",
+        "Design, engineering, manufacturing, finishing, and logistics teams",
+        "A real business-cycle lesson teens can understand",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 9 of 12",
+      title: "Marketplace",
+      subtitle: "Food moves to people through the marketplace.",
+      image: IMG.market,
+      body:
+        "The marketplace connects products, customers, growers, and food access. It supports produce sales, SNAP-aware customer pathways, GrownBy connections, and local food distribution.",
+      bullets: [
+        "Fresh produce and farm products",
+        "Customer access and ordering",
+        "A pathway for food and value to move through the ecosystem",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 10 of 12",
+      title: "Growers",
+      subtitle: "Growers belong in the ecosystem.",
+      image: IMG.grow,
+      body:
+        "Growers may include backyard gardeners, raised-bed growers, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms.",
+      bullets: [
+        "Resource sharing",
+        "Marketplace opportunities",
+        "Regional collaboration",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 11 of 12",
+      title: "Partners",
+      subtitle: "Partnerships turn vision into measurable impact.",
+      image: IMG.partners,
+      body:
+        "Schools, businesses, nonprofits, funders, agencies, faith communities, universities, and volunteer groups can all connect to the ecosystem through education, workforce development, food access, agritourism, and community investment.",
+      bullets: [
+        "Education and workforce partners",
+        "Sponsors and in-kind supporters",
+        "Community organizations and funders",
+      ],
+    },
+    {
+      eyebrow: "Guest Journey • Step 12 of 12",
+      title: "My Ecosystem Journey",
+      subtitle: "Choose where you want to go next.",
+      image: IMG.ecosystem,
+      body:
+        "You have completed the Guest Journey. Now choose what interested you most and decide how you would like to continue through the Bronson Family Farm Ecosystem.",
+      bullets: [
+        "Become a customer",
+        "Explore the youth workforce program",
+        "Become a grower, partner, volunteer, or supporter",
+      ],
+    },
+  ];
+
+  const current = guestSteps[step];
+  const isFinal = step === guestSteps.length - 1;
+
+  const toggleInterest = (interest: string) => {
+    setSelectedInterests((prev) =>
+      prev.includes(interest) ? prev.filter((item) => item !== interest) : [...prev, interest]
+    );
+  };
+
+  const saveGuestJourney = () => {
+    const row = {
+      id: uuid(),
+      profile_type: "customer" as ProfileType,
+      feedback_type: "platform" as FeedbackRecord["feedback_type"],
+      rating: 5,
+      comments: `Guest Journey completed. Interests: ${selectedInterests.join(", ") || "Not selected"}. Opportunity: ${opportunity || "Not entered"}`,
+      would_recommend: true,
+      screen: "guest",
+      pathway: "Guest Journey",
+      role: "Guest",
+      excited: selectedInterests.join(", "),
+      confused: "",
+      improve: "",
+      opportunity_interest: opportunity,
+      created_at: new Date().toISOString(),
+    };
+    insertRow<FeedbackRecord>("feedback", FEEDBACK_KEY, row);
+    setScreen("feedback");
+  };
+
   return (
-    <>
-      <SimplePathway
-        title="Guest Pathway"
-        image={IMG.ecosystem}
-        text="Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together."
-        setScreen={setScreen}
-        extra={
-          <>
-            <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Attend an Event</button>
-            <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Volunteer / Support</button>
-            <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
-          </>
-        }
-      />
-      <LaunchAuditDetailGrid
-        title="Guest journey now has a complete launch story."
-        items={[
-          { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
-          { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
-          { heading: "Regenerative Farming", body: "Guests learn that regenerative agriculture develops the land while improving soil, reducing waste, protecting natural systems, and strengthening future production." },
-          { heading: "Connected Food Ecosystem", body: "The ecosystem connects youth, growers, marketplace customers, parents, partners, volunteers, and value-added producers in one guided experience." },
-          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms are presented as regional hubs in the Mahoning and Trumbull food ecosystem." },
-          { heading: "Conversion Actions", body: "Guests can attend events, volunteer, shop, become customers, become partners, leave feedback, or continue to the marketplace." },
-        ]}
-      />
-    </>
+    <Card>
+      <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{current.eyebrow}</div>
+          <h1 className="mt-3 text-4xl font-black md:text-6xl">{current.title}</h1>
+          <p className="mt-3 text-xl font-bold text-emerald-100/90">{current.subtitle}</p>
+          <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">{current.body}</p>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {current.bullets.map((item) => (
+              <div key={item} className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4 text-sm font-bold leading-6 text-white/86">
+                ✓ {item}
+              </div>
+            ))}
+          </div>
+
+          {isFinal && (
+            <div className="mt-7 grid gap-5 lg:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+                <h3 className="text-2xl font-black">What interested you most?</h3>
+                <div className="mt-4 grid gap-2">
+                  {["Food access", "Youth workforce", "Marketplace", "Growing food", "Entrepreneurship", "Partnerships", "Agritourism", "Supporting the mission"].map((interest) => (
+                    <label key={interest} className="flex items-center gap-3 rounded-2xl bg-black/25 p-3 text-sm font-bold text-white/88">
+                      <input type="checkbox" checked={selectedInterests.includes(interest)} onChange={() => toggleInterest(interest)} />
+                      {interest}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+                <h3 className="text-2xl font-black">What opportunity do you see?</h3>
+                <p className="mt-2 text-sm leading-6 text-white/75">
+                  Share one idea, question, partnership, product, service, or opportunity you noticed during the journey.
+                </p>
+                <textarea
+                  value={opportunity}
+                  onChange={(event) => setOpportunity(event.target.value)}
+                  className="mt-4 min-h-[150px] w-full rounded-2xl border border-white/10 bg-black/35 p-4 text-white outline-none"
+                  placeholder="I see an opportunity to..."
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setStep((value) => Math.max(0, value - 1))}
+              disabled={step === 0}
+              className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Back
+            </button>
+            {!isFinal ? (
+              <button
+                type="button"
+                onClick={() => setStep((value) => Math.min(guestSteps.length - 1, value + 1))}
+                className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black"
+              >
+                Continue
+              </button>
+            ) : (
+              <>
+                <button type="button" onClick={saveGuestJourney} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Journey & Share Feedback</button>
+                <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Continue to Marketplace</button>
+                <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Pathway</button>
+              </>
+            )}
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
+          </div>
+        </div>
+
+        <div className="rounded-[2rem] border border-white/10 bg-black/25 p-4">
+          <img src={current.image} alt={current.title} className="h-72 w-full rounded-[1.5rem] object-cover" />
+          <div className="mt-5 rounded-[1.5rem] bg-white/10 p-4">
+            <div className="text-sm font-black uppercase tracking-[0.25em] text-emerald-100/75">Journey Progress</div>
+            <div className="mt-3 h-3 rounded-full bg-black/35">
+              <div className="h-3 rounded-full bg-emerald-300" style={{ width: `${((step + 1) / guestSteps.length) * 100}%` }} />
+            </div>
+            <div className="mt-3 text-sm font-bold text-white/80">
+              Step {step + 1} of {guestSteps.length}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-2">
+            {guestSteps.map((item, index) => (
+              <button
+                key={item.title}
+                type="button"
+                onClick={() => setStep(index)}
+                className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${index === step ? "bg-emerald-300 text-black" : "bg-white/10 text-white/78"}`}
+              >
+                {index + 1}. {item.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }
+
 
 function MyWorkspace({
   signIn,
