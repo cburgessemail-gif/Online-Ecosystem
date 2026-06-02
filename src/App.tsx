@@ -1593,7 +1593,7 @@ function LaunchAuditDetailGrid({
 }) {
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Launch Audit Fix</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Ecosystem Journey</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
@@ -1701,14 +1701,14 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         }
       />
       <LaunchAuditDetailGrid
-        title="Guest journey now has a complete launch story."
+        title="Explore the Connected Food Ecosystem"
         items={[
-          { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
-          { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
-          { heading: "Regenerative Farming", body: "Guests learn that regenerative agriculture develops the land while improving soil, reducing waste, protecting natural systems, and strengthening future production." },
-          { heading: "Connected Food Ecosystem", body: "The ecosystem connects youth, growers, marketplace customers, parents, partners, volunteers, and value-added producers in one guided experience." },
-          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms are presented as regional hubs in the Mahoning and Trumbull food ecosystem." },
-          { heading: "Conversion Actions", body: "Guests can attend events, volunteer, shop, become customers, become partners, leave feedback, or continue to the marketplace." },
+          { heading: "Farm Story", body: "Bronson Family Farm combines regenerative agriculture, workforce development, agritourism, food access, and community partnerships to create opportunity throughout the Mahoning Valley." },
+          { heading: "Historic Place", body: "Located at the historic Lansdowne Airport property, the farm demonstrates how community assets can be transformed into places of learning, production, recreation, and economic opportunity." },
+          { heading: "Regenerative Farming", body: "Regenerative agriculture strengthens soil health, biodiversity, environmental stewardship, and long-term food production for future generations." },
+          { heading: "Connected Food Ecosystem", body: "Youth, growers, customers, volunteers, families, educators, and partners all contribute to a stronger local food economy through one connected ecosystem." },
+          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms work together to strengthen workforce development, food access, and regional collaboration." },
+          { heading: "Get Involved", body: "Attend events, volunteer, shop the marketplace, become a grower, join the workforce program, become a partner, or support the mission." },
         ]}
       />
     </>
