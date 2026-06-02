@@ -511,128 +511,6 @@ const youthPortfolioEntries = [
 ];
 
 
-const cultivatorJourneyWeeks = [
-  {
-    week: 1,
-    stage: "SEE IT",
-    theme: "Vision, Opportunity & Workforce Readiness",
-    bigQuestion: "What opportunity do you see that others might miss?",
-    experiences: ["13-Year-Old Entrepreneur", "One Acre Challenge", "My Contribution", "63-Fan Workforce Production Challenge"],
-    skills: ["Vision", "Creativity", "Teamwork", "Responsibility"],
-    achievement: "🌱 Opportunity Seeker",
-    status: "Active",
-  },
-  {
-    week: 2,
-    stage: "IMAGINE IT",
-    theme: "Agriculture & Sustainability",
-    bigQuestion: "How does healthy soil create healthy communities?",
-    experiences: ["Soil testing", "Composting", "Seed starting", "Crop planning", "Water conservation"],
-    skills: ["Observation", "Stewardship", "Planning"],
-    achievement: "🌱 Soil Steward",
-    status: "Upcoming",
-  },
-  {
-    week: 3,
-    stage: "DESIGN IT",
-    theme: "Infrastructure & Site Development",
-    bigQuestion: "How do we improve the farm for future generations?",
-    experiences: ["Raised beds", "Irrigation", "Fencing", "Shade structures", "Signage"],
-    skills: ["Construction", "Problem Solving", "Collaboration"],
-    achievement: "🌱 Builder",
-    status: "Upcoming",
-  },
-  {
-    week: 4,
-    stage: "BUILD IT",
-    theme: "Safety & Workforce Excellence",
-    bigQuestion: "How do professionals work safely?",
-    experiences: ["PPE", "Tool safety", "Emergency drills", "Farm inspections", "First aid readiness"],
-    skills: ["Accountability", "Safety", "Leadership"],
-    achievement: "🌱 Safety Champion",
-    status: "Upcoming",
-  },
-  {
-    week: 5,
-    stage: "SHARE IT",
-    theme: "Guest Services & Communication",
-    bigQuestion: "How do we welcome and educate others?",
-    experiences: ["Farm tours", "Welcome speeches", "Customer service", "Event support", "Public speaking"],
-    skills: ["Communication", "Confidence", "Hospitality"],
-    achievement: "🌱 Community Ambassador",
-    status: "Upcoming",
-  },
-  {
-    week: 6,
-    stage: "TELL IT",
-    theme: "Media & Storytelling",
-    bigQuestion: "How do we tell the story of our work?",
-    experiences: ["Photography", "Video", "Interviews", "Social media", "Journaling"],
-    skills: ["Storytelling", "Digital Literacy", "Reflection"],
-    achievement: "🌱 Story Keeper",
-    status: "Upcoming",
-  },
-  {
-    week: 7,
-    stage: "LEAD IT",
-    theme: "Project Management & Logistics",
-    bigQuestion: "How do leaders help teams succeed?",
-    experiences: ["Task boards", "Inventory", "Event planning", "Resource management", "Team coordination"],
-    skills: ["Leadership", "Organization", "Decision Making"],
-    achievement: "🌱 Team Leader",
-    status: "Upcoming",
-  },
-  {
-    week: 8,
-    stage: "BECOME IT",
-    theme: "Leadership, Legacy & Future Opportunities",
-    bigQuestion: "What kind of future do I want to create?",
-    experiences: ["Portfolio review", "Reflection", "Showcase", "Family celebration", "Future planning"],
-    skills: ["Self-Awareness", "Goal Setting", "Leadership"],
-    achievement: "🌱 Cultivator Graduate",
-    status: "Upcoming",
-  },
-];
-
-const myContributionOptions = [
-  "Creating ideas",
-  "Solving problems",
-  "Building products",
-  "Supporting my team",
-  "Helping a customer",
-  "Creating value",
-  "Learning a new skill",
-  "Improving a process",
-  "Helping someone succeed",
-  "Demonstrating leadership",
-  "Showing creativity",
-  "Practicing responsibility",
-  "Completing assigned tasks",
-  "Maintaining quality standards",
-  "Supporting safety",
-];
-
-const whatILearnedOptions = [
-  "How businesses work",
-  "How customers and contractors work together",
-  "How products are manufactured",
-  "How quality affects customer satisfaction",
-  "How creativity creates value",
-  "How teamwork improves results",
-  "How communication helps projects succeed",
-  "How planning saves time and money",
-  "How ideas become products",
-  "How products create opportunities",
-  "How entrepreneurs identify opportunities",
-  "How money is earned by solving problems",
-  "How food moves from farms to customers",
-  "How rising costs affect businesses and families",
-  "How workforce skills prepare me for future opportunities",
-  "How Bronson Family Farm creates value for the community",
-  "That I am capable of more than I realized",
-];
-
-
 type LaunchVideo = {
   title: string;
   purpose: string;
@@ -1123,642 +1001,211 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
 };
 
 
-
-// Launch Translation Lock: exact translations for launch-critical screens added after the Cultivator Journey update.
-// This keeps all major user-facing screens readable when the language toggle changes.
-const launchCriticalTranslations: Record<LanguageCode, Record<string, string>> = {
-  en: {},
-  es: {
-    "Bronson Family Farm Cultivators": "Cultivadores de Bronson Family Farm",
-    "🌱 My Cultivator Journey": "🌱 Mi Camino de Cultivador",
-    "Growing People. Growing Food. Growing Futures. Every youth entering the program is a Cultivator on an 8-week journey of vision, work, creativity, leadership, and opportunity.": "Cultivamos personas. Cultivamos alimentos. Cultivamos futuros. Cada joven que entra al programa es un Cultivador en un camino de 8 semanas de visión, trabajo, creatividad, liderazgo y oportunidad.",
-    "Week 1 Active": "Semana 1 Activa",
-    "Big Question:": "Pregunta Principal:",
-    "Monday Mission:": "Misión del Lunes:",
-    "Complete the 63 Cooling Fan Workforce Production Challenge and begin learning how ideas become products, products create value, and value creates opportunity.": "Completa el Reto Laboral de Producción de 63 Ventiladores y comienza a aprender cómo las ideas se convierten en productos, los productos crean valor y el valor crea oportunidad.",
-    "Open June 8 Project": "Abrir Proyecto del 8 de Junio",
-    "Watch Videos": "Ver Videos",
-    "Reflection": "Reflexión",
-    "Monday Launch Assignment": "Asignación de Lanzamiento del Lunes",
-    "June 8 Workforce Production Challenge": "Reto Laboral de Producción del 8 de Junio",
-    "Customer": "Cliente",
-    "Contractor": "Contratista",
-    "Order": "Pedido",
+const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
+  tl: {
+    "Online Ecosystem": "Online Ecosystem",
     "Bronson Family Farm": "Bronson Family Farm",
-    "Cooling Station Builder": "Constructor de la Estación de Enfriamiento",
-    "The farm needs a cooling station for outdoor workers, volunteers, and visitors.": "La granja necesita una estación de enfriamiento para trabajadores al aire libre, voluntarios y visitantes.",
-    "The contractor becomes the customer when ordering 63 cooling fans.": "El contratista se convierte en cliente cuando ordena 63 ventiladores.",
-    "63 Fans": "63 Ventiladores",
-    "Produce, paint, quality-check, and prepare for delivery.": "Producir, pintar, revisar la calidad y preparar para entrega.",
-    "My Team": "Mi Equipo",
-    "Click a Team to See Its Mission": "Haz clic en un equipo para ver su misión",
-    "Deliverables": "Entregables",
-    "Skills": "Habilidades",
-    "Careers Connected": "Carreras Relacionadas",
-    "Recommended team size:": "Tamaño recomendado del equipo:",
-    "Cultivator Journey Map": "Mapa del Camino del Cultivador",
-    "This is the full journey from vision to leadership. Week 1 launches with the 63-fan production challenge and connects to the larger summer curriculum.": "Este es el camino completo desde la visión hasta el liderazgo. La Semana 1 comienza con el reto de producción de 63 ventiladores y se conecta con el currículo completo del verano.",
-    "Beginning of Day": "Inicio del Día",
-    "My Contribution": "Mi Contribución",
-    "Today I will contribute by:": "Hoy contribuiré al:",
-    "End of Day": "Fin del Día",
-    "What Did I Learn?": "¿Qué Aprendí?",
-    "At the end of the day, youth connect their contribution to their learning.": "Al final del día, los jóvenes conectan su contribución con lo que aprendieron.",
-    "Cultivator Journey: Week 1 Launch": "Camino del Cultivador: Lanzamiento de la Semana 1",
-    "How ideas become products": "Cómo las ideas se convierten en productos",
-    "How customers, contractors, and manufacturers work together": "Cómo trabajan juntos clientes, contratistas y fabricantes",
-    "How creativity and teamwork create value": "Cómo la creatividad y el trabajo en equipo crean valor",
-    "How workforce skills connect to future careers": "Cómo las habilidades laborales se conectan con carreras futuras",
-    "How Bronson Family Farm grows people, food, and opportunity": "Cómo Bronson Family Farm cultiva personas, alimentos y oportunidades",
-    "Open Today's Project": "Abrir Proyecto de Hoy",
-    "Complete Reflection": "Completar Reflexión",
-    "View Achievements": "Ver Logros",
-    "Visit Marketplace": "Visitar Mercado",
-    "Started the 8-week Cultivator Journey": "Comenzó el Camino de Cultivador de 8 semanas",
-    "Connected vision to work": "Conectó la visión con el trabajo",
-    "Practiced workforce and entrepreneurship skills": "Practicó habilidades laborales y empresariales",
-    "Added evidence toward achievement": "Agregó evidencia hacia el logro",
-    "Creating ideas": "Crear ideas",
-    "Solving problems": "Resolver problemas",
-    "Building products": "Construir productos",
-    "Supporting my team": "Apoyar a mi equipo",
-    "Helping a customer": "Ayudar a un cliente",
-    "Creating value": "Crear valor",
-    "Learning a new skill": "Aprender una nueva habilidad",
-    "Improving a process": "Mejorar un proceso",
-    "Helping someone succeed": "Ayudar a alguien a tener éxito",
-    "Demonstrating leadership": "Demostrar liderazgo",
-    "Showing creativity": "Mostrar creatividad",
-    "Practicing responsibility": "Practicar responsabilidad",
-    "Completing assigned tasks": "Completar tareas asignadas",
-    "Maintaining quality standards": "Mantener estándares de calidad",
-    "Supporting safety": "Apoyar la seguridad",
-    "How businesses work": "Cómo funcionan los negocios",
-    "How customers and contractors work together": "Cómo trabajan juntos clientes y contratistas",
-    "How products are manufactured": "Cómo se fabrican productos",
-    "How quality affects customer satisfaction": "Cómo la calidad afecta la satisfacción del cliente",
-    "How creativity creates value": "Cómo la creatividad crea valor",
-    "How teamwork improves results": "Cómo el trabajo en equipo mejora resultados",
-    "How communication helps projects succeed": "Cómo la comunicación ayuda al éxito de proyectos",
-    "How planning saves time and money": "Cómo la planificación ahorra tiempo y dinero",
-    "How ideas become products": "Cómo las ideas se convierten en productos",
-    "How products create opportunities": "Cómo los productos crean oportunidades",
-    "How entrepreneurs identify opportunities": "Cómo los emprendedores identifican oportunidades",
-    "How money is earned by solving problems": "Cómo se gana dinero resolviendo problemas",
-    "How food moves from farms to customers": "Cómo los alimentos se mueven de granjas a clientes",
-    "How rising costs affect businesses and families": "Cómo los costos crecientes afectan negocios y familias",
-    "How workforce skills prepare me for future opportunities": "Cómo las habilidades laborales me preparan para oportunidades futuras",
-    "How Bronson Family Farm creates value for the community": "Cómo Bronson Family Farm crea valor para la comunidad",
-    "That I am capable of more than I realized": "Que soy capaz de más de lo que pensaba"
-  },
-  tl: {
-    "Bronson Family Farm Cultivators": "Mga Cultivator ng Bronson Family Farm",
-    "🌱 My Cultivator Journey": "🌱 Aking Cultivator Journey",
-    "Week 1 Active": "Aktibo ang Linggo 1",
-    "Big Question:": "Malaking Tanong:",
-    "Monday Mission:": "Misyon sa Lunes:",
+    "Launch Focus": "Pokus sa Launch",
+    "🌞 My Day": "🌞 Aking Araw",
+    "June 8 Launch Assignment": "Takdang Gawain sa Hunyo 8",
+    "Start here for the Youth Workforce launch. Check in, watch the cardboard fan demonstration, meet your team, complete the Farm Worker Heat Safety & Cooling Station Challenge, and submit your reflection.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
+    "Project": "Proyekto",
+    "Cooling Station Challenge": "Cooling Station Challenge",
+    "Teams": "Mga Team",
+    "Design • Engineering • Manufacturing • Contractor": "Design • Engineering • Manufacturing • Contractor",
+    "Next Step": "Susunod na Hakbang",
+    "Start My Day": "Simulan ang Aking Araw",
+    "Goal": "Layunin",
+    "Farm worker heat safety": "Heat safety ng manggagawa sa farm",
+    "Open Today's Project": "Buksan ang Proyekto Ngayon",
+    "Watch Fan Video": "Panoorin ang Fan Video",
+    "Reflection": "Reflection",
+    "Recent Activity": "Kamakailang Aktibidad",
+    "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.": "Regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms.",
+    "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.": "Pumili ng role, pagkatapos ay sundan ang guided pathway na may resources, opportunities, at susunod na hakbang.",
+    "Supervisor Operations Center is the staff-only control room.": "Ang Supervisor Operations Center ay control room para lamang sa staff.",
+    "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.": "Ang youth check-ins at supervisor records ay unang nase-save locally, pagkatapos ay nagsi-sync sa Supabase kapag connected.",
+    "Parents receive progress summaries, not private raw youth reflections.": "Ang mga magulang ay tumatanggap ng progress summaries, hindi private raw youth reflections.",
+    "Incident and support flags stay staff-facing.": "Ang incident at support flags ay nananatiling para sa staff.",
+    "Reports convert daily records into launch readiness and program impact.": "Ginagawang launch readiness at program impact ng reports ang daily records.",
+    "Mission Control / Reports": "Mission Control / Mga Ulat",
+    "Launch-day readiness status.": "Status ng kahandaan sa araw ng launch.",
+    "Profiles": "Mga Profile",
+    "Youth Registered": "Naka-rehistrong Youth",
+    "Present Today": "Present Ngayon",
+    "Assessments": "Mga Assessment",
+    "Support Flags": "Mga Support Flag",
+    "Incident Logs": "Mga Incident Log",
+    "Feedback": "Feedback",
+    "Project Items Complete": "Mga Item ng Proyekto na Kumpleto",
+    "System Status": "Status ng System",
+    "ONLINE": "ONLINE",
+    "Launch Phase": "Yugto ng Launch",
+    "Community Beta": "Community Beta",
+    "Staff Orientation": "Orientation ng Staff",
+    "Youth Workforce Launch": "Youth Workforce Launch",
+    "Featured Project": "Pangunahing Proyekto",
+    "63 Cooling Fan Challenge": "Hamon: 63 Cooling Fans",
+    "Project Teams": "Mga Team ng Proyekto",
+    "Design | Engineering | Manufacturing | Contractor": "Design | Engineering | Manufacturing | Contractor",
+    "Photo / Video Documentation": "Photo / Video Documentation",
+    "Media Center Ready": "Handa ang Media Center",
+    "Fan Template / Design Video": "Fan Template / Design Video",
+    "Ready for upload": "Handa para i-upload",
+    "Manufacturing Fan Painting Video": "Manufacturing Fan Painting Video",
+    "Cooling Station Completion Video": "Cooling Station Completion Video",
+    "Translation Coverage": "Saklaw ng Translation",
+    "Audit In Progress": "Nagaganap ang Audit",
+    "Launch Decision": "Desisyon sa Launch",
+    "Validate Pathways + Launch": "I-validate ang Pathways + Launch",
+    "🌲 Bronson Family Farm Launch Command Center": "🌲 Bronson Family Farm Launch Command Center",
+    "Community Beta Launch Phase": "Community Beta Launch Phase",
+    "Staff Orientation: June 5, 2026 — 9:30 AM": "Staff Orientation: Hunyo 5, 2026 — 9:30 AM",
+    "Youth Workforce Launch: June 8, 2026 — 8:00 AM": "Youth Workforce Launch: Hunyo 8, 2026 — 8:00 AM",
+    "We Grow Green to Harvest Dreams.": "We Grow Green to Harvest Dreams.",
     "Open June 8 Project": "Buksan ang Proyekto ng Hunyo 8",
-    "Watch Videos": "Manood ng mga Video",
-    "Reflection": "Pagninilay",
-    "Monday Launch Assignment": "Assignment sa Launch ng Lunes",
-    "June 8 Workforce Production Challenge": "June 8 Workforce Production Challenge",
-    "Customer": "Customer",
-    "Contractor": "Contractor",
-    "Order": "Order",
-    "Cooling Station Builder": "Tagabuo ng Cooling Station",
-    "63 Fans": "63 Fans",
-    "My Team": "Aking Team",
-    "Click a Team to See Its Mission": "Pindutin ang team para makita ang misyon",
-    "Deliverables": "Mga Deliverable",
-    "Skills": "Mga Kasanayan",
-    "Careers Connected": "Mga Kaugnay na Career",
-    "Cultivator Journey Map": "Mapa ng Cultivator Journey",
+    "Events & Orientation": "Events at Orientation",
+    "Supervisor Center": "Supervisor Center",
+    "Operations": "Operasyon",
+    "Daily rhythm for launch.": "Araw-araw na ritmo para sa launch.",
     "Beginning of Day": "Simula ng Araw",
-    "My Contribution": "Aking Kontribusyon",
-    "Today I will contribute by:": "Ngayon, ako ay mag-aambag sa pamamagitan ng:",
+    "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments.": "QR/manual check-in, PPE, tubig, heat-safety awareness para sa farm workers, daily proverb, weather awareness, at assignments.",
+    "June 8 Featured Project": "Pangunahing Proyekto ng Hunyo 8",
+    "Farm Worker Heat Safety & Cooling Station Challenge: Design, Engineering, Manufacturing, and Contractor teams work in sequence.": "Farm Worker Heat Safety at Cooling Station Challenge: Design, Engineering, Manufacturing, at Contractor teams ay gagana nang sunod-sunod.",
+    "During Program": "Habang Programa",
+    "Supervisor observations, wellness support, safety follow-up, team progress, task completion, incident documentation.": "Supervisor observations, wellness support, safety follow-up, team progress, task completion, at incident documentation.",
     "End of Day": "Pagtatapos ng Araw",
-    "What Did I Learn?": "Ano ang Natutunan Ko?",
-    "Complete Reflection": "Kumpletuhin ang Reflection",
-    "View Achievements": "Tingnan ang mga Nakamit",
-    "Visit Marketplace": "Pumunta sa Marketplace",
-    "Creating ideas": "Paglikha ng mga ideya",
-    "Solving problems": "Paglutas ng problema",
-    "Building products": "Paggawa ng produkto",
-    "Supporting my team": "Pagsuporta sa aking team",
-    "Creating value": "Paglikha ng halaga",
-    "Learning a new skill": "Pag-aaral ng bagong kasanayan"
-  },
-  it: {
-    "Bronson Family Farm Cultivators": "Coltivatori di Bronson Family Farm",
-    "🌱 My Cultivator Journey": "🌱 Il Mio Percorso da Coltivatore",
-    "Week 1 Active": "Settimana 1 Attiva",
-    "Big Question:": "Domanda Chiave:",
-    "Monday Mission:": "Missione del Lunedì:",
-    "Open June 8 Project": "Apri Progetto dell'8 Giugno",
-    "Watch Videos": "Guarda Video",
-    "Reflection": "Riflessione",
-    "Monday Launch Assignment": "Assegnazione del Lancio di Lunedì",
-    "June 8 Workforce Production Challenge": "Sfida di Produzione Lavorativa dell'8 Giugno",
-    "Customer": "Cliente",
-    "Contractor": "Appaltatore",
-    "Order": "Ordine",
-    "Cooling Station Builder": "Costruttore della Stazione di Raffreddamento",
-    "63 Fans": "63 Ventagli",
-    "My Team": "Il Mio Team",
-    "Click a Team to See Its Mission": "Clicca un team per vedere la missione",
-    "Deliverables": "Risultati",
-    "Skills": "Competenze",
-    "Careers Connected": "Carriere Collegate",
-    "Cultivator Journey Map": "Mappa del Percorso Coltivatore",
-    "Beginning of Day": "Inizio Giornata",
-    "My Contribution": "Il Mio Contributo",
-    "Today I will contribute by:": "Oggi contribuirò con:",
-    "End of Day": "Fine Giornata",
-    "What Did I Learn?": "Che Cosa Ho Imparato?",
-    "Complete Reflection": "Completa Riflessione",
-    "View Achievements": "Vedi Risultati",
-    "Visit Marketplace": "Visita il Mercato",
-    "Creating ideas": "Creare idee",
-    "Solving problems": "Risolvere problemi",
-    "Building products": "Costruire prodotti",
-    "Supporting my team": "Supportare il mio team",
-    "Creating value": "Creare valore",
-    "Learning a new skill": "Imparare una nuova competenza"
-  },
-  he: {
-    "Bronson Family Farm Cultivators": "מטפחי Bronson Family Farm",
-    "🌱 My Cultivator Journey": "🌱 מסע המטפח שלי",
-    "Week 1 Active": "שבוע 1 פעיל",
-    "Big Question:": "שאלה מרכזית:",
-    "Monday Mission:": "משימת יום שני:",
-    "Open June 8 Project": "פתח את פרויקט 8 ביוני",
-    "Watch Videos": "צפה בסרטונים",
-    "Reflection": "רפלקציה",
-    "Monday Launch Assignment": "משימת ההשקה של יום שני",
-    "June 8 Workforce Production Challenge": "אתגר ייצור כוח עבודה 8 ביוני",
-    "Customer": "לקוח",
-    "Contractor": "קבלן",
-    "Order": "הזמנה",
-    "Cooling Station Builder": "בונה תחנת קירור",
-    "63 Fans": "63 מניפות",
-    "My Team": "הצוות שלי",
-    "Click a Team to See Its Mission": "לחץ על צוות כדי לראות את המשימה",
-    "Deliverables": "תוצרים",
-    "Skills": "מיומנויות",
-    "Careers Connected": "קריירות קשורות",
-    "Cultivator Journey Map": "מפת מסע המטפח",
-    "Beginning of Day": "תחילת היום",
-    "My Contribution": "התרומה שלי",
-    "Today I will contribute by:": "היום אתרום על ידי:",
-    "End of Day": "סוף היום",
-    "What Did I Learn?": "מה למדתי?",
-    "Complete Reflection": "השלם רפלקציה",
-    "View Achievements": "צפה בהישגים",
-    "Visit Marketplace": "בקר בשוק",
-    "Creating ideas": "יצירת רעיונות",
-    "Solving problems": "פתרון בעיות",
-    "Building products": "בניית מוצרים",
-    "Supporting my team": "תמיכה בצוות שלי",
-    "Creating value": "יצירת ערך",
-    "Learning a new skill": "לימוד מיומנות חדשה"
-  },
-  fr: {
-    "Bronson Family Farm Cultivators": "Cultivateurs de Bronson Family Farm",
-    "🌱 My Cultivator Journey": "🌱 Mon Parcours de Cultivateur",
-    "Week 1 Active": "Semaine 1 Active",
-    "Big Question:": "Grande Question :",
-    "Monday Mission:": "Mission du Lundi :",
-    "Open June 8 Project": "Ouvrir le Projet du 8 Juin",
-    "Watch Videos": "Regarder les Vidéos",
-    "Reflection": "Réflexion",
-    "Monday Launch Assignment": "Mission de Lancement du Lundi",
-    "June 8 Workforce Production Challenge": "Défi de Production Main-d'œuvre du 8 Juin",
-    "Customer": "Client",
-    "Contractor": "Entrepreneur",
-    "Order": "Commande",
-    "Cooling Station Builder": "Constructeur de Station de Refroidissement",
-    "63 Fans": "63 Éventails",
-    "My Team": "Mon Équipe",
-    "Click a Team to See Its Mission": "Cliquez sur une équipe pour voir sa mission",
-    "Deliverables": "Livrables",
-    "Skills": "Compétences",
-    "Careers Connected": "Carrières Liées",
-    "Cultivator Journey Map": "Carte du Parcours Cultivateur",
-    "Beginning of Day": "Début de Journée",
-    "My Contribution": "Ma Contribution",
-    "Today I will contribute by:": "Aujourd'hui je contribuerai en :",
-    "End of Day": "Fin de Journée",
-    "What Did I Learn?": "Qu'ai-je Appris ?",
-    "Complete Reflection": "Compléter la Réflexion",
-    "View Achievements": "Voir les Réussites",
-    "Visit Marketplace": "Visiter le Marché",
-    "Creating ideas": "Créer des idées",
-    "Solving problems": "Résoudre des problèmes",
-    "Building products": "Construire des produits",
-    "Supporting my team": "Soutenir mon équipe",
-    "Creating value": "Créer de la valeur",
-    "Learning a new skill": "Apprendre une nouvelle compétence"
-  }
-};
-
-
-
-// Launch translation patch: covers new operational text added after the first translation pass.
-// This keeps screens from mixing English with the selected language during Monday launch.
-const runtimeLaunchTranslationPatches: Record<LanguageCode, Record<string, string>> = {
-  en: {},
-  es: {
-    "Achievements": "Logros",
-    "Real Supervisor Operations Center": "Centro Real de Operaciones de Supervisores",
-    "Morning-to-end-of-day control room.": "Sala de control desde la mañana hasta el final del día.",
-    "Dashboard": "Panel",
-    "6/8 Cooling Station": "Estación de Enfriamiento 6/8",
-    "Youth Roster": "Lista de Jóvenes",
-    "Attendance / PPE": "Asistencia / PPE",
-    "Wellness Review": "Revisión de Bienestar",
-    "Assessment": "Evaluación",
-    "Incident Log": "Registro de Incidentes",
-    "Parent Summary": "Resumen para Padres",
-    "Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.": "El acceso de supervisores protege la información de los jóvenes. Los padres reciben resúmenes de progreso, no notas privadas de bienestar.",
-    "Refresh Data": "Actualizar Datos",
-    "Launch-day operating picture.": "Vista operativa del día de lanzamiento.",
-    "Today Attendance": "Asistencia de Hoy",
-    "Support Flags": "Alertas de Apoyo",
-    "Today Incidents": "Incidentes de Hoy",
-    "Parent Summaries": "Resúmenes para Padres",
-    "Start day: attendance, PPE, water, assignment.": "Inicio del día: asistencia, PPE, agua y asignación.",
-    "During day: wellness review, safety support, incident log.": "Durante el día: revisión de bienestar, apoyo de seguridad y registro de incidentes.",
-    "End day: assessment, parent-safe summary, reports.": "Fin del día: evaluación, resumen seguro para padres e informes.",
-    "Active youth participants.": "Participantes jóvenes activos.",
-    "This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.": "Esta es la lista para supervisores. Úsela para ver quién está activo, asignado a un equipo, registrado hoy y listo para evaluación o actualizaciones seguras para padres.",
-    "Add New Youth": "Agregar Joven",
-    "No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.": "Aún no hay jóvenes registrados. Agregue el primer perfil desde Registro y regrese aquí para administrar asistencia, bienestar, evaluaciones y resúmenes para padres.",
-    "Youth": "Joven",
-    "Participant ID": "ID de Participante",
-    "Crew": "Equipo",
-    "Age": "Edad",
-    "Today": "Hoy",
-    "Status": "Estado",
-    "Guardian:": "Tutor:",
-    "not entered": "no ingresado",
-    "Unassigned": "Sin asignar",
-    "Review": "Revisar",
-    "Clear": "Claro",
-    "Take Attendance / PPE": "Tomar Asistencia / PPE",
-    "Daily Assessment": "Evaluación Diaria",
-    "Reports": "Informes",
-    "Ops": "Operaciones"
-  },
-  tl: {
-    "Achievements": "Mga Nakamit",
-    "Real Supervisor Operations Center": "Tunay na Sentro ng Operasyon ng Supervisor",
+    "Youth reflection, supervisor assessment, parent-safe summary, media documentation, reports.": "Youth reflection, supervisor assessment, parent-safe summary, media documentation, at reports.",
+    "Open Supervisor Center": "Buksan ang Supervisor Center",
+    "Real Supervisor Operations Center": "Tunay na Supervisor Operations Center",
     "Morning-to-end-of-day control room.": "Control room mula umaga hanggang pagtatapos ng araw.",
     "Dashboard": "Dashboard",
     "6/8 Cooling Station": "6/8 Cooling Station",
-    "Youth Roster": "Listahan ng Kabataan",
+    "Youth Roster": "Youth Roster",
     "Attendance / PPE": "Attendance / PPE",
-    "Wellness Review": "Pagsusuri ng Kalagayan",
-    "Assessment": "Pagtatasa",
-    "Incident Log": "Talaan ng Insidente",
-    "Parent Summary": "Buod para sa Magulang",
-    "Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.": "Pinoprotektahan ng access ng supervisor ang impormasyon ng kabataan. Ang mga magulang ay tumatanggap ng buod ng pag-unlad, hindi pribadong wellness notes.",
-    "Refresh Data": "I-refresh ang Data",
-    "Launch-day operating picture.": "Larawan ng operasyon sa araw ng launch.",
+    "Wellness Review": "Wellness Review",
+    "Assessment": "Assessment",
+    "Incident Log": "Incident Log",
+    "Parent Summary": "Parent Summary",
+    "Launch-day operating picture.": "Operating picture sa araw ng launch.",
+    "Youth Roster": "Youth Roster",
     "Today Attendance": "Attendance Ngayon",
-    "Support Flags": "Mga Senyales ng Suporta",
-    "Today Incidents": "Mga Insidente Ngayon",
-    "Parent Summaries": "Mga Buod para sa Magulang",
+    "Today Incidents": "Incidents Ngayon",
+    "Parent Summaries": "Parent Summaries",
     "Start day: attendance, PPE, water, assignment.": "Simula ng araw: attendance, PPE, tubig, assignment.",
     "During day: wellness review, safety support, incident log.": "Habang araw: wellness review, safety support, incident log.",
-    "End day: assessment, parent-safe summary, reports.": "Pagtatapos ng araw: pagtatasa, buod para sa magulang, reports.",
-    "Active youth participants.": "Aktibong kabataang kalahok.",
-    "This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.": "Ito ang roster para sa supervisor. Gamitin ito para makita kung sino ang aktibo, nasa crew, naka-check in ngayon, at handa para sa pagtatasa o update para sa magulang.",
-    "Add New Youth": "Magdagdag ng Kabataan",
-    "No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.": "Wala pang nakarehistrong kabataan. Magdagdag muna ng youth profile sa Registration, pagkatapos bumalik dito para pamahalaan ang attendance, wellness review, assessments, at parent summaries.",
-    "Youth": "Kabataan",
-    "Participant ID": "ID ng Kalahok",
-    "Crew": "Crew",
-    "Age": "Edad",
-    "Today": "Ngayon",
-    "Status": "Status",
-    "Guardian:": "Guardian:",
-    "not entered": "hindi pa inilagay",
-    "Unassigned": "Walang assignment",
-    "Review": "Suriin",
-    "Clear": "Maayos",
-    "Take Attendance / PPE": "Kunin ang Attendance / PPE",
-    "Daily Assessment": "Arawang Pagtatasa",
-    "Reports": "Ulat",
-    "Ops": "Operasyon",
-    "Operations": "Operasyon",
-    "Supervisor": "Supervisor",
-    "Report": "Ulat",
-    "Parent": "Magulang",
-    "Grower User · Grower": "Grower User · Magtatanim",
-    "Sign Out": "Mag-sign Out",
-    "Feedback": "Komento",
-    "My Workspace": "Aking Workspace",
-    "My Day": "Aking Araw",
-    "6/8 Project": "6/8 Project",
-    "Value-Added": "Value-Added"
+    "End day: assessment, parent-safe summary, reports.": "Pagtatapos: assessment, parent-safe summary, reports.",
+    "Guest Pathway": "Landas ng Bisita",
+    "Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together.": "Natututuhan ng mga bisita ang kuwento ng farm, connected food ecosystem, historic Lansdowne Airport context, regenerative agriculture, at kung paano gumagalaw nang sama-sama ang youth, growers, pamilya, customers, at partners.",
+    "Attend an Event": "Dumalo sa Event",
+    "Volunteer / Support": "Mag-volunteer / Suporta",
+    "Become a Partner": "Maging Partner",
+    "Return to Portal": "Bumalik sa Portal",
+    "Choose Another Role": "Pumili ng Ibang Role",
+    "Comment on This Screen": "Magkomento sa Screen na Ito",
+    "Record Achievement": "I-record ang Achievement",
+    "Go to Marketplace": "Pumunta sa Marketplace",
+    "Journey Completion & Conversion": "Journey Completion at Conversion",
+    "What You Learned": "Ano ang Natutuhan Mo",
+    "What You Can Do Next": "Ano ang Maaari Mong Gawin Susunod",
+    "My Ecosystem Impact": "Aking Ecosystem Impact",
+    "Record My Journey": "I-record ang Aking Journey",
+    "Continue to Marketplace": "Magpatuloy sa Marketplace",
+    "Choose Another Pathway": "Pumili ng Ibang Pathway",
+    "Share Feedback": "Magbigay ng Feedback",
+    "Return Home": "Bumalik sa Home",
+    "Cultivator Journey": "Cultivator Journey",
+    "My Contribution": "Aking Kontribusyon",
+    "What Did I Learn?": "Ano ang Natutuhan Ko?",
+    "Career Connections": "Career Connections",
+    "One Acre Challenge": "One Acre Challenge",
+    "What opportunity do you see?": "Anong opportunity ang nakikita mo?",
+    "What opportunity do you see now?": "Anong opportunity ang nakikita mo ngayon?",
+    "SEE IT": "SEE IT",
+    "IMAGINE IT": "IMAGINE IT",
+    "DESIGN IT": "DESIGN IT",
+    "BUILD IT": "BUILD IT",
+    "SHARE IT": "SHARE IT",
+    "TELL IT": "TELL IT",
+    "LEAD IT": "LEAD IT",
+    "BECOME IT": "BECOME IT"
   },
-  it: {
-    "Achievements": "Risultati",
-    "Real Supervisor Operations Center": "Centro Operativo Reale dei Supervisori",
-    "Morning-to-end-of-day control room.": "Sala di controllo dalla mattina alla fine della giornata.",
-    "Dashboard": "Dashboard",
-    "Youth Roster": "Elenco Giovani",
-    "Attendance / PPE": "Presenze / DPI",
-    "Wellness Review": "Revisione Benessere",
-    "Assessment": "Valutazione",
-    "Incident Log": "Registro Incidenti",
-    "Parent Summary": "Riepilogo per Genitori",
-    "Refresh Data": "Aggiorna Dati",
-    "Launch-day operating picture.": "Quadro operativo del giorno di lancio.",
-    "Today Attendance": "Presenze di Oggi",
-    "Support Flags": "Segnali di Supporto",
-    "Today Incidents": "Incidenti di Oggi",
-    "Parent Summaries": "Riepiloghi per Genitori"
-  },
-  he: {
-    "Achievements": "הישגים",
-    "Real Supervisor Operations Center": "מרכז תפעול מדריכים אמיתי",
-    "Morning-to-end-of-day control room.": "חדר בקרה מהבוקר ועד סוף היום.",
-    "Dashboard": "לוח בקרה",
-    "Youth Roster": "רשימת נוער",
-    "Attendance / PPE": "נוכחות / ציוד מגן",
-    "Wellness Review": "סקירת רווחה",
-    "Assessment": "הערכה",
-    "Incident Log": "יומן אירועים",
-    "Parent Summary": "סיכום להורים",
-    "Refresh Data": "רענן נתונים",
-    "Launch-day operating picture.": "תמונת תפעול ליום ההשקה.",
-    "Today Attendance": "נוכחות היום",
-    "Support Flags": "דגלי תמיכה",
-    "Today Incidents": "אירועים היום",
-    "Parent Summaries": "סיכומי הורים"
-  },
-  fr: {
-    "Achievements": "Réussites",
-    "Real Supervisor Operations Center": "Centre réel des opérations des superviseurs",
-    "Morning-to-end-of-day control room.": "Salle de contrôle du matin à la fin de journée.",
-    "Dashboard": "Tableau de bord",
-    "Youth Roster": "Liste des jeunes",
-    "Attendance / PPE": "Présence / EPI",
-    "Wellness Review": "Suivi du bien-être",
-    "Assessment": "Évaluation",
-    "Incident Log": "Journal des incidents",
-    "Parent Summary": "Résumé pour parents",
-    "Refresh Data": "Actualiser les données",
-    "Launch-day operating picture.": "Vue opérationnelle du jour de lancement.",
-    "Today Attendance": "Présence du jour",
-    "Support Flags": "Alertes de soutien",
-    "Today Incidents": "Incidents du jour",
-    "Parent Summaries": "Résumés pour parents"
-  }
-};
-
-
-const partialPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
-  en: {},
   es: {
     "Launch-day readiness status.": "Estado de preparación para el día de lanzamiento.",
     "Daily rhythm for launch.": "Ritmo diario para el lanzamiento.",
-    "Launch-day operating picture.": "Vista operativa del día de lanzamiento.",
-    "Morning-to-end-of-day control room.": "Sala de control desde la mañana hasta el cierre.",
-    "Mission Control / Reports": "Control de misión / Informes",
-    "Real Supervisor Operations Center": "Centro real de operaciones de supervisores",
-    "Youth Roster": "Lista de jóvenes",
-    "Today Attendance": "Asistencia de hoy",
+    "Beginning of Day": "Inicio del día",
+    "During Program": "Durante el programa",
+    "End of Day": "Fin del día",
+    "Profiles": "Perfiles",
+    "Youth Registered": "Jóvenes registrados",
     "Present Today": "Presentes hoy",
-    "Support Flags": "Alertas de apoyo",
-    "Today Incidents": "Incidentes de hoy",
-    "Parent Summaries": "Resúmenes para padres",
     "Assessments": "Evaluaciones",
-    "Feedback": "Comentarios",
+    "Support Flags": "Alertas de apoyo",
+    "Incident Logs": "Registros de incidentes",
     "Project Items Complete": "Elementos del proyecto completos",
-    "System Status": "Estado del sistema",
-    "Online": "En línea",
-    "Launch Phase": "Fase de lanzamiento",
-    "Community Beta": "Beta comunitaria",
-    "Staff Orientation": "Orientación del personal",
-    "Youth Workforce Launch": "Lanzamiento de fuerza laboral juvenil",
-    "Featured Project": "Proyecto destacado",
-    "Project Teams": "Equipos del proyecto",
-    "Design": "Diseño",
-    "Engineering": "Ingeniería",
-    "Manufacturing": "Manufactura",
-    "Contractor": "Contratista",
-    "Operations": "Operaciones",
-    "Dashboard": "Panel",
-    "Start day": "Inicio del día",
-    "During day": "Durante el día",
-    "End day": "Cierre del día",
-    "attendance": "asistencia",
-    "PPE": "PPE",
-    "water": "agua",
-    "assignment": "asignación",
-    "wellness review": "revisión de bienestar",
-    "safety support": "apoyo de seguridad",
-    "incident log": "registro de incidentes",
-    "supervisor assessment": "evaluación del supervisor",
-    "parent-safe summary": "resumen seguro para padres",
-    "reports": "informes",
-    "Open Supervisor Center": "Abrir Centro de Supervisores",
-    "Open June 8 Project": "Abrir Proyecto del 8 de Junio",
-    "Events & Orientation": "Eventos y Orientación",
-    "Guest Pathway": "Ruta de Visitante",
-    "Journey Completion & Conversion": "Finalización de Ruta y Conversión",
-    "What You Learned": "Lo que aprendiste",
-    "What You Can Do Next": "Qué puedes hacer ahora",
-    "My Ecosystem Impact": "Mi impacto en el ecosistema",
-    "Continue to Marketplace": "Continuar al mercado",
-    "Choose Another Pathway": "Elegir otra ruta",
-    "Share Feedback": "Compartir comentarios",
-    "Return Home": "Volver al inicio",
-    "Save Journey & Share Feedback": "Guardar recorrido y compartir comentarios",
-    "Step": "Paso",
-    "Begin Journey": "Comenzar recorrido",
-    "Back": "Atrás",
-    "Next": "Siguiente",
-    "Farm Story": "Historia de la granja",
-    "Historic Airport": "Aeropuerto histórico",
-    "Why Food Prices Matter": "Por qué importan los precios de los alimentos",
-    "Regenerative Agriculture": "Agricultura regenerativa",
-    "Connected Ecosystem": "Ecosistema conectado",
-    "Youth Workforce": "Fuerza laboral juvenil",
-    "Marketplace": "Mercado",
-    "Growers": "Productores",
-    "Partners": "Aliados",
-    "Impact": "Impacto",
-    "My Journey": "Mi recorrido"
+    "Open Supervisor Center": "Abrir centro de supervisores",
+    "Open June 8 Project": "Abrir proyecto del 8 de junio"
   },
-  tl: {
-    "Launch-day readiness status.": "Katayuan ng kahandaan para sa araw ng paglulunsad.",
-    "Daily rhythm for launch.": "Pang-araw-araw na daloy para sa paglulunsad.",
-    "Launch-day operating picture.": "Larawan ng operasyon sa araw ng paglulunsad.",
-    "Morning-to-end-of-day control room.": "Control room mula umaga hanggang pagtatapos ng araw.",
-    "Mission Control / Reports": "Mission Control / Mga Ulat",
-    "Real Supervisor Operations Center": "Tunay na Sentro ng Operasyon ng Supervisor",
-    "Youth Roster": "Listahan ng Kabataan",
-    "Today Attendance": "Attendance Ngayon",
-    "Present Today": "Present Ngayon",
-    "Support Flags": "Mga Palatandaan ng Suporta",
-    "Today Incidents": "Mga Insidente Ngayon",
-    "Parent Summaries": "Buod para sa Magulang",
-    "Assessments": "Mga Pagtatasa",
-    "Feedback": "Komento",
-    "Project Items Complete": "Mga Bahagi ng Proyekto na Kumpleto",
-    "System Status": "Katayuan ng Sistema",
-    "ONLINE": "ONLINE",
-    "Online": "Online",
-    "Launch Phase": "Yugto ng Paglulunsad",
-    "Community Beta": "Community Beta",
-    "Staff Orientation": "Oryentasyon ng Staff",
-    "Youth Workforce Launch": "Paglulunsad ng Youth Workforce",
-    "Featured Project": "Tampok na Proyekto",
-    "Project Teams": "Mga Koponan ng Proyekto",
-    "Design": "Disenyo",
-    "Engineering": "Engineering",
-    "Manufacturing": "Paggawa",
-    "Contractor": "Kontratista",
-    "Operations": "Operasyon",
-    "Dashboard": "Dashboard",
-    "Start day": "Simula ng araw",
-    "During day": "Habang nasa programa",
-    "End day": "Pagtatapos ng araw",
-    "attendance": "attendance",
-    "PPE": "PPE",
-    "water": "tubig",
-    "assignment": "assignment",
-    "wellness review": "pagsusuri ng kalagayan",
-    "safety support": "suporta sa kaligtasan",
-    "incident log": "incident log",
-    "supervisor assessment": "pagtatasa ng supervisor",
-    "parent-safe summary": "buod na ligtas para sa magulang",
-    "reports": "mga ulat",
-    "Open Supervisor Center": "Buksan ang Supervisor Center",
-    "Open June 8 Project": "Buksan ang Proyekto ng Hunyo 8",
-    "Events & Orientation": "Mga Event at Oryentasyon",
-    "Guest Pathway": "Landas ng Bisita",
-    "Guests learn": "Natututuhan ng mga bisita",
-    "Journey Completion & Conversion": "Pagkumpleto ng Journey at Susunod na Hakbang",
-    "What You Learned": "Ang Natutuhan Mo",
-    "What You Can Do Next": "Ano ang Maaari Mong Gawin Susunod",
-    "My Ecosystem Impact": "Aking Epekto sa Ecosystem",
-    "Continue to Marketplace": "Magpatuloy sa Marketplace",
-    "Choose Another Pathway": "Pumili ng Ibang Landas",
-    "Share Feedback": "Magbahagi ng Feedback",
-    "Return Home": "Bumalik sa Home",
-    "Save Journey & Share Feedback": "I-save ang Journey at Magbahagi ng Feedback",
-    "Record My Journey": "I-record ang Aking Journey",
-    "Step": "Hakbang",
-    "Begin Journey": "Simulan ang Journey",
-    "Back": "Bumalik",
-    "Next": "Susunod",
-    "Farm Story": "Kuwento ng Bukid",
-    "Historic Airport": "Makasaysayang Paliparan",
-    "Why Food Prices Matter": "Bakit Mahalaga ang Presyo ng Pagkain",
-    "Regenerative Agriculture": "Regenerative Agriculture",
-    "Connected Ecosystem": "Connected Food Ecosystem",
-    "Youth Workforce": "Youth Workforce",
-    "Marketplace": "Marketplace",
-    "Growers": "Growers",
-    "Partners": "Partners",
-    "Impact": "Epekto",
-    "My Journey": "Aking Journey",
-    "Welcome to Bronson Family Farm": "Maligayang pagdating sa Bronson Family Farm",
-    "The Farm Story": "Ang Kuwento ng Bukid",
-    "Historic Lansdowne Airport": "Makasaysayang Lansdowne Airport",
-    "Youth Workforce Program": "Youth Workforce Program",
-    "Partner Opportunities": "Mga Oportunidad para sa Partner",
-    "Impact & Outcomes": "Epekto at Mga Resulta",
-    "What interested you most": "Ano ang pinaka-interesado ka",
-    "Become a Customer": "Maging Customer",
-    "Become a Grower": "Maging Grower",
-    "Become a Partner": "Maging Partner",
-    "Support the Mission": "Suportahan ang Misyon",
-    "Attend an Event": "Dumalo sa Event",
-    "Volunteer / Support": "Magboluntaryo / Suporta",
-    "Become a Partner": "Maging Partner",
-    "Go to Marketplace": "Pumunta sa Marketplace",
-    "Record Achievement": "I-record ang Achievement",
-    "Comment on This Screen": "Magkomento sa Screen na Ito",
-    "Return to Portal": "Bumalik sa Portal",
-    "Choose Another Role": "Pumili ng Ibang Role",
-    "Complete Journey": "Kumpletuhin ang Journey",
-    "63 Cooling Fan Challenge": "63 Cooling Fan Challenge",
-    "June 8 Featured Project": "Tampok na Proyekto sa Hunyo 8",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "Hamon sa Kaligtasan sa Init at Cooling Station",
-    "Supervisor observations": "Mga obserbasyon ng supervisor",
-    "team progress": "progreso ng team",
-    "task completion": "pagkumpleto ng gawain",
-    "incident documentation": "dokumentasyon ng insidente",
-    "QR/manual check-in": "QR/manual check-in",
-    "daily proverb": "pang-araw-araw na kasabihan",
-    "weather awareness": "kaalaman sa panahon",
-    "assignments": "mga assignment"
+  fr: {
+    "Launch-day readiness status.": "État de préparation du jour du lancement.",
+    "Daily rhythm for launch.": "Rythme quotidien pour le lancement.",
+    "Beginning of Day": "Début de journée",
+    "During Program": "Pendant le programme",
+    "End of Day": "Fin de journée",
+    "Profiles": "Profils",
+    "Youth Registered": "Jeunes inscrits",
+    "Present Today": "Présents aujourd’hui",
+    "Assessments": "Évaluations",
+    "Support Flags": "Alertes de soutien",
+    "Incident Logs": "Registres d’incidents",
+    "Project Items Complete": "Éléments du projet terminés",
+    "Open Supervisor Center": "Ouvrir le centre superviseur",
+    "Open June 8 Project": "Ouvrir le projet du 8 juin"
   },
   it: {
-    "Launch-day readiness status.": "Stato di preparazione al lancio.",
+    "Launch-day readiness status.": "Stato di preparazione per il giorno del lancio.",
     "Daily rhythm for launch.": "Ritmo quotidiano per il lancio.",
-    "Launch-day operating picture.": "Quadro operativo del giorno di lancio.",
-    "Youth Roster": "Elenco giovani",
-    "Today Attendance": "Presenze di oggi",
-    "Support Flags": "Segnalazioni di supporto",
-    "Today Incidents": "Incidenti di oggi",
-    "Parent Summaries": "Riepiloghi per i genitori",
+    "Beginning of Day": "Inizio giornata",
+    "During Program": "Durante il programma",
+    "End of Day": "Fine giornata",
+    "Profiles": "Profili",
+    "Youth Registered": "Giovani registrati",
+    "Present Today": "Presenti oggi",
     "Assessments": "Valutazioni",
+    "Support Flags": "Avvisi di supporto",
+    "Incident Logs": "Registri incidenti",
     "Project Items Complete": "Elementi del progetto completati",
-    "Open Supervisor Center": "Apri Centro supervisori",
-    "Open June 8 Project": "Apri progetto dell'8 giugno"
+    "Open Supervisor Center": "Apri centro supervisori",
+    "Open June 8 Project": "Apri progetto dell’8 giugno"
   },
   he: {
     "Launch-day readiness status.": "מצב מוכנות ליום ההשקה.",
     "Daily rhythm for launch.": "קצב יומי להשקה.",
-    "Youth Roster": "רשימת נוער",
-    "Today Attendance": "נוכחות היום",
-    "Support Flags": "סימוני תמיכה",
-    "Today Incidents": "אירועים היום",
-    "Parent Summaries": "סיכומים להורים",
+    "Beginning of Day": "תחילת היום",
+    "During Program": "במהלך התוכנית",
+    "End of Day": "סוף היום",
+    "Profiles": "פרופילים",
+    "Youth Registered": "נוער רשום",
+    "Present Today": "נוכחים היום",
     "Assessments": "הערכות",
-    "Project Items Complete": "פריטי פרויקט שהושלמו"
-  },
-  fr: {
-    "Launch-day readiness status.": "État de préparation du jour de lancement.",
-    "Daily rhythm for launch.": "Rythme quotidien pour le lancement.",
-    "Launch-day operating picture.": "Vue opérationnelle du jour de lancement.",
-    "Youth Roster": "Liste des jeunes",
-    "Today Attendance": "Présence aujourd'hui",
-    "Support Flags": "Alertes de soutien",
-    "Today Incidents": "Incidents aujourd'hui",
-    "Parent Summaries": "Résumés pour les parents",
-    "Assessments": "Évaluations",
-    "Project Items Complete": "Éléments du projet complétés",
-    "Open Supervisor Center": "Ouvrir le centre superviseur",
-    "Open June 8 Project": "Ouvrir le projet du 8 juin"
+    "Support Flags": "סימוני תמיכה",
+    "Incident Logs": "יומני אירועים",
+    "Project Items Complete": "פריטי פרויקט הושלמו",
+    "Open Supervisor Center": "פתח מרכז מדריכים",
+    "Open June 8 Project": "פתח פרויקט 8 ביוני"
   }
 };
-
-function applyPartialPhraseTranslations(language: LanguageCode, text: string) {
-  if (language === "en") return text;
-  const replacements = partialPhraseTranslations[language] || {};
-  let output = text;
-  Object.entries(replacements)
-    .sort((a, b) => b[0].length - a[0].length)
-    .forEach(([source, target]) => {
-      if (!source || source === target) return;
-      output = output.split(source).join(target);
-    });
-  return output;
-}
 
 function translatePhrase(language: LanguageCode, raw: string) {
   if (language === "en") return raw;
   const key = raw.trim();
-  const exact = screenTranslations[language]?.[key] || launchPhraseTranslations[language]?.[key] || languageText[language]?.[key] || partialPhraseTranslations[language]?.[key];
-  if (exact) return raw.replace(key, exact);
-  return applyPartialPhraseTranslations(language, raw);
+  return (
+    launchCriticalTranslations[language]?.[key] ||
+    launchPhraseTranslations[language]?.[key] ||
+    screenTranslations[language]?.[key] ||
+    languageText[language]?.[key] ||
+    key
+  );
 }
 
 function applyScreenTranslations(language: LanguageCode) {
@@ -2370,7 +1817,7 @@ function LaunchAuditDetailGrid({
 }) {
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Ecosystem Journey</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Launch Audit Fix</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
@@ -2478,7 +1925,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         }
       />
       <LaunchAuditDetailGrid
-        title="Explore the Connected Food Ecosystem"
+        title="Guest journey now has a complete launch story."
         items={[
           { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
           { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
@@ -2781,114 +2228,78 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const currentJourney = cultivatorJourneyWeeks[0];
+  const currentWeek = youthCurriculumWeeks[0];
   const completionPercent = 12.5;
-  const [selectedTeam, setSelectedTeam] = useState(coolingCenterTeams[2].name);
-  const team = coolingCenterTeams.find((item) => item.name === selectedTeam) || coolingCenterTeams[2];
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[380px_1fr]">
+    <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Cultivators</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌱 My Cultivator Journey</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
         <p className="mt-5 text-base leading-8 text-white/86">
-          Growing People. Growing Food. Growing Futures. Every youth entering the program is a Cultivator on an 8-week journey of vision, work, creativity, leadership, and opportunity.
+          Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
         </p>
 
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Week 1 Active</div>
-          <h2 className="mt-2 text-2xl font-black">{currentJourney.stage}: {currentJourney.theme}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82"><strong>Big Question:</strong> {currentJourney.bigQuestion}</p>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-white/82">
-            <strong>Monday Mission:</strong> Complete the 63 Cooling Fan Workforce Production Challenge and begin learning how ideas become products, products create value, and value creates opportunity.
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
+          <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.objective}</p>
+          <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Date:</strong> {featuredProject.launchDate}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Start:</strong> {featuredProject.startTime}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Week:</strong> Week 1</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Badge:</strong> {currentWeek.badge}</div>
           </div>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open June 8 Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Videos</button>
+          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
         </div>
       </Card>
 
       <div className="grid gap-5">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Monday Launch Assignment</div>
-          <h2 className="mt-3 text-3xl font-black">June 8 Workforce Production Challenge</h2>
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Customer</div>
-              <div className="mt-2 text-lg font-black">Bronson Family Farm</div>
-              <p className="mt-2 text-xs leading-5 text-white/72">The farm needs a cooling station for outdoor workers, volunteers, and visitors.</p>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
+          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
             </div>
-            <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Contractor</div>
-              <div className="mt-2 text-lg font-black">Cooling Station Builder</div>
-              <p className="mt-2 text-xs leading-5 text-white/72">The contractor becomes the customer when ordering 63 cooling fans.</p>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
+              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
             </div>
-            <div className="rounded-[1.25rem] border border-amber-200/30 bg-amber-300/15 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-amber-100/80">Order</div>
-              <div className="mt-2 text-3xl font-black">63 Fans</div>
-              <p className="mt-2 text-xs leading-5 text-white/72">Produce, paint, quality-check, and prepare for delivery.</p>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
             </div>
           </div>
-          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-center text-sm font-black leading-7 text-emerald-50">
-            SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT → BECOME IT → CELEBRATE IT → CONTINUE IT
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
           </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Team</div>
-          <h2 className="mt-3 text-3xl font-black">Click a Team to See Its Mission</h2>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {coolingCenterTeams.map((item) => (
-              <button
-                key={item.name}
-                type="button"
-                onClick={() => setSelectedTeam(item.name)}
-                className={`rounded-full px-4 py-2 text-sm font-black ${selectedTeam === item.name ? "bg-emerald-300 text-black" : "border border-white/15 bg-white/10 text-white"}`}
-              >
-                {item.icon} {item.name}
-              </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {currentWeek.skills.map((skill) => (
+              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
             ))}
           </div>
-          <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-black/25 p-5">
-            <div className="text-sm font-black uppercase tracking-[0.25em] text-emerald-100/70">{team.name}</div>
-            <h3 className="mt-2 text-2xl font-black">{team.identity}</h3>
-            <p className="mt-3 text-sm leading-7 text-white/82">{team.mission}</p>
-            <div className="mt-5 grid gap-4 lg:grid-cols-3">
-              <div>
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Deliverables</div>
-                <div className="mt-2 grid gap-2">{team.deliverables.map((item) => <div key={item} className="rounded-xl bg-white/10 p-2 text-xs font-bold">✓ {item}</div>)}</div>
-              </div>
-              <div>
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Skills</div>
-                <div className="mt-2 flex flex-wrap gap-2">{team.skills.map((item) => <span key={item} className="rounded-full bg-emerald-300/15 px-3 py-1 text-xs font-bold">{item}</span>)}</div>
-              </div>
-              <div>
-                <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Careers Connected</div>
-                <div className="mt-2 grid gap-2">{team.careers.map((item) => <div key={item} className="rounded-xl bg-white/10 p-2 text-xs font-bold">{item}</div>)}</div>
-              </div>
-            </div>
-            <div className="mt-5 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-3 text-sm font-bold text-amber-50">
-              Recommended team size: {team.recommendedShare}
-            </div>
-          </div>
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My 8-Week Journey</div>
-          <h2 className="mt-3 text-3xl font-black">Cultivator Journey Map</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">This is the full journey from vision to leadership. Week 1 launches with the 63-fan production challenge and connects to the larger summer curriculum.</p>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
+          <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {cultivatorJourneyWeeks.map((week) => (
+            {youthCurriculumWeeks.map((week) => (
               <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
-                <h3 className="mt-2 text-xl font-black">{week.stage}</h3>
-                <p className="mt-2 text-sm font-bold text-white/84">{week.theme}</p>
-                <p className="mt-2 text-xs leading-5 text-white/72">{week.bigQuestion}</p>
-                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.achievement}</div>
+                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
+                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
               </div>
             ))}
           </div>
@@ -2896,43 +2307,63 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
 
         <div className="grid gap-5 lg:grid-cols-2">
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Beginning of Day</div>
-            <h2 className="mt-3 text-3xl font-black">My Contribution</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">Today I will contribute by:</p>
-            <div className="mt-5 grid gap-2 md:grid-cols-2">
-              {myContributionOptions.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold">☐ {item}</div>)}
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
+            <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated.</p>
+            <div className="mt-5 grid gap-3">
+              {youthPortfolioEntries.map((entry) => (
+                <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                  <div className="text-lg font-black">{entry.title}</div>
+                  <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
+                  <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.skills.map((skill) => (
+                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
 
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">End of Day</div>
-            <h2 className="mt-3 text-3xl font-black">What Did I Learn?</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">At the end of the day, youth connect their contribution to their learning.</p>
-            <div className="mt-5 grid gap-2 md:grid-cols-2">
-              {whatILearnedOptions.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold">☐ {item}</div>)}
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🏆 My Achievements</div>
+            <h2 className="mt-3 text-3xl font-black">Skills, Badges, and Recognition</h2>
+            <div className="mt-5 grid gap-3">
+              {youthAchievementBadges.map((badge) => (
+                <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg font-black">{badge.title}</div>
+                      <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
+                    </div>
+                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black">{badge.earned ? "Available Week 1" : "Upcoming"}</span>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
+                </div>
+              ))}
             </div>
           </Card>
         </div>
-
         <JourneyCompletionCard
-          title="Cultivator Journey: Week 1 Launch"
+          title="Youth Workforce Journey Completion"
           learned={[
-            "How ideas become products",
-            "How customers, contractors, and manufacturers work together",
-            "How creativity and teamwork create value",
-            "How workforce skills connect to future careers",
-            "How Bronson Family Farm grows people, food, and opportunity",
+            "Safety and PPE",
+            "Teamwork and communication",
+            "Cooling Station Challenge",
+            "Portfolio evidence",
+            "Career and income connections",
           ]}
           nextSteps={[
-            { label: "Open Today's Project", screen: "launchProject" },
+            { label: "Open Today's Project", screen: "supervisor" },
             { label: "Complete Reflection", screen: "feedback" },
             { label: "View Achievements", screen: "completion" },
             { label: "Visit Marketplace", screen: "marketplace" },
           ]}
           impact={[
-            "Started the 8-week Cultivator Journey",
-            "Connected vision to work",
-            "Practiced workforce and entrepreneurship skills",
+            "Completed youth pathway",
+            "Built work-readiness skills",
+            "Connected today's work to future income",
             "Added evidence toward achievement",
           ]}
           setScreen={setScreen}
