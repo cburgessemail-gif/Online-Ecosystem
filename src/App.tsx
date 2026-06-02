@@ -2040,12 +2040,12 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
       <div className="grid gap-5">
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week 1: {lt(language, currentWeek.title)}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{lt(language, currentWeek.focus)}</p>
+          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
-              <div className="mt-2 text-sm font-black">{lt(language, currentWeek.project)}</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
@@ -2061,21 +2061,21 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
-              <span key={lt(language, skill)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{lt(language, skill)}</span>
+              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
             ))}
           </div>
         </Card>
 
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
-          <h2 className="mt-3 text-3xl font-black">{lt(language, "Cultivator Workforce Development Roadmap")}</h2>
+          <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {youthCurriculumWeeks.map((week) => (
               <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{lt(language, "Week")} {week.week}</div>
-                <h3 className="mt-2 text-lg font-black">{lt(language, week.title)}</h3>
-                <p className="mt-2 text-xs leading-5 text-white/72">{lt(language, week.focus)}</p>
-                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{lt(language, week.status)}</div>
+                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
+                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
               </div>
             ))}
           </div>
@@ -2094,7 +2094,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
                   <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {entry.skills.map((skill) => (
-                      <span key={lt(language, skill)} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{lt(language, skill)}</span>
+                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
                     ))}
                   </div>
                 </div>
@@ -3705,7 +3705,7 @@ function CoolingCenterProjectModule({
             </ul>
             <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
             <div className="mt-2 flex flex-wrap gap-2">
-              {team.skills.map((skill) => <span key={lt(language, skill)} className="rounded-full bg-black/35 px-3 py-1 text-xs font-bold">{lt(language, skill)}</span>)}
+              {team.skills.map((skill) => <span key={skill} className="rounded-full bg-black/35 px-3 py-1 text-xs font-bold">{skill}</span>)}
             </div>
           </div>
         ))}
