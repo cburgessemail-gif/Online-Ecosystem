@@ -2131,7 +2131,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
             "Career and income connections",
           ]}
           nextSteps={[
-            { label: "Open Today's Project", screen: "launchProject" },
+            { label: "Open Today's Project", screen: "supervisor" },
             { label: "Complete Reflection", screen: "feedback" },
             { label: "View Achievements", screen: "completion" },
             { label: "Visit Marketplace", screen: "marketplace" },
@@ -3023,7 +3023,7 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
           "Family engagement options",
         ]}
         nextSteps={[
-          { label: "View June 8 Project", screen: "launchProject" },
+          { label: "View June 8 Project", screen: "supervisor" },
           { label: "Send Parent Feedback", screen: "feedback" },
           { label: "View Achievements", screen: "completion" },
           { label: "Return to Workspace", screen: "roles" },
