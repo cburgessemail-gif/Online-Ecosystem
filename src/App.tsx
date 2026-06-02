@@ -504,14 +504,14 @@ const launchVideos: LaunchVideo[] = [
     title: "June 5 Staff & Supervisor Orientation Video",
     purpose: "Staff orientation, site rules, safety expectations, youth support, emergency procedures, and platform training.",
     file: "/videos/june5-staff-supervisor-orientation.mp4",
-    fallback: "Upload the June 5 orientation video to public/videos/june5-staff-supervisor-orientation.mp4 or replace this placeholder with a link.",
+    fallback: "Supervisor Orientation Video: Training materials for site rules, youth safety, daily operations, emergency procedures, parent-safe communication, and platform use will be added here as the program expands.",
     tags: ["Orientation", "Staff", "Safety"],
   },
   {
     title: "June 8 Cooling Station Challenge Introduction Video",
     purpose: "Introduces youth to the farm worker heat-safety problem, the four-team production flow, and the connection to real farm operations.",
     file: "/videos/june8-cooling-station-introduction.mp4",
-    fallback: "Upload the intro video to public/videos/june8-cooling-station-introduction.mp4 or replace this placeholder with a link.",
+    fallback: "Cooling Station Introduction: This training section introduces the farm worker heat-safety challenge, team assignments, safety expectations, and the connection to real farm operations.",
     tags: ["Youth", "Cooling Station", "Farm Safety"],
   },
   {
@@ -519,21 +519,21 @@ const launchVideos: LaunchVideo[] = [
     purpose: "Watch the cardboard fan demonstration before the June 8 Cooling Station Challenge. Youth use this to understand how the template, assembly, and hand-powered fan concept works before Design, Engineering, Manufacturing, and Contractor teams begin their work.",
     embedUrl: "https://www.youtube.com/embed/dtYzf3avkT4",
     embedTitle: "DIY Cardboard Fan | Cardboard Fan no motor no battery",
-    fallback: "Embedded YouTube demonstration: DIY Cardboard Fan | Cardboard Fan no motor no battery.",
+    fallback: "Training Resource Available: Fan template and design demonstration for the Cooling Station Challenge.",
     tags: ["Fan Video", "Design", "Templates", "June 8"],
   },
   {
     title: "Manufacturing: Assemble, Paint, Personalize, and Quality Check",
     purpose: "Documents the Manufacturing Team assembling, painting, branding, personalizing, and quality-checking the fans.",
     file: "/videos/fan-manufacturing-painting.mp4",
-    fallback: "Upload the manufacturing/painting video to public/videos/fan-manufacturing-painting.mp4 or replace this placeholder with a link.",
+    fallback: "Manufacturing Team Training Module: This section demonstrates assembly, painting, personalization, branding, and quality review procedures used during the Cooling Station Challenge.",
     tags: ["Fan Video", "Manufacturing", "Painting"],
   },
   {
     title: "Final Cooling Station Completion Video",
     purpose: "Shows the Contractor Team collecting fans, building the cooling station, and presenting the final farm heat-safety solution.",
     file: "/videos/cooling-station-completion.mp4",
-    fallback: "Upload the completion video to public/videos/cooling-station-completion.mp4 or replace this placeholder with a link.",
+    fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and portfolio evidence.",
     tags: ["Completion", "Contractor", "Farm Infrastructure"],
   },
 ];
@@ -1607,6 +1607,83 @@ function LaunchAuditDetailGrid({
   );
 }
 
+
+function JourneyCompletionCard({
+  title,
+  learned,
+  nextSteps,
+  impact,
+  setScreen,
+}: {
+  title: string;
+  learned: string[];
+  nextSteps: { label: string; screen: Screen }[];
+  impact: string[];
+  setScreen: (screen: Screen) => void;
+}) {
+  const saveImpact = () => {
+    recordCompletion(title);
+    setScreen("completion");
+  };
+
+  return (
+    <Card className="mt-5">
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion & Conversion</div>
+      <h2 className="mt-3 text-3xl font-black">{title}</h2>
+      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h3 className="text-xl font-black">What You Learned</h3>
+          <div className="mt-3 grid gap-2">
+            {learned.map((item) => (
+              <div key={item} className="rounded-2xl bg-black/28 p-3 text-sm font-bold text-white/84">✓ {item}</div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h3 className="text-xl font-black">What You Can Do Next</h3>
+          <div className="mt-3 grid gap-2">
+            {nextSteps.map((step) => (
+              <button
+                key={step.label}
+                type="button"
+                onClick={() => setScreen(step.screen)}
+                className="rounded-2xl border border-white/10 bg-black/28 p-3 text-left text-sm font-black hover:bg-emerald-300 hover:text-black"
+              >
+                {step.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <h3 className="text-xl font-black">My Ecosystem Impact</h3>
+          <div className="mt-3 grid gap-2">
+            {impact.map((item) => (
+              <div key={item} className="rounded-2xl bg-black/25 p-3 text-sm font-bold text-white/86">☑ {item}</div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={saveImpact}
+            className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-3 font-black text-black"
+          >
+            Record My Journey
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Continue to Marketplace</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Pathway</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Share Feedback</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
+      </div>
+    </Card>
+  );
+}
+
+
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <>
@@ -2044,6 +2121,29 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
             </div>
           </Card>
         </div>
+        <JourneyCompletionCard
+          title="Youth Workforce Journey Completion"
+          learned={[
+            "Safety and PPE",
+            "Teamwork and communication",
+            "Cooling Station Challenge",
+            "Portfolio evidence",
+            "Career and income connections",
+          ]}
+          nextSteps={[
+            { label: "Open Today's Project", screen: "launchProject" },
+            { label: "Complete Reflection", screen: "feedback" },
+            { label: "View Achievements", screen: "completion" },
+            { label: "Visit Marketplace", screen: "marketplace" },
+          ]}
+          impact={[
+            "Completed youth pathway",
+            "Built work-readiness skills",
+            "Connected today's work to future income",
+            "Added evidence toward achievement",
+          ]}
+          setScreen={setScreen}
+        />
       </div>
     </div>
   );
@@ -2838,6 +2938,36 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Workforce Project</div>
         <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
         <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.farmConnection}</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <h3 className="font-black">Learning Objectives</h3>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+              <li>✓ Understand heat stress risks</li>
+              <li>✓ Follow PPE requirements</li>
+              <li>✓ Complete assigned team role</li>
+              <li>✓ Participate in final presentation</li>
+            </ul>
+          </div>
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <h3 className="font-black">Career Connections</h3>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+              <li>Manufacturing Technician</li>
+              <li>Construction Trades</li>
+              <li>Product Designer</li>
+              <li>Quality Control</li>
+              <li>Entrepreneur</li>
+            </ul>
+          </div>
+          <div className="rounded-[1.25rem] border border-white/10 bg-amber-300/12 p-4">
+            <h3 className="font-black">Completion Evidence</h3>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+              <li>☐ Watched demonstration</li>
+              <li>☐ Participated in team assignment</li>
+              <li>☐ Practiced safe work procedures</li>
+              <li>☐ Added evidence to portfolio</li>
+            </ul>
+          </div>
+        </div>
         <div className="mt-4 grid gap-3 md:grid-cols-4">
           {coolingCenterTeams.map((team) => (
             <div key={team.name} className="rounded-2xl border border-white/10 bg-black/25 p-4">
@@ -2882,6 +3012,30 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Parent Feedback</button>
       </div>
+
+      <JourneyCompletionCard
+        title="Parent / Guardian Journey Completion"
+        learned={[
+          "Attendance progress",
+          "Project participation",
+          "Achievement status",
+          "Parent-safe supervisor summaries",
+          "Family engagement options",
+        ]}
+        nextSteps={[
+          { label: "View June 8 Project", screen: "launchProject" },
+          { label: "Send Parent Feedback", screen: "feedback" },
+          { label: "View Achievements", screen: "completion" },
+          { label: "Return to Workspace", screen: "roles" },
+        ]}
+        impact={[
+          "Reviewed youth progress",
+          "Identified next milestone",
+          "Connected family support to workforce growth",
+          "Protected sensitive youth wellness information",
+        ]}
+        setScreen={setScreen}
+      />
     </Card>
   );
 }
@@ -3417,9 +3571,9 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
               </div>
               <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] leading-5 text-white/62">
                 {video.embedUrl ? (
-                  <>Embedded launch video: <span className="font-black text-white/80">YouTube demonstration ready</span></>
+                  <>Training Resource: <span className="font-black text-white/80">demonstration ready</span></>
                 ) : (
-                  <>Expected file: <span className="font-black text-white/80">{video.file}</span></>
+                  <>Training Module: <span className="font-black text-white/80">materials coming soon</span></>
                 )}
               </div>
             </div>
@@ -3964,25 +4118,49 @@ function SimplePathway({
   extra?: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          {extra}
-          <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+    <>
+      <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
+          <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
+          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {extra}
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
+            <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
+            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+          </div>
+        </Card>
+        <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
+          <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
         </div>
-      </Card>
-      <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
-        <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
       </div>
-    </div>
+      <JourneyCompletionCard
+        title={`${title} Completion`}
+        learned={[
+          "Explored this pathway",
+          "Viewed role-specific resources",
+          "Identified a next step",
+          "Connected the pathway to ecosystem impact",
+        ]}
+        nextSteps={[
+          { label: "Visit Marketplace", screen: "marketplace" },
+          { label: "Register / Update Profile", screen: "registration" },
+          { label: "Share Feedback", screen: "feedback" },
+          { label: "Record Achievement", screen: "completion" },
+        ]}
+        impact={[
+          "Explored pathway",
+          "Viewed resources",
+          "Identified opportunity",
+          "Stayed connected",
+        ]}
+        setScreen={setScreen}
+      />
+    </>
   );
 }
 
