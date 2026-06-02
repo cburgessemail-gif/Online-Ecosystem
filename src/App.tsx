@@ -3520,12 +3520,93 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 
 function VideoLibrary({ compact = false }: { compact?: boolean }) {
+  const moduleCard = (video: LaunchVideo) => {
+    const isSupervisor = video.title.includes("Supervisor") || video.title.includes("June 5");
+    const isCoolingIntro = video.title.includes("Cooling Station Challenge Introduction") || video.title.includes("June 8 Cooling Station");
+    const isManufacturing = video.title.includes("Manufacturing");
+    const isCompletion = video.title.includes("Final Cooling Station");
+
+    const heading = isSupervisor
+      ? "June 5 Staff & Supervisor Orientation"
+      : isCoolingIntro
+        ? "June 8 Cooling Station Challenge Launch Brief"
+        : isManufacturing
+          ? "Manufacturing Team Training Module"
+          : isCompletion
+            ? "Final Cooling Station Completion Module"
+            : video.title;
+
+    const items = isSupervisor
+      ? [
+          "Site safety and youth protection",
+          "Attendance and check-in procedures",
+          "PPE and heat-safety expectations",
+          "Wellness awareness and support",
+          "Incident documentation",
+          "Parent-safe communication",
+          "Platform navigation and reporting",
+        ]
+      : isCoolingIntro
+        ? [
+            "Real-world farm worker heat-safety challenge",
+            "Design Team develops concepts and templates",
+            "Engineering Team optimizes materials and layout",
+            "Manufacturing Team assembles and quality-checks",
+            "Contractor Team builds the final cooling station",
+            "Youth practice teamwork, communication, and problem solving",
+            "Photos, reflections, and assessments become portfolio evidence",
+          ]
+        : isManufacturing
+          ? [
+              "Assembly and safe production flow",
+              "Painting, personalization, and branding",
+              "Quality review before delivery to the Contractor Team",
+              "Teamwork, finishing, and farm operations documentation",
+            ]
+          : isCompletion
+            ? [
+                "Completed fans collected from production teams",
+                "Cooling station setup and presentation area prepared",
+                "Final team presentation and project documentation",
+                "Youth achievement evidence saved for portfolios",
+              ]
+            : [];
+
+    return (
+      <div className="min-h-[260px] border-b border-emerald-200/15 bg-gradient-to-br from-emerald-950/70 via-slate-950/65 to-amber-950/45 p-5">
+        <div className="inline-flex rounded-full bg-emerald-300/18 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-50">
+          Active Training Content
+        </div>
+        <h3 className="mt-4 text-2xl font-black text-white">{heading}</h3>
+        {items.length > 0 ? (
+          <ul className="mt-4 space-y-2 text-sm leading-6 text-white/84">
+            {items.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="font-black text-emerald-200">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm leading-7 text-white/80">{video.fallback}</p>
+        )}
+        <div className="mt-5 rounded-xl border border-emerald-200/15 bg-emerald-300/12 p-3 text-xs font-bold leading-5 text-emerald-50">
+          {isSupervisor
+            ? "Training content is active. Video recording will be added after the live orientation session."
+            : isCoolingIntro
+              ? "Challenge content is active. Video recording will be added after the live launch session."
+              : "Training module is active. Video documentation can be added after the live session."}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="mt-7 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
       <h2 className="mt-3 text-2xl font-black">June 5 and June 8 media documentation</h2>
       <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78">
-        This section organizes the staff orientation video, the June 8 fan demonstration, manufacturing/painting documentation, youth interviews, and the final Cooling Station completion video. The fan demonstration is embedded for launch so youth can watch it before beginning their assignments.
+        This section organizes the staff orientation, the June 8 Cooling Station Challenge, the fan demonstration, manufacturing/painting documentation, youth interviews, and the final project completion record. Missing live recordings are now shown as active training cards so reviewers do not see empty black video boxes.
       </p>
       <div className={`mt-5 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}>
         {launchVideos.map((video) => (
@@ -3544,22 +3625,7 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
                 />
               </div>
             ) : (
-              <>
-                <video
-                  controls
-                  preload="metadata"
-                  className="aspect-video w-full bg-black/70 object-cover"
-                  onError={(event) => {
-                    const wrapper = event.currentTarget.parentElement?.querySelector("[data-video-fallback]") as HTMLElement | null;
-                    if (wrapper) wrapper.style.display = "block";
-                  }}
-                >
-                  {video.file && <source src={video.file} type="video/mp4" />}
-                </video>
-                <div data-video-fallback style={{ display: "none" }} className="border-y border-amber-200/15 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-amber-50">
-                  {video.fallback}
-                </div>
-              </>
+              moduleCard(video)
             )}
             <div className="p-4">
               <h3 className="text-lg font-black">{video.title}</h3>
@@ -3573,7 +3639,7 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
                 {video.embedUrl ? (
                   <>Training Resource: <span className="font-black text-white/80">demonstration ready</span></>
                 ) : (
-                  <>Training Module: <span className="font-black text-white/80">materials coming soon</span></>
+                  <>Training Module: <span className="font-black text-white/80">Active and Ready for Launch</span></>
                 )}
               </div>
             </div>
