@@ -215,6 +215,20 @@ type ParentSummary = {
   created_at: string;
 };
 
+type ParentContactLog = {
+  id: string;
+  participant_id: string;
+  youth_name?: string;
+  guardian_name?: string;
+  guardian_phone?: string;
+  guardian_email?: string;
+  contact_method: "phone" | "text" | "email" | "in_person" | "left_message" | "other";
+  contact_reason: "daily_update" | "encouragement" | "concern" | "incident" | "pickup" | "attendance" | "other";
+  contact_notes: string;
+  staff_id?: string;
+  created_at: string;
+};
+
 type FeedbackRecord = {
   id: string;
   profile_id?: string;
@@ -291,6 +305,7 @@ const WELLNESS_KEY = "bff.launch.wellness";
 const PPE_KEY = "bff.launch.ppeCheckins";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
+const PARENT_CONTACT_KEY = "bff.launch.parentContactLogs";
 const FEEDBACK_KEY = "bff.launch.feedback";
 const MARKET_PRODUCTS_KEY = "bff.launch.market.products";
 const MARKET_ORDERS_KEY = "bff.launch.market.orders";
@@ -1373,39 +1388,68 @@ function recordCompletion(pathway: string, user?: EcosystemUser | null) {
   safeWrite(COMPLETION_KEY, [row, ...rows].slice(0, 250));
 }
 
+function supabaseTableCandidates(table: string) {
+  const aliases: Record<string, string[]> = {
+    attendance: ["attendance_records", "attendance"],
+    attendance_records: ["attendance_records", "attendance"],
+    feedback: ["feedback", "ecosystem_feedback", "program_feedback"],
+    parent_contact_logs: ["parent_contact_logs", "attendance_communications", "parent_communications"],
+    parent_summaries: ["parent_summaries", "parent_summary"],
+  };
+  return aliases[table] || [table];
+}
+
+function scrollToTop() {
+  if (typeof window === "undefined") return;
+  window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+}
+
 async function insertRow<T extends { id: string }>(table: string, localKey: string, row: T) {
-  // Launch-review rule: the app must never feel broken to reviewers.
-  // Every save writes to localStorage first. Supabase is attempted as a live sync layer.
-  // If Supabase rejects a row because the live schema/RLS is not aligned yet, the reviewer
-  // still receives a successful save experience and the developer can inspect the console.
+  // Launch rule: write locally first so the workflow never loses data on a bad connection.
+  // Then try Supabase using known table-name aliases, because earlier launch versions used
+  // attendance while the database uses attendance_records.
   const localRows = safeRead<T[]>(localKey, []);
   safeWrite(localKey, [row, ...localRows]);
 
-  if (!supabase) return { ok: true, mode: "local", error: null };
+  if (!supabase) return { ok: true, mode: "local", table: "localStorage", error: null };
 
-  try {
-    const { error } = await supabase.from(table).insert(row);
-    if (error) {
-      console.warn(`Saved locally, but Supabase rejected ${table}:`, error);
-      return { ok: true, mode: "local-fallback", error };
+  let lastError: unknown = null;
+  for (const candidate of supabaseTableCandidates(table)) {
+    try {
+      const { error } = await supabase.from(candidate).insert(row);
+      if (!error) return { ok: true, mode: "supabase", table: candidate, error: null };
+      lastError = error;
+      console.warn(`Supabase rejected ${candidate}:`, error);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Supabase sync failed for ${candidate}:`, error);
     }
-    return { ok: true, mode: "supabase", error: null };
-  } catch (error) {
-    console.warn(`Saved locally, but Supabase sync failed for ${table}:`, error);
-    return { ok: true, mode: "local-fallback", error };
   }
+
+  return { ok: true, mode: "local-fallback", table: "localStorage", error: lastError };
 }
 
 async function loadSupabaseRows<T>(table: string, localKey: string) {
   if (!supabase) return safeRead<T[]>(localKey, []);
-  try {
-    const { data, error } = await supabase.from(table).select("*").order("created_at", { ascending: false });
-    if (error || !data) return safeRead<T[]>(localKey, []);
-    safeWrite(localKey, data as T[]);
-    return data as T[];
-  } catch {
-    return safeRead<T[]>(localKey, []);
+  for (const candidate of supabaseTableCandidates(table)) {
+    try {
+      const { data, error } = await supabase.from(candidate).select("*").order("created_at", { ascending: false });
+      if (!error && data) {
+        safeWrite(localKey, data as T[]);
+        return data as T[];
+      }
+      if (error) console.warn(`Could not load ${candidate}:`, error);
+    } catch (error) {
+      console.warn(`Could not load ${candidate}:`, error);
+    }
   }
+  return safeRead<T[]>(localKey, []);
+}
+
+function saveModeMessage(action: string, result: { mode?: string; table?: string }) {
+  if (result.mode === "supabase") return `${action} saved to Supabase (${result.table}).`;
+  if (result.mode === "local-fallback") return `${action} saved on this device. Supabase did not accept the row yet.`;
+  return `${action} saved on this device.`;
 }
 
 function profileName(profile?: MasterProfile) {
@@ -1483,6 +1527,7 @@ function App() {
     setMessage("");
     recordJourney(target, activeUser);
     setScreenState(target);
+    scrollToTop();
   };
 
   const signIn = (role: Role, name?: string) => {
@@ -1499,12 +1544,14 @@ function App() {
     recordJourney(target, user);
     setActiveUser(user);
     setScreenState(target);
+    scrollToTop();
   };
 
   const signOut = () => {
     safeWrite<EcosystemUser | null>(SESSION_KEY, null);
     setActiveUser(null);
     setScreenState("portal");
+    scrollToTop();
   };
 
   return (
@@ -2220,7 +2267,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Registration</button>
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to My Workspace</button>
+        <button type="button" onClick={() => setScreen(routeForRole(role))} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Go to My Workspace</button>
       </div>
       {saved && <Notice text={saved} />}
     </Card>
@@ -2374,7 +2421,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
 }
 
 function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [tab, setTab] = useState<"dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports">("dashboard");
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
@@ -2382,15 +2429,21 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
   const [wellness, setWellness] = useState<WellnessCheckIn[]>(() => safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []));
   const [incidents, setIncidents] = useState<IncidentRecord[]>(() => safeRead<IncidentRecord[]>(INCIDENT_KEY, []));
   const [parentSummaries, setParentSummaries] = useState<ParentSummary[]>(() => safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []));
+  const [parentContacts, setParentContacts] = useState<ParentContactLog[]>(() => safeRead<ParentContactLog[]>(PARENT_CONTACT_KEY, []));
+  const [feedbackRows, setFeedbackRows] = useState<FeedbackRecord[]>(() => safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []));
+  const [refreshMessage, setRefreshMessage] = useState("");
 
   const refresh = async () => {
     setProfiles(await loadSupabaseRows<MasterProfile>("profiles", PROFILE_KEY));
     setYouth(await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY));
-    setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance", ATTENDANCE_KEY));
+    setAttendance(await loadSupabaseRows<AttendanceRecord>("attendance_records", ATTENDANCE_KEY));
     setAssessments(await loadSupabaseRows<AssessmentRecord>("supervisor_assessments", ASSESSMENT_KEY));
     setWellness(await loadSupabaseRows<WellnessCheckIn>("wellness_checkins", WELLNESS_KEY));
     setIncidents(await loadSupabaseRows<IncidentRecord>("incident_logs", INCIDENT_KEY));
     setParentSummaries(await loadSupabaseRows<ParentSummary>("parent_summaries", PARENT_SUMMARY_KEY));
+    setParentContacts(await loadSupabaseRows<ParentContactLog>("parent_contact_logs", PARENT_CONTACT_KEY));
+    setFeedbackRows(await loadSupabaseRows<FeedbackRecord>("feedback", FEEDBACK_KEY));
+    setRefreshMessage(`Data refreshed at ${nowLabel()}.`);
   };
 
   useEffect(() => {
@@ -2411,6 +2464,8 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
     { key: "assessment", label: "Assessment" },
     { key: "incident", label: "Incident Log" },
     { key: "parent", label: "Parent Summary" },
+    { key: "guardian", label: "Guardian Contact" },
+    { key: "feedback", label: "Feedback Center" },
     { key: "reports", label: "Reports" },
   ];
 
@@ -2421,7 +2476,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
         <div className="mt-5 grid gap-2">
           {tabs.map((item) => (
-            <button type="button" key={item.key} onClick={() => setTab(item.key)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+            <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
               {item.label}
             </button>
           ))}
@@ -2430,6 +2485,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
           Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.
         </div>
         <button type="button" onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Data</button>
+        {refreshMessage && <div className="mt-3 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-xs font-bold text-emerald-50">{refreshMessage}</div>}
       </Card>
 
       <div>
@@ -2451,6 +2507,8 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
         {tab === "assessment" && <AssessmentTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "incident" && <IncidentTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "parent" && <ParentSummaryTool youthRows={youthRows} activeUser={activeUser} assessments={assessments} attendance={attendance} onSaved={refresh} />}
+        {tab === "guardian" && <GuardianContactTool youthRows={youthRows} activeUser={activeUser} parentContacts={parentContacts} onSaved={refresh} />}
+        {tab === "feedback" && <FeedbackCenter feedbackRows={feedbackRows} />}
         {tab === "reports" && <SupervisorReports profiles={profiles} youth={youth} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} parentSummaries={parentSummaries} />}
       </div>
     </div>
@@ -2471,7 +2529,7 @@ function SupervisorDashboard({
   supportFlags: number;
   incidentCount: number;
   parentSummaryCount: number;
-  setTab: (tab: "dashboard" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports") => void;
+  setTab: (tab: "dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
   setScreen: (screen: Screen) => void;
 }) {
   const stats = [
@@ -2523,7 +2581,7 @@ function YouthRosterModule({
   wellness: WellnessCheckIn[];
   incidents: IncidentRecord[];
   setScreen: (screen: Screen) => void;
-  setTab: (tab: "dashboard" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "reports") => void;
+  setTab: (tab: "dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
 }) {
   const today = todayISO();
   const nameFor = (row: { registration: YouthRegistration; profile?: MasterProfile }) =>
@@ -2611,8 +2669,8 @@ function AttendanceTool({
       notes,
       created_at: new Date().toISOString(),
     };
-    await insertRow("attendance", ATTENDANCE_KEY, row);
-    setMessage("Attendance and PPE saved.");
+    const result = await insertRow("attendance_records", ATTENDANCE_KEY, row);
+    setMessage(saveModeMessage("Attendance and PPE", result));
     onSaved();
   };
 
@@ -2693,8 +2751,8 @@ function AssessmentTool({
       notes,
       created_at: new Date().toISOString(),
     };
-    await insertRow("supervisor_assessments", ASSESSMENT_KEY, row);
-    setMessage("Supervisor assessment saved.");
+    const result = await insertRow("supervisor_assessments", ASSESSMENT_KEY, row);
+    setMessage(saveModeMessage("Supervisor assessment", result));
     onSaved();
   };
 
@@ -2758,8 +2816,8 @@ function IncidentTool({
       parent_contacted: parentContacted,
       created_at: new Date().toISOString(),
     };
-    await insertRow("incident_logs", INCIDENT_KEY, row);
-    setMessage("Incident/support log saved for staff follow-up.");
+    const result = await insertRow("incident_logs", INCIDENT_KEY, row);
+    setMessage(saveModeMessage("Incident/support log", result));
     onSaved();
   };
 
@@ -2831,8 +2889,8 @@ function ParentSummaryTool({
       private_staff_notes: privateNotes,
       created_at: new Date().toISOString(),
     };
-    await insertRow("parent_summaries", PARENT_SUMMARY_KEY, row);
-    setMessage("Parent-safe summary saved.");
+    const result = await insertRow("parent_summaries", PARENT_SUMMARY_KEY, row);
+    setMessage(saveModeMessage("Parent-safe summary", result));
     onSaved();
   };
 
@@ -2855,6 +2913,129 @@ function ParentSummaryTool({
       </div>
       <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Parent Summary</button>
       {message && <Notice text={message} />}
+    </Card>
+  );
+}
+
+
+function GuardianContactTool({
+  youthRows,
+  activeUser,
+  parentContacts,
+  onSaved,
+}: {
+  youthRows: { registration: YouthRegistration; profile?: MasterProfile }[];
+  activeUser: EcosystemUser | null;
+  parentContacts: ParentContactLog[];
+  onSaved: () => void;
+}) {
+  const [participantId, setParticipantId] = useState(youthRows[0]?.registration.participant_id || "");
+  const [method, setMethod] = useState<ParentContactLog["contact_method"]>("phone");
+  const [reason, setReason] = useState<ParentContactLog["contact_reason"]>("daily_update");
+  const [notes, setNotes] = useState("");
+  const [message, setMessage] = useState("");
+
+  const selected = youthRows.find((row) => row.registration.participant_id === participantId);
+  const youthName = selected?.profile ? profileName(selected.profile) : participantId;
+  const guardianName = selected?.registration.guardian_name || "No guardian entered";
+  const guardianPhone = selected?.registration.guardian_phone || "No phone entered";
+  const guardianEmail = selected?.registration.guardian_email || "No email entered";
+
+  const save = async () => {
+    const row: ParentContactLog = {
+      id: uuid(),
+      participant_id: participantId,
+      youth_name: youthName,
+      guardian_name: selected?.registration.guardian_name,
+      guardian_phone: selected?.registration.guardian_phone,
+      guardian_email: selected?.registration.guardian_email,
+      contact_method: method,
+      contact_reason: reason,
+      contact_notes: notes,
+      staff_id: activeUser?.id,
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("parent_contact_logs", PARENT_CONTACT_KEY, row);
+    setMessage(saveModeMessage("Guardian contact log", result));
+    setNotes("");
+    onSaved();
+  };
+
+  const recent = parentContacts.slice(0, 10);
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guardian Contact Center</div>
+      <h2 className="mt-3 text-4xl font-black">Log parent and guardian contact.</h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This does not send automatic email or text yet. It gives supervisors one place to see guardian contact information and document phone calls, texts sent, emails sent, pickup conversations, concerns, and daily updates.</p>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <SelectField label="Contact Method" value={method} onChange={(v) => setMethod(v as ParentContactLog["contact_method"])} options={["phone", "text", "email", "in_person", "left_message", "other"]} />
+        <SelectField label="Reason" value={reason} onChange={(v) => setReason(v as ParentContactLog["contact_reason"])} options={["daily_update", "encouragement", "concern", "incident", "pickup", "attendance", "other"]} />
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">
+          <div className="font-black text-white">Guardian Information</div>
+          <div>Youth: {youthName}</div>
+          <div>Guardian: {guardianName}</div>
+          <div>Phone: {guardianPhone}</div>
+          <div>Email: {guardianEmail}</div>
+        </div>
+      </div>
+      <div className="mt-5"><TextArea label="Contact Notes" value={notes} onChange={setNotes} /></div>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Contact Log</button>
+      {message && <Notice text={message} />}
+
+      <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-5">
+        <div className="text-lg font-black">Recent Contact Logs</div>
+        {recent.length === 0 ? (
+          <div className="mt-3 text-sm text-white/70">No guardian contact logs yet.</div>
+        ) : (
+          <div className="mt-3 grid gap-3">
+            {recent.map((row) => (
+              <div key={row.id} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">
+                <div className="font-black text-white">{row.youth_name || row.participant_id} — {row.contact_method} / {row.contact_reason}</div>
+                <div>{row.contact_notes || "No notes entered."}</div>
+                <div className="text-xs text-white/55">{new Date(row.created_at).toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function FeedbackCenter({ feedbackRows }: { feedbackRows: FeedbackRecord[] }) {
+  const rows = feedbackRows.slice(0, 40);
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback Center</div>
+      <h2 className="mt-3 text-4xl font-black">Review feedback from guests, parents, youth, growers, partners, and reviewers.</h2>
+      <p className="mt-3 text-sm leading-6 text-white/82">If this list is empty after submitting feedback, the feedback table is not accepting rows yet. Local fallback records will still appear on this device.</p>
+      <div className="mt-6 grid gap-3 md:grid-cols-4">
+        <Metric title="Feedback Records" value={feedbackRows.length} />
+        <Metric title="Recommend" value={feedbackRows.filter((f) => f.would_recommend).length} />
+        <Metric title="Average Rating" value={feedbackRows.length ? (feedbackRows.reduce((sum, f) => sum + (f.rating || 0), 0) / feedbackRows.length).toFixed(1) : "—"} />
+        <Metric title="Pathways" value={new Set(feedbackRows.map((f) => f.pathway || f.role || "Unknown")).size} />
+      </div>
+      <div className="mt-6 grid gap-3">
+        {rows.length === 0 ? (
+          <div className="rounded-2xl border border-white/10 bg-black/35 p-5 text-white/78">No feedback records found yet.</div>
+        ) : rows.map((row) => (
+          <div key={row.id} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">
+            <div className="flex flex-wrap justify-between gap-3 font-black text-white">
+              <span>{row.pathway || row.role || "Unknown pathway"}</span>
+              <span>{row.rating}/5 • {row.would_recommend ? "Would recommend" : "Would not recommend"}</span>
+            </div>
+            {row.excited && <div className="mt-2"><b>Excited:</b> {row.excited}</div>}
+            {row.confused && <div><b>Confused:</b> {row.confused}</div>}
+            {row.improve && <div><b>Improve:</b> {row.improve}</div>}
+            {row.opportunity_interest && <div><b>Opportunity:</b> {row.opportunity_interest}</div>}
+            {row.comments && <div><b>Comments:</b> {row.comments}</div>}
+            <div className="mt-2 text-xs text-white/55">{new Date(row.created_at).toLocaleString()}</div>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }
@@ -3017,7 +3198,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
     try {
       await Promise.all([
-        insertRow("attendance", ATTENDANCE_KEY, attendanceRow),
+        insertRow("attendance_records", ATTENDANCE_KEY, attendanceRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
       setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
@@ -4445,8 +4626,8 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
       opportunity_interest: opportunity,
       created_at: new Date().toISOString(),
     };
-    await insertRow("feedback", FEEDBACK_KEY, row);
-    setMessage("Feedback/comments saved on this device and sent to Supabase when the feedback table accepts the row.");
+    const result = await insertRow("feedback", FEEDBACK_KEY, row);
+    setMessage(saveModeMessage("Feedback/comments", result));
   };
 
   return (
