@@ -346,6 +346,9 @@ const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 
+const COMPACT_PROPRIETARY_NOTICE =
+  "© 2026 Bronson Family Farm LLC & Farm & Family Alliance Inc. | Developed by Bronson Family Farm | Proprietary & Confidential | All Rights Reserved";
+
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
   // Keep spaces/capitalization exactly as the uploaded file names; Vercel is case-sensitive.
@@ -1243,10 +1246,51 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
   }
 };
 
+
+
+const supportFrameworkTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
+  es: {
+    "Home": "Inicio", "Choose Your Path": "Elija su ruta", "My Workspace": "Mi espacio", "Choose Role": "Elegir rol", "More tools": "Más herramientas", "Switch Role": "Cambiar rol", "Register": "Registrar", "Events": "Eventos", "Media": "Medios", "Feedback": "Comentarios", "Supervisor": "Supervisor", "Case Manager": "Administrador de casos", "Operations": "Operaciones", "Mission Control": "Centro de control",
+    "Parent / Guardian": "Padre / Tutor", "Case Manager Portal": "Portal de administrador de casos", "Supervisor Learning Center": "Centro de aprendizaje de supervisores", "Concern & Support Center": "Centro de inquietudes y apoyo", "Support Cases": "Casos de apoyo", "Youth Progress": "Progreso juvenil", "Encouragement": "Ánimo", "Family Feedback": "Comentarios familiares", "Reports": "Informes", "June 8": "8 de junio", "Today": "Hoy", "Reflection": "Reflexión", "Resources": "Recursos", "Impact": "Impacto",
+    "Youth Support Network": "Red de apoyo juvenil", "Understanding Adolescents": "Comprender a los adolescentes", "Positive Youth Development": "Desarrollo juvenil positivo", "Teen Development": "Desarrollo adolescente", "Trauma-Informed Supervision": "Supervisión informada por trauma", "Mental Health Awareness": "Conciencia de salud mental", "Need-to-Know Access": "Acceso según necesidad", "Every youth has a support team.": "Cada joven tiene un equipo de apoyo.", "We cultivate people as well as crops.": "Cultivamos personas además de cultivos.",
+    "Green — Everyday Support": "Verde — Apoyo cotidiano", "Yellow — Additional Support": "Amarillo — Apoyo adicional", "Orange — Significant Concern": "Naranja — Preocupación importante", "Red — Emergency": "Rojo — Emergencia", "Supervisor leads": "El supervisor lidera", "Supervisor refers to Case Manager": "El supervisor refiere al administrador de casos", "Case Manager leads": "El administrador de casos lidera", "Leadership + Case Manager immediately": "Liderazgo + administrador de casos de inmediato",
+    "Request Support": "Solicitar apoyo", "Refer to Case Manager": "Referir al administrador de casos", "Transportation": "Transporte", "Family Concern": "Preocupación familiar", "Health Concern": "Preocupación de salud", "Emotional Support": "Apoyo emocional", "Workplace Concern": "Preocupación laboral", "Other": "Otro", "I Need Help": "Necesito ayuda", "I Am Concerned About Someone": "Me preocupa alguien"
+  },
+  tl: {
+    "Home": "Home", "Choose Your Path": "Piliin ang Iyong Landas", "My Workspace": "Aking Workspace", "Choose Role": "Pumili ng Role", "More tools": "Higit pang tools", "Switch Role": "Palitan ang Role", "Register": "Magrehistro", "Events": "Events", "Media": "Media", "Feedback": "Feedback", "Supervisor": "Supervisor", "Case Manager": "Case Manager", "Operations": "Operasyon", "Mission Control": "Mission Control",
+    "Parent / Guardian": "Magulang / Guardian", "Case Manager Portal": "Case Manager Portal", "Supervisor Learning Center": "Supervisor Learning Center", "Concern & Support Center": "Concern at Support Center", "Support Cases": "Mga Support Case", "Youth Progress": "Progreso ng Youth", "Encouragement": "Paghihikayat", "Family Feedback": "Family Feedback", "Reports": "Mga Ulat", "June 8": "Hunyo 8", "Today": "Ngayon", "Reflection": "Reflection", "Resources": "Resources", "Impact": "Impact",
+    "Youth Support Network": "Youth Support Network", "Understanding Adolescents": "Pag-unawa sa mga Kabataan", "Positive Youth Development": "Positive Youth Development", "Teen Development": "Teen Development", "Trauma-Informed Supervision": "Trauma-Informed Supervision", "Mental Health Awareness": "Mental Health Awareness", "Need-to-Know Access": "Need-to-Know Access", "Every youth has a support team.": "Bawat kabataan ay may support team.", "We cultivate people as well as crops.": "Nililinang natin ang tao pati ang pananim.",
+    "Green — Everyday Support": "Green — Araw-araw na Suporta", "Yellow — Additional Support": "Yellow — Karagdagang Suporta", "Orange — Significant Concern": "Orange — Malaking Alalahanin", "Red — Emergency": "Red — Emergency", "Supervisor leads": "Supervisor ang mangunguna", "Supervisor refers to Case Manager": "Ire-refer ng supervisor sa Case Manager", "Case Manager leads": "Case Manager ang mangunguna", "Leadership + Case Manager immediately": "Leadership + Case Manager agad",
+    "Request Support": "Humingi ng Suporta", "Refer to Case Manager": "I-refer sa Case Manager", "Transportation": "Transportasyon", "Family Concern": "Alalahanin sa Pamilya", "Health Concern": "Alalahanin sa Kalusugan", "Emotional Support": "Emosyonal na Suporta", "Workplace Concern": "Alalahanin sa Trabaho", "Other": "Iba pa", "I Need Help": "Kailangan Ko ng Tulong", "I Am Concerned About Someone": "Nag-aalala Ako sa Isang Tao"
+  },
+  it: {
+    "Home": "Home", "Choose Your Path": "Scegli il tuo percorso", "My Workspace": "Il mio spazio", "Choose Role": "Scegli ruolo", "More tools": "Altri strumenti", "Switch Role": "Cambia ruolo", "Register": "Registrati", "Events": "Eventi", "Media": "Media", "Feedback": "Feedback", "Supervisor": "Supervisore", "Case Manager": "Case manager", "Operations": "Operazioni", "Mission Control": "Centro di controllo",
+    "Parent / Guardian": "Genitore / Tutore", "Case Manager Portal": "Portale case manager", "Supervisor Learning Center": "Centro apprendimento supervisori", "Concern & Support Center": "Centro preoccupazioni e supporto", "Support Cases": "Casi di supporto", "Youth Progress": "Progresso giovani", "Encouragement": "Incoraggiamento", "Family Feedback": "Feedback famiglia", "Reports": "Report", "June 8": "8 giugno", "Today": "Oggi", "Reflection": "Riflessione", "Resources": "Risorse", "Impact": "Impatto"
+  },
+  he: {
+    "Home": "בית", "Choose Your Path": "בחרו מסלול", "My Workspace": "המרחב שלי", "Choose Role": "בחר תפקיד", "More tools": "כלים נוספים", "Switch Role": "החלפת תפקיד", "Register": "הרשמה", "Events": "אירועים", "Media": "מדיה", "Feedback": "משוב", "Supervisor": "מפקח", "Case Manager": "מנהל מקרה", "Operations": "תפעול", "Mission Control": "מרכז בקרה",
+    "Parent / Guardian": "הורה / אפוטרופוס", "Case Manager Portal": "שער מנהל מקרה", "Supervisor Learning Center": "מרכז למידת מפקחים", "Concern & Support Center": "מרכז דאגה ותמיכה", "Support Cases": "מקרי תמיכה", "Youth Progress": "התקדמות נוער", "Encouragement": "עידוד", "Family Feedback": "משוב משפחתי", "Reports": "דוחות", "June 8": "8 ביוני", "Today": "היום", "Reflection": "רפלקציה", "Resources": "משאבים", "Impact": "השפעה"
+  },
+  fr: {
+    "Home": "Accueil", "Choose Your Path": "Choisissez votre parcours", "My Workspace": "Mon espace", "Choose Role": "Choisir un rôle", "More tools": "Plus d’outils", "Switch Role": "Changer de rôle", "Register": "S’inscrire", "Events": "Événements", "Media": "Média", "Feedback": "Commentaires", "Supervisor": "Superviseur", "Case Manager": "Gestionnaire de cas", "Operations": "Opérations", "Mission Control": "Centre de mission",
+    "Parent / Guardian": "Parent / Tuteur", "Case Manager Portal": "Portail du gestionnaire de cas", "Supervisor Learning Center": "Centre d’apprentissage des superviseurs", "Concern & Support Center": "Centre de soutien", "Support Cases": "Cas de soutien", "Youth Progress": "Progrès des jeunes", "Encouragement": "Encouragement", "Family Feedback": "Commentaires familiaux", "Reports": "Rapports", "June 8": "8 juin", "Today": "Aujourd’hui", "Reflection": "Réflexion", "Resources": "Ressources", "Impact": "Impact",
+    "Youth Support Network": "Réseau de soutien jeunesse", "Understanding Adolescents": "Comprendre les adolescents", "Positive Youth Development": "Développement positif des jeunes", "Teen Development": "Développement adolescent", "Trauma-Informed Supervision": "Supervision sensible au trauma", "Mental Health Awareness": "Sensibilisation à la santé mentale", "Need-to-Know Access": "Accès selon le besoin", "Every youth has a support team.": "Chaque jeune a une équipe de soutien.", "We cultivate people as well as crops.": "Nous cultivons les personnes autant que les récoltes."
+  }
+};
+
 function translatePhrase(language: LanguageCode, raw: string) {
   if (language === "en") return raw;
   const key = raw.trim();
+  const compactNoticeTranslations: Partial<Record<LanguageCode, string>> = {
+    es: "© 2026 Bronson Family Farm LLC y Farm & Family Alliance Inc. | Desarrollado por Bronson Family Farm | Propietario y Confidencial | Todos los derechos reservados",
+    tl: "© 2026 Bronson Family Farm LLC at Farm & Family Alliance Inc. | Developed by Bronson Family Farm | Proprietary at Confidential | All Rights Reserved",
+    it: "© 2026 Bronson Family Farm LLC e Farm & Family Alliance Inc. | Sviluppato da Bronson Family Farm | Proprietario e Riservato | Tutti i diritti riservati",
+    he: "© 2026 Bronson Family Farm LLC ו-Farm & Family Alliance Inc. | פותח על ידי Bronson Family Farm | קנייני וסודי | כל הזכויות שמורות",
+    fr: "© 2026 Bronson Family Farm LLC et Farm & Family Alliance Inc. | Développé par Bronson Family Farm | Propriétaire et confidentiel | Tous droits réservés",
+  };
+  if (key === COMPACT_PROPRIETARY_NOTICE) return compactNoticeTranslations[language] || key;
   return (
+    supportFrameworkTranslations[language]?.[key] ||
     launchCriticalTranslations[language]?.[key] ||
     launchPhraseTranslations[language]?.[key] ||
     screenTranslations[language]?.[key] ||
@@ -1259,36 +1303,46 @@ function applyScreenTranslations(language: LanguageCode) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
   const skip = new Set(["SCRIPT", "STYLE", "INPUT", "TEXTAREA", "SELECT", "OPTION"]);
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
       const text = node.textContent || "";
-      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
+      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) {
+        return NodeFilter.FILTER_REJECT;
+      }
       return NodeFilter.FILTER_ACCEPT;
     },
   });
+
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+
   nodes.forEach((node) => {
-    const el = node.parentElement;
-    if (!el) return;
+    const anyNode = node as Text & { __bffOriginalText?: string };
     const current = node.textContent || "";
-    const original = el.getAttribute("data-bff-original-text") || current.trim();
-    el.setAttribute("data-bff-original-text", original);
-    const translated = translatePhrase(language, original);
-    node.textContent = current.replace(current.trim(), translated);
+    const trimmed = current.trim();
+    if (!trimmed) return;
+
+    // Store the original English on the text node itself, not on the parent element.
+    // Parent-level storage breaks when one element contains multiple text nodes.
+    if (!anyNode.__bffOriginalText || language === "en") {
+      anyNode.__bffOriginalText = trimmed;
+    }
+
+    const original = anyNode.__bffOriginalText;
+    const translated = language === "en" ? original : translatePhrase(language, original);
+    node.textContent = current.replace(trimmed, translated);
   });
-  const placeholderMap: Record<string, string> = {
-    "Example: BFF-825435 or Supervisor Aide": translatePhrase(language, "Example: BFF-825435 or Supervisor Aide"),
-    "Enter name": translatePhrase(language, "Enter name"),
-  };
+
   root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((node) => {
     const el = node as HTMLInputElement | HTMLTextAreaElement;
     const original = el.getAttribute("data-bff-original-placeholder") || el.getAttribute("placeholder") || "";
     el.setAttribute("data-bff-original-placeholder", original);
-    el.setAttribute("placeholder", placeholderMap[original] || translatePhrase(language, original));
+    el.setAttribute("placeholder", language === "en" ? original : translatePhrase(language, original));
   });
 }
+
 
 const roles: Role[] = [
   "Guest",
@@ -1554,7 +1608,15 @@ function App() {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
     const timer = window.setTimeout(() => applyScreenTranslations(language), 0);
-    return () => window.clearTimeout(timer);
+    const root = document.querySelector("[data-bff-app-root]");
+    const observer = root
+      ? new MutationObserver(() => window.setTimeout(() => applyScreenTranslations(language), 0))
+      : null;
+    if (root && observer) observer.observe(root, { childList: true, subtree: true });
+    return () => {
+      window.clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, [language, screen, message, activeUser]);
 
   const setScreen = (target: Screen) => {
@@ -1715,7 +1777,7 @@ function Shell({
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${translatePhrase(language, activeUser.role)}` : translatePhrase(language, "Choose Your Path")}</div>
             </button>
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
@@ -1735,14 +1797,14 @@ function Shell({
           </div>
 
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
-            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
+            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>{translatePhrase(language, "Home")}</button>
+            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{translatePhrase(language, "My Workspace")}</button>
             {roleNav.map((item) => (
               <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
-                {item.label}
+                {translatePhrase(language, item.label)}
               </button>
             ))}
-            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Choose Role</button>}
+            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Choose Role")}</button>}
           </div>
 
           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
@@ -1750,26 +1812,29 @@ function Shell({
               {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
             </div>
             <div className="flex shrink-0 gap-2">
-              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">Mission Control</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">{translatePhrase(language, "Mission Control")}</button>}
               {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 font-black">{t(language, "signOut")}</button>}
             </div>
           </div>
 
           <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 text-xs text-white/75">
-            <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
+            <summary className="cursor-pointer font-black text-emerald-50">{translatePhrase(language, "More tools")}</summary>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
-              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
-              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
-              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
-              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
-              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>Case Manager</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
+              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Switch Role")}</button>
+              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>{translatePhrase(language, "Register")}</button>
+              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>{translatePhrase(language, "Events")}</button>
+              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>{translatePhrase(language, "Media")}</button>
+              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>{translatePhrase(language, "Feedback")}</button>
+              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>{translatePhrase(language, "Supervisor")}</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>{translatePhrase(language, "Case Manager")}</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>{translatePhrase(language, "Operations")}</button>}
             </div>
           </details>
         </div>
         {children}
+        <footer className="mt-6 mb-2 rounded-2xl border border-white/10 bg-black/45 px-3 py-2 text-center text-[10px] font-semibold leading-snug text-white/65 backdrop-blur-xl md:text-xs">
+          {translatePhrase(language, COMPACT_PROPRIETARY_NOTICE)}
+        </footer>
       </div>
     </div>
   );
@@ -1960,7 +2025,7 @@ function Portal({ setScreen, activeUser }: { setScreen: (screen: Screen) => void
             <div className="rounded-xl bg-black/28 p-3"><b>Tomorrow:</b> assignment, PPE reminder, water bottle, next step.</div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Choose Role</button>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{translatePhrase(language, "Choose Role")}</button>
             <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Go to Workspace</button>
           </div>
         </Card>
@@ -3847,7 +3912,7 @@ function CaseManagerScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
-        <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Mission Control</button>
+        <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">{translatePhrase(language, "Mission Control")}</button>
         <button type="button" onClick={() => setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Parent Portal</button>
       </div>
     </Card>
@@ -5032,7 +5097,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
         ))}
       </div>
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{translatePhrase(language, "Choose Role")}</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
         <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
       </div>
