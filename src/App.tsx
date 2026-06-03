@@ -1599,52 +1599,62 @@ function Shell({
   language: LanguageCode;
   changeLanguage: (language: LanguageCode) => void;
 }) {
-  const navGroups: { label: string; items: { key: string; screen: Screen; label?: string }[] }[] = [
-    {
-      label: "Home",
-      items: [
-        { key: "portal", screen: "portal" },
-        { key: "demo", screen: "demo" },
-        { key: "events", screen: "events" },
-        { key: "media", screen: "media" },
-        { key: "feedback", screen: "feedback" },
-        { key: "complete", screen: "completion", label: "Achievements" },
-      ],
-    },
-    {
-      label: "Pathways",
-      items: [
-        { key: "guest", screen: "guest" },
-        { key: "youth", screen: "youth" },
-        { key: "parent", screen: "parent" },
-        { key: "grower", screen: "grower" },
-        { key: "partner", screen: "partner" },
-        { key: "support", screen: "support" },
-        { key: "valueAdded", screen: "valueAdded" },
-      ],
-    },
-    {
-      label: "Marketplace",
-      items: [{ key: "market", screen: "marketplace" }],
-    },
-    {
-      label: "Workspace",
-      items: [
-        { key: "register", screen: "registration" },
-        { key: "workspace", screen: "roles" },
-        { key: "wellness", screen: "wellness", label: "My Day" },
-        { key: "project", screen: "launchProject", label: "6/8 Project" },
-      ],
-    },
-    {
-      label: "Operations",
-      items: [
-        { key: "supervisor", screen: "supervisor" },
-        { key: "reports", screen: "reports" },
-        { key: "ops", screen: "operations" },
-      ],
-    },
-  ];
+  const role = activeUser?.role;
+  const workspaceTarget = role ? routeForRole(role) : "roles";
+  const roleNav: { label: string; screen: Screen; roles?: Role[] }[] = role === "Youth Workforce Participant"
+    ? [
+        { label: "My Day", screen: "youth" },
+        { label: "Today", screen: "launchProject" },
+        { label: "Media", screen: "media" },
+        { label: "Reflection", screen: "feedback" },
+      ]
+    : role === "Parent / Guardian"
+    ? [
+        { label: "Youth Progress", screen: "parent" },
+        { label: "Encouragement", screen: "parent" },
+        { label: "Family Feedback", screen: "feedback" },
+      ]
+    : role === "Supervisor / Staff"
+    ? [
+        { label: "Supervisor", screen: "supervisor" },
+        { label: "Reports", screen: "reports" },
+        { label: "June 8", screen: "launchProject" },
+        { label: "Feedback", screen: "feedback" },
+      ]
+    : role === "Grower"
+    ? [
+        { label: "Grower", screen: "grower" },
+        { label: "Marketplace", screen: "marketplace" },
+        { label: "Resources", screen: "events" },
+      ]
+    : role === "Partner" || role === "Board / Funder"
+    ? [
+        { label: "Impact", screen: "partner" },
+        { label: "Reports", screen: "reports" },
+        { label: "Support", screen: "support" },
+      ]
+    : role === "Administrator"
+    ? [
+        { label: "Mission Control", screen: "reports" },
+        { label: "Supervisor", screen: "supervisor" },
+        { label: "Marketplace", screen: "marketplace" },
+        { label: "Register", screen: "registration" },
+      ]
+    : role === "Value-Added Producer"
+    ? [
+        { label: "Value-Added", screen: "valueAdded" },
+        { label: "Marketplace", screen: "marketplace" },
+        { label: "Feedback", screen: "feedback" },
+      ]
+    : [
+        { label: "Guest", screen: "guest" },
+        { label: "Marketplace", screen: "marketplace" },
+        { label: "Feedback", screen: "feedback" },
+      ];
+
+  const isStaff = role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder";
+  const buttonClass = (target: Screen) =>
+    `rounded-full border px-4 py-2 text-xs font-black transition ${screen === target ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`;
 
   return (
     <div data-bff-app-root className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
@@ -1653,57 +1663,63 @@ function Shell({
       </div>
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
-      <div className="relative z-10 mx-auto max-w-[1500px] px-3 py-3 md:px-6">
-        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/48 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
-          <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => setScreen("portal")} className="mr-2 min-w-[210px] px-2 text-left">
-              <div className="text-[10px] uppercase tracking-[0.32em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="text-base font-black leading-tight">{t(language, "onlineEcosystem")}</div>
+      <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 md:px-6">
+        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/58 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
+              <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
             </button>
-            {navGroups.map((group) => (
-              <div key={group.label} className="flex flex-wrap items-center gap-1 rounded-2xl border border-white/8 bg-white/[0.035] px-2 py-1">
-                <span className="px-2 text-[9px] font-black uppercase tracking-[0.22em] text-emerald-100/55">{group.label}</span>
-                {group.items.map((item) => (
-                  <button
-                    type="button"
-                    key={`${group.label}-${item.screen}`}
-                    onClick={() => setScreen(item.screen)}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                      screen === item.screen ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"
-                    }`}
-                    title={`${group.label}: ${item.label || t(language, item.key)}`}
-                  >
-                    {item.label || t(language, item.key)}
-                  </button>
+            <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
+              <span className="hidden sm:inline">🌎</span>
+              <select
+                value={language}
+                onChange={(event) => changeLanguage(event.target.value as LanguageCode)}
+                className="rounded-full border border-white/10 bg-black/65 px-2 py-1 text-[11px] font-black text-white outline-none"
+                aria-label="Language selector"
+              >
+                {languageOptions.map((option) => (
+                  <option key={option.code} value={option.code} className="bg-black text-white">
+                    {option.shortLabel}
+                  </option>
                 ))}
-              </div>
+              </select>
+            </label>
+          </div>
+
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
+            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
+            {roleNav.map((item) => (
+              <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
+                {item.label}
+              </button>
             ))}
-            <div className="ml-auto flex flex-wrap items-center gap-2">
-              <label className="flex items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
-                <span>🌎 {t(language, "language")}</span>
-                <select
-                  value={language}
-                  onChange={(event) => changeLanguage(event.target.value as LanguageCode)}
-                  className="rounded-full border border-white/10 bg-black/65 px-2 py-1 text-[11px] font-black text-white outline-none"
-                  aria-label="Language selector"
-                >
-                  {languageOptions.map((option) => (
-                    <option key={option.code} value={option.code} className="bg-black text-white">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[11px] font-bold">
-                {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
-              </div>
-              {activeUser && (
-                <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-[11px] font-black">
-                  {t(language, "signOut")}
-                </button>
-              )}
+            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Choose Role</button>}
+          </div>
+
+          <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
+            <div className="truncate rounded-full border border-white/10 bg-white/8 px-3 py-1">
+              {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
+            </div>
+            <div className="flex shrink-0 gap-2">
+              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">Mission Control</button>}
+              {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 font-black">{t(language, "signOut")}</button>}
             </div>
           </div>
+
+          <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 text-xs text-white/75">
+            <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
+              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
+              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
+              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
+              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
+            </div>
+          </details>
         </div>
         {children}
       </div>
@@ -1821,35 +1837,55 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const roleCards: { role: Role; title: string; subtitle: string; screen: Screen }[] = [
+    { role: "Youth Workforce Participant", title: "Youth", subtitle: "Start my day, see my assignment, reflect, and build achievements.", screen: "youth" },
+    { role: "Parent / Guardian", title: "Parent / Guardian", subtitle: "See progress, encouragement, family resources, and safe updates.", screen: "parent" },
+    { role: "Supervisor / Staff", title: "Supervisor", subtitle: "Attendance, wellness, assessments, parent summaries, and reports.", screen: "supervisor" },
+    { role: "Grower", title: "Grower", subtitle: "Resources, marketplace demand, opportunities, and grower support.", screen: "grower" },
+    { role: "Partner", title: "Partner", subtitle: "Impact, collaboration, sponsorship, and community opportunities.", screen: "partner" },
+    { role: "Guest", title: "Guest", subtitle: "Explore the farm story, ecosystem, marketplace, and next steps.", screen: "guest" },
+  ];
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
+    <div className="grid gap-5 lg:grid-cols-[1fr_.8fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm</div>
-        <h1 className="mt-4 text-5xl font-black leading-[0.9] tracking-tight md:text-7xl">Enter the living ecosystem.</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">
-          Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Ecosystem</div>
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">Who are you today?</h1>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-white/86">
+          Choose one path. The app will show only what that person needs for the day. This keeps the June 8 launch clearer for youth, parents, supervisors, growers, partners, and guests using phones.
         </p>
-        <div className="mt-8 flex flex-wrap gap-4">
-          <button type="button" onClick={() => setScreen("demo")} className="rounded-full bg-emerald-300 px-8 py-4 font-black text-black shadow-2xl">Start Guided Demo</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Enter The Ecosystem</button>
-          <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black">Register / Check In</button>
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/20 bg-black/35 px-8 py-4 font-black">My Workspace</button>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {roleCards.map((card) => (
+            <button
+              key={card.role}
+              type="button"
+              onClick={() => setScreen("roles")}
+              className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4 text-left transition hover:border-emerald-200/60 hover:bg-emerald-300/15"
+            >
+              <div className="text-xl font-black">{card.title}</div>
+              <div className="mt-2 text-sm leading-6 text-white/75">{card.subtitle}</div>
+              <div className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Select in role center →</div>
+            </button>
+          ))}
         </div>
-        <MyDayPreview setScreen={setScreen} />
       </Card>
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
-        {[
-          "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.",
-          "Choose a role, then follow a guided pathway with resources, opportunities, and next steps.",
-          "Supervisor Operations Center is the staff-only control room.",
-          "Youth check-ins and supervisor records save locally first, then sync to Supabase when connected.",
-          "Parents receive progress summaries, not private raw youth reflections.",
-          "Incident and support flags stay staff-facing.",
-          "Reports convert daily records into launch readiness and program impact.",
-        ].map((item) => (
-          <div key={item} className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
-        ))}
+        <h2 className="mt-3 text-3xl font-black">One screen. One purpose. One next step.</h2>
+        <div className="mt-5 grid gap-3">
+          {[
+            "Youth see My Day, today’s project, reflection, and achievements.",
+            "Parents see progress, encouragement, family resources, and feedback.",
+            "Supervisors see attendance, wellness, assessments, and Mission Control.",
+            "Marketplace customers do not see Catalog Admin or back-office tools.",
+            "Staff tools stay inside staff areas.",
+          ].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Choose Role</button>
+          <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reviewer Demo</button>
+        </div>
       </Card>
     </div>
   );
@@ -3525,6 +3561,12 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   const [cart, setCart] = useState<CartItem[]>([]);
   const [category, setCategory] = useState("All");
   const [message, setMessage] = useState("");
+  const isMarketplaceManager = activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Board / Funder";
+  useEffect(() => {
+    if (!isMarketplaceManager && (tab === "command" || tab === "catalog" || tab === "fulfillment")) {
+      setTab("storefront");
+    }
+  }, [isMarketplaceManager, tab]);
   const [customerName, setCustomerName] = useState(activeUser?.name || "");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -3695,25 +3737,46 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         <h1 className="mt-3 text-3xl font-black leading-tight">GrownBy + Direct Sales.</h1>
         <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
         <div className="mt-5 grid gap-2">
-          {[
-            ["command", "Operations Dashboard"],
-            ["storefront", "Product Catalog"],
-            ["checkout", `Cart / Checkout (${cartCount})`],
-            ["orders", "Orders"],
-            ["fulfillment", "Harvest / Fulfillment"],
-            ["catalog", "Catalog Admin"],
-          ].map(([key, label]) => (
-            <button type="button" key={key} onClick={() => setTab(key as typeof tab)} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
+          {(activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Board / Funder"
+            ? [
+                ["command", "Operations"],
+                ["storefront", "Products"],
+                ["checkout", `Cart (${cartCount})`],
+                ["orders", "Orders"],
+                ["fulfillment", "Fulfillment"],
+                ["catalog", "Catalog Admin"],
+              ]
+            : activeUser?.role === "Grower" || activeUser?.role === "Value-Added Producer"
+            ? [
+                ["storefront", "Products"],
+                ["checkout", `Cart (${cartCount})`],
+                ["orders", "My Orders"],
+              ]
+            : [
+                ["storefront", "Products"],
+                ["checkout", `Cart (${cartCount})`],
+                ["orders", "My Orders"],
+              ]
+          ).map(([key, label]) => (
+            <button type="button" key={key} onClick={() => { setTab(key as typeof tab); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>{label}</button>
           ))}
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(revenueToday)}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
-        </div>
-        <button type="button" onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
-        <button type="button" onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
+        {isMarketplaceManager ? (
+          <>
+            <div className="mt-5 grid grid-cols-2 gap-2 text-sm">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{ordersToday.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Orders Today</div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{money(revenueToday)}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Sales Today</div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{activeProducts.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Products</div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-3"><div className="text-2xl font-black">{lowInventory.length}</div><div className="text-xs uppercase tracking-[0.2em] text-white/60">Low Stock</div></div>
+            </div>
+            <button type="button" onClick={refresh} className="mt-4 w-full rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh Marketplace</button>
+            <button type="button" onClick={() => setScreen("grower")} className="mt-3 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Open Grower Demand</button>
+          </>
+        ) : (
+          <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50">
+            Browse products, add items to cart, and place an order. Staff-only catalog and fulfillment tools are hidden from customer and grower views.
+          </div>
+        )}
       </Card>
 
       <div>
@@ -4613,7 +4676,7 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
       id: uuid(),
       profile_id: activeUser?.id,
       profile_type: activeUser ? roleToProfileType(activeUser.role) : "customer",
-      feedback_type: "platform",
+      feedback_type: activeUser?.role === "Parent / Guardian" ? "program" : "platform",
       rating,
       comments,
       would_recommend: recommend,
@@ -4630,33 +4693,54 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
     setMessage(saveModeMessage("Feedback/comments", result));
   };
 
+  const returnTarget = activeUser ? routeForRole(activeUser.role) : "demo";
+  const promptTitle = activeUser?.role === "Parent / Guardian" ? "Parent / Guardian Feedback" : "How was your experience today?";
+  const promptIntro = activeUser?.role === "Parent / Guardian"
+    ? "Tell us what helped your family feel informed, encouraged, and connected."
+    : "Keep it short. Your feedback helps us improve the ecosystem for launch.";
+
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Tell us about the platform and program experience.</h1>
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">{promptTitle}</h1>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/76">{promptIntro}</p>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
         <label className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="flex justify-between text-sm font-black"><span>Rating</span><span>{rating}/5</span></div>
           <input className="mt-3 w-full" type="range" min={1} max={5} value={rating} onChange={(e) => setRating(Number(e.target.value))} />
         </label>
-        <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
+        <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
           <input type="checkbox" checked={recommend} onChange={(e) => setRecommend(e.target.checked)} />
           I would recommend this experience.
         </label>
       </div>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <TextArea label="What excited you?" value={excited} onChange={setExcited} />
-        <TextArea label="What confused you?" value={confused} onChange={setConfused} />
-        <TextArea label="What would you improve?" value={improve} onChange={setImprove} />
-        <TextArea label="What opportunity interests you?" value={opportunity} onChange={setOpportunity} />
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <CompactTextArea label={activeUser?.role === "Parent / Guardian" ? "What helped you feel informed?" : "What excited you?"} value={excited} onChange={setExcited} />
+        <CompactTextArea label={activeUser?.role === "Parent / Guardian" ? "Any concern or question?" : "What confused you?"} value={confused} onChange={setConfused} />
+        <CompactTextArea label="What should we improve?" value={improve} onChange={setImprove} />
+        <CompactTextArea label="What opportunity interests you?" value={opportunity} onChange={setOpportunity} />
       </div>
-      <div className="mt-5"><TextArea label="Additional Comments" value={comments} onChange={setComments} /></div>
+      <div className="mt-4"><CompactTextArea label="Additional comments" value={comments} onChange={setComments} rows={2} /></div>
       <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback / Comments</button>
-        <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to Guided Demo</button>
+        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback</button>
+        <button type="button" onClick={() => setScreen(returnTarget)} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return</button>
       </div>
       {message && <Notice text={message} />}
     </Card>
+  );
+}
+
+function CompactTextArea(props: { label: string; value: string; onChange: (v: string) => void; rows?: number }) {
+  return (
+    <label className="block rounded-2xl border border-white/10 bg-white/10 p-3">
+      <span className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-100/75">{props.label}</span>
+      <textarea
+        value={props.value}
+        rows={props.rows || 2}
+        onChange={(event) => props.onChange(event.target.value)}
+        className="mt-2 w-full rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-sm text-white outline-none placeholder:text-white/35"
+      />
+    </label>
   );
 }
 
