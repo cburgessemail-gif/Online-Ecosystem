@@ -1023,7 +1023,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Launch Focus": "Pokus sa Launch",
     "🌞 My Day": "🌞 Aking Araw",
     "June 8 Launch Assignment": "Takdang Gawain sa Hunyo 8",
-    "Start here for the Youth Workforce launch. Check in, watch the cardboard fan demonstration, meet your team, complete the Farm Worker Heat Safety & Cooling Station Challenge, and submit your reflection.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
+    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
     "Project": "Proyekto",
     "Cooling Station Challenge": "Cooling Station Challenge",
     "Teams": "Mga Team",
@@ -1247,7 +1247,7 @@ function applyScreenTranslations(language: LanguageCode) {
     node.textContent = current.replace(current.trim(), translated);
   });
   const placeholderMap: Record<string, string> = {
-    "Example: Supervisor Aide": translatePhrase(language, "Example: Supervisor Aide"),
+    "Example: BFF-825435 or Supervisor Aide": translatePhrase(language, "Example: BFF-825435 or Supervisor Aide"),
     "Enter name": translatePhrase(language, "Enter name"),
   };
   root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((node) => {
@@ -1557,7 +1557,7 @@ function App() {
   return (
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
-      {screen === "portal" && <Portal setScreen={setScreen} />}
+      {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -1773,7 +1773,7 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
         value={props.value}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
-        rows={4}
+        rows={3}
         className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-emerald-200"
       />
     </label>
@@ -1790,10 +1790,10 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">🌞 My Day</div>
       <div className="mt-2 text-2xl font-black">June 8 Launch Assignment</div>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82">
-        Start here for the Youth Workforce launch. Check in, watch the cardboard fan demonstration, meet your team, complete the Farm Worker Heat Safety & Cooling Station Challenge, and submit your reflection.
+        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.
       </p>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-4">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Project</div>
           <div className="mt-1 text-sm font-black">Cooling Station Challenge</div>
@@ -1836,57 +1836,87 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
-function Portal({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const roleCards: { role: Role; title: string; subtitle: string; screen: Screen }[] = [
-    { role: "Youth Workforce Participant", title: "Youth", subtitle: "Start my day, see my assignment, reflect, and build achievements.", screen: "youth" },
-    { role: "Parent / Guardian", title: "Parent / Guardian", subtitle: "See progress, encouragement, family resources, and safe updates.", screen: "parent" },
-    { role: "Supervisor / Staff", title: "Supervisor", subtitle: "Attendance, wellness, assessments, parent summaries, and reports.", screen: "supervisor" },
-    { role: "Grower", title: "Grower", subtitle: "Resources, marketplace demand, opportunities, and grower support.", screen: "grower" },
-    { role: "Partner", title: "Partner", subtitle: "Impact, collaboration, sponsorship, and community opportunities.", screen: "partner" },
-    { role: "Guest", title: "Guest", subtitle: "Explore the farm story, ecosystem, marketplace, and next steps.", screen: "guest" },
+function Portal({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
+  const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
+    { title: "Start Guided Portal", subtitle: "New visitors can enter through the story, ecosystem overview, and guided experience.", screen: "demo" },
+    { title: "Enter Ecosystem", subtitle: "Browse public pathways without registering: guest story, events, marketplace, and opportunities.", screen: "guest" },
+    { title: "Sign In / Returning Participant", subtitle: activeUser ? `Continue as ${activeUser.name}.` : "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.", screen: workspaceTarget },
+    { title: "Marketplace", subtitle: "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.", screen: "marketplace" },
   ];
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_.8fr]">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Bronson Family Farm Ecosystem</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">Who are you today?</h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-white/86">
-          Choose one path. The app will show only what that person needs for the day. This keeps the June 8 launch clearer for youth, parents, supervisors, growers, partners, and guests using phones.
-        </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {roleCards.map((card) => (
-            <button
-              key={card.role}
-              type="button"
-              onClick={() => setScreen("roles")}
-              className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4 text-left transition hover:border-emerald-200/60 hover:bg-emerald-300/15"
-            >
-              <div className="text-xl font-black">{card.title}</div>
-              <div className="mt-2 text-sm leading-6 text-white/75">{card.subtitle}</div>
-              <div className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Select in role center →</div>
-            </button>
-          ))}
+    <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
+      <Card className="overflow-hidden p-0">
+        <div className="relative min-h-[70vh] sm:min-h-[68vh]">
+          <img
+            src={IMG.forest}
+            alt="Bronson Family Farm forest gate entry"
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(event) => (event.currentTarget.src = IMG.backup)}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.32),rgba(0,0,0,.72))]" />
+          <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
+            <div>
+              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
+                Forest Gate Portal
+              </div>
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
+                Enter the Living Ecosystem
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
+                Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.
+              </p>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {quickChoices.map((choice) => (
+                <button
+                  key={choice.title}
+                  type="button"
+                  onClick={() => setScreen(choice.screen)}
+                  className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18"
+                >
+                  <div className="text-lg font-black leading-tight">{choice.title}</div>
+                  <div className="mt-2 text-sm leading-5 text-white/74">{choice.subtitle}</div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Focus</div>
-        <h2 className="mt-3 text-3xl font-black">One screen. One purpose. One next step.</h2>
-        <div className="mt-5 grid gap-3">
-          {[
-            "Youth see My Day, today’s project, reflection, and achievements.",
-            "Parents see progress, encouragement, family resources, and feedback.",
-            "Supervisors see attendance, wellness, assessments, and Mission Control.",
-            "Marketplace customers do not see Catalog Admin or back-office tools.",
-            "Staff tools stay inside staff areas.",
-          ].map((item) => (
-            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">{item}</div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Choose Role</button>
-          <button type="button" onClick={() => setScreen("demo")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reviewer Demo</button>
-        </div>
-      </Card>
+
+      <div className="grid gap-4">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Launch Candidate 3.0</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">New visitors enter the story. Returning users go straight to work.</h2>
+          <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <b>Public visitors</b> can explore the portal, story, events, and marketplace without registering.
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <b>Nesco youth participants</b> should already be in the system. They verify information instead of re-registering.
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <b>No phone required:</b> youth can enter with Participant ID plus last name or supervisor lookup.
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Daily Rhythm</div>
+          <h3 className="mt-3 text-2xl font-black">Today → Progress → Tomorrow</h3>
+          <div className="mt-4 grid gap-2 text-sm text-white/82">
+            <div className="rounded-xl bg-black/28 p-3"><b>Today:</b> team, project, supervisor, location, start time.</div>
+            <div className="rounded-xl bg-black/28 p-3"><b>Progress:</b> attendance, safety, achievements, contribution.</div>
+            <div className="rounded-xl bg-black/28 p-3"><b>Tomorrow:</b> assignment, PPE reminder, water bottle, next step.</div>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Choose Role</button>
+            <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Go to Workspace</button>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -2032,7 +2062,7 @@ function MyWorkspace({
   setScreen: (screen: Screen) => void;
 }) {
   const [name, setName] = useState("");
-  const [showAccessTools, setShowAccessTools] = useState(true);
+  const [showAccessTools, setShowAccessTools] = useState(!activeUser);
 
   const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
   const isYouth = activeUser?.role === "Youth Workforce Participant";
@@ -2124,7 +2154,7 @@ function MyWorkspace({
         {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
       </h1>
       <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
-        Roles stay in the background as permissions. This page shows the workspaces available for the person who is signed in.
+        This is the role center. Public visitors may explore without registering. Registered users should open only the workspace assigned to their role.
       </p>
 
       {activeUser && (
@@ -2154,12 +2184,12 @@ function MyWorkspace({
           onClick={() => setShowAccessTools((value) => !value)}
           className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
         >
-          {showAccessTools ? "Hide Access Tools" : "First-Time / Testing Access"}
+          {showAccessTools ? "Hide Sign-In / Access Tools" : "Sign In / Verify Role"}
         </button>
         {showAccessTools && (
           <div className="mt-5">
             <div className="max-w-xl">
-              <Field label="Name for this session" value={name} onChange={setName} placeholder="Example: Supervisor Aide" />
+              <Field label="Name / Participant ID for this session" value={name} onChange={setName} placeholder="Example: BFF-825435 or Supervisor Aide" />
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {roles.map((role) => (
@@ -2174,7 +2204,7 @@ function MyWorkspace({
               ))}
             </div>
             <div className="mt-4 text-xs leading-6 text-white/60">
-              These access buttons are for launch testing and first-time entry only. In daily use, registered users should come back to My Workspace and open only their assigned workspaces.
+              Youth participating through Nesco should already be in the system. They verify information instead of re-registering. Youth do not need a phone: use Participant ID + last name, badge QR, or supervisor lookup.
             </div>
           </div>
         )}
