@@ -57,17 +57,17 @@ type Role =
   | "Youth Workforce Participant"
   | "Parent / Guardian"
   | "Supervisor / Staff"
+  | "Case Manager"
   | "Grower"
   | "Marketplace Customer"
   | "Volunteer"
   | "Partner"
   | "Administrator"
-  | "Case Manager"
   | "Value-Added Producer"
   | "Board / Funder";
 
 type AccessLevel = "public" | "participant" | "family" | "staff" | "admin" | "board";
-type ProfileType = "youth" | "supervisor" | "parent" | "case_manager" | "grower" | "value_added" | "volunteer" | "partner" | "customer" | "board";
+type ProfileType = "youth" | "supervisor" | "case_manager" | "parent" | "grower" | "value_added" | "volunteer" | "partner" | "customer" | "board";
 
 type EcosystemUser = {
   id: string;
@@ -204,34 +204,6 @@ type IncidentRecord = {
   created_at: string;
 };
 
-type SupportLevel = "green" | "yellow" | "orange" | "red";
-
-type SupportCaseRecord = {
-  id: string;
-  participant_id?: string;
-  youth_name?: string;
-  submitted_by_role: "youth" | "parent" | "supervisor" | "case_manager" | "leadership";
-  support_level: SupportLevel;
-  concern_type: "work" | "transportation" | "family" | "health" | "wellness" | "safety" | "bullying" | "attendance" | "other";
-  summary: string;
-  routed_to: "supervisor" | "case_manager" | "leadership" | "emergency";
-  status: "open" | "in_progress" | "resolved";
-  parent_contact_recommended: boolean;
-  private_staff_notes?: string;
-  created_at: string;
-};
-
-type ParentEngagementRecord = {
-  id: string;
-  participant_id?: string;
-  guardian_name?: string;
-  youth_strength?: string;
-  hopes_for_program?: string;
-  support_note?: string;
-  preferred_contact?: "phone" | "text" | "email" | "in_person";
-  created_at: string;
-};
-
 type ParentSummary = {
   id: string;
   participant_id: string;
@@ -336,8 +308,6 @@ const PPE_KEY = "bff.launch.ppeCheckins";
 const INCIDENT_KEY = "bff.launch.incidents";
 const PARENT_SUMMARY_KEY = "bff.launch.parentSummaries";
 const PARENT_CONTACT_KEY = "bff.launch.parentContactLogs";
-const SUPPORT_CASE_KEY = "bff.launch.supportCases";
-const PARENT_ENGAGEMENT_KEY = "bff.launch.parentEngagement";
 const FEEDBACK_KEY = "bff.launch.feedback";
 const MARKET_PRODUCTS_KEY = "bff.launch.market.products";
 const MARKET_ORDERS_KEY = "bff.launch.market.orders";
@@ -345,9 +315,6 @@ const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
 const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
-
-const COMPACT_PROPRIETARY_NOTICE =
-  "© 2026 Bronson Family Farm LLC & Farm & Family Alliance Inc. | Developed by Bronson Family Farm | Proprietary & Confidential | All Rights Reserved";
 
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
@@ -1138,7 +1105,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Log": "Incident Log",
     "Parent Summary": "Parent Summary",
     "Launch-day operating picture.": "Operating picture sa araw ng launch.",
-    "Youth Roster": "Youth Roster",
+    "Supervisor Youth Roster": "Youth Roster",
     "Today Attendance": "Attendance Ngayon",
     "Today Incidents": "Incidents Ngayon",
     "Parent Summaries": "Parent Summaries",
@@ -1246,51 +1213,11 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
   }
 };
 
-
-
-const supportFrameworkTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
-  es: {
-    "Home": "Inicio", "Choose Your Path": "Elija su ruta", "My Workspace": "Mi espacio", "Choose Role": "Elegir rol", "More tools": "Más herramientas", "Switch Role": "Cambiar rol", "Register": "Registrar", "Events": "Eventos", "Media": "Medios", "Feedback": "Comentarios", "Supervisor": "Supervisor", "Case Manager": "Administrador de casos", "Operations": "Operaciones", "Mission Control": "Centro de control",
-    "Parent / Guardian": "Padre / Tutor", "Case Manager Portal": "Portal de administrador de casos", "Supervisor Learning Center": "Centro de aprendizaje de supervisores", "Concern & Support Center": "Centro de inquietudes y apoyo", "Support Cases": "Casos de apoyo", "Youth Progress": "Progreso juvenil", "Encouragement": "Ánimo", "Family Feedback": "Comentarios familiares", "Reports": "Informes", "June 8": "8 de junio", "Today": "Hoy", "Reflection": "Reflexión", "Resources": "Recursos", "Impact": "Impacto",
-    "Youth Support Network": "Red de apoyo juvenil", "Understanding Adolescents": "Comprender a los adolescentes", "Positive Youth Development": "Desarrollo juvenil positivo", "Teen Development": "Desarrollo adolescente", "Trauma-Informed Supervision": "Supervisión informada por trauma", "Mental Health Awareness": "Conciencia de salud mental", "Need-to-Know Access": "Acceso según necesidad", "Every youth has a support team.": "Cada joven tiene un equipo de apoyo.", "We cultivate people as well as crops.": "Cultivamos personas además de cultivos.",
-    "Green — Everyday Support": "Verde — Apoyo cotidiano", "Yellow — Additional Support": "Amarillo — Apoyo adicional", "Orange — Significant Concern": "Naranja — Preocupación importante", "Red — Emergency": "Rojo — Emergencia", "Supervisor leads": "El supervisor lidera", "Supervisor refers to Case Manager": "El supervisor refiere al administrador de casos", "Case Manager leads": "El administrador de casos lidera", "Leadership + Case Manager immediately": "Liderazgo + administrador de casos de inmediato",
-    "Request Support": "Solicitar apoyo", "Refer to Case Manager": "Referir al administrador de casos", "Transportation": "Transporte", "Family Concern": "Preocupación familiar", "Health Concern": "Preocupación de salud", "Emotional Support": "Apoyo emocional", "Workplace Concern": "Preocupación laboral", "Other": "Otro", "I Need Help": "Necesito ayuda", "I Am Concerned About Someone": "Me preocupa alguien"
-  },
-  tl: {
-    "Home": "Home", "Choose Your Path": "Piliin ang Iyong Landas", "My Workspace": "Aking Workspace", "Choose Role": "Pumili ng Role", "More tools": "Higit pang tools", "Switch Role": "Palitan ang Role", "Register": "Magrehistro", "Events": "Events", "Media": "Media", "Feedback": "Feedback", "Supervisor": "Supervisor", "Case Manager": "Case Manager", "Operations": "Operasyon", "Mission Control": "Mission Control",
-    "Parent / Guardian": "Magulang / Guardian", "Case Manager Portal": "Case Manager Portal", "Supervisor Learning Center": "Supervisor Learning Center", "Concern & Support Center": "Concern at Support Center", "Support Cases": "Mga Support Case", "Youth Progress": "Progreso ng Youth", "Encouragement": "Paghihikayat", "Family Feedback": "Family Feedback", "Reports": "Mga Ulat", "June 8": "Hunyo 8", "Today": "Ngayon", "Reflection": "Reflection", "Resources": "Resources", "Impact": "Impact",
-    "Youth Support Network": "Youth Support Network", "Understanding Adolescents": "Pag-unawa sa mga Kabataan", "Positive Youth Development": "Positive Youth Development", "Teen Development": "Teen Development", "Trauma-Informed Supervision": "Trauma-Informed Supervision", "Mental Health Awareness": "Mental Health Awareness", "Need-to-Know Access": "Need-to-Know Access", "Every youth has a support team.": "Bawat kabataan ay may support team.", "We cultivate people as well as crops.": "Nililinang natin ang tao pati ang pananim.",
-    "Green — Everyday Support": "Green — Araw-araw na Suporta", "Yellow — Additional Support": "Yellow — Karagdagang Suporta", "Orange — Significant Concern": "Orange — Malaking Alalahanin", "Red — Emergency": "Red — Emergency", "Supervisor leads": "Supervisor ang mangunguna", "Supervisor refers to Case Manager": "Ire-refer ng supervisor sa Case Manager", "Case Manager leads": "Case Manager ang mangunguna", "Leadership + Case Manager immediately": "Leadership + Case Manager agad",
-    "Request Support": "Humingi ng Suporta", "Refer to Case Manager": "I-refer sa Case Manager", "Transportation": "Transportasyon", "Family Concern": "Alalahanin sa Pamilya", "Health Concern": "Alalahanin sa Kalusugan", "Emotional Support": "Emosyonal na Suporta", "Workplace Concern": "Alalahanin sa Trabaho", "Other": "Iba pa", "I Need Help": "Kailangan Ko ng Tulong", "I Am Concerned About Someone": "Nag-aalala Ako sa Isang Tao"
-  },
-  it: {
-    "Home": "Home", "Choose Your Path": "Scegli il tuo percorso", "My Workspace": "Il mio spazio", "Choose Role": "Scegli ruolo", "More tools": "Altri strumenti", "Switch Role": "Cambia ruolo", "Register": "Registrati", "Events": "Eventi", "Media": "Media", "Feedback": "Feedback", "Supervisor": "Supervisore", "Case Manager": "Case manager", "Operations": "Operazioni", "Mission Control": "Centro di controllo",
-    "Parent / Guardian": "Genitore / Tutore", "Case Manager Portal": "Portale case manager", "Supervisor Learning Center": "Centro apprendimento supervisori", "Concern & Support Center": "Centro preoccupazioni e supporto", "Support Cases": "Casi di supporto", "Youth Progress": "Progresso giovani", "Encouragement": "Incoraggiamento", "Family Feedback": "Feedback famiglia", "Reports": "Report", "June 8": "8 giugno", "Today": "Oggi", "Reflection": "Riflessione", "Resources": "Risorse", "Impact": "Impatto"
-  },
-  he: {
-    "Home": "בית", "Choose Your Path": "בחרו מסלול", "My Workspace": "המרחב שלי", "Choose Role": "בחר תפקיד", "More tools": "כלים נוספים", "Switch Role": "החלפת תפקיד", "Register": "הרשמה", "Events": "אירועים", "Media": "מדיה", "Feedback": "משוב", "Supervisor": "מפקח", "Case Manager": "מנהל מקרה", "Operations": "תפעול", "Mission Control": "מרכז בקרה",
-    "Parent / Guardian": "הורה / אפוטרופוס", "Case Manager Portal": "שער מנהל מקרה", "Supervisor Learning Center": "מרכז למידת מפקחים", "Concern & Support Center": "מרכז דאגה ותמיכה", "Support Cases": "מקרי תמיכה", "Youth Progress": "התקדמות נוער", "Encouragement": "עידוד", "Family Feedback": "משוב משפחתי", "Reports": "דוחות", "June 8": "8 ביוני", "Today": "היום", "Reflection": "רפלקציה", "Resources": "משאבים", "Impact": "השפעה"
-  },
-  fr: {
-    "Home": "Accueil", "Choose Your Path": "Choisissez votre parcours", "My Workspace": "Mon espace", "Choose Role": "Choisir un rôle", "More tools": "Plus d’outils", "Switch Role": "Changer de rôle", "Register": "S’inscrire", "Events": "Événements", "Media": "Média", "Feedback": "Commentaires", "Supervisor": "Superviseur", "Case Manager": "Gestionnaire de cas", "Operations": "Opérations", "Mission Control": "Centre de mission",
-    "Parent / Guardian": "Parent / Tuteur", "Case Manager Portal": "Portail du gestionnaire de cas", "Supervisor Learning Center": "Centre d’apprentissage des superviseurs", "Concern & Support Center": "Centre de soutien", "Support Cases": "Cas de soutien", "Youth Progress": "Progrès des jeunes", "Encouragement": "Encouragement", "Family Feedback": "Commentaires familiaux", "Reports": "Rapports", "June 8": "8 juin", "Today": "Aujourd’hui", "Reflection": "Réflexion", "Resources": "Ressources", "Impact": "Impact",
-    "Youth Support Network": "Réseau de soutien jeunesse", "Understanding Adolescents": "Comprendre les adolescents", "Positive Youth Development": "Développement positif des jeunes", "Teen Development": "Développement adolescent", "Trauma-Informed Supervision": "Supervision sensible au trauma", "Mental Health Awareness": "Sensibilisation à la santé mentale", "Need-to-Know Access": "Accès selon le besoin", "Every youth has a support team.": "Chaque jeune a une équipe de soutien.", "We cultivate people as well as crops.": "Nous cultivons les personnes autant que les récoltes."
-  }
-};
-
 function translatePhrase(language: LanguageCode, raw: string) {
   if (language === "en") return raw;
   const key = raw.trim();
-  const compactNoticeTranslations: Partial<Record<LanguageCode, string>> = {
-    es: "© 2026 Bronson Family Farm LLC y Farm & Family Alliance Inc. | Desarrollado por Bronson Family Farm | Propietario y Confidencial | Todos los derechos reservados",
-    tl: "© 2026 Bronson Family Farm LLC at Farm & Family Alliance Inc. | Developed by Bronson Family Farm | Proprietary at Confidential | All Rights Reserved",
-    it: "© 2026 Bronson Family Farm LLC e Farm & Family Alliance Inc. | Sviluppato da Bronson Family Farm | Proprietario e Riservato | Tutti i diritti riservati",
-    he: "© 2026 Bronson Family Farm LLC ו-Farm & Family Alliance Inc. | פותח על ידי Bronson Family Farm | קנייני וסודי | כל הזכויות שמורות",
-    fr: "© 2026 Bronson Family Farm LLC et Farm & Family Alliance Inc. | Développé par Bronson Family Farm | Propriétaire et confidentiel | Tous droits réservés",
-  };
-  if (key === COMPACT_PROPRIETARY_NOTICE) return compactNoticeTranslations[language] || key;
   return (
-    supportFrameworkTranslations[language]?.[key] ||
+    launchIntegrationTranslations[language]?.[key] ||
     launchCriticalTranslations[language]?.[key] ||
     launchPhraseTranslations[language]?.[key] ||
     screenTranslations[language]?.[key] ||
@@ -1303,58 +1230,67 @@ function applyScreenTranslations(language: LanguageCode) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
   const skip = new Set(["SCRIPT", "STYLE", "INPUT", "TEXTAREA", "SELECT", "OPTION"]);
-
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
       const text = node.textContent || "";
-      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) {
-        return NodeFilter.FILTER_REJECT;
-      }
+      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
-
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
-
   nodes.forEach((node) => {
-    const anyNode = node as Text & { __bffOriginalText?: string };
+    const el = node.parentElement;
+    if (!el) return;
     const current = node.textContent || "";
-    const trimmed = current.trim();
-    if (!trimmed) return;
-
-    // Store the original English on the text node itself, not on the parent element.
-    // Parent-level storage breaks when one element contains multiple text nodes.
-    if (!anyNode.__bffOriginalText || language === "en") {
-      anyNode.__bffOriginalText = trimmed;
-    }
-
-    const original = anyNode.__bffOriginalText;
-    const translated = language === "en" ? original : translatePhrase(language, original);
-    node.textContent = current.replace(trimmed, translated);
+    const original = el.getAttribute("data-bff-original-text") || current.trim();
+    el.setAttribute("data-bff-original-text", original);
+    const translated = translatePhrase(language, original);
+    node.textContent = current.replace(current.trim(), translated);
   });
-
+  const placeholderMap: Record<string, string> = {
+    "Example: BFF-825435 or Supervisor Aide": translatePhrase(language, "Example: BFF-825435 or Supervisor Aide"),
+    "Enter name": translatePhrase(language, "Enter name"),
+  };
   root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((node) => {
     const el = node as HTMLInputElement | HTMLTextAreaElement;
     const original = el.getAttribute("data-bff-original-placeholder") || el.getAttribute("placeholder") || "";
     el.setAttribute("data-bff-original-placeholder", original);
-    el.setAttribute("placeholder", language === "en" ? original : translatePhrase(language, original));
+    el.setAttribute("placeholder", placeholderMap[original] || translatePhrase(language, original));
   });
 }
 
+
+const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
+  es: {
+    "Case Manager": "Administrador de Casos", "My Portfolio": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Resume and Portfolio Growth": "Crecimiento de Currículum y Portafolio", "Youth Support Response Framework": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
+  },
+  tl: {
+    "Case Manager": "Case Manager", "My Portfolio": "Aking Portfolio", "Resume Builder": "Resume Builder", "Resume and Portfolio Growth": "Paglago ng Resume at Portfolio", "Youth Support Response Framework": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
+  },
+  it: {
+    "Case Manager": "Case Manager", "My Portfolio": "Il Mio Portfolio", "Resume Builder": "Creatore di Curriculum", "Resume and Portfolio Growth": "Crescita di Curriculum e Portfolio", "Youth Support Response Framework": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
+  },
+  he: {
+    "Case Manager": "מנהל מקרה", "My Portfolio": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Resume and Portfolio Growth": "צמיחת קורות חיים ותיק עבודות", "Youth Support Response Framework": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
+  },
+  fr: {
+    "Case Manager": "Gestionnaire de cas", "My Portfolio": "Mon Portfolio", "Resume Builder": "Créateur de CV", "Resume and Portfolio Growth": "Développement du CV et du Portfolio", "Youth Support Response Framework": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
+  }
+};
 
 const roles: Role[] = [
   "Guest",
   "Youth Workforce Participant",
   "Parent / Guardian",
   "Supervisor / Staff",
+  "Case Manager",
   "Grower",
   "Marketplace Customer",
   "Volunteer",
   "Partner",
   "Administrator",
-  "Case Manager",
   "Value-Added Producer",
   "Board / Funder",
 ];
@@ -1364,12 +1300,12 @@ const roleAccess: Record<Role, AccessLevel> = {
   "Youth Workforce Participant": "participant",
   "Parent / Guardian": "family",
   "Supervisor / Staff": "staff",
+  "Case Manager": "staff",
   Grower: "participant",
   "Marketplace Customer": "public",
   Volunteer: "participant",
   Partner: "family",
   Administrator: "admin",
-  "Case Manager": "staff",
   "Value-Added Producer": "participant",
   "Board / Funder": "board",
 };
@@ -1484,8 +1420,6 @@ function supabaseTableCandidates(table: string) {
     feedback: ["feedback", "ecosystem_feedback", "program_feedback"],
     parent_contact_logs: ["parent_contact_logs", "attendance_communications", "parent_communications"],
     parent_summaries: ["parent_summaries", "parent_summary"],
-    support_cases: ["support_cases", "case_manager_support_cases", "youth_support_cases"],
-    parent_engagement: ["parent_engagement", "parent_profiles", "guardian_engagement"],
   };
   return aliases[table] || [table];
 }
@@ -1554,12 +1488,12 @@ function roleToProfileType(role: Role): ProfileType {
     "Youth Workforce Participant": "youth",
     "Parent / Guardian": "parent",
     "Supervisor / Staff": "supervisor",
+    "Case Manager": "case_manager",
     Grower: "grower",
     "Marketplace Customer": "customer",
     Volunteer: "volunteer",
     Partner: "partner",
     Administrator: "partner",
-    "Case Manager": "case_manager",
     "Value-Added Producer": "value_added",
     "Board / Funder": "board",
   };
@@ -1572,12 +1506,12 @@ function routeForRole(role: Role): Screen {
     "Youth Workforce Participant": "youth",
     "Parent / Guardian": "parent",
     "Supervisor / Staff": "supervisor",
+    "Case Manager": "caseManager",
     Grower: "grower",
     "Marketplace Customer": "marketplace",
     Volunteer: "support",
     Partner: "partner",
     Administrator: "operations",
-    "Case Manager": "caseManager",
     "Value-Added Producer": "valueAdded",
     "Board / Funder": "reports",
   };
@@ -1589,6 +1523,35 @@ function canEnter(user: EcosystemUser | null, screen: Screen) {
   // The Supervisor Center still separates private staff notes inside the workflow,
   // but the button should not redirect reviewers back to the Grower workspace.
   return true;
+}
+
+
+const youthSupportLevels = [
+  { level: "Green", title: "Everyday Support", lead: "Supervisor leads", examples: ["Tired", "Needs encouragement", "Minor disagreement", "First-day nervousness"] },
+  { level: "Yellow", title: "Additional Support Needed", lead: "Supervisor refers to case manager", examples: ["Repeated absences", "Transportation issue", "Family stress", "Social isolation"] },
+  { level: "Orange", title: "Significant Concern", lead: "Case manager leads", examples: ["Possible depression", "Substance concern", "Escalating conflict", "Housing instability"] },
+  { level: "Red", title: "Emergency", lead: "Leadership and case manager respond immediately", examples: ["Self-harm statement", "Medical emergency", "Abuse disclosure", "Missing youth"] },
+];
+
+function SupportResponseFrameworkCard() {
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Support Response Framework</div>
+      <h2 className="mt-3 text-3xl font-black">Youth + Parent + Supervisor + Case Manager</h2>
+      <p className="mt-3 text-sm leading-7 text-white/78">Supervisors coach daily work. Case managers support barriers, wellness, family needs, referrals, and escalation. Leadership protects safety and operations.</p>
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {youthSupportLevels.map((item) => (
+          <div key={item.level} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-lg font-black">{item.level} — {item.title}</div>
+            <div className="mt-2 text-xs font-black text-emerald-100">Lead: {item.lead}</div>
+            <ul className="mt-3 space-y-1 text-xs leading-5 text-white/72">
+              {item.examples.map((example) => <li key={example}>• {example}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
 }
 
 function App() {
@@ -1608,15 +1571,7 @@ function App() {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
     const timer = window.setTimeout(() => applyScreenTranslations(language), 0);
-    const root = document.querySelector("[data-bff-app-root]");
-    const observer = root
-      ? new MutationObserver(() => window.setTimeout(() => applyScreenTranslations(language), 0))
-      : null;
-    if (root && observer) observer.observe(root, { childList: true, subtree: true });
-    return () => {
-      window.clearTimeout(timer);
-      observer?.disconnect();
-    };
+    return () => window.clearTimeout(timer);
   }, [language, screen, message, activeUser]);
 
   const setScreen = (target: Screen) => {
@@ -1669,7 +1624,7 @@ function App() {
       {screen === "grower" && <GrowerJourney setScreen={setScreen} />}
       {screen === "partner" && <PartnerJourney setScreen={setScreen} />}
       {screen === "support" && <SupportJourney setScreen={setScreen} />}
-      {screen === "caseManager" && <CaseManagerScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "caseManager" && <CaseManagerPortal setScreen={setScreen} />}
       {screen === "valueAdded" && <ValueAddedJourney setScreen={setScreen} />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
@@ -1707,6 +1662,7 @@ function Shell({
     ? [
         { label: "My Day", screen: "youth" },
         { label: "Today", screen: "launchProject" },
+        { label: "My Portfolio", screen: "youth" },
         { label: "Media", screen: "media" },
         { label: "Reflection", screen: "feedback" },
       ]
@@ -1727,7 +1683,7 @@ function Shell({
     ? [
         { label: "Case Manager", screen: "caseManager" },
         { label: "Support Cases", screen: "caseManager" },
-        { label: "Mission Control", screen: "reports" },
+        { label: "Reports", screen: "reports" },
         { label: "Feedback", screen: "feedback" },
       ]
     : role === "Grower"
@@ -1777,7 +1733,7 @@ function Shell({
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${translatePhrase(language, activeUser.role)}` : translatePhrase(language, "Choose Your Path")}</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
             </button>
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
@@ -1797,14 +1753,14 @@ function Shell({
           </div>
 
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>{translatePhrase(language, "Home")}</button>
-            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{translatePhrase(language, "My Workspace")}</button>
+            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
+            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
             {roleNav.map((item) => (
               <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
-                {translatePhrase(language, item.label)}
+                {item.label}
               </button>
             ))}
-            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Choose Role")}</button>}
+            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Choose Role</button>}
           </div>
 
           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
@@ -1812,31 +1768,37 @@ function Shell({
               {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
             </div>
             <div className="flex shrink-0 gap-2">
-              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">{translatePhrase(language, "Mission Control")}</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">Mission Control</button>}
               {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 font-black">{t(language, "signOut")}</button>}
             </div>
           </div>
 
           <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 text-xs text-white/75">
-            <summary className="cursor-pointer font-black text-emerald-50">{translatePhrase(language, "More tools")}</summary>
+            <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Switch Role")}</button>
-              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>{translatePhrase(language, "Register")}</button>
-              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>{translatePhrase(language, "Events")}</button>
-              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>{translatePhrase(language, "Media")}</button>
-              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>{translatePhrase(language, "Feedback")}</button>
-              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>{translatePhrase(language, "Supervisor")}</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>{translatePhrase(language, "Case Manager")}</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>{translatePhrase(language, "Operations")}</button>}
+              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
+              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
+              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
+              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
+              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>Case Manager</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
           </details>
         </div>
         {children}
-        <footer className="mt-6 mb-2 rounded-2xl border border-white/10 bg-black/45 px-3 py-2 text-center text-[10px] font-semibold leading-snug text-white/65 backdrop-blur-xl md:text-xs">
-          {translatePhrase(language, COMPACT_PROPRIETARY_NOTICE)}
-        </footer>
+        <CompactProprietaryFooter />
       </div>
     </div>
+  );
+}
+
+function CompactProprietaryFooter() {
+  return (
+    <footer className="mt-5 rounded-2xl border border-white/10 bg-black/45 px-4 py-2 text-center text-[10px] font-semibold leading-5 text-white/60 backdrop-blur-xl">
+      © 2026 Bronson Family Farm LLC & Farm & Family Alliance Inc. All Rights Reserved. Developed by Bronson Family Farm. Proprietary & Confidential.
+    </footer>
   );
 }
 
@@ -1846,6 +1808,15 @@ function Notice({ text }: { text: string }) {
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-[2rem] border border-white/10 bg-black/32 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
+}
+
+function Metric({ title, value }: { title: string; value: string | number }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-5">
+      <div className="text-3xl font-black">{value}</div>
+      <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{title}</div>
+    </div>
+  );
 }
 
 function Field(props: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
@@ -2025,7 +1996,7 @@ function Portal({ setScreen, activeUser }: { setScreen: (screen: Screen) => void
             <div className="rounded-xl bg-black/28 p-3"><b>Tomorrow:</b> assignment, PPE reminder, water bottle, next step.</div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{translatePhrase(language, "Choose Role")}</button>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Choose Role</button>
             <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Go to Workspace</button>
           </div>
         </Card>
@@ -2535,7 +2506,17 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
             <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated.</p>
+            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated. This becomes a youth resume, portfolio, and achievement transcript.</p>
+            <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
+              <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Initiative", "Problem Solving", "Project Completion", "Career Exploration"].map((skill) => (
+                  <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs leading-5 text-white/70">Each check-in, project, reflection, badge, and supervisor assessment adds evidence toward a future resume and portfolio.</p>
+            </div>
             <div className="mt-5 grid gap-3">
               {youthPortfolioEntries.map((entry) => (
                 <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
@@ -2571,8 +2552,6 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
             </div>
           </Card>
         </div>
-        <YouthSupportNetworkPanel setScreen={setScreen} />
-        <ConcernSupportCenterPanel sourceRole="youth" />
         <JourneyCompletionCard
           title="Youth Workforce Journey Completion"
           learned={[
@@ -2741,14 +2720,6 @@ function SupervisorDashboard({
         ].map((item) => (
           <div key={item} className="rounded-2xl border border-white/10 bg-black/35 p-4 text-sm leading-6 text-white/86">{item}</div>
         ))}
-      </div>
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <SupervisorLearningCenterPanel />
-        <SupportResponseFrameworkPanel />
-      </div>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("caseManager")} className="rounded-full border border-sky-200/25 bg-sky-300/15 px-6 py-3 font-black text-sky-50">Open Case Manager Portal</button>
-        <button type="button" onClick={() => setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Parent Portal</button>
       </div>
     </Card>
   );
@@ -3268,7 +3239,6 @@ function SupervisorReports({
           ["Assessments", assessments.length],
           ["Avg Safety", avgSafety],
           ["Support Flags", supportFlags],
-          ["Support Cases", supportCases.length],
           ["Incident Logs", incidents.length],
           ["Parent Summaries", parentSummaries.length],
         ].map(([label, value]) => (
@@ -3497,6 +3467,43 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   );
 }
 
+
+function CaseManagerPortal({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
+  const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
+  const parentContacts = safeRead<ParentContactLog[]>(PARENT_CONTACT_KEY, []);
+  const supportFlags = wellness.filter((item) => item.safety_flag || item.support_needed || item.private_note);
+
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Case Manager Portal</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Whole-person youth support.</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">Case managers help identify barriers, coordinate resources, support families, respond to wellness concerns, and keep supervisors focused on coaching and safety.</p>
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
+          {[
+            ["Open Support Flags", supportFlags.length],
+            ["Incident Logs", incidents.length],
+            ["Parent Contacts", parentContacts.length],
+            ["Follow-Ups", supportFlags.length + incidents.length],
+          ].map(([label, value]) => (
+            <div key={label as string} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+              <div className="text-3xl font-black">{value}</div>
+              <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Supervisor Notes</button>
+          <button type="button" onClick={() => setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Parent Portal</button>
+          <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Mission Control</button>
+        </div>
+      </Card>
+      <SupportResponseFrameworkCard />
+    </div>
+  );
+}
+
 function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
@@ -3575,6 +3582,17 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View June 8 Project</button>
       </div>
 
+      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Child's Workforce Progress</div>
+        <h2 className="mt-2 text-2xl font-black">Resume and Portfolio Growth</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-5">
+          {["Badges Earned", "Projects Completed", "Skills Demonstrated", "Supervisor Strengths", "Career Interests"].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black">{item}</div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm leading-7 text-white/75">Families can see how daily work becomes evidence for future employment, education, trade programs, internships, and leadership opportunities.</p>
+      </div>
+
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <h2 className="text-2xl font-black">Parent-Safe Supervisor Summary</h2>
@@ -3592,11 +3610,6 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="mt-6 grid gap-5 lg:grid-cols-2">
-        <ParentEngagementPanel />
-        <ConcernSupportCenterPanel sourceRole="parent" />
       </div>
 
       <div className="mt-6 grid gap-3">
@@ -3640,285 +3653,6 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
-
-function YouthSupportNetworkPanel({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Support Network</div>
-      <h2 className="mt-3 text-3xl font-black">Every Cultivator has a team.</h2>
-      <p className="mt-3 text-sm leading-7 text-white/82">Youth are supported by parents or guardians, supervisors, onsite case managers, and program leadership. Supervisors coach the work. Case managers support barriers and wellness needs. Parents strengthen the support from home.</p>
-      <div className="mt-5 grid gap-3 md:grid-cols-2">
-        {[
-          ["Supervisor", "Daily coaching, assignments, safety, skill growth, attendance, and observations."],
-          ["Parent / Guardian", "Encouragement, transportation support, family communication, and growth observations."],
-          ["Case Manager", "Resource coordination, wellness support, family barriers, referrals, and crisis response."],
-          ["Program Leadership", "Safety oversight, compliance, resources, partnerships, and long-term opportunity."],
-        ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-            <div className="text-lg font-black text-emerald-50">{title}</div>
-            <p className="mt-2 text-xs leading-5 text-white/72">{text}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Daily Wellness Check-In</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Youth Reflection</button>
-      </div>
-    </Card>
-  );
-}
-
-function SupportResponseFrameworkPanel() {
-  const levels: { level: SupportLevel; title: string; lead: string; examples: string; className: string }[] = [
-    { level: "green", title: "Green — Everyday Support", lead: "Supervisor leads", examples: "Tired, nervous, needs encouragement, needs help with an assignment.", className: "border-emerald-200/25 bg-emerald-300/12" },
-    { level: "yellow", title: "Yellow — Additional Support", lead: "Supervisor refers to Case Manager", examples: "Repeated absence, transportation problem, family stress, isolation, repeated wellness concern.", className: "border-yellow-200/25 bg-yellow-300/12" },
-    { level: "orange", title: "Orange — Significant Concern", lead: "Case Manager leads", examples: "Possible depression, substance concern, escalating conflict, homelessness concern, major family crisis.", className: "border-orange-200/25 bg-orange-300/12" },
-    { level: "red", title: "Red — Emergency", lead: "Leadership + Case Manager immediately", examples: "Self-harm statement, medical emergency, abuse disclosure, missing youth, serious safety incident.", className: "border-red-200/25 bg-red-300/12" },
-  ];
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Support Response Framework</div>
-      <h3 className="mt-3 text-2xl font-black">Know who leads when something happens.</h3>
-      <div className="mt-5 grid gap-3">
-        {levels.map((item) => (
-          <div key={item.level} className={`rounded-2xl border p-4 ${item.className}`}>
-            <div className="font-black">{item.title}</div>
-            <div className="mt-1 text-sm font-bold text-white/82">Lead: {item.lead}</div>
-            <p className="mt-2 text-xs leading-5 text-white/72">{item.examples}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SupervisorLearningCenterPanel() {
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Supervisor Learning Center</div>
-      <h3 className="mt-3 text-2xl font-black">Teen development belongs in supervision.</h3>
-      <div className="mt-5 grid gap-3">
-        {[
-          ["Understanding Adolescents", "Decision-making is still developing. Emotions and peer influence can move faster than judgment."],
-          ["Positive Youth Development", "Youth need safety, belonging, competence, and purpose. The 5 Cs are confidence, character, competence, connection, and contribution."],
-          ["Trauma-Informed Leadership", "Behavior is communication. Use calm redirection, private correction, active listening, and consistent expectations."],
-          ["Mental Health Awareness", "Notice withdrawal, hopeless statements, sudden behavior changes, substance-use concerns, or any self-harm language. Escalate immediately."],
-        ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-black/30 p-4">
-            <div className="font-black text-emerald-50">{title}</div>
-            <p className="mt-2 text-xs leading-5 text-white/72">{text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function NeedToKnowPanel() {
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Need-to-Know Privacy</div>
-      <h3 className="mt-3 text-2xl font-black">Protect youth information.</h3>
-      <div className="mt-5 grid gap-3">
-        {[
-          ["Youth", "See only their own information and reflection prompts."],
-          ["Parents", "See parent-safe progress summaries for their child, not raw private youth notes."],
-          ["Supervisors", "See assigned youth, attendance, PPE, safety, and work observations."],
-          ["Case Managers", "See assigned support cases and resource follow-up needs."],
-          ["Leadership", "Sees program-wide operations, safety, compliance, and reporting metrics."],
-        ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-black/30 p-4">
-            <div className="font-black">{title}</div>
-            <p className="mt-2 text-xs leading-5 text-white/72">{text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ParentEngagementPanel() {
-  const [guardianName, setGuardianName] = useState("");
-  const [youthStrength, setYouthStrength] = useState("");
-  const [hopes, setHopes] = useState("");
-  const [supportNote, setSupportNote] = useState("");
-  const [saved, setSaved] = useState("");
-
-  const saveParentEngagement = async () => {
-    const row: ParentEngagementRecord = {
-      id: uuid(),
-      guardian_name: guardianName,
-      youth_strength: youthStrength,
-      hopes_for_program: hopes,
-      support_note: supportNote,
-      preferred_contact: "text",
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("parent_engagement", PARENT_ENGAGEMENT_KEY, row);
-    setSaved(saveModeMessage("Parent engagement note", result));
-    setGuardianName("");
-    setYouthStrength("");
-    setHopes("");
-    setSupportNote("");
-  };
-
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent Engagement</div>
-      <h2 className="mt-3 text-2xl font-black">Tell us how to support your child.</h2>
-      <div className="mt-5 grid gap-4">
-        <Field label="Parent / Guardian Name" value={guardianName} onChange={setGuardianName} />
-        <TextArea label="One strength I see in my child" value={youthStrength} onChange={setYouthStrength} placeholder="Leadership, kindness, creativity, persistence, teamwork..." />
-        <TextArea label="What I hope this program helps grow" value={hopes} onChange={setHopes} placeholder="Confidence, responsibility, career skills, friendships, leadership..." />
-        <TextArea label="Anything staff should know" value={supportNote} onChange={setSupportNote} placeholder="Transportation, health, family schedule, support needs, or encouragement notes..." />
-      </div>
-      <button type="button" onClick={saveParentEngagement} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Parent Note</button>
-      {saved && <div className="mt-3 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-xs font-bold text-emerald-50">{saved}</div>}
-    </div>
-  );
-}
-
-function ConcernSupportCenterPanel({ sourceRole }: { sourceRole: SupportCaseRecord["submitted_by_role"] }) {
-  const [level, setLevel] = useState<SupportLevel>("green");
-  const [concernType, setConcernType] = useState<SupportCaseRecord["concern_type"]>("wellness");
-  const [summary, setSummary] = useState("");
-  const [saved, setSaved] = useState("");
-
-  const routeForLevel = (nextLevel: SupportLevel): SupportCaseRecord["routed_to"] => {
-    if (nextLevel === "green") return "supervisor";
-    if (nextLevel === "yellow" || nextLevel === "orange") return "case_manager";
-    return "emergency";
-  };
-
-  const saveSupportCase = async () => {
-    const row: SupportCaseRecord = {
-      id: uuid(),
-      submitted_by_role: sourceRole,
-      support_level: level,
-      concern_type: concernType,
-      summary,
-      routed_to: routeForLevel(level),
-      status: "open",
-      parent_contact_recommended: level === "yellow" || level === "orange" || level === "red",
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("support_cases", SUPPORT_CASE_KEY, row);
-    setSaved(saveModeMessage("Support request", result));
-    setSummary("");
-  };
-
-  return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Concern & Support Center</div>
-      <h2 className="mt-3 text-2xl font-black">Ask for help or report a concern.</h2>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <SelectField label="Support Level" value={level} onChange={(v) => setLevel(v as SupportLevel)} options={["green", "yellow", "orange", "red"]} />
-        <SelectField label="Concern Type" value={concernType} onChange={(v) => setConcernType(v as SupportCaseRecord["concern_type"])} options={["work", "transportation", "family", "health", "wellness", "safety", "bullying", "attendance", "other"]} />
-      </div>
-      <div className="mt-4">
-        <TextArea label="Brief Summary" value={summary} onChange={setSummary} placeholder="Describe what support is needed. Private staff notes should be added by staff only." />
-      </div>
-      <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white/80">
-        Routing preview: <strong>{routeForLevel(level)}</strong>. Green stays with supervisor coaching. Yellow and Orange route to case manager. Red requires immediate emergency escalation.
-      </div>
-      <button type="button" onClick={saveSupportCase} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Support Request</button>
-      {saved && <div className="mt-3 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-xs font-bold text-emerald-50">{saved}</div>}
-    </div>
-  );
-}
-
-function CaseManagerScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [cases, setCases] = useState<SupportCaseRecord[]>(() => safeRead<SupportCaseRecord[]>(SUPPORT_CASE_KEY, []));
-  const [parentNotes, setParentNotes] = useState<ParentEngagementRecord[]>(() => safeRead<ParentEngagementRecord[]>(PARENT_ENGAGEMENT_KEY, []));
-  const [message, setMessage] = useState("");
-
-  const refresh = async () => {
-    setCases(await loadSupabaseRows<SupportCaseRecord>("support_cases", SUPPORT_CASE_KEY));
-    setParentNotes(await loadSupabaseRows<ParentEngagementRecord>("parent_engagement", PARENT_ENGAGEMENT_KEY));
-    setMessage(`Case manager data refreshed at ${nowLabel()}.`);
-  };
-
-  useEffect(() => {
-    refresh();
-  }, []);
-
-  const openCases = cases.filter((item) => item.status !== "resolved");
-  const yellowOrangeRed = openCases.filter((item) => item.support_level !== "green");
-
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-sky-100/75">Case Manager Portal</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Support specialists for youth and families.</h1>
-      <p className="mt-5 max-w-4xl text-base leading-8 text-white/84">Case managers are onsite to help identify barriers, coordinate resources, support families, respond to wellness concerns, and manage referrals when a concern goes beyond normal supervision.</p>
-
-      <div className="mt-6 grid gap-3 md:grid-cols-4">
-        {[
-          ["Open Cases", openCases.length],
-          ["Yellow / Orange / Red", yellowOrangeRed.length],
-          ["Parent Notes", parentNotes.length],
-          ["Current User", activeUser?.name || "Case Manager"],
-        ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-3xl font-black">{value}</div>
-            <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 grid gap-5 lg:grid-cols-2">
-        <SupportResponseFrameworkPanel />
-        <NeedToKnowPanel />
-      </div>
-
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-sky-100/75">Support Case Queue</div>
-            <h2 className="mt-2 text-2xl font-black">Route and follow up.</h2>
-          </div>
-          <button type="button" onClick={refresh} className="rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Refresh</button>
-        </div>
-        {message && <div className="mt-3 rounded-2xl border border-sky-200/20 bg-sky-300/10 p-3 text-xs font-bold text-sky-50">{message}</div>}
-        <div className="mt-5 grid gap-3">
-          {openCases.length === 0 && <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/72">No support cases saved yet. Requests from youth, parents, and supervisors will appear here.</div>}
-          {openCases.slice(0, 12).map((item) => (
-            <div key={item.id} className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-black uppercase tracking-[0.12em]">{item.support_level} • {item.concern_type}</div>
-                <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-black">Route: {item.routed_to}</div>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-white/82">{item.summary || "No summary entered."}</p>
-              <div className="mt-2 text-xs text-white/55">Submitted by: {item.submitted_by_role} • Status: {item.status} • {new Date(item.created_at).toLocaleString()}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent Strengths & Context</div>
-        <h2 className="mt-2 text-2xl font-black">Use family insight to support youth.</h2>
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {parentNotes.length === 0 && <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/72">No parent engagement notes saved yet.</div>}
-          {parentNotes.slice(0, 8).map((note) => (
-            <div key={note.id} className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <div className="font-black">{note.guardian_name || "Parent / Guardian"}</div>
-              <p className="mt-2 text-sm leading-6 text-white/82"><strong>Strength:</strong> {note.youth_strength || "Not provided"}</p>
-              <p className="mt-2 text-sm leading-6 text-white/82"><strong>Hope:</strong> {note.hopes_for_program || "Not provided"}</p>
-              {note.support_note && <p className="mt-2 text-xs leading-5 text-white/68"><strong>Support note:</strong> {note.support_note}</p>}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
-        <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">{translatePhrase(language, "Mission Control")}</button>
-        <button type="button" onClick={() => setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Parent Portal</button>
-      </div>
-    </Card>
-  );
-}
-
 const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
   {
     id: "seed-produce-greens",
@@ -3929,7 +3663,6 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
     unit: "bundle",
     inventory: 25,
     snap_eligible: true,
-    image_url: "/images/Grow Area.png",
     active: true,
     created_at: new Date().toISOString(),
   },
@@ -3942,7 +3675,6 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
     unit: "pack",
     inventory: 20,
     snap_eligible: true,
-    image_url: "/large (10).jpg",
     active: true,
     created_at: new Date().toISOString(),
   },
@@ -3955,7 +3687,6 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
     unit: "packet",
     inventory: 100,
     snap_eligible: true,
-    image_url: "/images/Seeds_Jubilee Gardens.png",
     active: true,
     created_at: new Date().toISOString(),
   },
@@ -3968,7 +3699,6 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
     unit: "space",
     inventory: 12,
     snap_eligible: false,
-    image_url: "/images/ConnectFoodEcosystem_withimages.png",
     active: true,
     created_at: new Date().toISOString(),
   },
@@ -3981,7 +3711,6 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
     unit: "item",
     inventory: 15,
     snap_eligible: false,
-    image_url: "/large (11).jpg",
     active: true,
     created_at: new Date().toISOString(),
   },
@@ -4149,7 +3878,6 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
       unit: newUnit || "item",
       inventory: Number(newInventory) || 0,
       snap_eligible: newSnap,
-      image_url: IMG.market,
       active: true,
       created_at: new Date().toISOString(),
       grownby_sales_enabled: newGrownByEnabled,
@@ -4268,7 +3996,10 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visibleProducts.map((product) => (
                 <div key={product.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10">
-                  <div className="relative h-36 bg-black/40"><img src={product.image_url || IMG.market} alt={product.name} className="h-full w-full object-cover opacity-95" onError={(e) => (e.currentTarget.src = IMG.backup)} /></div>
+                  <div className="border-b border-white/10 bg-black/35 p-4">
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/70">Marketplace Listing</div>
+                    <div className="mt-2 text-sm leading-6 text-white/70">Words-only launch card. Product images are intentionally hidden until verified images match each item.</div>
+                  </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between gap-3"><div className="text-lg font-black">{product.name}</div><div className="text-right font-black text-emerald-100">{money(product.price)}</div></div>
                     <div className="mt-1 text-xs uppercase tracking-[0.2em] text-white/55">{product.category} • per {product.unit}</div>
@@ -4587,6 +4318,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         ))}
       </div>
+      <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
@@ -4934,7 +4666,6 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
   const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
-  const supportCases = safeRead<SupportCaseRecord[]>(SUPPORT_CASE_KEY, []);
   const projectProgress = safeRead<string[]>("bff.launch.coolingCenterProgress", []);
   const today = todayISO();
   const present = attendance.filter((a) => a.date === today && a.status === "present").length;
@@ -4964,10 +4695,12 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
           ["Present Today", present],
           ["Assessments", assessments.length],
           ["Support Flags", supportFlags],
-          ["Support Cases", supportCases.length],
           ["Incident Logs", incidents.length],
           ["Feedback", feedback.length],
           ["Project Items Complete", projectProgress.length],
+          ["Portfolio Entries", youthPortfolioEntries.length],
+          ["Resume Ready", Math.min(youth.length, assessments.length)],
+          ["Career Pathways", coolingCenterTeams.length],
         ].map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
             <div className="text-3xl font-black">{value}</div>
@@ -4990,6 +4723,7 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <p className="text-sm text-white/80">Youth Workforce Launch: June 8, 2026 — 8:00 AM</p>
         <p className="mt-4 text-xl font-black">We Grow Green to Harvest Dreams.</p>
       </div>
+      <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
@@ -5017,10 +4751,6 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <p className="mt-3 text-sm leading-7 text-white/82">{text}</p>
           </div>
         ))}
-      </div>
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <SupportResponseFrameworkPanel />
-        <NeedToKnowPanel />
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
@@ -5097,7 +4827,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
         ))}
       </div>
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{translatePhrase(language, "Choose Role")}</button>
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
         <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
       </div>
