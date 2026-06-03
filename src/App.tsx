@@ -1213,52 +1213,120 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
   }
 };
 
+
+
+const commonWordTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
+  es: {
+    "Youth Workforce": "Fuerza Laboral Juvenil", "Youth": "Jóvenes", "Parent / Guardian": "Padre / Tutor", "Parent": "Padres", "Supervisor": "Supervisor", "Case Manager": "Administrador de Casos", "Mission Control": "Centro de Control", "Marketplace": "Mercado", "Portfolio": "Portafolio", "Resume": "Currículum", "Achievement": "Logro", "Achievements": "Logros", "Career Pathways": "Rutas Profesionales", "Support": "Apoyo", "Wellness": "Bienestar", "Attendance": "Asistencia", "Safety": "Seguridad", "PPE": "PPE", "Teamwork": "Trabajo en Equipo", "Communication": "Comunicación", "Problem Solving": "Resolución de Problemas", "Responsibility": "Responsabilidad", "Leadership": "Liderazgo", "Reflection": "Reflexión", "Check In": "Registrarse", "Check-in": "Registro", "Project": "Proyecto", "Team": "Equipo", "Skills": "Habilidades", "Badge": "Insignia", "Badges": "Insignias", "Growth": "Crecimiento", "Workforce": "Fuerza Laboral", "Development": "Desarrollo", "Family": "Familia", "Guardian": "Tutor", "Concern": "Preocupación", "Emergency": "Emergencia", "Referral": "Referencia", "Incident": "Incidente", "Report": "Informe", "Reports": "Informes", "Cooling Station": "Estación de Enfriamiento", "Challenge": "Reto", "Design": "Diseño", "Engineering": "Ingeniería", "Manufacturing": "Fabricación", "Logistics": "Logística", "Contractor": "Contratista", "Customer": "Cliente", "Grower": "Productor", "Partner": "Aliado", "Volunteer": "Voluntario", "Guest": "Visitante", "Launch": "Lanzamiento", "Today": "Hoy", "Week": "Semana"
+  },
+  tl: {
+    "Youth Workforce": "Youth Workforce", "Youth": "Kabataan", "Parent / Guardian": "Magulang / Guardian", "Parent": "Magulang", "Supervisor": "Supervisor", "Case Manager": "Case Manager", "Mission Control": "Mission Control", "Marketplace": "Merkado", "Portfolio": "Portfolio", "Resume": "Resume", "Achievement": "Nakamit", "Achievements": "Mga Nakamit", "Career Pathways": "Career Pathways", "Support": "Suporta", "Wellness": "Kalusugan", "Attendance": "Attendance", "Safety": "Kaligtasan", "PPE": "PPE", "Teamwork": "Pagtutulungan", "Communication": "Komunikasyon", "Problem Solving": "Paglutas ng Problema", "Responsibility": "Responsibilidad", "Leadership": "Pamumuno", "Reflection": "Reflection", "Check In": "Check In", "Check-in": "Check-in", "Project": "Proyekto", "Team": "Team", "Skills": "Skills", "Badge": "Badge", "Badges": "Badges", "Growth": "Paglago", "Workforce": "Workforce", "Development": "Development", "Family": "Pamilya", "Guardian": "Guardian", "Concern": "Concern", "Emergency": "Emergency", "Referral": "Referral", "Incident": "Incident", "Report": "Ulat", "Reports": "Mga Ulat", "Cooling Station": "Cooling Station", "Challenge": "Challenge", "Design": "Design", "Engineering": "Engineering", "Manufacturing": "Manufacturing", "Logistics": "Logistics", "Contractor": "Contractor", "Customer": "Customer", "Grower": "Grower", "Partner": "Partner", "Volunteer": "Volunteer", "Guest": "Bisita", "Launch": "Launch", "Today": "Ngayon", "Week": "Linggo"
+  },
+  it: {
+    "Youth Workforce": "Forza Lavoro Giovanile", "Youth": "Giovani", "Parent / Guardian": "Genitore / Tutore", "Parent": "Genitori", "Supervisor": "Supervisore", "Case Manager": "Case Manager", "Mission Control": "Centro di Controllo", "Marketplace": "Mercato", "Portfolio": "Portfolio", "Resume": "Curriculum", "Achievement": "Risultato", "Achievements": "Risultati", "Career Pathways": "Percorsi di Carriera", "Support": "Supporto", "Wellness": "Benessere", "Attendance": "Presenze", "Safety": "Sicurezza", "PPE": "DPI", "Teamwork": "Lavoro di Squadra", "Communication": "Comunicazione", "Problem Solving": "Risoluzione dei Problemi", "Responsibility": "Responsabilità", "Leadership": "Leadership", "Reflection": "Riflessione", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Progetto", "Team": "Team", "Skills": "Competenze", "Badge": "Badge", "Badges": "Badge", "Growth": "Crescita", "Workforce": "Forza Lavoro", "Development": "Sviluppo", "Family": "Famiglia", "Guardian": "Tutore", "Concern": "Preoccupazione", "Emergency": "Emergenza", "Referral": "Invio", "Incident": "Incidente", "Report": "Rapporto", "Reports": "Rapporti", "Cooling Station": "Stazione di Raffreddamento", "Challenge": "Sfida", "Design": "Design", "Engineering": "Ingegneria", "Manufacturing": "Produzione", "Logistics": "Logistica", "Contractor": "Appaltatore", "Customer": "Cliente", "Grower": "Coltivatore", "Partner": "Partner", "Volunteer": "Volontario", "Guest": "Ospite", "Launch": "Lancio", "Today": "Oggi", "Week": "Settimana"
+  },
+  he: {
+    "Youth Workforce": "כוח עבודה לנוער", "Youth": "נוער", "Parent / Guardian": "הורה / אפוטרופוס", "Parent": "הורה", "Supervisor": "מפקח", "Case Manager": "מנהל מקרה", "Mission Control": "מרכז בקרה", "Marketplace": "שוק", "Portfolio": "תיק עבודות", "Resume": "קורות חיים", "Achievement": "הישג", "Achievements": "הישגים", "Career Pathways": "מסלולי קריירה", "Support": "תמיכה", "Wellness": "רווחה", "Attendance": "נוכחות", "Safety": "בטיחות", "PPE": "ציוד מגן", "Teamwork": "עבודת צוות", "Communication": "תקשורת", "Problem Solving": "פתרון בעיות", "Responsibility": "אחריות", "Leadership": "מנהיגות", "Reflection": "רפלקציה", "Check In": "צ׳ק-אין", "Check-in": "צ׳ק-אין", "Project": "פרויקט", "Team": "צוות", "Skills": "כישורים", "Badge": "תג", "Badges": "תגים", "Growth": "צמיחה", "Workforce": "כוח עבודה", "Development": "פיתוח", "Family": "משפחה", "Guardian": "אפוטרופוס", "Concern": "דאגה", "Emergency": "חירום", "Referral": "הפניה", "Incident": "אירוע", "Report": "דוח", "Reports": "דוחות", "Cooling Station": "תחנת קירור", "Challenge": "אתגר", "Design": "עיצוב", "Engineering": "הנדסה", "Manufacturing": "ייצור", "Logistics": "לוגיסטיקה", "Contractor": "קבלן", "Customer": "לקוח", "Grower": "מגדל", "Partner": "שותף", "Volunteer": "מתנדב", "Guest": "אורח", "Launch": "השקה", "Today": "היום", "Week": "שבוע"
+  },
+  fr: {
+    "Youth Workforce": "Jeunesse au Travail", "Youth": "Jeunes", "Parent / Guardian": "Parent / Tuteur", "Parent": "Parent", "Supervisor": "Superviseur", "Case Manager": "Gestionnaire de cas", "Mission Control": "Centre de Mission", "Marketplace": "Marché", "Portfolio": "Portfolio", "Resume": "CV", "Achievement": "Réussite", "Achievements": "Réussites", "Career Pathways": "Parcours Professionnels", "Support": "Soutien", "Wellness": "Bien-être", "Attendance": "Présence", "Safety": "Sécurité", "PPE": "EPI", "Teamwork": "Travail d'Équipe", "Communication": "Communication", "Problem Solving": "Résolution de Problèmes", "Responsibility": "Responsabilité", "Leadership": "Leadership", "Reflection": "Réflexion", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Projet", "Team": "Équipe", "Skills": "Compétences", "Badge": "Badge", "Badges": "Badges", "Growth": "Croissance", "Workforce": "Main-d’œuvre", "Development": "Développement", "Family": "Famille", "Guardian": "Tuteur", "Concern": "Préoccupation", "Emergency": "Urgence", "Referral": "Orientation", "Incident": "Incident", "Report": "Rapport", "Reports": "Rapports", "Cooling Station": "Station de Refroidissement", "Challenge": "Défi", "Design": "Conception", "Engineering": "Ingénierie", "Manufacturing": "Fabrication", "Logistics": "Logistique", "Contractor": "Entrepreneur", "Customer": "Client", "Grower": "Producteur", "Partner": "Partenaire", "Volunteer": "Bénévole", "Guest": "Invité", "Launch": "Lancement", "Today": "Aujourd’hui", "Week": "Semaine"
+  }
+};
+
+function applyCommonTranslations(language: LanguageCode, phrase: string) {
+  if (language === "en") return phrase;
+  const replacements = commonWordTranslations[language] || {};
+  let output = phrase;
+  Object.entries(replacements)
+    .sort((a, b) => b[0].length - a[0].length)
+    .forEach(([english, translated]) => {
+      output = output.replaceAll(english, translated);
+    });
+  return output;
+}
+
 function translatePhrase(language: LanguageCode, raw: string) {
   if (language === "en") return raw;
   const key = raw.trim();
-  return (
+  const exact =
     launchIntegrationTranslations[language]?.[key] ||
     launchCriticalTranslations[language]?.[key] ||
     launchPhraseTranslations[language]?.[key] ||
     screenTranslations[language]?.[key] ||
-    languageText[language]?.[key] ||
-    key
-  );
+    languageText[language]?.[key];
+  if (exact) return exact;
+  return applyCommonTranslations(language, key);
 }
 
 function applyScreenTranslations(language: LanguageCode) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
   const skip = new Set(["SCRIPT", "STYLE", "INPUT", "TEXTAREA", "SELECT", "OPTION"]);
+  root.setAttribute("data-bff-language", language);
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
       const text = node.textContent || "";
-      if (!parent || skip.has(parent.tagName) || !text.trim() || !/[A-Za-z]/.test(text)) return NodeFilter.FILTER_REJECT;
+      if (!parent || skip.has(parent.tagName) || !text.trim()) return NodeFilter.FILTER_REJECT;
+      if (!/[A-Za-z]/.test(text) && !parent.getAttribute("data-bff-original-text")) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
+
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+
   nodes.forEach((node) => {
     const el = node.parentElement;
     if (!el) return;
     const current = node.textContent || "";
-    const original = el.getAttribute("data-bff-original-text") || current.trim();
-    el.setAttribute("data-bff-original-text", original);
+    const trimmed = current.trim();
+    if (!trimmed) return;
+    const original = el.getAttribute("data-bff-original-text") || trimmed;
+    if (!el.getAttribute("data-bff-original-text") && /[A-Za-z]/.test(trimmed)) {
+      el.setAttribute("data-bff-original-text", original);
+    }
     const translated = translatePhrase(language, original);
-    node.textContent = current.replace(current.trim(), translated);
+    node.textContent = current.replace(trimmed, translated);
   });
-  const placeholderMap: Record<string, string> = {
-    "Example: BFF-825435 or Supervisor Aide": translatePhrase(language, "Example: BFF-825435 or Supervisor Aide"),
-    "Enter name": translatePhrase(language, "Enter name"),
-  };
+
   root.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((node) => {
     const el = node as HTMLInputElement | HTMLTextAreaElement;
     const original = el.getAttribute("data-bff-original-placeholder") || el.getAttribute("placeholder") || "";
-    el.setAttribute("data-bff-original-placeholder", original);
-    el.setAttribute("placeholder", placeholderMap[original] || translatePhrase(language, original));
+    if (!el.getAttribute("data-bff-original-placeholder")) el.setAttribute("data-bff-original-placeholder", original);
+    el.setAttribute("placeholder", translatePhrase(language, original));
   });
+
+  root.querySelectorAll("[title]").forEach((node) => {
+    const el = node as HTMLElement;
+    const original = el.getAttribute("data-bff-original-title") || el.getAttribute("title") || "";
+    if (!el.getAttribute("data-bff-original-title")) el.setAttribute("data-bff-original-title", original);
+    el.setAttribute("title", translatePhrase(language, original));
+  });
+}
+
+function startTranslationObserver(language: LanguageCode) {
+  if (typeof document === "undefined") return () => undefined;
+  const root = document.querySelector("[data-bff-app-root]") || document.body;
+  let scheduled = false;
+  const run = () => {
+    scheduled = false;
+    applyScreenTranslations(language);
+  };
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    window.setTimeout(run, 0);
+  };
+  applyScreenTranslations(language);
+  const observer = new MutationObserver(schedule);
+  observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title"] });
+  const retryTimers = [50, 150, 350, 750].map((ms) => window.setTimeout(() => applyScreenTranslations(language), ms));
+  return () => {
+    observer.disconnect();
+    retryTimers.forEach((timer) => window.clearTimeout(timer));
+  };
 }
 
 
@@ -1570,8 +1638,7 @@ function App() {
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
-    const timer = window.setTimeout(() => applyScreenTranslations(language), 0);
-    return () => window.clearTimeout(timer);
+    return startTranslationObserver(language);
   }, [language, screen, message, activeUser]);
 
   const setScreen = (target: Screen) => {
