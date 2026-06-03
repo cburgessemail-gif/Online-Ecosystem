@@ -756,15 +756,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
 };
 
 function lt(language: LanguageCode, phrase: string) {
-  if (language === "en") return phrase;
-  return (
-    launchIntegrationTranslations[language]?.[phrase] ||
-    launchCriticalTranslations[language]?.[phrase] ||
-    launchPhraseTranslations[language]?.[phrase] ||
-    screenTranslations[language]?.[phrase] ||
-    languageText[language]?.[phrase] ||
-    applyCommonTranslations(language, phrase)
-  );
+  return launchPhraseTranslations[language]?.[phrase] || screenTranslations[language]?.[phrase] || phrase;
 }
 
 function t(language: LanguageCode, key: string) {
@@ -1314,25 +1306,34 @@ function applyScreenTranslations(language: LanguageCode) {
   });
 }
 
+let activeTranslationRun = 0;
+
 function startTranslationObserver(language: LanguageCode) {
   if (typeof document === "undefined") return () => undefined;
+  const runId = ++activeTranslationRun;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
   let scheduled = false;
+  let scheduledTimer: number | undefined;
   const run = () => {
     scheduled = false;
+    if (runId !== activeTranslationRun) return;
+    const currentLanguage = document.querySelector("[data-bff-app-root]")?.getAttribute("data-current-language");
+    if (currentLanguage && currentLanguage !== language) return;
     applyScreenTranslations(language);
   };
   const schedule = () => {
-    if (scheduled) return;
+    if (scheduled || runId !== activeTranslationRun) return;
     scheduled = true;
-    window.setTimeout(run, 0);
+    scheduledTimer = window.setTimeout(run, 0);
   };
-  applyScreenTranslations(language);
+  run();
   const observer = new MutationObserver(schedule);
   observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title"] });
-  const retryTimers = [50, 150, 350, 750].map((ms) => window.setTimeout(() => applyScreenTranslations(language), ms));
+  const retryTimers = [50, 150, 350, 750].map((ms) => window.setTimeout(run, ms));
   return () => {
+    activeTranslationRun++;
     observer.disconnect();
+    if (scheduledTimer !== undefined) window.clearTimeout(scheduledTimer);
     retryTimers.forEach((timer) => window.clearTimeout(timer));
   };
 }
@@ -1340,188 +1341,138 @@ function startTranslationObserver(language: LanguageCode) {
 
 const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
   es: {
-    "Start Guided Portal": "Iniciar portal guiado",
-    "New visitors can enter through the story, ecosystem overview, and guided experience.": "Los nuevos visitantes pueden entrar mediante la historia, la visión general del ecosistema y la experiencia guiada.",
-    "Enter Ecosystem": "Entrar al ecosistema",
-    "Browse public pathways without registering: guest story, events, marketplace, and opportunities.": "Explore rutas públicas sin registrarse: historia de visitante, eventos, mercado y oportunidades.",
-    "Sign In / Returning Participant": "Ingresar / Participante que regresa",
-    "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.": "Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.",
-    "Marketplace": "Mercado",
-    "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.": "Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.",
-    "Bronson Family Farm": "Bronson Family Farm",
-    "Choose Your Path": "Elija su ruta",
-    "Home": "Inicio",
-    "More tools": "Más herramientas",
-    "Switch Role": "Cambiar rol",
-    "Operations": "Operaciones",
-    "Forest Gate Portal": "Portal de Entrada del Bosque",
-    "Enter the Living Ecosystem": "Entrar al Ecosistema Vivo",
-    "Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.": "Bronson Family Farm conecta alimentos, familias, desarrollo laboral juvenil, productores, mercado y oportunidades comunitarias.",
-    "Launch Candidate 3.0": "Candidato de lanzamiento 3.0",
-    "New visitors enter the story. Returning users go straight to work.": "Los nuevos visitantes entran en la historia. Los usuarios que regresan van directamente al trabajo.",
-    "Public visitors": "Visitantes públicos",
-    "can explore the portal, story, events, and marketplace without registering.": "pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.",
-    "Nesco youth participants": "Los jóvenes participantes de Nesco",
-    "should already be in the system. They verify information instead of re-registering.": "ya deben estar en el sistema. Verifican la información en lugar de volver a registrarse.",
-    "No phone required:": "No se requiere teléfono:",
-    "youth can enter with Participant ID plus last name or supervisor lookup.": "los jóvenes pueden entrar con ID de participante más apellido o búsqueda por supervisor.",
-    "Daily Rhythm": "Ritmo Diario",
-    "Today → Progress → Tomorrow": "Hoy → Progreso → Mañana",
-    "Today:": "Hoy:",
-    "team, project, supervisor, location, start time.": "equipo, proyecto, supervisor, ubicación, hora de inicio.",
-    "Progress:": "Progreso:",
-    "attendance, safety, achievements, contribution.": "asistencia, seguridad, logros, contribución.",
-    "Tomorrow:": "Mañana:",
-    "assignment, PPE reminder, water bottle, next step.": "asignación, recordatorio de PPE, botella de agua, próximo paso.",
-    "Go to Workspace": "Ir al espacio de trabajo",
+    'Forest Gate Portal': 'Portal Puerta del Bosque',
+    'Enter the Living Ecosystem': 'Entrar al Ecosistema Vivo',
+    'Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.': 'Bronson Family Farm conecta alimentos, familias, desarrollo laboral juvenil, productores, mercado y oportunidades comunitarias.',
+    'Start Guided Portal': 'Iniciar portal guiado',
+    'New visitors can enter through the story, ecosystem overview, and guided experience.': 'Los nuevos visitantes pueden entrar por la historia, la vista general del ecosistema y la experiencia guiada.',
+    'Enter Ecosystem': 'Entrar al ecosistema',
+    'Browse public pathways without registering: guest story, events, marketplace, and opportunities.': 'Explore rutas públicas sin registrarse: historia para visitantes, eventos, mercado y oportunidades.',
+    'Sign In / Returning Participant': 'Ingresar / Participante que regresa',
+    'Continue as': 'Continuar como',
+    'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
+    'Marketplace': 'Mercado',
+    'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
+    'Launch Candidate 3.0': 'Candidato de lanzamiento 3.0',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'Daily Rhythm': 'Ritmo diario',
+    'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
+    'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
+    'Progress: attendance, safety, achievements, contribution.': 'Progreso: asistencia, seguridad, logros y contribución.',
+    'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
+    'Choose Role': 'Elegir rol',
+    'Go to Workspace': 'Ir a mi espacio',
     "Case Manager": "Administrador de Casos", "My Portfolio": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Resume and Portfolio Growth": "Crecimiento de Currículum y Portafolio", "Youth Support Response Framework": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
   },
   tl: {
-    "Start Guided Portal": "Simulan ang Guided Portal",
-    "New visitors can enter through the story, ecosystem overview, and guided experience.": "Ang bagong bisita ay maaaring pumasok sa pamamagitan ng kuwento, ecosystem overview, at guided experience.",
-    "Enter Ecosystem": "Pumasok sa Ecosystem",
-    "Browse public pathways without registering: guest story, events, marketplace, and opportunities.": "I-browse ang public pathways nang hindi nagre-register: guest story, events, marketplace, at opportunities.",
-    "Sign In / Returning Participant": "Sign In / Returning Participant",
-    "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.": "Ang registered youth, parents, supervisors, growers, at partners ay magpapatuloy mula sa assigned workspace.",
-    "Marketplace": "Marketplace",
-    "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.": "I-browse ang food, products, events, grower opportunities, at GrownBy-connected purchasing.",
-    "Bronson Family Farm": "Bronson Family Farm",
-    "Choose Your Path": "Piliin ang Iyong Landas",
-    "Home": "Home",
-    "More tools": "Higit pang tools",
-    "Switch Role": "Palitan ang Role",
-    "Operations": "Operasyon",
-    "Forest Gate Portal": "Forest Gate Portal",
-    "Enter the Living Ecosystem": "Pumasok sa Buhay na Ecosystem",
-    "Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.": "Pinag-uugnay ng Bronson Family Farm ang pagkain, pamilya, youth workforce development, growers, marketplace, at community opportunity.",
-    "Launch Candidate 3.0": "Launch Candidate 3.0",
-    "New visitors enter the story. Returning users go straight to work.": "Ang bagong bisita ay pumapasok sa kuwento. Ang returning users ay diretso sa trabaho.",
-    "Public visitors": "Public visitors",
-    "can explore the portal, story, events, and marketplace without registering.": "maaaring mag-explore sa portal, story, events, at marketplace nang hindi nagre-register.",
-    "Nesco youth participants": "Nesco youth participants",
-    "should already be in the system. They verify information instead of re-registering.": "dapat nasa system na. I-verify nila ang impormasyon sa halip na mag-register muli.",
-    "No phone required:": "Hindi kailangan ng phone:",
-    "youth can enter with Participant ID plus last name or supervisor lookup.": "makakapasok ang youth gamit ang Participant ID plus last name o supervisor lookup.",
-    "Daily Rhythm": "Daily Rhythm",
-    "Today → Progress → Tomorrow": "Ngayon → Progreso → Bukas",
-    "Today:": "Ngayon:",
-    "team, project, supervisor, location, start time.": "team, project, supervisor, lokasyon, oras ng simula.",
-    "Progress:": "Progreso:",
-    "attendance, safety, achievements, contribution.": "attendance, safety, achievements, kontribusyon.",
-    "Tomorrow:": "Bukas:",
-    "assignment, PPE reminder, water bottle, next step.": "assignment, PPE reminder, bote ng tubig, susunod na hakbang.",
-    "Go to Workspace": "Pumunta sa Workspace",
+    'Forest Gate Portal': 'Forest Gate Portal',
+    'Enter the Living Ecosystem': 'Pumasok sa Buhay na Ecosystem',
+    'Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.': 'Bronson Family Farm conecta alimentos, familias, desarrollo laboral juvenil, productores, mercado y oportunidades comunitarias.',
+    'Start Guided Portal': 'Simulan ang Guided Portal',
+    'New visitors can enter through the story, ecosystem overview, and guided experience.': 'Los nuevos visitantes pueden entrar por la historia, la vista general del ecosistema y la experiencia guiada.',
+    'Enter Ecosystem': 'Pumasok sa Ecosystem',
+    'Browse public pathways without registering: guest story, events, marketplace, and opportunities.': 'Explore rutas públicas sin registrarse: historia para visitantes, eventos, mercado y oportunidades.',
+    'Sign In / Returning Participant': 'Ingresar / Participante que regresa',
+    'Continue as': 'Continuar como',
+    'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
+    'Marketplace': 'Marketplace',
+    'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
+    'Launch Candidate 3.0': 'Launch Candidate 3.0',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'Daily Rhythm': 'Daily Rhythm',
+    'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
+    'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
+    'Progress: attendance, safety, achievements, contribution.': 'Progreso: asistencia, seguridad, logros y contribución.',
+    'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
+    'Choose Role': 'Pumili ng Role',
+    'Go to Workspace': 'Pumunta sa Workspace',
     "Case Manager": "Case Manager", "My Portfolio": "Aking Portfolio", "Resume Builder": "Resume Builder", "Resume and Portfolio Growth": "Paglago ng Resume at Portfolio", "Youth Support Response Framework": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
   },
   it: {
-    "Start Guided Portal": "Avvia portale guidato",
-    "New visitors can enter through the story, ecosystem overview, and guided experience.": "I nuovi visitatori possono entrare attraverso la storia, la panoramica dell’ecosistema e l’esperienza guidata.",
-    "Enter Ecosystem": "Entra nell’ecosistema",
-    "Browse public pathways without registering: guest story, events, marketplace, and opportunities.": "Esplora percorsi pubblici senza registrazione: storia ospite, eventi, mercato e opportunità.",
-    "Sign In / Returning Participant": "Accesso / Partecipante di ritorno",
-    "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.": "Giovani, genitori, supervisori, produttori e partner registrati continuano dal proprio spazio assegnato.",
-    "Marketplace": "Mercato",
-    "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.": "Esplora cibo, prodotti, eventi, opportunità per produttori e acquisti collegati a GrownBy.",
-    "Bronson Family Farm": "Bronson Family Farm",
-    "Choose Your Path": "Scegli il tuo percorso",
-    "Home": "Home",
-    "More tools": "Altri strumenti",
-    "Switch Role": "Cambia ruolo",
-    "Operations": "Operazioni",
-    "Forest Gate Portal": "Portale del Bosco",
-    "Enter the Living Ecosystem": "Entra nell’Ecosistema Vivente",
-    "Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.": "Bronson Family Farm collega cibo, famiglie, sviluppo del lavoro giovanile, produttori, mercato e opportunità comunitarie.",
-    "Launch Candidate 3.0": "Candidato al lancio 3.0",
-    "New visitors enter the story. Returning users go straight to work.": "I nuovi visitatori entrano nella storia. Gli utenti di ritorno vanno direttamente al lavoro.",
-    "Public visitors": "I visitatori pubblici",
-    "can explore the portal, story, events, and marketplace without registering.": "possono esplorare il portale, la storia, gli eventi e il mercato senza registrarsi.",
-    "Nesco youth participants": "I giovani partecipanti Nesco",
-    "should already be in the system. They verify information instead of re-registering.": "dovrebbero essere già nel sistema. Verificano le informazioni invece di registrarsi di nuovo.",
-    "No phone required:": "Telefono non richiesto:",
-    "youth can enter with Participant ID plus last name or supervisor lookup.": "i giovani possono entrare con ID partecipante e cognome o tramite ricerca del supervisore.",
-    "Daily Rhythm": "Ritmo quotidiano",
-    "Today → Progress → Tomorrow": "Oggi → Progresso → Domani",
-    "Today:": "Oggi:",
-    "team, project, supervisor, location, start time.": "team, progetto, supervisore, luogo, ora di inizio.",
-    "Progress:": "Progresso:",
-    "attendance, safety, achievements, contribution.": "presenza, sicurezza, risultati, contributo.",
-    "Tomorrow:": "Domani:",
-    "assignment, PPE reminder, water bottle, next step.": "assegnazione, promemoria DPI, bottiglia d’acqua, prossimo passo.",
-    "Go to Workspace": "Vai allo spazio di lavoro",
+    'Forest Gate Portal': 'Portale del Cancello Forestale',
+    'Enter the Living Ecosystem': 'Entra nell’ecosistema vivente',
+    'Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.': 'Bronson Family Farm conecta alimentos, familias, desarrollo laboral juvenil, productores, mercado y oportunidades comunitarias.',
+    'Start Guided Portal': 'Avvia portale guidato',
+    'New visitors can enter through the story, ecosystem overview, and guided experience.': 'Los nuevos visitantes pueden entrar por la historia, la vista general del ecosistema y la experiencia guiada.',
+    'Enter Ecosystem': 'Entra nell’ecosistema',
+    'Browse public pathways without registering: guest story, events, marketplace, and opportunities.': 'Explore rutas públicas sin registrarse: historia para visitantes, eventos, mercado y oportunidades.',
+    'Sign In / Returning Participant': 'Ingresar / Participante que regresa',
+    'Continue as': 'Continuar como',
+    'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
+    'Marketplace': 'Mercato',
+    'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
+    'Launch Candidate 3.0': 'Candidato di lancio 3.0',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'Daily Rhythm': 'Ritmo quotidiano',
+    'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
+    'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
+    'Progress: attendance, safety, achievements, contribution.': 'Progreso: asistencia, seguridad, logros y contribución.',
+    'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
+    'Choose Role': 'Scegli ruolo',
+    'Go to Workspace': 'Vai al mio spazio',
     "Case Manager": "Case Manager", "My Portfolio": "Il Mio Portfolio", "Resume Builder": "Creatore di Curriculum", "Resume and Portfolio Growth": "Crescita di Curriculum e Portfolio", "Youth Support Response Framework": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
   },
   he: {
-    "Start Guided Portal": "התחל שער מודרך",
-    "New visitors can enter through the story, ecosystem overview, and guided experience.": "מבקרים חדשים יכולים להיכנס דרך הסיפור, סקירת האקוסיסטם והחוויה המודרכת.",
-    "Enter Ecosystem": "כניסה לאקוסיסטם",
-    "Browse public pathways without registering: guest story, events, marketplace, and opportunities.": "עיון במסלולים ציבוריים ללא הרשמה: סיפור אורח, אירועים, שוק והזדמנויות.",
-    "Sign In / Returning Participant": "כניסה / משתתף חוזר",
-    "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.": "נוער, הורים, מפקחים, מגדלים ושותפים רשומים ממשיכים ממרחב העבודה שהוקצה להם.",
-    "Marketplace": "שוק",
-    "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.": "עיון במזון, מוצרים, אירועים, הזדמנויות למגדלים ורכישה דרך GrownBy.",
-    "Bronson Family Farm": "Bronson Family Farm",
-    "Choose Your Path": "בחר את המסלול שלך",
-    "Home": "בית",
-    "More tools": "כלים נוספים",
-    "Switch Role": "החלף תפקיד",
-    "Operations": "תפעול",
-    "Forest Gate Portal": "שער היער",
-    "Enter the Living Ecosystem": "כניסה לאקוסיסטם החי",
-    "Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.": "Bronson Family Farm מחברת מזון, משפחות, פיתוח כוח עבודה לנוער, מגדלים, שוק והזדמנויות קהילתיות.",
-    "Launch Candidate 3.0": "מועמד השקה 3.0",
-    "New visitors enter the story. Returning users go straight to work.": "מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ממשיכים ישר לעבודה.",
-    "Public visitors": "מבקרים ציבוריים",
-    "can explore the portal, story, events, and marketplace without registering.": "יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.",
-    "Nesco youth participants": "משתתפי הנוער של Nesco",
-    "should already be in the system. They verify information instead of re-registering.": "אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.",
-    "No phone required:": "אין צורך בטלפון:",
-    "youth can enter with Participant ID plus last name or supervisor lookup.": "נוער יכול להיכנס עם מזהה משתתף ושם משפחה או דרך חיפוש של מפקח.",
-    "Daily Rhythm": "קצב יומי",
-    "Today → Progress → Tomorrow": "היום → התקדמות → מחר",
-    "Today:": "היום:",
-    "team, project, supervisor, location, start time.": "צוות, פרויקט, מפקח, מיקום, שעת התחלה.",
-    "Progress:": "התקדמות:",
-    "attendance, safety, achievements, contribution.": "נוכחות, בטיחות, הישגים, תרומה.",
-    "Tomorrow:": "מחר:",
-    "assignment, PPE reminder, water bottle, next step.": "משימה, תזכורת לציוד מגן, בקבוק מים, הצעד הבא.",
-    "Go to Workspace": "למרחב העבודה",
+    'Forest Gate Portal': 'שער היער',
+    'Enter the Living Ecosystem': 'כניסה לאקוסיסטם החי',
+    'Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.': 'Bronson Family Farm מחברת מזון, משפחות, פיתוח כוח עבודה לנוער, מגדלים, שוק והזדמנות קהילתית.',
+    'Start Guided Portal': 'התחל שער מודרך',
+    'New visitors can enter through the story, ecosystem overview, and guided experience.': 'מבקרים חדשים יכולים להיכנס דרך הסיפור, סקירת האקוסיסטם והחוויה המודרכת.',
+    'Enter Ecosystem': 'כניסה לאקוסיסטם',
+    'Browse public pathways without registering: guest story, events, marketplace, and opportunities.': 'עיינו במסלולים ציבוריים ללא הרשמה: סיפור אורחים, אירועים, שוק והזדמנויות.',
+    'Sign In / Returning Participant': 'כניסה / משתתף חוזר',
+    'Continue as': 'המשך בתור',
+    'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'נוער, הורים, מדריכים, מגדלים ושותפים רשומים ממשיכים מהמרחב שהוקצה להם.',
+    'Marketplace': 'שוק',
+    'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'עיינו במזון, מוצרים, אירועים, הזדמנויות למגדלים ורכישה דרך GrownBy.',
+    'Launch Candidate 3.0': 'מועמד השקה 3.0',
+    'New visitors enter the story. Returning users go straight to work.': 'מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ניגשים ישר לעבודה.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'מבקרים ציבוריים יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'משתתפי הנוער של Nesco אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'אין צורך בטלפון: בני נוער יכולים להיכנס עם מזהה משתתף ושם משפחה או באמצעות חיפוש מדריך.',
+    'Daily Rhythm': 'קצב יומי',
+    'Today → Progress → Tomorrow': 'היום → התקדמות → מחר',
+    'Today: team, project, supervisor, location, start time.': 'היום: צוות, פרויקט, מדריך, מיקום ושעת התחלה.',
+    'Progress: attendance, safety, achievements, contribution.': 'התקדמות: נוכחות, בטיחות, הישגים ותרומה.',
+    'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'מחר: משימה, תזכורת ציוד מגן, בקבוק מים והצעד הבא.',
+    'Choose Role': 'בחר תפקיד',
+    'Go to Workspace': 'עבור למרחב העבודה',
     "Case Manager": "מנהל מקרה", "My Portfolio": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Resume and Portfolio Growth": "צמיחת קורות חיים ותיק עבודות", "Youth Support Response Framework": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
   },
   fr: {
-    "Start Guided Portal": "Démarrer le portail guidé",
-    "New visitors can enter through the story, ecosystem overview, and guided experience.": "Les nouveaux visiteurs peuvent entrer par l’histoire, l’aperçu de l’écosystème et l’expérience guidée.",
-    "Enter Ecosystem": "Entrer dans l’écosystème",
-    "Browse public pathways without registering: guest story, events, marketplace, and opportunities.": "Parcourez les parcours publics sans inscription : histoire des invités, événements, marché et opportunités.",
-    "Sign In / Returning Participant": "Connexion / Participant de retour",
-    "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.": "Les jeunes, parents, superviseurs, producteurs et partenaires inscrits continuent depuis leur espace attribué.",
-    "Marketplace": "Marché",
-    "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.": "Parcourez aliments, produits, événements, opportunités producteurs et achats connectés à GrownBy.",
-    "Bronson Family Farm": "Bronson Family Farm",
-    "Choose Your Path": "Choisissez votre parcours",
-    "Home": "Accueil",
-    "More tools": "Plus d’outils",
-    "Switch Role": "Changer de rôle",
-    "Operations": "Opérations",
-    "Forest Gate Portal": "Portail de la Forêt",
-    "Enter the Living Ecosystem": "Entrer dans l’Écosystème Vivant",
-    "Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.": "Bronson Family Farm relie l’alimentation, les familles, le développement de la main-d’œuvre jeunesse, les producteurs, le marché et les opportunités communautaires.",
-    "Launch Candidate 3.0": "Candidat au lancement 3.0",
-    "New visitors enter the story. Returning users go straight to work.": "Les nouveaux visiteurs entrent dans l’histoire. Les utilisateurs de retour vont directement au travail.",
-    "Public visitors": "Les visiteurs publics",
-    "can explore the portal, story, events, and marketplace without registering.": "peuvent explorer le portail, l’histoire, les événements et le marché sans inscription.",
-    "Nesco youth participants": "Les jeunes participants de Nesco",
-    "should already be in the system. They verify information instead of re-registering.": "devraient déjà être dans le système. Ils vérifient leurs informations au lieu de se réinscrire.",
-    "No phone required:": "Aucun téléphone requis :",
-    "youth can enter with Participant ID plus last name or supervisor lookup.": "les jeunes peuvent entrer avec leur identifiant de participant et leur nom de famille ou par recherche du superviseur.",
-    "Daily Rhythm": "Rythme quotidien",
-    "Today → Progress → Tomorrow": "Aujourd’hui → Progrès → Demain",
-    "Today:": "Aujourd’hui :",
-    "team, project, supervisor, location, start time.": "équipe, projet, superviseur, lieu, heure de début.",
-    "Progress:": "Progrès :",
-    "attendance, safety, achievements, contribution.": "présence, sécurité, réussites, contribution.",
-    "Tomorrow:": "Demain :",
-    "assignment, PPE reminder, water bottle, next step.": "affectation, rappel EPI, bouteille d’eau, prochaine étape.",
-    "Go to Workspace": "Aller à l’espace de travail",
+    'Forest Gate Portal': 'Portail de la Forêt',
+    'Enter the Living Ecosystem': 'Entrer dans l’écosystème vivant',
+    'Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.': 'Bronson Family Farm conecta alimentos, familias, desarrollo laboral juvenil, productores, mercado y oportunidades comunitarias.',
+    'Start Guided Portal': 'Démarrer le portail guidé',
+    'New visitors can enter through the story, ecosystem overview, and guided experience.': 'Los nuevos visitantes pueden entrar por la historia, la vista general del ecosistema y la experiencia guiada.',
+    'Enter Ecosystem': 'Entrer dans l’écosystème',
+    'Browse public pathways without registering: guest story, events, marketplace, and opportunities.': 'Explore rutas públicas sin registrarse: historia para visitantes, eventos, mercado y oportunidades.',
+    'Sign In / Returning Participant': 'Ingresar / Participante que regresa',
+    'Continue as': 'Continuar como',
+    'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
+    'Marketplace': 'Marché',
+    'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
+    'Launch Candidate 3.0': 'Candidat de lancement 3.0',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'Daily Rhythm': 'Rythme quotidien',
+    'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
+    'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
+    'Progress: attendance, safety, achievements, contribution.': 'Progreso: asistencia, seguridad, logros y contribución.',
+    'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
+    'Choose Role': 'Choisir un rôle',
+    'Go to Workspace': 'Aller à mon espace',
     "Case Manager": "Gestionnaire de cas", "My Portfolio": "Mon Portfolio", "Resume Builder": "Créateur de CV", "Resume and Portfolio Growth": "Développement du CV et du Portfolio", "Youth Support Response Framework": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
   }
 };
@@ -1810,12 +1761,16 @@ function App() {
     setLanguage(next);
     safeWrite(LANGUAGE_KEY, next);
     document.documentElement.lang = next;
-    document.documentElement.dir = languageDir(next);
+    document.documentElement.dir = "ltr";
   };
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.documentElement.dir = languageDir(language);
+    document.documentElement.dir = "ltr";
+    if (language === "en") {
+      activeTranslationRun++;
+      return () => undefined;
+    }
     return startTranslationObserver(language);
   }, [language, screen, message, activeUser]);
 
@@ -1967,7 +1922,7 @@ function Shell({
     `rounded-full border px-4 py-2 text-xs font-black transition ${screen === target ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`;
 
   return (
-    <div data-bff-app-root className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
+    <div data-bff-app-root data-current-language={language} key={language} className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir="ltr">
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
@@ -1977,8 +1932,8 @@ function Shell({
         <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/58 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
-              <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">{lt(language, "Bronson Family Farm")}</div>
-              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? lt(language, `${activeUser.role}`) : lt(language, "Choose Your Path")}</div>
+              <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
             </button>
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
@@ -1998,14 +1953,14 @@ function Shell({
           </div>
 
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>{lt(language, "Home")}</button>
-            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{lt(language, "My Workspace")}</button>
+            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
+            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
             {roleNav.map((item) => (
-              <button type="button" key={`${lt(language, item.label)}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
-                {lt(language, item.label)}
+              <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
+                {item.label}
               </button>
             ))}
-            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{lt(language, "Choose Role")}</button>}
+            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Choose Role")}</button>}
           </div>
 
           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
@@ -2013,22 +1968,22 @@ function Shell({
               {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
             </div>
             <div className="flex shrink-0 gap-2">
-              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">{lt(language, "Mission Control")}</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">Mission Control</button>}
               {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 font-black">{t(language, "signOut")}</button>}
             </div>
           </div>
 
           <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 text-xs text-white/75">
-            <summary className="cursor-pointer font-black text-emerald-50">{lt(language, "More tools")}</summary>
+            <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{lt(language, "Switch Role")}</button>
-              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>{lt(language, "Register")}</button>
-              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>{lt(language, "Events")}</button>
-              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>{lt(language, "Media")}</button>
-              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>{lt(language, "Feedback")}</button>
-              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>{lt(language, "Supervisor")}</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>{lt(language, "Case Manager")}</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>{lt(language, "Operations")}</button>}
+              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
+              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
+              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
+              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
+              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>Case Manager</button>}
+              {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
           </details>
         </div>
@@ -2166,13 +2121,13 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const tr = (phrase: string) => lt(language, phrase);
+  const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
   const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: "Start Guided Portal", subtitle: "New visitors can enter through the story, ecosystem overview, and guided experience.", screen: "demo" },
-    { title: "Enter Ecosystem", subtitle: "Browse public pathways without registering: guest story, events, marketplace, and opportunities.", screen: "guest" },
-    { title: "Sign In / Returning Participant", subtitle: activeUser ? `Continue as ${activeUser.name}.` : "Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.", screen: workspaceTarget },
-    { title: "Marketplace", subtitle: "Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.", screen: "marketplace" },
+    { title: TT("Start Guided Portal"), subtitle: TT("New visitors can enter through the story, ecosystem overview, and guided experience."), screen: "demo" },
+    { title: TT("Enter Ecosystem"), subtitle: TT("Browse public pathways without registering: guest story, events, marketplace, and opportunities."), screen: "guest" },
+    { title: TT("Sign In / Returning Participant"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace."), screen: workspaceTarget },
+    { title: TT("Marketplace"), subtitle: TT("Browse food, products, events, grower opportunities, and GrownBy-connected purchasing."), screen: "marketplace" },
   ];
 
   return (
@@ -2189,13 +2144,13 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
           <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                {tr("Forest Gate Portal")}
+                {TT("Forest Gate Portal")}
               </div>
               <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
-                {tr("Enter the Living Ecosystem")}
+                {TT("Enter the Living Ecosystem")}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
-                {tr("Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.")}
+                {TT("Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.")}
               </p>
             </div>
 
@@ -2207,8 +2162,8 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
                   onClick={() => setScreen(choice.screen)}
                   className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18"
                 >
-                  <div className="text-lg font-black leading-tight">{tr(choice.title)}</div>
-                  <div className="mt-2 text-sm leading-5 text-white/74">{tr(choice.subtitle)}</div>
+                  <div className="text-lg font-black leading-tight">{choice.title}</div>
+                  <div className="mt-2 text-sm leading-5 text-white/74">{choice.subtitle}</div>
                 </button>
               ))}
             </div>
@@ -2218,32 +2173,32 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
 
       <div className="grid gap-4">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{tr("Launch Candidate 3.0")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{tr("New visitors enter the story. Returning users go straight to work.")}</h2>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("New visitors enter the story. Returning users go straight to work.")}</h2>
           <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <b>{tr("Public visitors")}</b> {tr("can explore the portal, story, events, and marketplace without registering.")}
+              {TT("Public visitors can explore the portal, story, events, and marketplace without registering.")}
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <b>{tr("Nesco youth participants")}</b> {tr("should already be in the system. They verify information instead of re-registering.")}
+              {TT("Nesco youth participants should already be in the system. They verify information instead of re-registering.")}
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <b>{tr("No phone required:")}</b> {tr("youth can enter with Participant ID plus last name or supervisor lookup.")}
+              {TT("No phone required: youth can enter with Participant ID plus last name or supervisor lookup.")}
             </div>
           </div>
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{tr("Daily Rhythm")}</div>
-          <h3 className="mt-3 text-2xl font-black">{tr("Today → Progress → Tomorrow")}</h3>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
+          <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
           <div className="mt-4 grid gap-2 text-sm text-white/82">
-            <div className="rounded-xl bg-black/28 p-3"><b>{tr("Today:")}</b> {tr("team, project, supervisor, location, start time.")}</div>
-            <div className="rounded-xl bg-black/28 p-3"><b>{tr("Progress:")}</b> {tr("attendance, safety, achievements, contribution.")}</div>
-            <div className="rounded-xl bg-black/28 p-3"><b>{tr("Tomorrow:")}</b> {tr("assignment, PPE reminder, water bottle, next step.")}</div>
+            <div className="rounded-xl bg-black/28 p-3">{TT("Today: team, project, supervisor, location, start time.")}</div>
+            <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
+            <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{tr("Choose Role")}</button>
-            <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{tr("Go to Workspace")}</button>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{TT("Choose Role")}</button>
+            <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{TT("Go to Workspace")}</button>
           </div>
         </Card>
       </div>
