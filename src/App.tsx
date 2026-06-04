@@ -317,6 +317,8 @@ const OPERATIONS_INVENTORY_LOG_KEY = "bff.launch.operations.inventoryLog";
 const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
+const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
+const MEDIA_BUCKET = "bff-media";
 
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
@@ -538,6 +540,19 @@ type LaunchVideo = {
   embedTitle?: string;
   fallback: string;
   tags: string[];
+};
+
+type MediaAsset = {
+  id: string;
+  title: string;
+  category: string;
+  file_name: string;
+  file_url: string;
+  file_type: string;
+  file_size: number;
+  uploaded_by?: string;
+  storage_path?: string;
+  created_at: string;
 };
 
 const launchVideos: LaunchVideo[] = [
@@ -4675,6 +4690,87 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
     ["Youth Interviews", "Youth voice, what they learned, career connections, and reflections."],
     ["Supervisor Interviews", "Staff observations, workforce readiness, safety, and launch notes."],
   ];
+
+  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
+  const [uploadingCategory, setUploadingCategory] = useState<string>("");
+  const [mediaNotice, setMediaNotice] = useState<string>("");
+
+  const saveMediaAsset = async (asset: MediaAsset) => {
+    const next = [asset, ...mediaAssets];
+    setMediaAssets(next);
+    safeWrite(MEDIA_ASSETS_KEY, next);
+
+    if (supabase) {
+      try {
+        await supabase.from("media_assets").insert({
+          id: asset.id,
+          title: asset.title,
+          category: asset.category,
+          file_name: asset.file_name,
+          file_url: asset.file_url,
+          file_type: asset.file_type,
+          file_size: asset.file_size,
+          uploaded_by: asset.uploaded_by || "Launch Team",
+          storage_path: asset.storage_path || null,
+          created_at: asset.created_at,
+        });
+      } catch {
+        // Upload should still succeed even if the optional media_assets table is not created yet.
+      }
+    }
+  };
+
+  const handleMediaUpload = async (category: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const id = crypto.randomUUID ? crypto.randomUUID() : `media-${Date.now()}`;
+    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const folderName = category.replace(/[^a-zA-Z0-9._-]/g, "-").toLowerCase();
+    const storagePath = `${folderName}/${todayISO()}-${id}-${cleanName}`;
+
+    setUploadingCategory(category);
+    setMediaNotice(`Uploading ${file.name}...`);
+
+    try {
+      let fileUrl = URL.createObjectURL(file);
+
+      if (supabase) {
+        const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(storagePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+        if (error) throw error;
+
+        const { data } = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(storagePath);
+        fileUrl = data.publicUrl;
+      }
+
+      await saveMediaAsset({
+        id,
+        title: category,
+        category,
+        file_name: file.name,
+        file_url: fileUrl,
+        file_type: file.type || "unknown",
+        file_size: file.size,
+        uploaded_by: "Launch Team",
+        storage_path: storagePath,
+        created_at: new Date().toISOString(),
+      });
+
+      setMediaNotice(supabase ? `Uploaded to Supabase Storage: ${file.name}` : `Saved on this device for demo: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Upload failed.";
+      setMediaNotice(`Upload issue: ${message}. Confirm the Supabase Storage bucket '${MEDIA_BUCKET}' exists and allows uploads.`);
+    } finally {
+      setUploadingCategory("");
+      event.target.value = "";
+    }
+  };
+
+  const assetsFor = (category: string) => mediaAssets.filter((asset) => asset.category === category).slice(0, 3);
+
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media Center</div>
@@ -4682,15 +4778,45 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
         The Media Center organizes orientation videos, youth workforce activities, farm progress, interviews, testimonials, drone footage, and partner documentation. It keeps the June 8 project connected to real farm operations and impact reporting.
       </p>
+
+      <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50">
+        <strong>Supabase Storage Upload:</strong> Choose a file under the correct launch folder. Files upload to the <strong>{MEDIA_BUCKET}</strong> bucket when Supabase is connected; otherwise the entry is saved on this device for demo continuity.
+      </div>
+      {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
+
       <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {folders.map(([title, text]) => (
-          <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-2xl">🎥</div>
-            <h2 className="mt-3 text-xl font-black">{title}</h2>
-            <p className="mt-3 text-sm leading-6 text-white/78">{text}</p>
-            <div className="mt-4 rounded-full border border-white/10 bg-black/35 px-4 py-2 text-xs font-black text-white/70">Upload / archive placeholder</div>
-          </div>
-        ))}
+        {folders.map(([title, text]) => {
+          const folderAssets = assetsFor(title);
+          return (
+            <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+              <div className="text-2xl">🎥</div>
+              <h2 className="mt-3 text-xl font-black">{title}</h2>
+              <p className="mt-3 text-sm leading-6 text-white/78">{text}</p>
+
+              <label className="mt-4 block cursor-pointer rounded-full border border-emerald-200/30 bg-emerald-300 px-4 py-2 text-center text-xs font-black text-black shadow-lg shadow-emerald-950/25">
+                {uploadingCategory === title ? "Uploading..." : "Choose File / Upload"}
+                <input
+                  type="file"
+                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx"
+                  className="hidden"
+                  disabled={uploadingCategory === title}
+                  onChange={(event) => handleMediaUpload(title, event)}
+                />
+              </label>
+
+              {folderAssets.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  {folderAssets.map((asset) => (
+                    <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
+                      <div className="font-black text-white">{asset.file_name}</div>
+                      <div className="mt-1 text-white/55">{new Date(asset.created_at).toLocaleString()} • {(asset.file_size / 1024 / 1024).toFixed(2)} MB</div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
       <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
