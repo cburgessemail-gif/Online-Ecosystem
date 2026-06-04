@@ -2230,6 +2230,122 @@ function LaunchAuditDetailGrid({
 }
 
 
+type LargerPictureLayer = {
+  roleTitle: string;
+  identity: string;
+  today: string[];
+  largerPicture: string;
+  route: string[];
+};
+
+const largerPictureLayers: Record<string, LargerPictureLayer> = {
+  "Guest Pathway": {
+    roleTitle: "Guest Journey",
+    identity: "You are exploring the Bronson Family Farm ecosystem as a guest.",
+    today: ["Learn the farm story", "See how the food ecosystem connects", "Discover events, volunteer opportunities, marketplace access, and partnership pathways"],
+    largerPicture: "In the larger picture, guests often become volunteers, customers, growers, advocates, supporters, or partners who help the ecosystem grow.",
+    route: ["Guest", "Farm Story", "Event / Volunteer / Partner", "Marketplace", "Community Impact"],
+  },
+  "Youth Workforce Pathway": {
+    roleTitle: "Youth Workforce Journey",
+    identity: "You are a paid contributor to the ecosystem.",
+    today: ["Earn money", "Build workforce skills", "Solve a real business challenge", "Support customers and farm operations", "Create evidence for your portfolio and resume"],
+    largerPicture: "In the larger picture, your work strengthens local food systems, workforce development, economic opportunity, and community health.",
+    route: ["Youth Workforce", "Today's Project", "Production Team", "Skills + Earnings", "Portfolio", "Community Impact"],
+  },
+  "Parent / Guardian Portal": {
+    roleTitle: "Parent / Guardian Journey",
+    identity: "You are supporting a young person as they participate in the ecosystem.",
+    today: ["See progress", "Encourage attendance and readiness", "Celebrate achievement", "Understand parent-safe updates"],
+    largerPicture: "In the larger picture, families help build the next generation of workers, leaders, entrepreneurs, and community members.",
+    route: ["Parent / Guardian", "Youth Progress", "Encouragement", "Achievement", "Future Opportunity"],
+  },
+  "Grower Pathway": {
+    roleTitle: "Grower Journey",
+    identity: "You help produce food and opportunity.",
+    today: ["Connect crop planning to market demand", "Identify resource needs", "Use training and tools", "Move products toward customers"],
+    largerPicture: "In the larger picture, growers strengthen food security, local economies, healthy food access, and regional food movement.",
+    route: ["Grower", "Crop Plan", "Resources + Training", "Marketplace", "Families / Schools / Businesses"],
+  },
+  "Marketplace Operations Center": {
+    roleTitle: "Marketplace Journey",
+    identity: "You help move food through the ecosystem.",
+    today: ["Browse or manage products", "Support local growers", "Connect SNAP-aware food access", "Turn orders into harvest, packing, pickup, and reporting"],
+    largerPicture: "In the larger picture, food moves to families, schools, organizations, businesses, and community tables. Food moves, not the farmer.",
+    route: ["Marketplace", "Products", "Orders", "Harvest / Packing", "Pickup", "Food Access"],
+  },
+  "Partner Pathway": {
+    roleTitle: "Partner Journey",
+    identity: "You help create opportunity across the ecosystem.",
+    today: ["Offer resources", "Share expertise", "Support youth workforce development", "Connect programs, funding, equipment, or volunteers"],
+    largerPicture: "In the larger picture, partners connect people, resources, education, infrastructure, and opportunity so the ecosystem can serve more families and growers.",
+    route: ["Partner", "Resource / Expertise", "Project Support", "Measured Impact", "Regional Growth"],
+  },
+  "Support the Ecosystem": {
+    roleTitle: "Supporter Journey",
+    identity: "You help strengthen the ecosystem through resources, time, encouragement, mentorship, or in-kind support.",
+    today: ["Offer support", "Volunteer", "Mentor", "Contribute materials or funding", "Help youth, growers, food access, and infrastructure"],
+    largerPicture: "In the larger picture, supporters help turn vision into practical capacity and community benefit.",
+    route: ["Supporter", "Contribution", "Youth / Growers / Infrastructure", "Food Access", "Community Impact"],
+  },
+  "Value-Added Producer Pathway": {
+    roleTitle: "Value-Added Producer Journey",
+    identity: "You transform harvests, seeds, herbs, honey, flowers, and ideas into higher-value products.",
+    today: ["Develop products", "Package and price offerings", "Prepare for marketplace participation", "Build small-business opportunity"],
+    largerPicture: "In the larger picture, value-added production increases farm sustainability, entrepreneurship, local sales, and economic opportunity.",
+    route: ["Value-Added Producer", "Product Idea", "Packaging + Pricing", "Marketplace", "Economic Opportunity"],
+  },
+};
+
+function LargerPictureCard({ layerKey }: { layerKey: string }) {
+  const layer = largerPictureLayers[layerKey];
+  if (!layer) return null;
+
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/12 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">My Role in the Larger Picture</div>
+      <h2 className="mt-2 text-2xl font-black">{layer.roleTitle}</h2>
+      <p className="mt-3 text-sm leading-7 text-white/84">{layer.identity}</p>
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_.9fr]">
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">Today I</div>
+          <div className="mt-3 grid gap-2">
+            {layer.today.map((item) => (
+              <div key={item} className="rounded-2xl bg-white/10 p-3 text-sm font-bold text-white/84">✓ {item}</div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">Where Am I in the Larger Picture?</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-black">
+            {layer.route.map((stop, index) => (
+              <React.Fragment key={stop}>
+                <span className={index === 0 ? "rounded-full bg-emerald-300 px-3 py-2 text-black" : "rounded-full border border-white/10 bg-white/10 px-3 py-2 text-white"}>
+                  {index === 0 ? "📍 " : ""}{stop}
+                </span>
+                {index < layer.route.length - 1 && <span className="text-amber-100/70">→</span>}
+              </React.Fragment>
+            ))}
+          </div>
+          <p className="mt-4 text-sm leading-7 text-white/82">{layer.largerPicture}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/*
+SCIENTIST FEEDBACK INTEGRATION
+
+Users understood that the ecosystem was rich and promising, but needed help
+understanding where they were within it. The ecosystem image functions as a map.
+The pathway functions as the journey. This layer connects the two by explaining:
+1. why the user is here,
+2. what they do today,
+3. how their action connects to the larger picture, and
+4. what route they are traveling through the ecosystem.
+*/
+
 function JourneyCompletionCard({
   title,
   learned,
@@ -2250,8 +2366,9 @@ function JourneyCompletionCard({
 
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Journey Completion & Conversion</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Your Journey Continues</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
+      <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">You entered a pathway, made a contribution, and identified what can happen next. The ecosystem continues because people like you participate in the larger picture.</p>
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <h3 className="text-xl font-black">What You Learned</h3>
@@ -2637,6 +2754,8 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
         <p className="mt-5 text-base leading-8 text-white/86">
           Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
         </p>
+
+        <LargerPictureCard layerKey="Youth Workforce Pathway" />
 
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
@@ -3723,6 +3842,8 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         Parents see attendance, accomplishments, badges, goals, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
       </p>
 
+      <LargerPictureCard layerKey="Parent / Guardian Portal" />
+
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {[
           ["Present", String(presentCount)],
@@ -4103,6 +4224,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">GrownBy + Direct Sales.</h1>
         <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
+        <LargerPictureCard layerKey="Marketplace Operations Center" />
         <div className="mt-5 grid gap-2">
           {(activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Board / Funder"
             ? [
@@ -5248,6 +5370,7 @@ function SimplePathway({
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
           <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
+          <LargerPictureCard layerKey={title} />
           <div className="mt-8 flex flex-wrap gap-3">
             {extra}
             <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
