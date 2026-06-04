@@ -312,6 +312,8 @@ const FEEDBACK_KEY = "bff.launch.feedback";
 const MARKET_PRODUCTS_KEY = "bff.launch.market.products";
 const MARKET_ORDERS_KEY = "bff.launch.market.orders";
 const MARKET_ORDER_ITEMS_KEY = "bff.launch.market.orderItems";
+const OPERATIONS_INVENTORY_KEY = "bff.launch.operations.inventory";
+const OPERATIONS_INVENTORY_LOG_KEY = "bff.launch.operations.inventoryLog";
 const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
@@ -1556,6 +1558,49 @@ type CompletionRecord = {
   pathway: string;
   completed_at: string;
 };
+
+
+type OperationsInventoryItem = {
+  id: string;
+  name: string;
+  category: "Tools" | "Supplies" | "Technology" | "Safety" | "Water" | "Office" | "Cleaning";
+  total: number;
+  available: number;
+  location: string;
+  assigned_to?: string;
+  status: "Ready" | "Checked Out" | "Low" | "Needs Replacement" | "Missing";
+  notes?: string;
+  last_updated: string;
+};
+
+type OperationsInventoryLog = {
+  id: string;
+  item_id: string;
+  item_name: string;
+  action: "Checked Out" | "Returned" | "Count Adjusted" | "Needs Replacement" | "Marked Missing";
+  quantity: number;
+  person?: string;
+  notes?: string;
+  created_at: string;
+};
+
+const defaultOperationsInventory: OperationsInventoryItem[] = [
+  { id: "tool-shovels", name: "Shovels", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Count before youth arrive and again at end of day.", last_updated: new Date().toISOString() },
+  { id: "tool-rakes", name: "Rakes", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Separate garden rakes from leaf rakes if needed.", last_updated: new Date().toISOString() },
+  { id: "water-pitchers", name: "Water pitchers", category: "Water", total: 8, available: 8, location: "Water station / shade station", status: "Ready", notes: "Use for hydration station and heat-safety support.", last_updated: new Date().toISOString() },
+  { id: "office-markers", name: "Markers", category: "Office", total: 24, available: 24, location: "Supervisor supply bin", status: "Ready", notes: "For name tags, team signs, fan design work, and daily boards.", last_updated: new Date().toISOString() },
+  { id: "office-scissors", name: "Scissors", category: "Office", total: 10, available: 10, location: "Supervisor supply bin", status: "Ready", notes: "Use for paper, cardboard, labels, and project preparation.", last_updated: new Date().toISOString() },
+  { id: "office-staplers", name: "Staplers", category: "Office", total: 4, available: 4, location: "Supervisor supply bin", status: "Ready", notes: "Include extra staples in same bin.", last_updated: new Date().toISOString() },
+  { id: "clean-garbage-bags", name: "Garbage bags", category: "Cleaning", total: 100, available: 100, location: "Cleanup / sanitation bin", status: "Ready", notes: "Track when boxes are opened so replacement can be purchased early.", last_updated: new Date().toISOString() },
+  { id: "tech-timeclock-laptops", name: "Laptops for TimeClock Wizard sign-in", category: "Technology", total: 3, available: 3, location: "Check-in table / supervisor control", status: "Ready", notes: "Charge nightly. Use for TimeClock Wizard sign-in and backup attendance support.", last_updated: new Date().toISOString() },
+];
+
+function inventoryStatus(total: number, available: number): OperationsInventoryItem["status"] {
+  if (available <= 0) return "Missing";
+  if (available < total) return "Checked Out";
+  if (available <= Math.max(1, Math.floor(total * 0.25))) return "Low";
+  return "Ready";
+}
 
 function screenLabel(screen: Screen) {
   const labels: Record<Screen, string> = {
@@ -5057,6 +5102,186 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+function OperationsInventoryPanel() {
+  const [inventory, setInventory] = useState<OperationsInventoryItem[]>(() => {
+    const stored = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, []);
+    return stored.length ? stored : defaultOperationsInventory;
+  });
+  const [logs, setLogs] = useState<OperationsInventoryLog[]>(() => safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []));
+  const [selectedId, setSelectedId] = useState(inventory[0]?.id || "");
+  const [person, setPerson] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState<OperationsInventoryItem["category"]>("Supplies");
+  const [newTotal, setNewTotal] = useState(1);
+  const [newLocation, setNewLocation] = useState("Operations bin");
+
+  const saveInventory = (next: OperationsInventoryItem[]) => {
+    setInventory(next);
+    safeWrite(OPERATIONS_INVENTORY_KEY, next);
+  };
+
+  const saveLogs = (next: OperationsInventoryLog[]) => {
+    setLogs(next);
+    safeWrite(OPERATIONS_INVENTORY_LOG_KEY, next.slice(0, 100));
+  };
+
+  const selectedItem = inventory.find((item) => item.id === selectedId) || inventory[0];
+  const lowItems = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing");
+  const checkedOutItems = inventory.filter((item) => item.available < item.total);
+
+  function updateItem(action: OperationsInventoryLog["action"]) {
+    if (!selectedItem) return;
+    const count = Math.max(1, Number(quantity) || 1);
+    const nextInventory = inventory.map((item) => {
+      if (item.id !== selectedItem.id) return item;
+      let available = item.available;
+      if (action === "Checked Out") available = Math.max(0, item.available - count);
+      if (action === "Returned") available = Math.min(item.total, item.available + count);
+      if (action === "Count Adjusted") available = Math.max(0, Math.min(item.total, count));
+      const nextStatus = action === "Needs Replacement" ? "Needs Replacement" : action === "Marked Missing" ? "Missing" : inventoryStatus(item.total, available);
+      return { ...item, available, assigned_to: person || item.assigned_to, status: nextStatus, notes: notes || item.notes, last_updated: new Date().toISOString() };
+    });
+    const log: OperationsInventoryLog = {
+      id: uuid(),
+      item_id: selectedItem.id,
+      item_name: selectedItem.name,
+      action,
+      quantity: count,
+      person,
+      notes,
+      created_at: new Date().toISOString(),
+    };
+    saveInventory(nextInventory);
+    saveLogs([log, ...logs]);
+    setNotes("");
+  }
+
+  function addInventoryItem() {
+    const name = newName.trim();
+    if (!name) return;
+    const total = Math.max(1, Number(newTotal) || 1);
+    const item: OperationsInventoryItem = {
+      id: `ops-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`,
+      name,
+      category: newCategory,
+      total,
+      available: total,
+      location: newLocation || "Operations bin",
+      status: "Ready",
+      notes: "Added during launch operations.",
+      last_updated: new Date().toISOString(),
+    };
+    const next = [...inventory, item];
+    saveInventory(next);
+    setSelectedId(item.id);
+    setNewName("");
+    setNewTotal(1);
+  }
+
+  return (
+    <div className="mt-8 rounded-[2rem] border border-amber-200/20 bg-amber-50/10 p-5 shadow-2xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">Operations Inventory</div>
+          <h2 className="mt-2 text-3xl font-black">Tools, supplies, water, and TimeClock Wizard equipment.</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">
+            Use this to track what is ready, what is checked out, what is missing, and what must be replaced before youth arrive. This is especially important for shovels, rakes, water pitchers, markers, scissors, staplers, garbage bags, and laptops used for TimeClock Wizard sign-in.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-white/82">
+          <div><strong>{inventory.length}</strong> item groups tracked</div>
+          <div><strong>{checkedOutItems.length}</strong> checked out / not fully available</div>
+          <div><strong>{lowItems.length}</strong> low, missing, or replacement flags</div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 xl:grid-cols-[1.3fr_0.9fr]">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+          <div className="grid grid-cols-6 gap-2 border-b border-white/10 bg-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-white/70">
+            <div className="col-span-2">Item</div>
+            <div>Category</div>
+            <div>Ready</div>
+            <div>Location</div>
+            <div>Status</div>
+          </div>
+          <div className="max-h-[28rem] overflow-auto">
+            {inventory.map((item) => (
+              <button key={item.id} type="button" onClick={() => setSelectedId(item.id)} className={`grid w-full grid-cols-6 gap-2 px-4 py-3 text-left text-sm transition ${selectedId === item.id ? "bg-emerald-300/20" : "hover:bg-white/10"}`}>
+                <div className="col-span-2 font-black">{item.name}<div className="text-xs font-normal text-white/60">{item.notes}</div></div>
+                <div>{item.category}</div>
+                <div>{item.available} / {item.total}</div>
+                <div className="text-white/75">{item.location}</div>
+                <div><span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-black">{item.status}</span></div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
+          <h3 className="text-2xl font-black">Check out / return item</h3>
+          <label className="mt-4 block text-xs font-black uppercase tracking-[0.2em] text-white/60">Inventory Item</label>
+          <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white">
+            {inventory.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          </select>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <input value={person} onChange={(event) => setPerson(event.target.value)} placeholder="Person / team responsible" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white" />
+          </div>
+          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Notes: condition, missing pieces, where it went, who has it..." className="mt-3 min-h-[5.5rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" onClick={() => updateItem("Checked Out")} className="rounded-full bg-amber-200 px-5 py-3 text-sm font-black text-black">Check Out</button>
+            <button type="button" onClick={() => updateItem("Returned")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Return</button>
+            <button type="button" onClick={() => updateItem("Count Adjusted")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Set Available Count</button>
+            <button type="button" onClick={() => updateItem("Needs Replacement")} className="rounded-full border border-red-200/30 bg-red-500/15 px-5 py-3 text-sm font-black">Needs Replacement</button>
+            <button type="button" onClick={() => updateItem("Marked Missing")} className="rounded-full border border-red-200/30 bg-red-500/15 px-5 py-3 text-sm font-black">Missing</button>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/10 p-4">
+            <h4 className="font-black">Add item</h4>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="Item name" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+              <select value={newCategory} onChange={(event) => setNewCategory(event.target.value as OperationsInventoryItem["category"])} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white">
+                {(["Tools", "Supplies", "Technology", "Safety", "Water", "Office", "Cleaning"] as OperationsInventoryItem["category"][]).map((category) => <option key={category} value={category}>{category}</option>)}
+              </select>
+              <input type="number" min={1} value={newTotal} onChange={(event) => setNewTotal(Number(event.target.value))} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white" />
+              <input value={newLocation} onChange={(event) => setNewLocation(event.target.value)} placeholder="Location" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            </div>
+            <button type="button" onClick={addInventoryItem} className="mt-3 rounded-full bg-white px-5 py-3 text-sm font-black text-black">Add to Inventory</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <h3 className="text-xl font-black">Launch-day checklist</h3>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-white/82">
+            <li>• Count tools before youth arrive.</li>
+            <li>• Assign laptops to the check-in table for TimeClock Wizard.</li>
+            <li>• Confirm water pitchers and hydration station are ready.</li>
+            <li>• Put markers, scissors, staplers, and garbage bags in labeled bins.</li>
+            <li>• Count everything again before youth leave the site.</li>
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <h3 className="text-xl font-black">Recent inventory activity</h3>
+          <div className="mt-3 max-h-48 space-y-2 overflow-auto text-sm text-white/78">
+            {logs.length === 0 ? <p>No inventory activity recorded yet.</p> : logs.slice(0, 8).map((log) => (
+              <div key={log.id} className="rounded-xl bg-white/10 p-3">
+                <strong>{log.action}</strong> — {log.quantity} {log.item_name}{log.person ? ` by ${log.person}` : ""}
+                <div className="text-xs text-white/55">{new Date(log.created_at).toLocaleString()}</div>
+                {log.notes && <div className="mt-1 text-xs text-white/70">{log.notes}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <Card>
@@ -5075,6 +5300,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         ))}
       </div>
+      <OperationsInventoryPanel />
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open June 8 Project</button>
