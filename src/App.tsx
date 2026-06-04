@@ -1570,6 +1570,9 @@ type OperationsInventoryItem = {
   assigned_to?: string;
   status: "Ready" | "Checked Out" | "Low" | "Needs Replacement" | "Missing";
   notes?: string;
+  managed_by: "Supervisor / Staff Lead" | "Administrator";
+  youth_team_role?: "Logistics & Inventory Team";
+  supervisor_approval_required: boolean;
   last_updated: string;
 };
 
@@ -1581,18 +1584,21 @@ type OperationsInventoryLog = {
   quantity: number;
   person?: string;
   notes?: string;
+  approved_by?: string;
+  youth_lead?: string;
+  team?: string;
   created_at: string;
 };
 
 const defaultOperationsInventory: OperationsInventoryItem[] = [
-  { id: "tool-shovels", name: "Shovels", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Count before youth arrive and again at end of day.", last_updated: new Date().toISOString() },
-  { id: "tool-rakes", name: "Rakes", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Separate garden rakes from leaf rakes if needed.", last_updated: new Date().toISOString() },
-  { id: "water-pitchers", name: "Water pitchers", category: "Water", total: 8, available: 8, location: "Water station / shade station", status: "Ready", notes: "Use for hydration station and heat-safety support.", last_updated: new Date().toISOString() },
-  { id: "office-markers", name: "Markers", category: "Office", total: 24, available: 24, location: "Supervisor supply bin", status: "Ready", notes: "For name tags, team signs, fan design work, and daily boards.", last_updated: new Date().toISOString() },
-  { id: "office-scissors", name: "Scissors", category: "Office", total: 10, available: 10, location: "Supervisor supply bin", status: "Ready", notes: "Use for paper, cardboard, labels, and project preparation.", last_updated: new Date().toISOString() },
-  { id: "office-staplers", name: "Staplers", category: "Office", total: 4, available: 4, location: "Supervisor supply bin", status: "Ready", notes: "Include extra staples in same bin.", last_updated: new Date().toISOString() },
-  { id: "clean-garbage-bags", name: "Garbage bags", category: "Cleaning", total: 100, available: 100, location: "Cleanup / sanitation bin", status: "Ready", notes: "Track when boxes are opened so replacement can be purchased early.", last_updated: new Date().toISOString() },
-  { id: "tech-timeclock-laptops", name: "Laptops for TimeClock Wizard sign-in", category: "Technology", total: 3, available: 3, location: "Check-in table / supervisor control", status: "Ready", notes: "Charge nightly. Use for TimeClock Wizard sign-in and backup attendance support.", last_updated: new Date().toISOString() },
+  { id: "tool-shovels", name: "Shovels", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Count before youth arrive and again at end of day.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "tool-rakes", name: "Rakes", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Separate garden rakes from leaf rakes if needed.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "water-pitchers", name: "Water pitchers", category: "Water", total: 8, available: 8, location: "Water station / shade station", status: "Ready", notes: "Use for hydration station and heat-safety support.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "office-markers", name: "Markers", category: "Office", total: 24, available: 24, location: "Supervisor supply bin", status: "Ready", notes: "For name tags, team signs, fan design work, and daily boards.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "office-scissors", name: "Scissors", category: "Office", total: 10, available: 10, location: "Supervisor supply bin", status: "Ready", notes: "Use for paper, cardboard, labels, and project preparation.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "office-staplers", name: "Staplers", category: "Office", total: 4, available: 4, location: "Supervisor supply bin", status: "Ready", notes: "Include extra staples in same bin.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "clean-garbage-bags", name: "Garbage bags", category: "Cleaning", total: 100, available: 100, location: "Cleanup / sanitation bin", status: "Ready", notes: "Track when boxes are opened so replacement can be purchased early.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "tech-timeclock-laptops", name: "Laptops for TimeClock Wizard sign-in", category: "Technology", total: 3, available: 3, location: "Check-in table / supervisor control", status: "Ready", notes: "Charge nightly. Use for TimeClock Wizard sign-in and backup attendance support.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
 ];
 
 function inventoryStatus(total: number, available: number): OperationsInventoryItem["status"] {
@@ -5111,6 +5117,9 @@ function OperationsInventoryPanel() {
   const [logs, setLogs] = useState<OperationsInventoryLog[]>(() => safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []));
   const [selectedId, setSelectedId] = useState(inventory[0]?.id || "");
   const [person, setPerson] = useState("");
+  const [youthLead, setYouthLead] = useState("");
+  const [approver, setApprover] = useState("");
+  const [team, setTeam] = useState("Logistics & Inventory Team");
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
   const [newName, setNewName] = useState("");
@@ -5142,7 +5151,7 @@ function OperationsInventoryPanel() {
       if (action === "Returned") available = Math.min(item.total, item.available + count);
       if (action === "Count Adjusted") available = Math.max(0, Math.min(item.total, count));
       const nextStatus = action === "Needs Replacement" ? "Needs Replacement" : action === "Marked Missing" ? "Missing" : inventoryStatus(item.total, available);
-      return { ...item, available, assigned_to: person || item.assigned_to, status: nextStatus, notes: notes || item.notes, last_updated: new Date().toISOString() };
+      return { ...item, available, assigned_to: person || item.assigned_to, status: nextStatus, notes: notes || item.notes, managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() };
     });
     const log: OperationsInventoryLog = {
       id: uuid(),
@@ -5151,6 +5160,9 @@ function OperationsInventoryPanel() {
       action,
       quantity: count,
       person,
+      youth_lead: youthLead,
+      approved_by: approver,
+      team,
       notes,
       created_at: new Date().toISOString(),
     };
@@ -5172,6 +5184,9 @@ function OperationsInventoryPanel() {
       location: newLocation || "Operations bin",
       status: "Ready",
       notes: "Added during launch operations.",
+      managed_by: "Supervisor / Staff Lead",
+      youth_team_role: "Logistics & Inventory Team",
+      supervisor_approval_required: true,
       last_updated: new Date().toISOString(),
     };
     const next = [...inventory, item];
@@ -5186,9 +5201,9 @@ function OperationsInventoryPanel() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">Operations Inventory</div>
-          <h2 className="mt-2 text-3xl font-black">Tools, supplies, water, and TimeClock Wizard equipment.</h2>
+          <h2 className="mt-2 text-3xl font-black">Inventory & Logistics: tools, supplies, water, and TimeClock Wizard equipment.</h2>
           <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">
-            Use this to track what is ready, what is checked out, what is missing, and what must be replaced before youth arrive. This is especially important for shovels, rakes, water pitchers, markers, scissors, staplers, garbage bags, and laptops used for TimeClock Wizard sign-in.
+            Supervisor / Staff Lead manages accountability. The Youth Logistics & Inventory Team helps count, prepare, check out, return, and organize items. Administrator controls the master list. Track shovels, rakes, water pitchers, markers, scissors, staplers, garbage bags, and laptops used for TimeClock Wizard sign-in.
           </p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-white/82">
@@ -5198,13 +5213,27 @@ function OperationsInventoryPanel() {
         </div>
       </div>
 
+
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        {[
+          ["Supervisor / Staff Lead", "Verifies opening inventory, approves check-outs and returns, and confirms damaged, missing, or replacement-needed items."],
+          ["Youth Logistics & Inventory Team", "Counts equipment, prepares bins, tracks responsible teams, supports TimeClock Wizard setup, and conducts end-of-day return checks."],
+          ["Administrator", "Adds new items, edits master quantities, archives equipment, reviews reports, and approves purchase/replacement planning."],
+        ].map(([title, text]) => (
+          <div key={title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-sm font-black uppercase tracking-[0.14em] text-amber-100">{title}</div>
+            <p className="mt-2 text-sm leading-6 text-white/78">{text}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="mt-6 grid gap-4 xl:grid-cols-[1.3fr_0.9fr]">
         <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20">
           <div className="grid grid-cols-6 gap-2 border-b border-white/10 bg-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-white/70">
             <div className="col-span-2">Item</div>
             <div>Category</div>
             <div>Ready</div>
-            <div>Location</div>
+            <div>Managed By</div>
             <div>Status</div>
           </div>
           <div className="max-h-[28rem] overflow-auto">
@@ -5213,7 +5242,7 @@ function OperationsInventoryPanel() {
                 <div className="col-span-2 font-black">{item.name}<div className="text-xs font-normal text-white/60">{item.notes}</div></div>
                 <div>{item.category}</div>
                 <div>{item.available} / {item.total}</div>
-                <div className="text-white/75">{item.location}</div>
+                <div className="text-white/75"><div>{item.managed_by || "Supervisor / Staff Lead"}</div><div className="text-xs text-white/50">{item.location}</div></div>
                 <div><span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-black">{item.status}</span></div>
               </button>
             ))}
@@ -5227,7 +5256,10 @@ function OperationsInventoryPanel() {
             {inventory.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <input value={person} onChange={(event) => setPerson(event.target.value)} placeholder="Person / team responsible" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            <input value={person} onChange={(event) => setPerson(event.target.value)} placeholder="Responsible person / station" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            <input value={team} onChange={(event) => setTeam(event.target.value)} placeholder="Team using item" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            <input value={youthLead} onChange={(event) => setYouthLead(event.target.value)} placeholder="Youth logistics lead" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+            <input value={approver} onChange={(event) => setApprover(event.target.value)} placeholder="Supervisor approval" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
             <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white" />
           </div>
           <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Notes: condition, missing pieces, where it went, who has it..." className="mt-3 min-h-[5.5rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
@@ -5258,11 +5290,12 @@ function OperationsInventoryPanel() {
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
           <h3 className="text-xl font-black">Launch-day checklist</h3>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-white/82">
-            <li>• Count tools before youth arrive.</li>
-            <li>• Assign laptops to the check-in table for TimeClock Wizard.</li>
-            <li>• Confirm water pitchers and hydration station are ready.</li>
-            <li>• Put markers, scissors, staplers, and garbage bags in labeled bins.</li>
-            <li>• Count everything again before youth leave the site.</li>
+            <li>• Supervisor opens inventory and assigns the Youth Logistics & Inventory Team.</li>
+            <li>• Youth team counts tools before participants arrive.</li>
+            <li>• Laptops are assigned to the check-in table for TimeClock Wizard.</li>
+            <li>• Water pitchers, PPE, markers, scissors, staplers, and garbage bags are placed in labeled bins.</li>
+            <li>• Supervisor approves missing, damaged, or replacement-needed items.</li>
+            <li>• Youth team completes end-of-day count before youth leave the site.</li>
           </ul>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
@@ -5270,12 +5303,24 @@ function OperationsInventoryPanel() {
           <div className="mt-3 max-h-48 space-y-2 overflow-auto text-sm text-white/78">
             {logs.length === 0 ? <p>No inventory activity recorded yet.</p> : logs.slice(0, 8).map((log) => (
               <div key={log.id} className="rounded-xl bg-white/10 p-3">
-                <strong>{log.action}</strong> — {log.quantity} {log.item_name}{log.person ? ` by ${log.person}` : ""}
+                <strong>{log.action}</strong> — {log.quantity} {log.item_name}{log.person ? ` assigned to ${log.person}` : ""}
                 <div className="text-xs text-white/55">{new Date(log.created_at).toLocaleString()}</div>
+                {(log.team || log.youth_lead || log.approved_by) && <div className="mt-1 text-xs text-white/65">{log.team ? `Team: ${log.team}. ` : ""}{log.youth_lead ? `Youth lead: ${log.youth_lead}. ` : ""}{log.approved_by ? `Approved by: ${log.approved_by}.` : ""}</div>}
                 {log.notes && <div className="mt-1 text-xs text-white/70">{log.notes}</div>}
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100">Youth Workforce Career Connection</div>
+        <h3 className="mt-2 text-2xl font-black">Logistics & Inventory Team</h3>
+        <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">
+          Youth help every team succeed by managing resources responsibly. They learn asset management, supply chain basics, equipment accountability, check-out procedures, return checks, and operations support.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-white/80">
+          {["Inventory Specialist", "Warehouse Associate", "Supply Chain Coordinator", "Operations Manager", "Logistics Technician", "Project Coordinator"].map((career) => <span key={career} className="rounded-full border border-white/10 bg-black/25 px-3 py-2">{career}</span>)}
         </div>
       </div>
     </div>
