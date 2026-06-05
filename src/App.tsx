@@ -3475,97 +3475,128 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   const completionPercent = Math.round((unlockedWeek / youthCurriculumWeeks.length) * 100);
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
+    <div className="grid gap-5 xl:grid-cols-[380px_1fr]">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
-        <p className="mt-5 text-base leading-8 text-white/86">
-          Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 Start My Day</h1>
+        <p className="mt-4 text-base leading-7 text-white/84">
+          Start here. Check in, confirm safety, see today&apos;s project, then begin work with your team.
         </p>
 
-        <LargerPictureCard layerKey="Youth Workforce Pathway" />
-
-        <CultureCard language={language} variant="today" />
-        <FarmHumorCard audience="Youth" />
-        <GuidedDiscovery audience="Youth" week={currentWeek.week} setScreen={setScreen} />
-        <GuidedMedia audience="Youth" week={currentWeek.week} setScreen={setScreen} />
-
-        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
-          <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.objective}</p>
-          <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/15 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today&apos;s Priority</div>
+          <h2 className="mt-2 text-2xl font-black">{featuredProject.shortTitle}</h2>
+          <p className="mt-3 text-sm leading-6 text-white/82">
+            {featuredProject.objective}
+          </p>
+          <div className="mt-4 grid gap-3 text-sm">
             <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Date:</strong> {featuredProject.launchDate}</div>
             <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Start:</strong> {featuredProject.startTime}</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Week:</strong> Week 1</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Badge:</strong> {currentWeek.badge}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Current Badge:</strong> {currentWeek.badge}</div>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
+        <div className="mt-6 grid gap-3">
+          <button type="button" onClick={() => setScreen("wellness")} className="w-full rounded-full bg-emerald-300 px-7 py-4 text-lg font-black text-black">
+            Start My Day
+          </button>
+          <button type="button" onClick={() => setScreen("launchProject")} className="w-full rounded-full border border-emerald-200/25 bg-emerald-300/15 px-7 py-4 font-black text-emerald-50">
+            Open Today&apos;s Project
+          </button>
         </div>
+
+        <div className="mt-6 rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Before You Start</div>
+          <div className="mt-3 grid gap-2 text-sm text-white/82">
+            <div>✓ Closed-toe shoes</div>
+            <div>✓ Water bottle</div>
+            <div>✓ Weather-ready clothing</div>
+            <div>✓ PPE when assigned</div>
+            <div>✓ Positive attitude</div>
+          </div>
+        </div>
+
+        <FarmHumorCard audience="Youth" />
       </Card>
 
       <div className="grid gap-5">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
-              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
-            </div>
-          </div>
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {currentWeek.skills.map((skill) => (
-              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today</div>
+          <h2 className="mt-3 text-4xl font-black">One Day. One Priority.</h2>
+          <p className="mt-3 text-base leading-8 text-white/82">
+            Youth do not need to sort through the whole ecosystem first. Today starts with check-in, safety, team assignment, project work, and reflection.
+          </p>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-5">
+            {[
+              ["1", "Check In", "Attendance and wellness"],
+              ["2", "Safety", "Shoes, water, PPE"],
+              ["3", "Team", "Know your assignment"],
+              ["4", "Work", "Cooling Station Challenge"],
+              ["5", "Reflect", "What did I learn?"],
+            ].map(([step, title, body]) => (
+              <div key={step} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-300 text-sm font-black text-black">{step}</div>
+                <div className="mt-3 text-lg font-black">{title}</div>
+                <p className="mt-2 text-xs leading-5 text-white/70">{body}</p>
+              </div>
             ))}
           </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Week</div>
+              <div className="mt-2 text-xl font-black">Week {currentWeek.week}: {currentWeek.title}</div>
+              <p className="mt-2 text-xs leading-5 text-white/72">{currentWeek.theme}</p>
+            </div>
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
+              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
+              </div>
+            </div>
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
+              <div className="mt-2 text-lg font-black">{currentWeek.badge}</div>
+              <p className="mt-2 text-xs leading-5 text-white/70">Earned through orientation, safety, teamwork, and reflection.</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">This Week</div>
+          <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Required Outcomes</div>
-              <ul className="mt-3 space-y-2 text-xs leading-5 text-white/78">
+              <ul className="mt-3 space-y-2 text-sm leading-5 text-white/78">
                 {currentWeek.requiredOutcomes.map((item) => (
                   <li key={item}>✓ {item}</li>
                 ))}
               </ul>
             </div>
             <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Activity Options</div>
-              <ul className="mt-3 space-y-2 text-xs leading-5 text-white/78">
-                {currentWeek.flexibleActivities.map((item) => (
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Today Can Include</div>
+              <ul className="mt-3 space-y-2 text-sm leading-5 text-white/78">
+                {currentWeek.flexibleActivities.slice(0, 5).map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50">
-            <b>Resume Builder:</b> {currentWeek.resumeOutcome}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {currentWeek.skills.map((skill) => (
+              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+            ))}
           </div>
         </Card>
 
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
-          <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
+        <details className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5">
+          <summary className="cursor-pointer text-2xl font-black">View 8-Week Roadmap</summary>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {youthCurriculumWeeks.map((week) => {
               const isUnlocked = week.week <= unlockedWeek;
@@ -3582,112 +3613,50 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                         : "border-white/10 bg-black/30 opacity-80"
                   }`}
                 >
-                  <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
+                  <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
                   <h3 className="mt-2 text-lg font-black">{week.title}</h3>
                   <p className="mt-2 text-xs font-black text-emerald-100">{week.theme}</p>
                   {isUnlocked || isPreview ? (
                     <>
                       <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
                       <div className="mt-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black">{week.badge}</div>
-                      <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">
-                        {isPreview ? "Supervisor Preview" : isCurrent ? "Open Now" : "Completed / Open"}
-                      </div>
                     </>
                   ) : (
                     <>
                       <div className="mt-3 rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-xs font-black">
                         🔒 Opens {formatUnlockDate(week.unlockDate)}
                       </div>
-                      <p className="mt-2 text-xs leading-5 text-white/60">
-                        Future details open Sunday at 12:00 AM so youth stay focused on the current week.
-                      </p>
+                      <p className="mt-2 text-xs leading-5 text-white/60">Future details open Sunday at 12:00 AM.</p>
                     </>
                   )}
                 </div>
               );
             })}
           </div>
-        </Card>
+        </details>
 
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Wisdom by Team</div>
-          <h2 className="mt-3 text-3xl font-black">Encouragement for Every Rotation</h2>
-          <TeamWisdomGrid language={language} />
-        </Card>
-
-        <div className="grid gap-5 lg:grid-cols-2">
-          <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
-            <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated. This becomes a youth resume, portfolio, and achievement transcript.</p>
-            <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
-              <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
-                {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Initiative", "Problem Solving", "Project Completion", "Career Exploration"].map((skill) => (
-                  <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
-                ))}
+        <details className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5">
+          <summary className="cursor-pointer text-2xl font-black">Helpful When Needed</summary>
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <div>
+              <GuidedDiscovery audience="Youth" week={currentWeek.week} setScreen={setScreen} />
+              <GuidedMedia audience="Youth" week={currentWeek.week} setScreen={setScreen} />
+            </div>
+            <div>
+              <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+                <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
+                <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
+                <p className="mt-3 text-sm leading-6 text-white/78">{currentWeek.resumeOutcome}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
+                  {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Problem Solving", "Project Completion"].map((skill) => (
+                    <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
+                  ))}
+                </div>
               </div>
-              <p className="mt-3 text-xs leading-5 text-white/70">Each check-in, project, reflection, badge, and supervisor assessment adds evidence toward a future resume and portfolio.</p>
+              <TeamWisdomGrid language={language} />
             </div>
-            <div className="mt-5 grid gap-3">
-              {youthPortfolioEntries.map((entry) => (
-                <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                  <div className="text-lg font-black">{entry.title}</div>
-                  <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
-                  <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.skills.map((skill) => (
-                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🏆 My Achievements</div>
-            <h2 className="mt-3 text-3xl font-black">Skills, Badges, and Recognition</h2>
-            <div className="mt-5 grid gap-3">
-              {youthAchievementBadges.map((badge) => (
-                <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-lg font-black">{badge.title}</div>
-                      <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
-                    </div>
-                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black">{badge.earned ? "Available Week 1" : "Upcoming"}</span>
-                  </div>
-                  <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-        <JourneyCompletionCard
-          title="Youth Workforce Journey Completion"
-          learned={[
-            "Safety and PPE",
-            "Teamwork and communication",
-            "Cooling Station Challenge",
-            "Portfolio evidence",
-            "Career and income connections",
-          ]}
-          nextSteps={[
-            { label: "Open Today's Project", screen: "supervisor" },
-            { label: "Complete Reflection", screen: "feedback" },
-            { label: "View Achievements", screen: "completion" },
-            { label: "Visit Marketplace", screen: "marketplace" },
-          ]}
-          impact={[
-            "Completed youth pathway",
-            "Built work-readiness skills",
-            "Connected today's work to future income",
-            "Added evidence toward achievement",
-          ]}
-          setScreen={setScreen}
-        />
+          </div>
+        </details>
       </div>
     </div>
   );
