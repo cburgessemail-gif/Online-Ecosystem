@@ -1884,9 +1884,9 @@ function App() {
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
-      {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "parent" && <ParentScreen setScreen={setScreen} />}
+      {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "parent" && <ParentScreen setScreen={setScreen} language={language} />}
       {screen === "grower" && <GrowerJourney setScreen={setScreen} />}
       {screen === "partner" && <PartnerJourney setScreen={setScreen} />}
       {screen === "support" && <SupportJourney setScreen={setScreen} />}
@@ -1894,7 +1894,7 @@ function App() {
       {screen === "valueAdded" && <ValueAddedJourney setScreen={setScreen} />}
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "reports" && <Reports setScreen={setScreen} />}
+      {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MediaCenter setScreen={setScreen} />}
@@ -2238,6 +2238,8 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
       </Card>
 
       <div className="grid gap-4">
+        <CultureCard language={language} variant="seed" />
+
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
           <h2 className="mt-3 text-3xl font-black leading-tight">{TT("New visitors enter the story. Returning users go straight to work.")}</h2>
@@ -2396,6 +2398,183 @@ function LargerPictureCard({ layerKey }: { layerKey: string }) {
           <p className="mt-4 text-sm leading-7 text-white/82">{layer.largerPicture}</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+
+type CultureCopy = {
+  seedThoughts: string[];
+  todaysThoughts: string[];
+  harvestReflections: string[];
+  supervisorEncouragement: string[];
+  parentEncouragement: string[];
+  missionBanner: { title: string; subtitle: string };
+  teamWisdom: Record<string, string>;
+};
+
+const cultureCopy: Record<LanguageCode, CultureCopy> = {
+  en: {
+    seedThoughts: [
+      "A seed never becomes a harvest the day it is planted. Growth takes time.",
+      "Your future is built by the choices you make today.",
+      "Strong foundations create strong futures.",
+      "What you practice today becomes part of who you become tomorrow.",
+      "Preparation creates opportunity.",
+    ],
+    todaysThoughts: [
+      "Strong teams are built by people who help one another succeed.",
+      "Every expert was once a beginner.",
+      "Leadership begins with taking responsibility for yourself.",
+      "Progress is often hidden inside difficult work.",
+      "Your work matters in the larger picture.",
+    ],
+    harvestReflections: [
+      "What did I learn today?",
+      "Who helped me today?",
+      "How did I help someone else?",
+      "What am I proud of?",
+      "What will I improve tomorrow?",
+    ],
+    supervisorEncouragement: [
+      "You are growing people, not just managing tasks.",
+      "Young people often remember the adults who believed in them.",
+      "Expectations and encouragement belong together.",
+    ],
+    parentEncouragement: [
+      "Growth happens through challenge, practice, and encouragement.",
+      "Thank you for supporting your youth's journey.",
+      "Confidence grows through experience, responsibility, and encouragement.",
+    ],
+    missionBanner: { title: "We Grow Green to Harvest Dreams™", subtitle: "Growing Food. Growing People. Growing Community." },
+    teamWisdom: {
+      Agriculture: "Healthy soil grows healthy food. Healthy food strengthens communities.",
+      Infrastructure: "The strongest structures begin with work most people never see.",
+      Apiary: "Small actions, repeated consistently, create extraordinary results.",
+      Culinary: "Food is one of the ways we care for people.",
+      "Guest Services": "People may forget what you say. They often remember how you made them feel.",
+      Media: "Stories help people understand what matters.",
+      Safety: "Safety is not slowing down. Safety helps us continue.",
+      "Project Management & Logistics": "Preparation creates opportunity.",
+    },
+  },
+  es: {
+    seedThoughts: [
+      "Una semilla no se convierte en cosecha el mismo día que se planta. El crecimiento toma tiempo.",
+      "Tu futuro se construye con las decisiones que tomas hoy.",
+      "Las bases fuertes crean futuros fuertes.",
+      "Lo que practicas hoy se vuelve parte de quien serás mañana.",
+      "La preparación crea oportunidad.",
+    ],
+    todaysThoughts: [
+      "Los equipos fuertes se forman con personas que ayudan a otros a tener éxito.",
+      "Toda persona experta alguna vez fue principiante.",
+      "El liderazgo comienza con hacerte responsable de ti mismo.",
+      "El progreso muchas veces está escondido dentro del trabajo difícil.",
+      "Tu trabajo importa en el panorama más grande.",
+    ],
+    harvestReflections: ["¿Qué aprendí hoy?", "¿Quién me ayudó hoy?", "¿Cómo ayudé a otra persona?", "¿De qué estoy orgulloso/a?", "¿Qué mejoraré mañana?"],
+    supervisorEncouragement: ["Estás cultivando personas, no solo administrando tareas.", "Los jóvenes suelen recordar a los adultos que creyeron en ellos.", "Las expectativas y el ánimo deben ir juntos."],
+    parentEncouragement: ["El crecimiento ocurre con desafío, práctica y ánimo.", "Gracias por apoyar el camino de su joven.", "La confianza crece con experiencia, responsabilidad y apoyo."],
+    missionBanner: { title: "Cultivamos Verde para Cosechar Sueños™", subtitle: "Cultivando Alimentos. Cultivando Personas. Cultivando Comunidad." },
+    teamWisdom: { Agriculture: "La tierra sana produce alimentos sanos. Los alimentos sanos fortalecen comunidades.", Infrastructure: "Las estructuras fuertes comienzan con trabajo que muchos no ven.", Apiary: "Pequeñas acciones repetidas crean grandes resultados.", Culinary: "La comida es una forma de cuidar a las personas.", "Guest Services": "Las personas pueden olvidar lo que dices, pero recuerdan cómo las hiciste sentir.", Media: "Las historias ayudan a las personas a entender lo que importa.", Safety: "La seguridad no nos retrasa. La seguridad nos permite continuar.", "Project Management & Logistics": "La preparación crea oportunidad." },
+  },
+  tl: {
+    seedThoughts: ["Ang binhi ay hindi agad nagiging ani sa araw na itinanim. Kailangan ng panahon ang paglago.", "Ang kinabukasan mo ay binubuo ng mga desisyon mo ngayon.", "Matibay na pundasyon ang gumagawa ng matibay na kinabukasan.", "Ang inuulit mong pagsasanay ngayon ay nagiging bahagi ng pagkatao mo bukas.", "Ang paghahanda ay lumilikha ng oportunidad."],
+    todaysThoughts: ["Ang matatag na team ay binubuo ng mga taong tumutulong sa isa't isa magtagumpay.", "Bawat eksperto ay minsang naging baguhan.", "Nagsisimula ang pamumuno sa pananagutan sa sarili.", "Madalas nakatago ang progreso sa mahirap na trabaho.", "Mahalaga ang iyong trabaho sa mas malaking larawan."],
+    harvestReflections: ["Ano ang natutuhan ko ngayon?", "Sino ang tumulong sa akin ngayon?", "Paano ako tumulong sa iba?", "Ano ang ipinagmamalaki ko?", "Ano ang papahusayin ko bukas?"],
+    supervisorEncouragement: ["Nagpapalago ka ng tao, hindi lamang namamahala ng gawain.", "Madalas maalala ng kabataan ang mga adultong naniwala sa kanila.", "Magkasama dapat ang expectations at encouragement."],
+    parentEncouragement: ["Ang paglago ay nangyayari sa hamon, pagsasanay, at encouragement.", "Salamat sa pagsuporta sa journey ng inyong youth.", "Lumalaki ang kumpiyansa sa experience, responsibilidad, at encouragement."],
+    missionBanner: { title: "We Grow Green to Harvest Dreams™", subtitle: "Nagpapalago ng Pagkain. Nagpapalago ng Tao. Nagpapalago ng Komunidad." },
+    teamWisdom: { Agriculture: "Malusog na lupa ang nagpapalago ng malusog na pagkain. Malusog na pagkain ang nagpapalakas ng komunidad.", Infrastructure: "Ang pinakamatibay na estruktura ay nagsisimula sa trabahong madalas hindi nakikita.", Apiary: "Maliliit na aksyon na inuulit ay lumilikha ng malaking resulta.", Culinary: "Ang pagkain ay isang paraan ng pag-aalaga sa tao.", "Guest Services": "Maaaring makalimutan ng tao ang sinabi mo, pero maaalala nila kung paano mo sila pinadama.", Media: "Tinutulungan ng mga kuwento ang tao na maunawaan kung ano ang mahalaga.", Safety: "Ang safety ay hindi pagpapabagal. Tinutulungan tayo nitong magpatuloy.", "Project Management & Logistics": "Ang paghahanda ay lumilikha ng oportunidad." },
+  },
+  it: {
+    seedThoughts: ["Un seme non diventa raccolto il giorno in cui viene piantato. La crescita richiede tempo.", "Il tuo futuro si costruisce con le scelte che fai oggi.", "Fondamenta forti creano futuri forti.", "Ciò che pratichi oggi diventa parte di chi sarai domani.", "La preparazione crea opportunità."],
+    todaysThoughts: ["Le squadre forti nascono da persone che aiutano gli altri ad avere successo.", "Ogni esperto è stato un principiante.", "La leadership inizia assumendosi la responsabilità di sé.", "Il progresso spesso è nascosto nel lavoro difficile.", "Il tuo lavoro conta nel quadro più grande."],
+    harvestReflections: ["Che cosa ho imparato oggi?", "Chi mi ha aiutato oggi?", "Come ho aiutato qualcun altro?", "Di cosa sono orgoglioso/a?", "Che cosa migliorerò domani?"],
+    supervisorEncouragement: ["Stai facendo crescere persone, non solo gestendo compiti.", "I giovani spesso ricordano gli adulti che hanno creduto in loro.", "Aspettative e incoraggiamento devono stare insieme."],
+    parentEncouragement: ["La crescita avviene attraverso sfida, pratica e incoraggiamento.", "Grazie per sostenere il percorso del vostro giovane.", "La fiducia cresce con esperienza, responsabilità e incoraggiamento."],
+    missionBanner: { title: "Coltiviamo Verde per Raccogliere Sogni™", subtitle: "Coltivare Cibo. Coltivare Persone. Coltivare Comunità." },
+    teamWisdom: { Agriculture: "Un suolo sano fa crescere cibo sano. Il cibo sano rafforza le comunità.", Infrastructure: "Le strutture più forti iniziano con un lavoro che molti non vedono.", Apiary: "Piccole azioni ripetute creano risultati straordinari.", Culinary: "Il cibo è uno dei modi in cui ci prendiamo cura delle persone.", "Guest Services": "Le persone possono dimenticare ciò che dici, ma ricordano come le hai fatte sentire.", Media: "Le storie aiutano le persone a capire ciò che conta.", Safety: "La sicurezza non rallenta. La sicurezza ci permette di continuare.", "Project Management & Logistics": "La preparazione crea opportunità." },
+  },
+  he: {
+    seedThoughts: ["זרע אינו הופך לקציר ביום שבו נשתל. צמיחה דורשת זמן.", "העתיד שלך נבנה מהבחירות שאתה עושה היום.", "יסודות חזקים יוצרים עתיד חזק.", "מה שאתה מתרגל היום הופך לחלק ממי שתהיה מחר.", "הכנה יוצרת הזדמנות."],
+    todaysThoughts: ["צוותים חזקים נבנים מאנשים שעוזרים זה לזה להצליח.", "כל מומחה היה פעם מתחיל.", "מנהיגות מתחילה בלקיחת אחריות על עצמך.", "התקדמות לעיתים מסתתרת בתוך עבודה קשה.", "העבודה שלך חשובה בתמונה הגדולה."],
+    harvestReflections: ["מה למדתי היום?", "מי עזר לי היום?", "איך עזרתי למישהו אחר?", "במה אני גאה?", "מה אשפר מחר?"],
+    supervisorEncouragement: ["אתם מצמיחים אנשים, לא רק מנהלים משימות.", "צעירים זוכרים לעיתים את המבוגרים שהאמינו בהם.", "ציפיות ועידוד שייכים יחד."],
+    parentEncouragement: ["צמיחה מתרחשת דרך אתגר, תרגול ועידוד.", "תודה שאתם תומכים במסע של הצעיר/ה שלכם.", "ביטחון גדל דרך ניסיון, אחריות ועידוד."],
+    missionBanner: { title: "We Grow Green to Harvest Dreams™", subtitle: "מגדלים מזון. מגדלים אנשים. מגדלים קהילה." },
+    teamWisdom: { Agriculture: "אדמה בריאה מגדלת מזון בריא. מזון בריא מחזק קהילות.", Infrastructure: "המבנים החזקים ביותר מתחילים בעבודה שרבים לא רואים.", Apiary: "פעולות קטנות שחוזרות על עצמן יוצרות תוצאות גדולות.", Culinary: "אוכל הוא דרך לדאוג לאנשים.", "Guest Services": "אנשים עשויים לשכוח מה אמרת, אך יזכרו איך גרמת להם להרגיש.", Media: "סיפורים עוזרים לאנשים להבין מה חשוב.", Safety: "בטיחות אינה האטה. בטיחות מאפשרת לנו להמשיך.", "Project Management & Logistics": "הכנה יוצרת הזדמנות." },
+  },
+  fr: {
+    seedThoughts: ["Une graine ne devient pas une récolte le jour où elle est plantée. La croissance prend du temps.", "Ton avenir se construit avec les choix que tu fais aujourd’hui.", "Des bases solides créent des avenirs solides.", "Ce que tu pratiques aujourd’hui devient une partie de qui tu seras demain.", "La préparation crée l’opportunité."],
+    todaysThoughts: ["Les équipes fortes sont formées par des personnes qui s’aident à réussir.", "Chaque expert a été débutant.", "Le leadership commence par la responsabilité personnelle.", "Le progrès est souvent caché dans le travail difficile.", "Ton travail compte dans l’ensemble."],
+    harvestReflections: ["Qu’ai-je appris aujourd’hui ?", "Qui m’a aidé aujourd’hui ?", "Comment ai-je aidé quelqu’un d’autre ?", "De quoi suis-je fier/fière ?", "Que vais-je améliorer demain ?"],
+    supervisorEncouragement: ["Vous faites grandir des personnes, pas seulement des tâches.", "Les jeunes se souviennent souvent des adultes qui ont cru en eux.", "Les attentes et l’encouragement vont ensemble."],
+    parentEncouragement: ["La croissance vient du défi, de la pratique et de l’encouragement.", "Merci de soutenir le parcours de votre jeune.", "La confiance grandit avec l’expérience, la responsabilité et l’encouragement."],
+    missionBanner: { title: "Nous Cultivons le Vert pour Récolter les Rêves™", subtitle: "Cultiver la Nourriture. Cultiver les Personnes. Cultiver la Communauté." },
+    teamWisdom: { Agriculture: "Un sol sain produit une nourriture saine. Une nourriture saine renforce les communautés.", Infrastructure: "Les structures les plus fortes commencent par un travail que beaucoup ne voient jamais.", Apiary: "De petites actions répétées créent des résultats extraordinaires.", Culinary: "La nourriture est une façon de prendre soin des autres.", "Guest Services": "Les gens peuvent oublier ce que tu dis, mais ils se souviennent de ce que tu leur as fait ressentir.", Media: "Les histoires aident les gens à comprendre ce qui compte.", Safety: "La sécurité ne ralentit pas. Elle nous permet de continuer.", "Project Management & Logistics": "La préparation crée l’opportunité." },
+  },
+};
+
+function dailyCultureItem(items: string[]) {
+  if (!items.length) return "";
+  const dayIndex = Math.floor(Date.now() / 86400000);
+  return items[dayIndex % items.length];
+}
+
+function CultureCard({ language, variant = "seed" }: { language: LanguageCode; variant?: "seed" | "today" | "harvest" }) {
+  const copy = cultureCopy[language] || cultureCopy.en;
+  const title = variant === "harvest" ? "Harvest Reflection" : variant === "today" ? "Today's Thought" : "Seed of Thought";
+  const text = variant === "harvest" ? copy.harvestReflections.join(" • ") : dailyCultureItem(variant === "today" ? copy.todaysThoughts : copy.seedThoughts);
+  return (
+    <div className="rounded-[1.5rem] border border-amber-200/25 bg-amber-300/12 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">{translatePhrase(language, title)}</div>
+      <p className="mt-3 text-lg font-black leading-8 text-white/92">{text}</p>
+    </div>
+  );
+}
+
+function SupervisorEncouragementCard({ language }: { language: LanguageCode }) {
+  const copy = cultureCopy[language] || cultureCopy.en;
+  return <CultureMiniCard label={translatePhrase(language, "Supervisor Encouragement")} text={dailyCultureItem(copy.supervisorEncouragement)} />;
+}
+
+function ParentEncouragementCard({ language }: { language: LanguageCode }) {
+  const copy = cultureCopy[language] || cultureCopy.en;
+  return <CultureMiniCard label={translatePhrase(language, "Parent Encouragement")} text={dailyCultureItem(copy.parentEncouragement)} />;
+}
+
+function MissionCultureBanner({ language }: { language: LanguageCode }) {
+  const copy = cultureCopy[language] || cultureCopy.en;
+  return (
+    <div className="mt-7 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/12 p-5 text-center">
+      <h2 className="text-3xl font-black">🌱 {copy.missionBanner.title}</h2>
+      <p className="mt-3 text-lg font-bold text-white/88">{copy.missionBanner.subtitle}</p>
+    </div>
+  );
+}
+
+function TeamWisdomGrid({ language }: { language: LanguageCode }) {
+  const copy = cultureCopy[language] || cultureCopy.en;
+  return (
+    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      {Object.entries(copy.teamWisdom).map(([team, wisdom]) => (
+        <div key={team} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{translatePhrase(language, team)}</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/86">{wisdom}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CultureMiniCard({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="mt-5 rounded-[1.35rem] border border-amber-200/20 bg-amber-300/10 p-4">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/75">{label}</div>
+      <p className="mt-2 text-sm font-black leading-6 text-white/88">{text}</p>
     </div>
   );
 }
@@ -2808,7 +2987,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   );
 }
 
-function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = youthCurriculumWeeks[0];
   const completionPercent = 12.5;
 
@@ -2822,6 +3001,8 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
         </p>
 
         <LargerPictureCard layerKey="Youth Workforce Pathway" />
+
+        <CultureCard language={language} variant="today" />
 
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
@@ -2886,6 +3067,12 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
               </div>
             ))}
           </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Wisdom by Team</div>
+          <h2 className="mt-3 text-3xl font-black">Encouragement for Every Rotation</h2>
+          <TeamWisdomGrid language={language} />
         </Card>
 
         <div className="grid gap-5 lg:grid-cols-2">
@@ -2966,7 +3153,7 @@ function YouthScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) =>
   );
 }
 
-function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const [tab, setTab] = useState<"dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports">("dashboard");
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
@@ -3020,6 +3207,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser }: { setScreen: (scr
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
+        <SupervisorEncouragementCard language={language} />
         <div className="mt-5 grid gap-2">
           {tabs.map((item) => (
             <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
@@ -3890,7 +4078,7 @@ function CaseManagerPortal({ setScreen }: { setScreen: (screen: Screen) => void 
   );
 }
 
-function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
+function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => void; language: LanguageCode }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
   const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
@@ -3909,6 +4097,8 @@ function ParentScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </p>
 
       <LargerPictureCard layerKey="Parent / Guardian Portal" />
+
+      <ParentEncouragementCard language={language} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {[
@@ -5158,7 +5348,7 @@ function CoolingCenterProjectModule({
   );
 }
 
-function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
+function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void; language: LanguageCode }) {
   const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
   const youth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
@@ -5188,6 +5378,7 @@ function Reports({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Mission Control / Reports</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Launch-day readiness status.</h1>
+      <MissionCultureBanner language={language} />
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
           ["Profiles", profiles.length],
