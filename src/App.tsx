@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.1 - TRUE GUIDED PORTAL + SCREEN FIT + WEEK 1 CULTIVATOR LAUNCH
+ * LAUNCH CANDIDATE 3.3 - GUIDED PORTAL BUTTON WIRING + SCREEN FIT VERIFY
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1436,7 +1436,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Mercado',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.0': 'Candidato de lanzamiento 3.0',
+    'Launch Candidate 3.3': 'Candidato de lanzamiento 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1463,7 +1463,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Marketplace',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.0': 'Launch Candidate 3.0',
+    'Launch Candidate 3.3': 'Launch Candidate 3.3',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1490,7 +1490,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Mercato',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.0': 'Candidato di lancio 3.0',
+    'Launch Candidate 3.3': 'Candidato di lancio 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1517,7 +1517,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'נוער, הורים, מדריכים, מגדלים ושותפים רשומים ממשיכים מהמרחב שהוקצה להם.',
     'Marketplace': 'שוק',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'עיינו במזון, מוצרים, אירועים, הזדמנויות למגדלים ורכישה דרך GrownBy.',
-    'Launch Candidate 3.0': 'מועמד השקה 3.0',
+    'Launch Candidate 3.3': 'מועמד השקה 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ניגשים ישר לעבודה.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'מבקרים ציבוריים יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'משתתפי הנוער של Nesco אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.',
@@ -1544,7 +1544,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Marché',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.0': 'Candidat de lancement 3.0',
+    'Launch Candidate 3.3': 'Candidat de lancement 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -2256,7 +2256,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
   const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("Start Guided Portal"), subtitle: TT("New visitors can enter through the story, ecosystem overview, and guided experience."), screen: "demo" },
+    { title: TT("Start Guided Portal"), subtitle: TT("Opens a true step-by-step guided tour with Next, Previous, Restart, and progress tracking."), screen: "demo" },
     { title: TT("Enter Ecosystem"), subtitle: TT("Browse public pathways without registering: guest story, events, marketplace, and opportunities."), screen: "guest" },
     { title: TT("Sign In / Returning Participant"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace."), screen: workspaceTarget },
     { title: TT("Marketplace"), subtitle: TT("Browse food, products, events, grower opportunities, and GrownBy-connected purchasing."), screen: "marketplace" },
@@ -2265,7 +2265,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[70vh] sm:min-h-[68vh]">
+        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
           <img
             src={IMG.forest}
             alt="Bronson Family Farm forest gate entry"
@@ -2273,12 +2273,12 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
             onError={(event) => (event.currentTarget.src = IMG.backup)}
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.32),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
+          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-7">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
                 {TT("Forest Gate Portal")}
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
+              <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[0.98] sm:text-5xl md:text-6xl">
                 {TT("Enter the Living Ecosystem")}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
@@ -2307,7 +2307,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
         <CultureCard language={language} variant="seed" />
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.3")}</div>
           <h2 className="mt-3 text-3xl font-black leading-tight">{TT("New visitors enter the story. Returning users go straight to work.")}</h2>
           <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
