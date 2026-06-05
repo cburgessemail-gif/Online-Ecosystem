@@ -439,78 +439,240 @@ const coolingCenterReflectionQuestions = [
 ];
 
 
+const curriculumTeams = [
+  "Agriculture",
+  "Infrastructure",
+  "Apiary & Pollination",
+  "Culinary & Nutrition",
+  "Guest Services & Tourism",
+  "Media & Storytelling",
+  "Safety & Security",
+  "Project Management & Logistics",
+];
+
 const youthCurriculumWeeks = [
   {
     week: 1,
-    title: "Workplace Foundations & Safety",
-    focus: "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.",
-    project: "Farm Worker Heat Safety & Cooling Station Challenge",
-    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Following Instructions"],
-    badge: "🏅 Workplace Foundations",
+    title: "Becoming a Cultivator",
+    theme: "Orientation, Safety, Belonging",
+    focus:
+      "Youth enter the Bronson Family Farm ecosystem, complete orientation, learn safety expectations, meet teams, and understand their role as Cultivators.",
+    project: "Orientation, safety, team assignment, ecosystem introduction, and June 8 Cooling Station launch project.",
+    skills: ["Safety", "Teamwork", "Communication", "Responsibility", "Following Instructions"],
+    badge: "🌱 Cultivator Foundations",
     status: "Current Week",
+    requiredOutcomes: [
+      "Complete orientation",
+      "Understand farm safety and PPE",
+      "Join assigned team",
+      "Understand the ecosystem story",
+      "Complete first reflection",
+    ],
+    flexibleActivities: [
+      "Farm tour",
+      "Team introductions",
+      "Safety walk-through",
+      "Ecosystem demonstration",
+      "Supervisor check-in",
+      "Cooling Station Challenge orientation",
+    ],
+    resumeOutcome:
+      "Completed workforce orientation and safety training in a multidisciplinary agricultural workforce development program.",
   },
   {
     week: 2,
-    title: "Regenerative Agriculture",
-    focus: "Soil health, compost, planting, biodiversity, food systems, and caring for land as a living ecosystem.",
-    project: "Regenerative growing and soil stewardship activities",
-    skills: ["Observation", "Soil Health", "Plant Care", "Environmental Stewardship"],
-    badge: "🌱 Regenerative Agriculture",
+    title: "Planting & Establishment",
+    theme: "Every Seed Has Potential",
+    focus:
+      "Youth participate in planting, crop establishment, bed preparation, watering, pollinator awareness, and early growing-system support.",
+    project: "Crop establishment, planting support, pollinator awareness, and early growing-system setup.",
+    skills: ["Planting", "Responsibility", "Stewardship", "Tool Care", "Observation"],
+    badge: "🌱 Seed Starter",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Participate in planting or establishment work",
+      "Demonstrate care for crops and tools",
+      "Understand seed-to-harvest connection",
+      "Follow safety procedures",
+    ],
+    flexibleActivities: [
+      "Direct seeding",
+      "Transplanting",
+      "Bed preparation",
+      "Trellis setup",
+      "Pollinator habitat support",
+      "Irrigation support",
+    ],
+    resumeOutcome:
+      "Participated in crop establishment, transplanting, irrigation support, and team-based agricultural production assignments.",
   },
   {
     week: 3,
-    title: "Farm Infrastructure",
-    focus: "Fencing, water, shade, tools, work zones, field layout, safety zones, and farm operations support.",
-    project: "Farm infrastructure and site-readiness project",
-    skills: ["Construction", "Tool Safety", "Planning", "Logistics"],
-    badge: "🏗 Infrastructure Builder",
+    title: "Maintenance, Observation & Problem Solving",
+    theme: "Leaders Notice What Others Miss",
+    focus:
+      "Youth learn observation, maintenance, plant health monitoring, safety awareness, and problem-solving through real farm operations.",
+    project: "Farm maintenance, observation logs, plant health checks, and practical problem solving.",
+    skills: ["Observation", "Problem Solving", "Initiative", "Documentation", "Critical Thinking"],
+    badge: "🔍 Problem Solver",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Complete observation activities",
+      "Identify one challenge or improvement need",
+      "Contribute to a solution",
+      "Document progress",
+    ],
+    flexibleActivities: [
+      "Plant health checks",
+      "Weeding",
+      "Mulching",
+      "Water-system checks",
+      "Safety audits",
+      "Visitor experience review",
+      "Tool and equipment inspection",
+    ],
+    resumeOutcome:
+      "Applied observation and problem-solving skills to identify operational challenges and support improvements in farm systems.",
   },
   {
     week: 4,
-    title: "Production & Harvest",
-    focus: "Crop care, harvesting, washing, sorting, handling, quality, and food safety awareness.",
-    project: "Production and harvest readiness activities",
-    skills: ["Harvest", "Quality Control", "Food Safety", "Responsibility"],
-    badge: "🥕 Production Specialist",
+    title: "Systems & Infrastructure",
+    theme: "Everything Is Connected",
+    focus:
+      "Youth learn how infrastructure, tools, water, shade, signage, safety zones, and workflow systems support farm productivity and visitor readiness.",
+    project: "Infrastructure support, site-readiness projects, safe tool use, signage, pathways, and workflow mapping.",
+    skills: ["Construction", "Tool Safety", "Planning", "Systems Thinking", "Logistics"],
+    badge: "⚙️ Systems Builder",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Participate in infrastructure or site-readiness work",
+      "Understand how systems support farm operations",
+      "Demonstrate teamwork and planning",
+      "Practice safe tool use",
+    ],
+    flexibleActivities: [
+      "Bench or shade structure support",
+      "Pathway improvements",
+      "Signage",
+      "Tool organization",
+      "Irrigation improvements",
+      "Guest-area setup",
+      "Workflow mapping",
+    ],
+    resumeOutcome:
+      "Supported farm infrastructure, site-readiness, logistics, and team-based improvement projects using safe work practices.",
   },
   {
     week: 5,
-    title: "Marketplace & Entrepreneurship",
-    focus: "Customer service, pricing, product presentation, GrownBy, SNAP awareness, and farm-based entrepreneurship.",
-    project: "Marketplace and customer experience project",
-    skills: ["Customer Service", "Sales", "Pricing", "Entrepreneurship"],
-    badge: "🛒 Marketplace Explorer",
+    title: "Harvest Preparation",
+    theme: "Preparation Creates Success",
+    focus:
+      "Youth prepare for harvest, public engagement, marketplace activity, food handling, visitor support, and team presentations.",
+    project: "Harvest readiness, quality standards, tool organization, wash/pack preparation, and marketplace planning.",
+    skills: ["Organization", "Reliability", "Quality Control", "Food Safety", "Planning"],
+    badge: "📋 Readiness Leader",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Understand harvest readiness",
+      "Prepare tools, spaces, and workflow",
+      "Support quality standards",
+      "Plan for marketplace or public engagement",
+    ],
+    flexibleActivities: [
+      "Crop readiness checks",
+      "Tool preparation",
+      "Wash/pack setup",
+      "Market planning",
+      "Recipe planning",
+      "Visitor preparation",
+      "Media promotion",
+    ],
+    resumeOutcome:
+      "Prepared for harvest and marketplace operations through planning, organization, quality control, and team coordination.",
   },
   {
     week: 6,
-    title: "Leadership & Community",
-    focus: "Team leadership, communication, service, visitor support, community impact, and peer responsibility.",
-    project: "Leadership and community service activity",
-    skills: ["Leadership", "Service", "Communication", "Accountability"],
-    badge: "🤝 Community Leader",
+    title: "Harvest & Preservation",
+    theme: "We Harvest What We Grow",
+    focus:
+      "Youth participate in harvesting, washing, sorting, packing, food preparation, preservation, and understanding how food moves through the ecosystem.",
+    project: "Harvest operations, washing, sorting, packing, food preparation, preservation, and harvest documentation.",
+    skills: ["Harvest", "Food Handling", "Quality Assurance", "Time Management", "Productivity"],
+    badge: "🥕 Harvest Steward",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Participate in harvest operations",
+      "Understand food handling and preservation",
+      "Support quality control",
+      "Connect harvest to families and marketplace",
+    ],
+    flexibleActivities: [
+      "Harvesting",
+      "Washing",
+      "Sorting",
+      "Packing",
+      "Food preparation",
+      "Preservation",
+      "Harvest documentation",
+    ],
+    resumeOutcome:
+      "Supported harvest, food handling, sorting, packing, preservation, and quality-control activities in a farm-based workforce program.",
   },
   {
     week: 7,
-    title: "Career Exploration",
-    focus: "Agriculture, construction, engineering, culinary, tourism, marketing, environmental science, and public safety careers.",
-    project: "Career pathway exploration and portfolio development",
-    skills: ["Career Awareness", "Interviewing", "Goal Setting", "Professional Identity"],
-    badge: "🧭 Career Pathfinder",
+    title: "Marketplace & Community Engagement",
+    theme: "Sharing Value With Community",
+    focus:
+      "Youth practice public speaking, customer service, product presentation, visitor hosting, media storytelling, and community engagement.",
+    project: "Marketplace setup, product presentation, visitor greeting, community event support, and food-system storytelling.",
+    skills: ["Customer Service", "Public Speaking", "Entrepreneurship", "Hospitality", "Community Engagement"],
+    badge: "🏪 Community Ambassador",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Engage with visitors or customers",
+      "Represent Bronson Family Farm professionally",
+      "Understand marketplace and community value",
+      "Support public-facing activities",
+    ],
+    flexibleActivities: [
+      "Farm tours",
+      "Marketplace setup",
+      "Product presentation",
+      "Customer greeting",
+      "Community event support",
+      "Media interviews",
+      "Food demonstrations",
+    ],
+    resumeOutcome:
+      "Practiced customer service, public speaking, event support, product presentation, and community engagement.",
   },
   {
     week: 8,
-    title: "Capstone & Achievement",
-    focus: "Final project presentation, portfolio review, supervisor recognition, skills summary, and achievement certificate.",
-    project: "Cultivator capstone and achievement showcase",
-    skills: ["Presentation", "Reflection", "Portfolio", "Readiness"],
-    badge: "🏆 Cultivator Achievement",
+    title: "Showcase, Reflection & Achievement",
+    theme: "Growth Creates Opportunity",
+    focus:
+      "Youth complete portfolios, prepare presentations, reflect on growth, explore career pathways, and participate in community showcase and recognition.",
+    project: "Portfolio completion, team presentations, final reflection, achievement recognition, and career pathway exploration.",
+    skills: ["Presentation", "Reflection", "Portfolio", "Career Readiness", "Leadership"],
+    badge: "🏆 Cultivator Graduate",
     status: "Upcoming",
+    requiredOutcomes: [
+      "Complete final reflection",
+      "Present team accomplishments",
+      "Identify skills learned",
+      "Explore future career pathways",
+      "Earn final achievement recognition",
+    ],
+    flexibleActivities: [
+      "Team presentations",
+      "Portfolio completion",
+      "Career pathway reflection",
+      "Achievement ceremony preparation",
+      "Community showcase",
+      "Supervisor final assessment",
+    ],
+    resumeOutcome:
+      "Completed an 8-week workforce development program with hands-on experience in agriculture, infrastructure, food systems, public engagement, and leadership.",
   },
 ];
 
@@ -3052,6 +3214,29 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
               <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
             ))}
           </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Required Outcomes</div>
+              <ul className="mt-3 space-y-2 text-xs leading-5 text-white/78">
+                {currentWeek.requiredOutcomes.map((item) => (
+                  <li key={item}>✓ {item}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Activity Options</div>
+              <ul className="mt-3 space-y-2 text-xs leading-5 text-white/78">
+                {currentWeek.flexibleActivities.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50">
+            <b>Resume Builder:</b> {currentWeek.resumeOutcome}
+          </div>
         </Card>
 
         <Card>
@@ -3062,7 +3247,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
               <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
                 <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
                 <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                <p className="mt-2 text-xs font-black text-emerald-100">{week.theme}</p>
                 <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                <div className="mt-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black">{week.badge}</div>
                 <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
               </div>
             ))}
