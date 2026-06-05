@@ -453,6 +453,7 @@ const curriculumTeams = [
 const youthCurriculumWeeks = [
   {
     week: 1,
+    unlockDate: "2026-06-07T00:00:00",
     title: "Becoming a Cultivator",
     theme: "Orientation, Safety, Belonging",
     focus:
@@ -481,6 +482,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 2,
+    unlockDate: "2026-06-14T00:00:00",
     title: "Planting & Establishment",
     theme: "Every Seed Has Potential",
     focus:
@@ -508,6 +510,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 3,
+    unlockDate: "2026-06-21T00:00:00",
     title: "Maintenance, Observation & Problem Solving",
     theme: "Leaders Notice What Others Miss",
     focus:
@@ -536,6 +539,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 4,
+    unlockDate: "2026-06-28T00:00:00",
     title: "Systems & Infrastructure",
     theme: "Everything Is Connected",
     focus:
@@ -564,6 +568,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 5,
+    unlockDate: "2026-07-05T00:00:00",
     title: "Harvest Preparation",
     theme: "Preparation Creates Success",
     focus:
@@ -592,6 +597,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 6,
+    unlockDate: "2026-07-12T00:00:00",
     title: "Harvest & Preservation",
     theme: "We Harvest What We Grow",
     focus:
@@ -620,6 +626,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 7,
+    unlockDate: "2026-07-19T00:00:00",
     title: "Marketplace & Community Engagement",
     theme: "Sharing Value With Community",
     focus:
@@ -648,6 +655,7 @@ const youthCurriculumWeeks = [
   },
   {
     week: 8,
+    unlockDate: "2026-07-26T00:00:00",
     title: "Showcase, Reflection & Achievement",
     theme: "Growth Creates Opportunity",
     focus:
@@ -692,6 +700,313 @@ const youthPortfolioEntries = [
     skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Farm Operations"],
   },
 ];
+
+
+
+type DiscoveryAudience =
+  | "Youth"
+  | "Supervisor"
+  | "Parent"
+  | "Guest"
+  | "Grower"
+  | "Partner"
+  | "Marketplace"
+  | "Admin";
+
+type GuidedDiscoveryItem = {
+  id: string;
+  audience: DiscoveryAudience[];
+  title: string;
+  prompt: string;
+  quickAnswer: string;
+  nextAction: string;
+  relatedScreen?: Screen;
+  week?: number | "All";
+};
+
+const guidedDiscoveryItems: GuidedDiscoveryItem[] = [
+  {
+    id: "youth-start",
+    audience: ["Youth"],
+    title: "Start Here",
+    prompt: "What am I supposed to do today?",
+    quickAnswer:
+      "Check in, confirm safety and PPE, learn today's assignment, work with your team, and complete your reflection.",
+    nextAction: "Open My Day",
+    relatedScreen: "youth",
+    week: "All",
+  },
+  {
+    id: "youth-wear",
+    audience: ["Youth", "Parent"],
+    title: "What should I wear?",
+    prompt: "What do I need to be ready for the farm?",
+    quickAnswer:
+      "Wear closed-toe shoes, weather-appropriate clothing, bring water, and use PPE when assigned.",
+    nextAction: "Review My Day",
+    relatedScreen: "youth",
+    week: 1,
+  },
+  {
+    id: "youth-curriculum",
+    audience: ["Youth", "Parent"],
+    title: "Why are we doing this?",
+    prompt: "How does today's work connect to my future?",
+    quickAnswer:
+      "Each assignment builds evidence for leadership, teamwork, agriculture, construction, media, culinary, marketplace, safety, or project management skills.",
+    nextAction: "View Achievements",
+    relatedScreen: "completion",
+    week: "All",
+  },
+  {
+    id: "supervisor-start",
+    audience: ["Supervisor"],
+    title: "Supervisor Start Here",
+    prompt: "What do I need to manage first?",
+    quickAnswer:
+      "Begin with attendance, PPE, team assignments, wellness review, daily observations, and parent-safe notes.",
+    nextAction: "Open Supervisor Center",
+    relatedScreen: "supervisor",
+    week: "All",
+  },
+  {
+    id: "parent-start",
+    audience: ["Parent"],
+    title: "Parent Start Here",
+    prompt: "What should I know first?",
+    quickAnswer:
+      "Your youth is learning safety, teamwork, responsibility, agriculture, communication, and career readiness through hands-on work.",
+    nextAction: "Open Parent Portal",
+    relatedScreen: "parent",
+    week: "All",
+  },
+  {
+    id: "guest-start",
+    audience: ["Guest"],
+    title: "First Time Here?",
+    prompt: "What is Bronson Family Farm?",
+    quickAnswer:
+      "Bronson Family Farm is a connected food ecosystem where agriculture, youth workforce development, marketplace activity, and community partnerships work together.",
+    nextAction: "Start Guided Demo",
+    relatedScreen: "demo",
+    week: "All",
+  },
+];
+
+type FarmHumorItem = {
+  audience: DiscoveryAudience[];
+  category: string;
+  text: string;
+};
+
+const farmHumor: FarmHumorItem[] = [
+  {
+    audience: ["Youth", "Supervisor"],
+    category: "Safety Smile",
+    text: "Closed-toe shoes today. The soil does not need to meet your toes personally.",
+  },
+  {
+    audience: ["Youth", "Parent", "Guest"],
+    category: "Farm Funny",
+    text: "Why did the tomato blush? Because it saw the salad dressing.",
+  },
+  {
+    audience: ["Supervisor"],
+    category: "Supervisor Smile",
+    text: "If everyone has water, shoes, and a task, you are already winning.",
+  },
+  {
+    audience: ["Youth"],
+    category: "Reflection Smile",
+    text: "Farm rule: if you drop a seed, you may have accidentally started a future.",
+  },
+];
+
+type GuidedMediaItem = {
+  id: string;
+  title: string;
+  audience: DiscoveryAudience[];
+  week?: number | "All";
+  purpose: string;
+  mediaType: "video" | "photo" | "document" | "link";
+  relatedScreen?: Screen;
+  tags: string[];
+};
+
+const guidedMediaItems: GuidedMediaItem[] = [
+  {
+    id: "fan-demo",
+    title: "Fan Template & Design Demonstration",
+    audience: ["Youth", "Supervisor"],
+    week: 1,
+    purpose:
+      "Watch this before the Cooling Station Challenge so youth understand the template, assembly, and hand-powered fan concept.",
+    mediaType: "video",
+    relatedScreen: "media",
+    tags: ["Cooling Station", "Design", "Manufacturing"],
+  },
+  {
+    id: "supervisor-orientation",
+    title: "Supervisor Orientation Media",
+    audience: ["Supervisor", "Admin"],
+    week: "All",
+    purpose:
+      "Use this for site rules, youth safety, daily workflow, emergency procedures, parent-safe communication, and platform training.",
+    mediaType: "video",
+    relatedScreen: "media",
+    tags: ["Supervisor", "Training", "Safety"],
+  },
+  {
+    id: "portfolio-evidence",
+    title: "Portfolio Evidence",
+    audience: ["Youth", "Parent", "Supervisor"],
+    week: "All",
+    purpose:
+      "Photos, video clips, reflections, and supervisor assessments become evidence of work, growth, and future career readiness.",
+    mediaType: "photo",
+    relatedScreen: "media",
+    tags: ["Portfolio", "Evidence", "Achievements"],
+  },
+];
+
+function getWeekUnlockDate(week: number) {
+  const found = youthCurriculumWeeks.find((item) => item.week === week);
+  return found?.unlockDate || "2026-06-07T00:00:00";
+}
+
+function getUnlockedWeek() {
+  const now = new Date();
+  const unlocked = youthCurriculumWeeks
+    .filter((week) => now >= new Date(week.unlockDate))
+    .map((week) => week.week);
+  return Math.min(8, Math.max(1, unlocked.length ? Math.max(...unlocked) : 1));
+}
+
+function formatUnlockDate(value: string) {
+  return new Date(value).toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function canPreviewAllCurriculum(activeUser: EcosystemUser | null) {
+  return (
+    activeUser?.accessLevel === "staff" ||
+    activeUser?.accessLevel === "admin" ||
+    activeUser?.accessLevel === "board" ||
+    activeUser?.role === "Supervisor / Staff" ||
+    activeUser?.role === "Administrator" ||
+    activeUser?.role === "Board / Funder"
+  );
+}
+
+function GuidedDiscovery({
+  audience,
+  week,
+  setScreen,
+}: {
+  audience: DiscoveryAudience;
+  week?: number;
+  setScreen: (screen: Screen) => void;
+}) {
+  const items = guidedDiscoveryItems.filter(
+    (item) =>
+      item.audience.includes(audience) &&
+      (!item.week || item.week === "All" || item.week === week)
+  );
+
+  if (!items.length) return null;
+
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-black/35 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Guided Discovery</div>
+      <h2 className="mt-2 text-2xl font-black">Start Here</h2>
+      <p className="mt-2 text-sm leading-7 text-white/75">
+        You do not need to know what to ask. The ecosystem will guide you to what matters now.
+      </p>
+      <div className="mt-4 grid gap-3">
+        {items.map((item) => (
+          <div key={item.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-lg font-black">{item.title}</div>
+            <p className="mt-2 text-sm text-emerald-100">{item.prompt}</p>
+            <p className="mt-2 text-sm leading-6 text-white/78">{item.quickAnswer}</p>
+            {item.relatedScreen && (
+              <button
+                type="button"
+                onClick={() => setScreen(item.relatedScreen!)}
+                className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black"
+              >
+                {item.nextAction}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FarmHumorCard({ audience }: { audience: DiscoveryAudience }) {
+  const item = farmHumor.find((entry) => entry.audience.includes(audience));
+  if (!item) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/10 p-4 text-sm leading-6 text-amber-50">
+      <b>{item.category}:</b> {item.text}
+    </div>
+  );
+}
+
+function GuidedMedia({
+  audience,
+  week,
+  setScreen,
+}: {
+  audience: DiscoveryAudience;
+  week?: number;
+  setScreen: (screen: Screen) => void;
+}) {
+  const items = guidedMediaItems.filter(
+    (item) =>
+      item.audience.includes(audience) &&
+      (!item.week || item.week === "All" || item.week === week)
+  );
+
+  if (!items.length) return null;
+
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">Media That Matters Now</div>
+      <h2 className="mt-2 text-2xl font-black">Photos, Videos, and Portfolio Evidence</h2>
+      <div className="mt-4 grid gap-3">
+        {items.map((item) => (
+          <div key={item.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="text-lg font-black">{item.title}</div>
+            <p className="mt-2 text-sm leading-6 text-white/78">{item.purpose}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {item.tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-black">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            {item.relatedScreen && (
+              <button
+                type="button"
+                onClick={() => setScreen(item.relatedScreen!)}
+                className="mt-3 rounded-full border border-white/15 bg-white/10 px-5 py-2 text-sm font-black"
+              >
+                Open Media
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 
 type LaunchVideo = {
@@ -2835,8 +3150,8 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <>
       <SimplePathway
         title="Guest Pathway"
-        image={IMG.ecosystem}
-        text="Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together."
+        image={IMG.forest}
+        text="Guests enter through the farm story first, then learn how the connected food ecosystem works through youth, growers, families, customers, and partners."
         setScreen={setScreen}
         extra={
           <>
@@ -2846,6 +3161,10 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </>
         }
       />
+      <Card>
+        <GuidedDiscovery audience="Guest" setScreen={setScreen} />
+        <FarmHumorCard audience="Guest" />
+      </Card>
       <LaunchAuditDetailGrid
         title="Guest journey now has a complete launch story."
         items={[
@@ -3150,8 +3469,10 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const currentWeek = youthCurriculumWeeks[0];
-  const completionPercent = 12.5;
+  const unlockedWeek = getUnlockedWeek();
+  const canPreviewWeeks = canPreviewAllCurriculum(activeUser);
+  const currentWeek = youthCurriculumWeeks[Math.max(0, Math.min(unlockedWeek, youthCurriculumWeeks.length) - 1)];
+  const completionPercent = Math.round((unlockedWeek / youthCurriculumWeeks.length) * 100);
 
   return (
     <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
@@ -3165,6 +3486,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <LargerPictureCard layerKey="Youth Workforce Pathway" />
 
         <CultureCard language={language} variant="today" />
+        <FarmHumorCard audience="Youth" />
+        <GuidedDiscovery audience="Youth" week={currentWeek.week} setScreen={setScreen} />
+        <GuidedMedia audience="Youth" week={currentWeek.week} setScreen={setScreen} />
 
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
@@ -3190,7 +3514,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <div className="grid gap-5">
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+          <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
           <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
@@ -3243,16 +3567,45 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
           <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {youthCurriculumWeeks.map((week) => (
-              <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
-                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
-                <p className="mt-2 text-xs font-black text-emerald-100">{week.theme}</p>
-                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
-                <div className="mt-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black">{week.badge}</div>
-                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
-              </div>
-            ))}
+            {youthCurriculumWeeks.map((week) => {
+              const isUnlocked = week.week <= unlockedWeek;
+              const isPreview = canPreviewWeeks && !isUnlocked;
+              const isCurrent = week.week === currentWeek.week;
+              return (
+                <div
+                  key={week.week}
+                  className={`rounded-[1.25rem] border p-4 ${
+                    isCurrent
+                      ? "border-emerald-200/35 bg-emerald-300/15"
+                      : isUnlocked || isPreview
+                        ? "border-white/10 bg-white/10"
+                        : "border-white/10 bg-black/30 opacity-80"
+                  }`}
+                >
+                  <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
+                  <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                  <p className="mt-2 text-xs font-black text-emerald-100">{week.theme}</p>
+                  {isUnlocked || isPreview ? (
+                    <>
+                      <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                      <div className="mt-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black">{week.badge}</div>
+                      <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">
+                        {isPreview ? "Supervisor Preview" : isCurrent ? "Open Now" : "Completed / Open"}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="mt-3 rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-xs font-black">
+                        🔒 Opens {formatUnlockDate(week.unlockDate)}
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-white/60">
+                        Future details open Sunday at 12:00 AM so youth stay focused on the current week.
+                      </p>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </Card>
 
@@ -3395,6 +3748,9 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
         <SupervisorEncouragementCard language={language} />
+        <FarmHumorCard audience="Supervisor" />
+        <GuidedDiscovery audience="Supervisor" setScreen={setScreen} />
+        <GuidedMedia audience="Supervisor" setScreen={setScreen} />
         <div className="mt-5 grid gap-2">
           {tabs.map((item) => (
             <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
@@ -4286,6 +4642,9 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
       <LargerPictureCard layerKey="Parent / Guardian Portal" />
 
       <ParentEncouragementCard language={language} />
+      <FarmHumorCard audience="Parent" />
+      <GuidedDiscovery audience="Parent" week={getUnlockedWeek()} setScreen={setScreen} />
+      <GuidedMedia audience="Parent" week={getUnlockedWeek()} setScreen={setScreen} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {[
