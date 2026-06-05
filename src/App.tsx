@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.3 - GUIDED PORTAL BUTTON WIRING + SCREEN FIT VERIFY
+ * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -321,23 +321,17 @@ const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
 
 const IMG = {
-  // Coherent Visual System: pathway images come from the Canva ecosystem wheel slices.
-  // Place these files in /public/images/ecosystem/ before deploying.
-  ecosystem: "/images/ecosystem/ecosystem_full.jpg",
-  ecosystemFull: "/images/ecosystem/ecosystem_full.jpg",
-  forest: "/images/ecosystem/ecosystem_full.jpg",
-  guest: "/images/ecosystem/guest.jpg",
-  customer: "/images/ecosystem/customer.jpg",
-  marketplace: "/images/ecosystem/marketplace.jpg",
-  market: "/images/ecosystem/marketplace.jpg",
-  grower: "/images/ecosystem/grower.jpg",
-  grow: "/images/ecosystem/grower.jpg",
-  youth: "/images/ecosystem/youth.jpg",
-  partner: "/images/ecosystem/partner.jpg",
-  partners: "/images/ecosystem/partner.jpg",
+  // Public-folder image paths. Files are in /public, so they are referenced from the site root.
+  // Keep spaces/capitalization exactly as the uploaded file names; Vercel is case-sensitive.
+  forest: "/images/Grow Area.png",
+  backup: "/images/GrowArea2.jpg",
+  youth: "/images/Fence_volunteers.png",
   supervisor: "/images/large (15).jpg",
-  backup: "/images/ConnectFoodEcosystem_withimages.png",
+  market: "/images/large.jpg",
+  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
+  grow: "/images/Grow Area.png",
   compost: "/images/Compost_ElliottGarden.png",
+  partners: "/images/Queens Village.png",
   queens: "/images/Queens Village.png",
   seeds: "/images/Seeds_Jubilee Gardens.png",
   fencing: "/images/Deer Fencing.png",
@@ -518,72 +512,6 @@ const youthCurriculumWeeks = [
     badge: "🏆 Cultivator Achievement",
     status: "Upcoming",
   },
-];
-
-const weekOneDailyPlan = [
-  {
-    day: "Monday",
-    theme: "Welcome Cultivators",
-    bigIdea: "I belong here.",
-    workforceSkill: "Professionalism",
-    farmSkill: "Site Orientation",
-    activity: "Scavenger Hunt: growing area, compost area, water station, safety station, marketplace area.",
-    reflection: "What made me feel welcome today?",
-    motivation: "Every expert was once a beginner.",
-  },
-  {
-    day: "Tuesday",
-    theme: "Soil Creates Life",
-    bigIdea: "Strong foundations create strong futures.",
-    workforceSkill: "Responsibility",
-    farmSkill: "Soil Health",
-    activity: "Observe soil, learn compost basics, and connect healthy soil to healthy food.",
-    reflection: "What responsibility do I have to my team?",
-    motivation: "Small actions create big results.",
-  },
-  {
-    day: "Wednesday",
-    theme: "Every Seed Has Potential",
-    bigIdea: "Growth takes time.",
-    workforceSkill: "Growth Mindset",
-    farmSkill: "Planting",
-    activity: "Plant seeds or seedlings and connect seed → plant → harvest → customer → community.",
-    reflection: "What strengths am I developing?",
-    motivation: "Growth happens one step at a time.",
-  },
-  {
-    day: "Thursday",
-    theme: "We Grow Better Together",
-    bigIdea: "Success is a team effort.",
-    workforceSkill: "Teamwork",
-    farmSkill: "Crop Care",
-    activity: "Complete a small team challenge such as weeding, preparing a bed, or organizing supplies.",
-    reflection: "How did I help my team succeed?",
-    motivation: "We accomplish more together.",
-  },
-  {
-    day: "Friday",
-    theme: "Building the Future",
-    bigIdea: "My actions matter.",
-    workforceSkill: "Leadership",
-    farmSkill: "Harvest Readiness",
-    activity: "Celebrate attendance, effort, growth, teamwork, problem solving, and positive attitude.",
-    reflection: "What am I most proud of this week?",
-    motivation: "Leadership begins with responsibility.",
-  },
-];
-
-const cultivatorCareerPathways = [
-  "Agriculture",
-  "Food Systems",
-  "Construction",
-  "Logistics",
-  "Culinary Arts",
-  "Environmental Science",
-  "Entrepreneurship",
-  "Agritourism",
-  "Marketing & Media",
-  "Public Service",
 ];
 
 const youthAchievementBadges = youthCurriculumWeeks.map((week) => ({
@@ -1442,7 +1370,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Mercado',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.3': 'Candidato de lanzamiento 3.0',
+    'Launch Candidate 3.0': 'Candidato de lanzamiento 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1469,7 +1397,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Marketplace',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.3': 'Launch Candidate 3.3',
+    'Launch Candidate 3.0': 'Launch Candidate 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1496,7 +1424,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Mercato',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.3': 'Candidato di lancio 3.0',
+    'Launch Candidate 3.0': 'Candidato di lancio 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1523,7 +1451,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'נוער, הורים, מדריכים, מגדלים ושותפים רשומים ממשיכים מהמרחב שהוקצה להם.',
     'Marketplace': 'שוק',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'עיינו במזון, מוצרים, אירועים, הזדמנויות למגדלים ורכישה דרך GrownBy.',
-    'Launch Candidate 3.3': 'מועמד השקה 3.0',
+    'Launch Candidate 3.0': 'מועמד השקה 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ניגשים ישר לעבודה.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'מבקרים ציבוריים יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'משתתפי הנוער של Nesco אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.',
@@ -1550,7 +1478,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace.': 'Jóvenes, padres, supervisores, productores y aliados registrados continúan desde su espacio asignado.',
     'Marketplace': 'Marché',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
-    'Launch Candidate 3.3': 'Candidat de lancement 3.0',
+    'Launch Candidate 3.0': 'Candidat de lancement 3.0',
     'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
     'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
     'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
@@ -1952,7 +1880,7 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
-      {screen === "demo" && <GuidedDemo setScreen={setScreen} language={language} />}
+      {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
@@ -2262,7 +2190,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
   const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("Start Guided Portal"), subtitle: TT("Opens a true step-by-step guided tour with Next, Previous, Restart, and progress tracking."), screen: "demo" },
+    { title: TT("Start Guided Portal"), subtitle: TT("New visitors can enter through the story, ecosystem overview, and guided experience."), screen: "demo" },
     { title: TT("Enter Ecosystem"), subtitle: TT("Browse public pathways without registering: guest story, events, marketplace, and opportunities."), screen: "guest" },
     { title: TT("Sign In / Returning Participant"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace."), screen: workspaceTarget },
     { title: TT("Marketplace"), subtitle: TT("Browse food, products, events, grower opportunities, and GrownBy-connected purchasing."), screen: "marketplace" },
@@ -2271,7 +2199,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
+        <div className="relative min-h-[70vh] sm:min-h-[68vh]">
           <img
             src={IMG.forest}
             alt="Bronson Family Farm forest gate entry"
@@ -2279,12 +2207,12 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
             onError={(event) => (event.currentTarget.src = IMG.backup)}
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.32),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-7">
+          <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
                 {TT("Forest Gate Portal")}
               </div>
-              <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[0.98] sm:text-5xl md:text-6xl">
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
                 {TT("Enter the Living Ecosystem")}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
@@ -2313,7 +2241,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
         <CultureCard language={language} variant="seed" />
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.3")}</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
           <h2 className="mt-3 text-3xl font-black leading-tight">{TT("New visitors enter the story. Returning users go straight to work.")}</h2>
           <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
@@ -3122,37 +3050,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
               <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Week 1 Experience</div>
-          <h2 className="mt-3 text-3xl font-black">Every Seed Has Potential</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">Week 1 teaches belonging, safety, responsibility, teamwork, leadership, and how every Cultivator contributes to the connected food ecosystem.</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {weekOneDailyPlan.map((day) => (
-              <div key={day.day} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{day.day}</div>
-                <h3 className="mt-2 text-lg font-black leading-tight">{day.theme}</h3>
-                <p className="mt-2 text-xs font-black text-amber-100">{day.bigIdea}</p>
-                <div className="mt-3 space-y-1 text-xs leading-5 text-white/74">
-                  <div><strong>Skill:</strong> {day.workforceSkill}</div>
-                  <div><strong>Farm:</strong> {day.farmSkill}</div>
-                  <div><strong>Reflect:</strong> {day.reflection}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Career + Resume Connections</div>
-          <h2 className="mt-3 text-3xl font-black">Skills Become Future Pathways</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">Cultivators build leadership, communication, responsibility, environmental stewardship, food-system knowledge, problem solving, entrepreneurship exposure, and career awareness while supporting real farm operations.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {cultivatorCareerPathways.map((pathway) => (
-              <span key={pathway} className="rounded-full border border-white/10 bg-black/30 px-3 py-2 text-xs font-black">{pathway}</span>
             ))}
           </div>
         </Card>
@@ -5776,228 +5673,76 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 
-type GuidedStop = {
-  title: string;
-  subtitle: string;
-  message: string;
-  bullets: string[];
-  image: string;
-  target?: Screen;
-  action?: string;
-};
-
-const guidedPortalStops: GuidedStop[] = [
-  {
-    title: "Welcome to Bronson Family Farm",
-    subtitle: "Connected Food Ecosystem",
-    message: "Welcome to a place-based ecosystem where food, people, education, business, and opportunity work together.",
-    bullets: ["One ecosystem", "Many pathways", "Shared community future"],
-    image: IMG.ecosystemFull,
-  },
-  {
-    title: "Connected Ecosystem",
-    subtitle: "The Larger Picture",
-    message: "Every pathway contributes to a stronger community. Food, knowledge, resources, and opportunity circulate locally.",
-    bullets: ["Grow", "Connect", "Circulate"],
-    image: IMG.ecosystemFull,
-  },
-  {
-    title: "Explore the Farm",
-    subtitle: "Guest Pathway",
-    message: "Guests experience the vision, story, and future of Bronson Family Farm through visits, events, and learning experiences.",
-    bullets: ["Learn", "Engage", "Be inspired"],
-    image: IMG.guest,
-    target: "guest",
-    action: "Open Guest Pathway",
-  },
-  {
-    title: "Healthy Food Access",
-    subtitle: "Customer Pathway",
-    message: "Families connect with fresh, chemical-free produce and practical nutrition that strengthens health and community life.",
-    bullets: ["Fresh food", "Nutrition", "Stronger families"],
-    image: IMG.customer,
-    target: "marketplace",
-    action: "Go to Marketplace",
-  },
-  {
-    title: "Community Marketplace",
-    subtitle: "Marketplace Pathway",
-    message: "The marketplace connects growers to schools, businesses, organizations, and community buyers so food moves and money circulates.",
-    bullets: ["Food moves", "Money circulates", "Community grows"],
-    image: IMG.marketplace,
-    target: "marketplace",
-    action: "Open Marketplace",
-  },
-  {
-    title: "Grower Support System",
-    subtitle: "Grower Pathway",
-    message: "Growers connect to education, tools, demonstrations, resources, and infrastructure that help them succeed.",
-    bullets: ["Learn and grow", "Tools and resources", "Stronger growers"],
-    image: IMG.grower,
-    target: "grower",
-    action: "Open Grower Pathway",
-  },
-  {
-    title: "Youth Workforce Development",
-    subtitle: "Cultivator Pathway",
-    message: "Youth Cultivators build skills, confidence, leadership, and job readiness through meaningful hands-on work.",
-    bullets: ["Build skills", "Build confidence", "Build futures"],
-    image: IMG.youth,
-    target: "youth",
-    action: "Open Youth Pathway",
-  },
-  {
-    title: "Community Partnerships",
-    subtitle: "Partner Pathway",
-    message: "Partners invest in education, health, workforce, and community revitalization through aligned support and collaboration.",
-    bullets: ["Collaborate", "Invest", "Create impact"],
-    image: IMG.partner,
-    target: "partner",
-    action: "Open Partner Pathway",
-  },
-  {
-    title: "Supervisor Support",
-    subtitle: "Operational Leadership",
-    message: "Supervisors coach youth, protect safety, document progress, support parents, and help the program operate well each day.",
-    bullets: ["Coach", "Document", "Protect"],
-    image: IMG.supervisor,
-    target: "supervisor",
-    action: "Open Supervisor Center",
-  },
-  {
-    title: "Mission Control",
-    subtitle: "Whole Ecosystem View",
-    message: "Mission Control uses records, feedback, reports, and observations to help the ecosystem improve and show impact.",
-    bullets: ["Readiness", "Reports", "Impact"],
-    image: IMG.ecosystemFull,
-    target: "reports",
-    action: "Open Reports",
-  },
-  {
-    title: "Choose Your Journey",
-    subtitle: "You Are Ready to Enter",
-    message: "Now choose the pathway that matches your role today. Each path uses the same visual language from the ecosystem wheel.",
-    bullets: ["Guest", "Youth", "Supervisor"],
-    image: IMG.ecosystemFull,
-  },
-];
-
-function GuidedDemo({ setScreen, language }: { setScreen: (screen: Screen) => void; language: LanguageCode }) {
-  const TT = (phrase: string) => translatePhrase(language, phrase);
-  const [stopIndex, setStopIndex] = useState(0);
-  const stop = guidedPortalStops[stopIndex];
-  const progress = Math.round(((stopIndex + 1) / guidedPortalStops.length) * 100);
-  const canGoBack = stopIndex > 0;
-  const canGoNext = stopIndex < guidedPortalStops.length - 1;
-
-  const goNext = () => setStopIndex((current) => Math.min(current + 1, guidedPortalStops.length - 1));
-  const goBack = () => setStopIndex((current) => Math.max(current - 1, 0));
-  const restart = () => setStopIndex(0);
+function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const stops = [
+    {
+      title: "1. Forest Gate",
+      text: "Begin with the story of Bronson Family Farm as the Youngstown anchor of the Mahoning & Trumbull Regional Food Ecosystem.",
+      action: "Explore Guest Story",
+      target: "guest" as Screen,
+    },
+    {
+      title: "2. Connected Food Ecosystem",
+      text: "See how growers, youth workforce, partners, supporters, marketplace activity, education, and community resources connect.",
+      action: "View Marketplace",
+      target: "marketplace" as Screen,
+    },
+    {
+      title: "3. Grower Pathway",
+      text: "Backyard gardens, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms all belong.",
+      action: "Open Grower Pathway",
+      target: "grower" as Screen,
+    },
+    {
+      title: "4. Youth Workforce",
+      text: "Youth begin with daily rhythm, PPE, wellness readiness, team identity, skills, leadership, and opportunity.",
+      action: "Open Youth Pathway",
+      target: "youth" as Screen,
+    },
+    {
+      title: "5. June 8 Farm Worker Heat Safety Project",
+      text: "Youth work through Design, Engineering, Manufacturing, and Contractor teams to build a real cooling station for farm worker and visitor heat safety.",
+      action: "Open Cooling Station Challenge",
+      target: "launchProject" as Screen,
+    },
+    {
+      title: "5. Partner + Support",
+      text: "Partners and supporters can volunteer, mentor, teach, donate, share resources, sponsor infrastructure, and strengthen the regional ecosystem.",
+      action: "Open Support Pathway",
+      target: "support" as Screen,
+    },
+    {
+      title: "6. Leave Comments",
+      text: "Every user can save comments, ratings, what excited them, what confused them, and what should improve. Data saves locally first and syncs to Supabase when the table matches.",
+      action: "Save Feedback / Comments",
+      target: "feedback" as Screen,
+    },
+  ];
 
   return (
-    <div className="mx-auto grid min-h-[calc(100vh-190px)] max-w-6xl items-stretch gap-4 lg:grid-cols-[1fr_.72fr]">
-      <Card className="flex min-h-[520px] flex-col overflow-hidden p-0">
-        <div className="relative h-[34vh] min-h-[210px] max-h-[340px] overflow-hidden">
-          <img src={stop.image} alt={stop.title} className="h-full w-full object-cover" onError={(event) => (event.currentTarget.src = IMG.backup)} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="inline-flex rounded-full border border-emerald-200/25 bg-black/45 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-50 backdrop-blur-xl">
-              {TT("Guided Portal")} · {TT("Stop")} {stopIndex + 1} {TT("of")} {guidedPortalStops.length}
-            </div>
-            <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">{TT(stop.title)}</h1>
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guided Demo</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Experience the ecosystem in order.</h1>
+      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
+        This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.
+      </p>
+      <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {stops.map((stop) => (
+          <div key={stop.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <h2 className="text-2xl font-black">{stop.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-white/82">{stop.text}</p>
+            <button type="button" onClick={() => setScreen(stop.target)} className="mt-5 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">
+              {stop.action}
+            </button>
           </div>
-        </div>
-
-        <div className="flex flex-1 flex-col justify-between p-5">
-          <div>
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">{TT(stop.subtitle)}</div>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-white/86">{TT(stop.message)}</p>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {stop.bullets.map((bullet) => (
-                <div key={bullet} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black leading-5">✓ {TT(bullet)}</div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5">
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-emerald-300" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={goBack} disabled={!canGoBack} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black disabled:opacity-35">◀ {TT("Previous")}</button>
-                <button type="button" onClick={goNext} disabled={!canGoNext} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black disabled:opacity-35">{TT("Next")} ▶</button>
-                <button type="button" onClick={restart} className="rounded-full border border-white/15 bg-black/35 px-5 py-3 text-sm font-black">↺ {TT("Restart")}</button>
-              </div>
-              {stop.target && (
-                <button type="button" onClick={() => setScreen(stop.target!)} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-5 py-3 text-sm font-black text-emerald-50">
-                  {TT(stop.action || "Open Pathway")}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <Card className="flex flex-col justify-between">
-        {stopIndex < guidedPortalStops.length - 1 ? (
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Visual System")}</div>
-            <h2 className="mt-3 text-3xl font-black leading-tight">{TT(stop.title)}</h2>
-            <p className="mt-3 text-sm leading-7 text-white/78">
-              {TT("Each guided stop now uses the image that matches its ecosystem-wheel pathway. Finish the tour before choosing a role.")}
-            </p>
-            <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{TT("Tour Progress")}</div>
-              <div className="mt-2 text-2xl font-black">{stopIndex + 1} / {guidedPortalStops.length}</div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-300" style={{ width: `${progress}%` }} />
-              </div>
-              <p className="mt-3 text-sm text-white/70">{progress}% {TT("Complete")}</p>
-            </div>
-            <div className="mt-4 grid gap-2 text-sm">
-              {[
-                ["Guest", "Explore the Farm"],
-                ["Customer", "Healthy Food Access"],
-                ["Marketplace", "Community Marketplace"],
-                ["Grower", "Grower Support System"],
-                ["Youth", "Youth Workforce Development"],
-                ["Partner", "Community Partnerships"],
-              ].map(([role, label]) => (
-                <div key={role} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
-                  <strong>{TT(role)}:</strong> {TT(label)}
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose Your Journey")}</div>
-            <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Now enter the pathway that fits your role.")}</h2>
-            <p className="mt-3 text-sm leading-7 text-white/78">
-              {TT("The tour is complete. Each pathway now matches the same ecosystem-wheel visual system.")}
-            </p>
-            <div className="mt-5 grid gap-2">
-              {[
-                { label: "Guest", screen: "guest" as Screen },
-                { label: "Youth Workforce", screen: "youth" as Screen },
-                { label: "Supervisor", screen: "supervisor" as Screen },
-                { label: "Parent", screen: "parent" as Screen },
-                { label: "Marketplace", screen: "marketplace" as Screen },
-                { label: "Partner", screen: "partner" as Screen },
-              ].map((choice) => (
-                <button key={choice.label} type="button" onClick={() => setScreen(choice.screen)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black transition hover:border-emerald-200/50 hover:bg-emerald-300/15">
-                  {TT(choice.label)}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="mt-5 rounded-2xl border border-amber-200/20 bg-amber-300/12 p-4 text-sm leading-6 text-amber-50">
-          <strong>{TT("Launch Fit Rule")}:</strong> {TT("One screen. One idea. One action. No hidden buttons before launch.")}
-        </div>
-      </Card>
-    </div>
+        ))}
+      </div>
+      <div className="mt-7 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+      </div>
+    </Card>
   );
 }
 
