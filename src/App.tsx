@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
+ * LAUNCH CANDIDATE 3.1 - TRUE GUIDED PORTAL + SCREEN FIT + WEEK 1 CULTIVATOR LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -512,6 +512,72 @@ const youthCurriculumWeeks = [
     badge: "🏆 Cultivator Achievement",
     status: "Upcoming",
   },
+];
+
+const weekOneDailyPlan = [
+  {
+    day: "Monday",
+    theme: "Welcome Cultivators",
+    bigIdea: "I belong here.",
+    workforceSkill: "Professionalism",
+    farmSkill: "Site Orientation",
+    activity: "Scavenger Hunt: growing area, compost area, water station, safety station, marketplace area.",
+    reflection: "What made me feel welcome today?",
+    motivation: "Every expert was once a beginner.",
+  },
+  {
+    day: "Tuesday",
+    theme: "Soil Creates Life",
+    bigIdea: "Strong foundations create strong futures.",
+    workforceSkill: "Responsibility",
+    farmSkill: "Soil Health",
+    activity: "Observe soil, learn compost basics, and connect healthy soil to healthy food.",
+    reflection: "What responsibility do I have to my team?",
+    motivation: "Small actions create big results.",
+  },
+  {
+    day: "Wednesday",
+    theme: "Every Seed Has Potential",
+    bigIdea: "Growth takes time.",
+    workforceSkill: "Growth Mindset",
+    farmSkill: "Planting",
+    activity: "Plant seeds or seedlings and connect seed → plant → harvest → customer → community.",
+    reflection: "What strengths am I developing?",
+    motivation: "Growth happens one step at a time.",
+  },
+  {
+    day: "Thursday",
+    theme: "We Grow Better Together",
+    bigIdea: "Success is a team effort.",
+    workforceSkill: "Teamwork",
+    farmSkill: "Crop Care",
+    activity: "Complete a small team challenge such as weeding, preparing a bed, or organizing supplies.",
+    reflection: "How did I help my team succeed?",
+    motivation: "We accomplish more together.",
+  },
+  {
+    day: "Friday",
+    theme: "Building the Future",
+    bigIdea: "My actions matter.",
+    workforceSkill: "Leadership",
+    farmSkill: "Harvest Readiness",
+    activity: "Celebrate attendance, effort, growth, teamwork, problem solving, and positive attitude.",
+    reflection: "What am I most proud of this week?",
+    motivation: "Leadership begins with responsibility.",
+  },
+];
+
+const cultivatorCareerPathways = [
+  "Agriculture",
+  "Food Systems",
+  "Construction",
+  "Logistics",
+  "Culinary Arts",
+  "Environmental Science",
+  "Entrepreneurship",
+  "Agritourism",
+  "Marketing & Media",
+  "Public Service",
 ];
 
 const youthAchievementBadges = youthCurriculumWeeks.map((week) => ({
@@ -1880,7 +1946,7 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
-      {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
+      {screen === "demo" && <GuidedDemo setScreen={setScreen} language={language} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
@@ -3050,6 +3116,37 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
               <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Week 1 Experience</div>
+          <h2 className="mt-3 text-3xl font-black">Every Seed Has Potential</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">Week 1 teaches belonging, safety, responsibility, teamwork, leadership, and how every Cultivator contributes to the connected food ecosystem.</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            {weekOneDailyPlan.map((day) => (
+              <div key={day.day} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{day.day}</div>
+                <h3 className="mt-2 text-lg font-black leading-tight">{day.theme}</h3>
+                <p className="mt-2 text-xs font-black text-amber-100">{day.bigIdea}</p>
+                <div className="mt-3 space-y-1 text-xs leading-5 text-white/74">
+                  <div><strong>Skill:</strong> {day.workforceSkill}</div>
+                  <div><strong>Farm:</strong> {day.farmSkill}</div>
+                  <div><strong>Reflect:</strong> {day.reflection}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Career + Resume Connections</div>
+          <h2 className="mt-3 text-3xl font-black">Skills Become Future Pathways</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">Cultivators build leadership, communication, responsibility, environmental stewardship, food-system knowledge, problem solving, entrepreneurship exposure, and career awareness while supporting real farm operations.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {cultivatorCareerPathways.map((pathway) => (
+              <span key={pathway} className="rounded-full border border-white/10 bg-black/30 px-3 py-2 text-xs font-black">{pathway}</span>
             ))}
           </div>
         </Card>
@@ -5673,76 +5770,200 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 
-function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const stops = [
-    {
-      title: "1. Forest Gate",
-      text: "Begin with the story of Bronson Family Farm as the Youngstown anchor of the Mahoning & Trumbull Regional Food Ecosystem.",
-      action: "Explore Guest Story",
-      target: "guest" as Screen,
-    },
-    {
-      title: "2. Connected Food Ecosystem",
-      text: "See how growers, youth workforce, partners, supporters, marketplace activity, education, and community resources connect.",
-      action: "View Marketplace",
-      target: "marketplace" as Screen,
-    },
-    {
-      title: "3. Grower Pathway",
-      text: "Backyard gardens, community gardens, school gardens, church gardens, urban farms, greenhouses, homesteads, and market farms all belong.",
-      action: "Open Grower Pathway",
-      target: "grower" as Screen,
-    },
-    {
-      title: "4. Youth Workforce",
-      text: "Youth begin with daily rhythm, PPE, wellness readiness, team identity, skills, leadership, and opportunity.",
-      action: "Open Youth Pathway",
-      target: "youth" as Screen,
-    },
-    {
-      title: "5. June 8 Farm Worker Heat Safety Project",
-      text: "Youth work through Design, Engineering, Manufacturing, and Contractor teams to build a real cooling station for farm worker and visitor heat safety.",
-      action: "Open Cooling Station Challenge",
-      target: "launchProject" as Screen,
-    },
-    {
-      title: "5. Partner + Support",
-      text: "Partners and supporters can volunteer, mentor, teach, donate, share resources, sponsor infrastructure, and strengthen the regional ecosystem.",
-      action: "Open Support Pathway",
-      target: "support" as Screen,
-    },
-    {
-      title: "6. Leave Comments",
-      text: "Every user can save comments, ratings, what excited them, what confused them, and what should improve. Data saves locally first and syncs to Supabase when the table matches.",
-      action: "Save Feedback / Comments",
-      target: "feedback" as Screen,
-    },
-  ];
+type GuidedStop = {
+  title: string;
+  subtitle: string;
+  message: string;
+  bullets: string[];
+  image: string;
+  target?: Screen;
+  action?: string;
+};
+
+const guidedPortalStops: GuidedStop[] = [
+  {
+    title: "Welcome",
+    subtitle: "Forest Gate Portal",
+    message: "Welcome to the Bronson Family Farm Ecosystem. Discover how food, people, education, business, and opportunity work together.",
+    bullets: ["One ecosystem", "Many pathways", "Shared community future"],
+    image: IMG.forest,
+    target: "guest",
+    action: "Explore Guest Story",
+  },
+  {
+    title: "Connected Ecosystem",
+    subtitle: "The Larger Picture",
+    message: "Every pathway contributes to a stronger community. Food moves through growers, youth, families, customers, partners, and marketplace activity.",
+    bullets: ["Food", "Education", "Opportunity"],
+    image: IMG.ecosystem,
+    target: "marketplace",
+    action: "View Marketplace",
+  },
+  {
+    title: "Why This Matters",
+    subtitle: "Purpose Before Tasks",
+    message: "Every seed planted, customer served, and visitor welcomed contributes to a stronger Youngstown. Youth are not just working; they are helping build the future.",
+    bullets: ["Belonging", "Responsibility", "Community impact"],
+    image: IMG.youth,
+    target: "youth",
+    action: "Begin Youth Journey",
+  },
+  {
+    title: "Guest",
+    subtitle: "Explore the Farm",
+    message: "Guests experience the farm story, the Historic Lansdowne Airport setting, regenerative agriculture, and the connected food ecosystem.",
+    bullets: ["Learn the story", "Visit events", "Connect to opportunity"],
+    image: IMG.forest,
+    target: "guest",
+    action: "Open Guest Pathway",
+  },
+  {
+    title: "Customer",
+    subtitle: "Healthy Food Access",
+    message: "Customers support local agriculture and healthy communities by connecting with produce, marketplace offerings, and GrownBy purchasing.",
+    bullets: ["Fresh food", "Local purchasing", "SNAP-aware marketplace"],
+    image: IMG.market,
+    target: "marketplace",
+    action: "Go to Marketplace",
+  },
+  {
+    title: "Grower",
+    subtitle: "Create Abundance",
+    message: "Growers connect crop planning, resource needs, inventory, training, and marketplace opportunity across backyard, school, church, urban, and market gardens.",
+    bullets: ["Plan crops", "Share resources", "Reach markets"],
+    image: IMG.grow,
+    target: "grower",
+    action: "Open Grower Pathway",
+  },
+  {
+    title: "Youth Workforce",
+    subtitle: "Cultivators Build the Future",
+    message: "Youth Cultivators learn leadership, responsibility, teamwork, agriculture, communication, and career readiness while helping grow healthy food.",
+    bullets: ["Check in", "Complete mission", "Reflect and grow"],
+    image: IMG.youth,
+    target: "youth",
+    action: "Open Youth Pathway",
+  },
+  {
+    title: "Supervisor",
+    subtitle: "Support Youth Success",
+    message: "Supervisors guide attendance, PPE, safety, wellness review, daily assessment, parent-safe summaries, and encouragement.",
+    bullets: ["Coach", "Document", "Protect"],
+    image: IMG.supervisor,
+    target: "supervisor",
+    action: "Open Supervisor Center",
+  },
+  {
+    title: "Partner",
+    subtitle: "Align Resources",
+    message: "Partners strengthen impact through volunteer support, mentoring, supplies, education, sponsorship, and collaboration.",
+    bullets: ["Collaborate", "Sponsor", "Serve"],
+    image: IMG.partners,
+    target: "partner",
+    action: "Open Partner Pathway",
+  },
+  {
+    title: "Mission Control",
+    subtitle: "See the Whole System",
+    message: "Mission Control turns daily records into readiness, reporting, feedback, and impact so the ecosystem can operate and improve.",
+    bullets: ["Readiness", "Reports", "Impact"],
+    image: IMG.ecosystem,
+    target: "reports",
+    action: "Open Reports",
+  },
+  {
+    title: "Choose Your Journey",
+    subtitle: "You Are Ready to Enter",
+    message: "Select the pathway that matches your role today. The ecosystem will guide you one step at a time.",
+    bullets: ["Youth", "Supervisor", "Guest or Partner"],
+    image: IMG.forest,
+  },
+];
+
+function GuidedDemo({ setScreen, language }: { setScreen: (screen: Screen) => void; language: LanguageCode }) {
+  const TT = (phrase: string) => translatePhrase(language, phrase);
+  const [stopIndex, setStopIndex] = useState(0);
+  const stop = guidedPortalStops[stopIndex];
+  const progress = Math.round(((stopIndex + 1) / guidedPortalStops.length) * 100);
+  const canGoBack = stopIndex > 0;
+  const canGoNext = stopIndex < guidedPortalStops.length - 1;
+
+  const goNext = () => setStopIndex((current) => Math.min(current + 1, guidedPortalStops.length - 1));
+  const goBack = () => setStopIndex((current) => Math.max(current - 1, 0));
+  const restart = () => setStopIndex(0);
 
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guided Demo</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Experience the ecosystem in order.</h1>
-      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
-        This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.
-      </p>
-      <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {stops.map((stop) => (
-          <div key={stop.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <h2 className="text-2xl font-black">{stop.title}</h2>
-            <p className="mt-3 text-sm leading-6 text-white/82">{stop.text}</p>
-            <button type="button" onClick={() => setScreen(stop.target)} className="mt-5 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">
-              {stop.action}
-            </button>
+    <div className="mx-auto grid min-h-[calc(100vh-190px)] max-w-6xl items-stretch gap-4 lg:grid-cols-[1fr_.72fr]">
+      <Card className="flex min-h-[520px] flex-col overflow-hidden p-0">
+        <div className="relative h-[34vh] min-h-[210px] max-h-[340px] overflow-hidden">
+          <img src={stop.image} alt={stop.title} className="h-full w-full object-cover" onError={(event) => (event.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="inline-flex rounded-full border border-emerald-200/25 bg-black/45 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-50 backdrop-blur-xl">
+              {TT("Guided Portal")} · {TT("Stop")} {stopIndex + 1} {TT("of")} {guidedPortalStops.length}
+            </div>
+            <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">{TT(stop.title)}</h1>
           </div>
-        ))}
-      </div>
-      <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
-        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
-      </div>
-    </Card>
+        </div>
+
+        <div className="flex flex-1 flex-col justify-between p-5">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">{TT(stop.subtitle)}</div>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-white/86">{TT(stop.message)}</p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {stop.bullets.map((bullet) => (
+                <div key={bullet} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black leading-5">✓ {TT(bullet)}</div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-emerald-300" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={goBack} disabled={!canGoBack} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black disabled:opacity-35">◀ {TT("Previous")}</button>
+                <button type="button" onClick={goNext} disabled={!canGoNext} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black disabled:opacity-35">{TT("Next")} ▶</button>
+                <button type="button" onClick={restart} className="rounded-full border border-white/15 bg-black/35 px-5 py-3 text-sm font-black">↺ {TT("Restart")}</button>
+              </div>
+              {stop.target && (
+                <button type="button" onClick={() => setScreen(stop.target!)} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-5 py-3 text-sm font-black text-emerald-50">
+                  {TT(stop.action || "Open Pathway")}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="flex flex-col justify-between">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose Your Journey")}</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("One screen. One idea. One action.")}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/78">
+            {TT("This guided portal is built for launch: no long paragraphs, no hidden buttons, no confusing menu-first experience.")}
+          </p>
+          <div className="mt-5 grid gap-2">
+            {[
+              { label: "Guest", screen: "guest" as Screen },
+              { label: "Youth Workforce", screen: "youth" as Screen },
+              { label: "Supervisor", screen: "supervisor" as Screen },
+              { label: "Parent", screen: "parent" as Screen },
+              { label: "Marketplace", screen: "marketplace" as Screen },
+              { label: "Partner", screen: "partner" as Screen },
+            ].map((choice) => (
+              <button key={choice.label} type="button" onClick={() => setScreen(choice.screen)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black transition hover:border-emerald-200/50 hover:bg-emerald-300/15">
+                {TT(choice.label)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 rounded-2xl border border-amber-200/20 bg-amber-300/12 p-4 text-sm leading-6 text-amber-50">
+          <strong>{TT("Launch Fit Rule")}:</strong> {TT("Each stop must be readable in under 15 seconds and usable without scrolling during supervisor training.")}
+        </div>
+      </Card>
+    </div>
   );
 }
 
