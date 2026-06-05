@@ -1924,66 +1924,33 @@ function Shell({
 }) {
   const role = activeUser?.role;
   const workspaceTarget = role ? routeForRole(role) : "roles";
-  const roleNav: { label: string; screen: Screen; roles?: Role[] }[] = role === "Youth Workforce Participant"
-    ? [
-        { label: "Start Day", screen: "wellness" },
-        { label: "My Day", screen: "youth" },
-        { label: "Today", screen: "launchProject" },
-        { label: "Ecosystem", screen: "demo" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Media", screen: "media" },
-        { label: "Reflection", screen: "feedback" },
-      ]
-    : role === "Parent / Guardian"
-    ? [
-        { label: "Youth Progress", screen: "parent" },
-        { label: "Encouragement", screen: "parent" },
-        { label: "Family Feedback", screen: "feedback" },
-      ]
-    : role === "Supervisor / Staff"
-    ? [
-        { label: "Supervisor", screen: "supervisor" },
-        { label: "Reports", screen: "reports" },
-        { label: "June 8", screen: "launchProject" },
-        { label: "Feedback", screen: "feedback" },
-      ]
-    : role === "Case Manager"
-    ? [
-        { label: "Case Manager", screen: "caseManager" },
-        { label: "Support Cases", screen: "caseManager" },
-        { label: "Reports", screen: "reports" },
-        { label: "Feedback", screen: "feedback" },
-      ]
-    : role === "Grower"
-    ? [
-        { label: "Grower", screen: "grower" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Resources", screen: "events" },
-      ]
-    : role === "Partner" || role === "Board / Funder"
-    ? [
-        { label: "Impact", screen: "partner" },
-        { label: "Reports", screen: "reports" },
-        { label: "Support", screen: "support" },
-      ]
-    : role === "Administrator"
-    ? [
-        { label: "Mission Control", screen: "reports" },
-        { label: "Supervisor", screen: "supervisor" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Register", screen: "registration" },
-      ]
-    : role === "Value-Added Producer"
-    ? [
-        { label: "Value-Added", screen: "valueAdded" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Feedback", screen: "feedback" },
-      ]
-    : [
-        { label: "Guest", screen: "guest" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Feedback", screen: "feedback" },
-      ];
+
+  // Launch 4.0 ecosystem shell restoration:
+  // The primary navigation always shows the full ecosystem.
+  // Role-specific workspaces, such as Youth Start Day, stay in a secondary row.
+  const primaryNav: { label: string; screen: Screen }[] = [
+    { label: "Guest", screen: "guest" },
+    { label: "Youth Workforce", screen: "youth" },
+    { label: "Parent", screen: "parent" },
+    { label: "Supervisor", screen: "supervisor" },
+    { label: "Grower", screen: "grower" },
+    { label: "Marketplace", screen: "marketplace" },
+    { label: "Partner", screen: "partner" },
+    { label: "Value-Added", screen: "valueAdded" },
+    { label: "Mission Control", screen: "reports" },
+  ];
+
+  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion"];
+  const showYouthWorkspace = role === "Youth Workforce Participant" || youthScreens.includes(screen);
+  const youthWorkspaceNav: { label: string; screen: Screen }[] = [
+    { label: "Start Day", screen: "wellness" },
+    { label: "My Day", screen: "youth" },
+    { label: "Today’s Project", screen: "launchProject" },
+    { label: "My Week", screen: "youth" },
+    { label: "Portfolio", screen: "completion" },
+    { label: "Media", screen: "media" },
+    { label: "Reflection", screen: "feedback" },
+  ];
 
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
   const buttonClass = (target: Screen) =>
@@ -2001,7 +1968,7 @@ function Shell({
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">Bronson Family Farm Ecosystem</div>
             </button>
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
@@ -2022,14 +1989,27 @@ function Shell({
 
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
             <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
-            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
-            {roleNav.map((item) => (
-              <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
+            {primaryNav.map((item) => (
+              <button type="button" key={`primary-${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                 {item.label}
               </button>
             ))}
-            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Choose Role")}</button>}
           </div>
+
+          {showYouthWorkspace && (
+            <div className="mt-2 rounded-2xl border border-emerald-200/12 bg-emerald-300/[0.055] p-2">
+              <div className="mb-2 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">
+                Youth Workspace
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {youthWorkspaceNav.map((item) => (
+                  <button type="button" key={`youth-${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
             <div className="truncate rounded-full border border-white/10 bg-white/8 px-3 py-1">
@@ -2047,6 +2027,10 @@ function Shell({
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
               <button type="button" onClick={() => setScreen("demo")} className={buttonClass("demo")}>Guided Portal</button>
               <button type="button" onClick={() => setScreen("guest")} className={buttonClass("guest")}>Guest</button>
+              <button type="button" onClick={() => setScreen("youth")} className={buttonClass("youth")}>Youth Workforce</button>
+              <button type="button" onClick={() => setScreen("parent")} className={buttonClass("parent")}>Parent</button>
+              <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>
+              <button type="button" onClick={() => setScreen("reports")} className={buttonClass("reports")}>Mission Control</button>
               <button type="button" onClick={() => setScreen("marketplace")} className={buttonClass("marketplace")}>Marketplace</button>
               <button type="button" onClick={() => setScreen("grower")} className={buttonClass("grower")}>Grower</button>
               <button type="button" onClick={() => setScreen("partner")} className={buttonClass("partner")}>Partner</button>
@@ -2056,7 +2040,6 @@ function Shell({
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
-              {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
               {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>Case Manager</button>}
               {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
