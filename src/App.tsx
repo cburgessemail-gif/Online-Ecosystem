@@ -321,17 +321,23 @@ const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
 
 const IMG = {
-  // Public-folder image paths. Files are in /public, so they are referenced from the site root.
-  // Keep spaces/capitalization exactly as the uploaded file names; Vercel is case-sensitive.
-  forest: "/images/Grow Area.png",
-  backup: "/images/GrowArea2.jpg",
-  youth: "/images/Fence_volunteers.png",
+  // Coherent Visual System: pathway images come from the Canva ecosystem wheel slices.
+  // Place these files in /public/images/ecosystem/ before deploying.
+  ecosystem: "/images/ecosystem/ecosystem_full.jpg",
+  ecosystemFull: "/images/ecosystem/ecosystem_full.jpg",
+  forest: "/images/ecosystem/ecosystem_full.jpg",
+  guest: "/images/ecosystem/guest.jpg",
+  customer: "/images/ecosystem/customer.jpg",
+  marketplace: "/images/ecosystem/marketplace.jpg",
+  market: "/images/ecosystem/marketplace.jpg",
+  grower: "/images/ecosystem/grower.jpg",
+  grow: "/images/ecosystem/grower.jpg",
+  youth: "/images/ecosystem/youth.jpg",
+  partner: "/images/ecosystem/partner.jpg",
+  partners: "/images/ecosystem/partner.jpg",
   supervisor: "/images/large (15).jpg",
-  market: "/images/large.jpg",
-  ecosystem: "/images/ConnectFoodEcosystem_withimages.png",
-  grow: "/images/Grow Area.png",
+  backup: "/images/ConnectFoodEcosystem_withimages.png",
   compost: "/images/Compost_ElliottGarden.png",
-  partners: "/images/Queens Village.png",
   queens: "/images/Queens Village.png",
   seeds: "/images/Seeds_Jubilee Gardens.png",
   fencing: "/images/Deer Fencing.png",
@@ -5782,101 +5788,97 @@ type GuidedStop = {
 
 const guidedPortalStops: GuidedStop[] = [
   {
-    title: "Welcome",
-    subtitle: "Forest Gate Portal",
-    message: "Welcome to the Bronson Family Farm Ecosystem. Discover how food, people, education, business, and opportunity work together.",
+    title: "Welcome to Bronson Family Farm",
+    subtitle: "Connected Food Ecosystem",
+    message: "Welcome to a place-based ecosystem where food, people, education, business, and opportunity work together.",
     bullets: ["One ecosystem", "Many pathways", "Shared community future"],
-    image: IMG.forest,
-    target: "guest",
-    action: "Explore Guest Story",
+    image: IMG.ecosystemFull,
   },
   {
     title: "Connected Ecosystem",
     subtitle: "The Larger Picture",
-    message: "Every pathway contributes to a stronger community. Food moves through growers, youth, families, customers, partners, and marketplace activity.",
-    bullets: ["Food", "Education", "Opportunity"],
-    image: IMG.ecosystem,
-    target: "marketplace",
-    action: "View Marketplace",
+    message: "Every pathway contributes to a stronger community. Food, knowledge, resources, and opportunity circulate locally.",
+    bullets: ["Grow", "Connect", "Circulate"],
+    image: IMG.ecosystemFull,
   },
   {
-    title: "Why This Matters",
-    subtitle: "Purpose Before Tasks",
-    message: "Every seed planted, customer served, and visitor welcomed contributes to a stronger Youngstown. Youth are not just working; they are helping build the future.",
-    bullets: ["Belonging", "Responsibility", "Community impact"],
-    image: IMG.youth,
-    target: "youth",
-    action: "Begin Youth Journey",
-  },
-  {
-    title: "Guest",
-    subtitle: "Explore the Farm",
-    message: "Guests experience the farm story, the Historic Lansdowne Airport setting, regenerative agriculture, and the connected food ecosystem.",
-    bullets: ["Learn the story", "Visit events", "Connect to opportunity"],
-    image: IMG.forest,
+    title: "Explore the Farm",
+    subtitle: "Guest Pathway",
+    message: "Guests experience the vision, story, and future of Bronson Family Farm through visits, events, and learning experiences.",
+    bullets: ["Learn", "Engage", "Be inspired"],
+    image: IMG.guest,
     target: "guest",
     action: "Open Guest Pathway",
   },
   {
-    title: "Customer",
-    subtitle: "Healthy Food Access",
-    message: "Customers support local agriculture and healthy communities by connecting with produce, marketplace offerings, and GrownBy purchasing.",
-    bullets: ["Fresh food", "Local purchasing", "SNAP-aware marketplace"],
-    image: IMG.market,
+    title: "Healthy Food Access",
+    subtitle: "Customer Pathway",
+    message: "Families connect with fresh, chemical-free produce and practical nutrition that strengthens health and community life.",
+    bullets: ["Fresh food", "Nutrition", "Stronger families"],
+    image: IMG.customer,
     target: "marketplace",
     action: "Go to Marketplace",
   },
   {
-    title: "Grower",
-    subtitle: "Create Abundance",
-    message: "Growers connect crop planning, resource needs, inventory, training, and marketplace opportunity across backyard, school, church, urban, and market gardens.",
-    bullets: ["Plan crops", "Share resources", "Reach markets"],
-    image: IMG.grow,
+    title: "Community Marketplace",
+    subtitle: "Marketplace Pathway",
+    message: "The marketplace connects growers to schools, businesses, organizations, and community buyers so food moves and money circulates.",
+    bullets: ["Food moves", "Money circulates", "Community grows"],
+    image: IMG.marketplace,
+    target: "marketplace",
+    action: "Open Marketplace",
+  },
+  {
+    title: "Grower Support System",
+    subtitle: "Grower Pathway",
+    message: "Growers connect to education, tools, demonstrations, resources, and infrastructure that help them succeed.",
+    bullets: ["Learn and grow", "Tools and resources", "Stronger growers"],
+    image: IMG.grower,
     target: "grower",
     action: "Open Grower Pathway",
   },
   {
-    title: "Youth Workforce",
-    subtitle: "Cultivators Build the Future",
-    message: "Youth Cultivators learn leadership, responsibility, teamwork, agriculture, communication, and career readiness while helping grow healthy food.",
-    bullets: ["Check in", "Complete mission", "Reflect and grow"],
+    title: "Youth Workforce Development",
+    subtitle: "Cultivator Pathway",
+    message: "Youth Cultivators build skills, confidence, leadership, and job readiness through meaningful hands-on work.",
+    bullets: ["Build skills", "Build confidence", "Build futures"],
     image: IMG.youth,
     target: "youth",
     action: "Open Youth Pathway",
   },
   {
-    title: "Supervisor",
-    subtitle: "Support Youth Success",
-    message: "Supervisors guide attendance, PPE, safety, wellness review, daily assessment, parent-safe summaries, and encouragement.",
+    title: "Community Partnerships",
+    subtitle: "Partner Pathway",
+    message: "Partners invest in education, health, workforce, and community revitalization through aligned support and collaboration.",
+    bullets: ["Collaborate", "Invest", "Create impact"],
+    image: IMG.partner,
+    target: "partner",
+    action: "Open Partner Pathway",
+  },
+  {
+    title: "Supervisor Support",
+    subtitle: "Operational Leadership",
+    message: "Supervisors coach youth, protect safety, document progress, support parents, and help the program operate well each day.",
     bullets: ["Coach", "Document", "Protect"],
     image: IMG.supervisor,
     target: "supervisor",
     action: "Open Supervisor Center",
   },
   {
-    title: "Partner",
-    subtitle: "Align Resources",
-    message: "Partners strengthen impact through volunteer support, mentoring, supplies, education, sponsorship, and collaboration.",
-    bullets: ["Collaborate", "Sponsor", "Serve"],
-    image: IMG.partners,
-    target: "partner",
-    action: "Open Partner Pathway",
-  },
-  {
     title: "Mission Control",
-    subtitle: "See the Whole System",
-    message: "Mission Control turns daily records into readiness, reporting, feedback, and impact so the ecosystem can operate and improve.",
+    subtitle: "Whole Ecosystem View",
+    message: "Mission Control uses records, feedback, reports, and observations to help the ecosystem improve and show impact.",
     bullets: ["Readiness", "Reports", "Impact"],
-    image: IMG.ecosystem,
+    image: IMG.ecosystemFull,
     target: "reports",
     action: "Open Reports",
   },
   {
     title: "Choose Your Journey",
     subtitle: "You Are Ready to Enter",
-    message: "Select the pathway that matches your role today. The ecosystem will guide you one step at a time.",
-    bullets: ["Youth", "Supervisor", "Guest or Partner"],
-    image: IMG.forest,
+    message: "Now choose the pathway that matches your role today. Each path uses the same visual language from the ecosystem wheel.",
+    bullets: ["Guest", "Youth", "Supervisor"],
+    image: IMG.ecosystemFull,
   },
 ];
 
@@ -5938,29 +5940,61 @@ function GuidedDemo({ setScreen, language }: { setScreen: (screen: Screen) => vo
       </Card>
 
       <Card className="flex flex-col justify-between">
-        <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose Your Journey")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("One screen. One idea. One action.")}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/78">
-            {TT("This guided portal is built for launch: no long paragraphs, no hidden buttons, no confusing menu-first experience.")}
-          </p>
-          <div className="mt-5 grid gap-2">
-            {[
-              { label: "Guest", screen: "guest" as Screen },
-              { label: "Youth Workforce", screen: "youth" as Screen },
-              { label: "Supervisor", screen: "supervisor" as Screen },
-              { label: "Parent", screen: "parent" as Screen },
-              { label: "Marketplace", screen: "marketplace" as Screen },
-              { label: "Partner", screen: "partner" as Screen },
-            ].map((choice) => (
-              <button key={choice.label} type="button" onClick={() => setScreen(choice.screen)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black transition hover:border-emerald-200/50 hover:bg-emerald-300/15">
-                {TT(choice.label)}
-              </button>
-            ))}
+        {stopIndex < guidedPortalStops.length - 1 ? (
+          <div>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Visual System")}</div>
+            <h2 className="mt-3 text-3xl font-black leading-tight">{TT(stop.title)}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/78">
+              {TT("Each guided stop now uses the image that matches its ecosystem-wheel pathway. Finish the tour before choosing a role.")}
+            </p>
+            <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{TT("Tour Progress")}</div>
+              <div className="mt-2 text-2xl font-black">{stopIndex + 1} / {guidedPortalStops.length}</div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-emerald-300" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="mt-3 text-sm text-white/70">{progress}% {TT("Complete")}</p>
+            </div>
+            <div className="mt-4 grid gap-2 text-sm">
+              {[
+                ["Guest", "Explore the Farm"],
+                ["Customer", "Healthy Food Access"],
+                ["Marketplace", "Community Marketplace"],
+                ["Grower", "Grower Support System"],
+                ["Youth", "Youth Workforce Development"],
+                ["Partner", "Community Partnerships"],
+              ].map(([role, label]) => (
+                <div key={role} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
+                  <strong>{TT(role)}:</strong> {TT(label)}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose Your Journey")}</div>
+            <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Now enter the pathway that fits your role.")}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/78">
+              {TT("The tour is complete. Each pathway now matches the same ecosystem-wheel visual system.")}
+            </p>
+            <div className="mt-5 grid gap-2">
+              {[
+                { label: "Guest", screen: "guest" as Screen },
+                { label: "Youth Workforce", screen: "youth" as Screen },
+                { label: "Supervisor", screen: "supervisor" as Screen },
+                { label: "Parent", screen: "parent" as Screen },
+                { label: "Marketplace", screen: "marketplace" as Screen },
+                { label: "Partner", screen: "partner" as Screen },
+              ].map((choice) => (
+                <button key={choice.label} type="button" onClick={() => setScreen(choice.screen)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black transition hover:border-emerald-200/50 hover:bg-emerald-300/15">
+                  {TT(choice.label)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="mt-5 rounded-2xl border border-amber-200/20 bg-amber-300/12 p-4 text-sm leading-6 text-amber-50">
-          <strong>{TT("Launch Fit Rule")}:</strong> {TT("Each stop must be readable in under 15 seconds and usable without scrolling during supervisor training.")}
+          <strong>{TT("Launch Fit Rule")}:</strong> {TT("One screen. One idea. One action. No hidden buttons before launch.")}
         </div>
       </Card>
     </div>
