@@ -439,248 +439,78 @@ const coolingCenterReflectionQuestions = [
 ];
 
 
-const curriculumTeams = [
-  "Agriculture",
-  "Infrastructure",
-  "Apiary & Pollination",
-  "Culinary & Nutrition",
-  "Guest Services & Tourism",
-  "Media & Storytelling",
-  "Safety & Security",
-  "Project Management & Logistics",
-];
-
 const youthCurriculumWeeks = [
   {
     week: 1,
-    unlockDate: "2026-06-07T00:00:00",
-    title: "Becoming a Cultivator",
-    theme: "Orientation, Safety, Belonging",
-    focus:
-      "Youth enter the Bronson Family Farm ecosystem, complete orientation, learn safety expectations, meet teams, and understand their role as Cultivators.",
-    project: "Orientation, safety, team assignment, ecosystem introduction, and June 8 Cooling Station launch project.",
-    skills: ["Safety", "Teamwork", "Communication", "Responsibility", "Following Instructions"],
-    badge: "🌱 Cultivator Foundations",
+    title: "Workplace Foundations & Safety",
+    focus: "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.",
+    project: "Farm Worker Heat Safety & Cooling Station Challenge",
+    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Following Instructions"],
+    badge: "🏅 Workplace Foundations",
     status: "Current Week",
-    requiredOutcomes: [
-      "Complete orientation",
-      "Understand farm safety and PPE",
-      "Join assigned team",
-      "Understand the ecosystem story",
-      "Complete first reflection",
-    ],
-    flexibleActivities: [
-      "Farm tour",
-      "Team introductions",
-      "Safety walk-through",
-      "Ecosystem demonstration",
-      "Supervisor check-in",
-      "Cooling Station Challenge orientation",
-    ],
-    resumeOutcome:
-      "Completed workforce orientation and safety training in a multidisciplinary agricultural workforce development program.",
   },
   {
     week: 2,
-    unlockDate: "2026-06-14T00:00:00",
-    title: "Planting & Establishment",
-    theme: "Every Seed Has Potential",
-    focus:
-      "Youth participate in planting, crop establishment, bed preparation, watering, pollinator awareness, and early growing-system support.",
-    project: "Crop establishment, planting support, pollinator awareness, and early growing-system setup.",
-    skills: ["Planting", "Responsibility", "Stewardship", "Tool Care", "Observation"],
-    badge: "🌱 Seed Starter",
+    title: "Regenerative Agriculture",
+    focus: "Soil health, compost, planting, biodiversity, food systems, and caring for land as a living ecosystem.",
+    project: "Regenerative growing and soil stewardship activities",
+    skills: ["Observation", "Soil Health", "Plant Care", "Environmental Stewardship"],
+    badge: "🌱 Regenerative Agriculture",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Participate in planting or establishment work",
-      "Demonstrate care for crops and tools",
-      "Understand seed-to-harvest connection",
-      "Follow safety procedures",
-    ],
-    flexibleActivities: [
-      "Direct seeding",
-      "Transplanting",
-      "Bed preparation",
-      "Trellis setup",
-      "Pollinator habitat support",
-      "Irrigation support",
-    ],
-    resumeOutcome:
-      "Participated in crop establishment, transplanting, irrigation support, and team-based agricultural production assignments.",
   },
   {
     week: 3,
-    unlockDate: "2026-06-21T00:00:00",
-    title: "Maintenance, Observation & Problem Solving",
-    theme: "Leaders Notice What Others Miss",
-    focus:
-      "Youth learn observation, maintenance, plant health monitoring, safety awareness, and problem-solving through real farm operations.",
-    project: "Farm maintenance, observation logs, plant health checks, and practical problem solving.",
-    skills: ["Observation", "Problem Solving", "Initiative", "Documentation", "Critical Thinking"],
-    badge: "🔍 Problem Solver",
+    title: "Farm Infrastructure",
+    focus: "Fencing, water, shade, tools, work zones, field layout, safety zones, and farm operations support.",
+    project: "Farm infrastructure and site-readiness project",
+    skills: ["Construction", "Tool Safety", "Planning", "Logistics"],
+    badge: "🏗 Infrastructure Builder",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Complete observation activities",
-      "Identify one challenge or improvement need",
-      "Contribute to a solution",
-      "Document progress",
-    ],
-    flexibleActivities: [
-      "Plant health checks",
-      "Weeding",
-      "Mulching",
-      "Water-system checks",
-      "Safety audits",
-      "Visitor experience review",
-      "Tool and equipment inspection",
-    ],
-    resumeOutcome:
-      "Applied observation and problem-solving skills to identify operational challenges and support improvements in farm systems.",
   },
   {
     week: 4,
-    unlockDate: "2026-06-28T00:00:00",
-    title: "Systems & Infrastructure",
-    theme: "Everything Is Connected",
-    focus:
-      "Youth learn how infrastructure, tools, water, shade, signage, safety zones, and workflow systems support farm productivity and visitor readiness.",
-    project: "Infrastructure support, site-readiness projects, safe tool use, signage, pathways, and workflow mapping.",
-    skills: ["Construction", "Tool Safety", "Planning", "Systems Thinking", "Logistics"],
-    badge: "⚙️ Systems Builder",
+    title: "Production & Harvest",
+    focus: "Crop care, harvesting, washing, sorting, handling, quality, and food safety awareness.",
+    project: "Production and harvest readiness activities",
+    skills: ["Harvest", "Quality Control", "Food Safety", "Responsibility"],
+    badge: "🥕 Production Specialist",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Participate in infrastructure or site-readiness work",
-      "Understand how systems support farm operations",
-      "Demonstrate teamwork and planning",
-      "Practice safe tool use",
-    ],
-    flexibleActivities: [
-      "Bench or shade structure support",
-      "Pathway improvements",
-      "Signage",
-      "Tool organization",
-      "Irrigation improvements",
-      "Guest-area setup",
-      "Workflow mapping",
-    ],
-    resumeOutcome:
-      "Supported farm infrastructure, site-readiness, logistics, and team-based improvement projects using safe work practices.",
   },
   {
     week: 5,
-    unlockDate: "2026-07-05T00:00:00",
-    title: "Harvest Preparation",
-    theme: "Preparation Creates Success",
-    focus:
-      "Youth prepare for harvest, public engagement, marketplace activity, food handling, visitor support, and team presentations.",
-    project: "Harvest readiness, quality standards, tool organization, wash/pack preparation, and marketplace planning.",
-    skills: ["Organization", "Reliability", "Quality Control", "Food Safety", "Planning"],
-    badge: "📋 Readiness Leader",
+    title: "Marketplace & Entrepreneurship",
+    focus: "Customer service, pricing, product presentation, GrownBy, SNAP awareness, and farm-based entrepreneurship.",
+    project: "Marketplace and customer experience project",
+    skills: ["Customer Service", "Sales", "Pricing", "Entrepreneurship"],
+    badge: "🛒 Marketplace Explorer",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Understand harvest readiness",
-      "Prepare tools, spaces, and workflow",
-      "Support quality standards",
-      "Plan for marketplace or public engagement",
-    ],
-    flexibleActivities: [
-      "Crop readiness checks",
-      "Tool preparation",
-      "Wash/pack setup",
-      "Market planning",
-      "Recipe planning",
-      "Visitor preparation",
-      "Media promotion",
-    ],
-    resumeOutcome:
-      "Prepared for harvest and marketplace operations through planning, organization, quality control, and team coordination.",
   },
   {
     week: 6,
-    unlockDate: "2026-07-12T00:00:00",
-    title: "Harvest & Preservation",
-    theme: "We Harvest What We Grow",
-    focus:
-      "Youth participate in harvesting, washing, sorting, packing, food preparation, preservation, and understanding how food moves through the ecosystem.",
-    project: "Harvest operations, washing, sorting, packing, food preparation, preservation, and harvest documentation.",
-    skills: ["Harvest", "Food Handling", "Quality Assurance", "Time Management", "Productivity"],
-    badge: "🥕 Harvest Steward",
+    title: "Leadership & Community",
+    focus: "Team leadership, communication, service, visitor support, community impact, and peer responsibility.",
+    project: "Leadership and community service activity",
+    skills: ["Leadership", "Service", "Communication", "Accountability"],
+    badge: "🤝 Community Leader",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Participate in harvest operations",
-      "Understand food handling and preservation",
-      "Support quality control",
-      "Connect harvest to families and marketplace",
-    ],
-    flexibleActivities: [
-      "Harvesting",
-      "Washing",
-      "Sorting",
-      "Packing",
-      "Food preparation",
-      "Preservation",
-      "Harvest documentation",
-    ],
-    resumeOutcome:
-      "Supported harvest, food handling, sorting, packing, preservation, and quality-control activities in a farm-based workforce program.",
   },
   {
     week: 7,
-    unlockDate: "2026-07-19T00:00:00",
-    title: "Marketplace & Community Engagement",
-    theme: "Sharing Value With Community",
-    focus:
-      "Youth practice public speaking, customer service, product presentation, visitor hosting, media storytelling, and community engagement.",
-    project: "Marketplace setup, product presentation, visitor greeting, community event support, and food-system storytelling.",
-    skills: ["Customer Service", "Public Speaking", "Entrepreneurship", "Hospitality", "Community Engagement"],
-    badge: "🏪 Community Ambassador",
+    title: "Career Exploration",
+    focus: "Agriculture, construction, engineering, culinary, tourism, marketing, environmental science, and public safety careers.",
+    project: "Career pathway exploration and portfolio development",
+    skills: ["Career Awareness", "Interviewing", "Goal Setting", "Professional Identity"],
+    badge: "🧭 Career Pathfinder",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Engage with visitors or customers",
-      "Represent Bronson Family Farm professionally",
-      "Understand marketplace and community value",
-      "Support public-facing activities",
-    ],
-    flexibleActivities: [
-      "Farm tours",
-      "Marketplace setup",
-      "Product presentation",
-      "Customer greeting",
-      "Community event support",
-      "Media interviews",
-      "Food demonstrations",
-    ],
-    resumeOutcome:
-      "Practiced customer service, public speaking, event support, product presentation, and community engagement.",
   },
   {
     week: 8,
-    unlockDate: "2026-07-26T00:00:00",
-    title: "Showcase, Reflection & Achievement",
-    theme: "Growth Creates Opportunity",
-    focus:
-      "Youth complete portfolios, prepare presentations, reflect on growth, explore career pathways, and participate in community showcase and recognition.",
-    project: "Portfolio completion, team presentations, final reflection, achievement recognition, and career pathway exploration.",
-    skills: ["Presentation", "Reflection", "Portfolio", "Career Readiness", "Leadership"],
-    badge: "🏆 Cultivator Graduate",
+    title: "Capstone & Achievement",
+    focus: "Final project presentation, portfolio review, supervisor recognition, skills summary, and achievement certificate.",
+    project: "Cultivator capstone and achievement showcase",
+    skills: ["Presentation", "Reflection", "Portfolio", "Readiness"],
+    badge: "🏆 Cultivator Achievement",
     status: "Upcoming",
-    requiredOutcomes: [
-      "Complete final reflection",
-      "Present team accomplishments",
-      "Identify skills learned",
-      "Explore future career pathways",
-      "Earn final achievement recognition",
-    ],
-    flexibleActivities: [
-      "Team presentations",
-      "Portfolio completion",
-      "Career pathway reflection",
-      "Achievement ceremony preparation",
-      "Community showcase",
-      "Supervisor final assessment",
-    ],
-    resumeOutcome:
-      "Completed an 8-week workforce development program with hands-on experience in agriculture, infrastructure, food systems, public engagement, and leadership.",
   },
 ];
 
@@ -700,313 +530,6 @@ const youthPortfolioEntries = [
     skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Farm Operations"],
   },
 ];
-
-
-
-type DiscoveryAudience =
-  | "Youth"
-  | "Supervisor"
-  | "Parent"
-  | "Guest"
-  | "Grower"
-  | "Partner"
-  | "Marketplace"
-  | "Admin";
-
-type GuidedDiscoveryItem = {
-  id: string;
-  audience: DiscoveryAudience[];
-  title: string;
-  prompt: string;
-  quickAnswer: string;
-  nextAction: string;
-  relatedScreen?: Screen;
-  week?: number | "All";
-};
-
-const guidedDiscoveryItems: GuidedDiscoveryItem[] = [
-  {
-    id: "youth-start",
-    audience: ["Youth"],
-    title: "Start Here",
-    prompt: "What am I supposed to do today?",
-    quickAnswer:
-      "Check in, confirm safety and PPE, learn today's assignment, work with your team, and complete your reflection.",
-    nextAction: "Open My Day",
-    relatedScreen: "youth",
-    week: "All",
-  },
-  {
-    id: "youth-wear",
-    audience: ["Youth", "Parent"],
-    title: "What should I wear?",
-    prompt: "What do I need to be ready for the farm?",
-    quickAnswer:
-      "Wear closed-toe shoes, weather-appropriate clothing, bring water, and use PPE when assigned.",
-    nextAction: "Review My Day",
-    relatedScreen: "youth",
-    week: 1,
-  },
-  {
-    id: "youth-curriculum",
-    audience: ["Youth", "Parent"],
-    title: "Why are we doing this?",
-    prompt: "How does today's work connect to my future?",
-    quickAnswer:
-      "Each assignment builds evidence for leadership, teamwork, agriculture, construction, media, culinary, marketplace, safety, or project management skills.",
-    nextAction: "View Achievements",
-    relatedScreen: "completion",
-    week: "All",
-  },
-  {
-    id: "supervisor-start",
-    audience: ["Supervisor"],
-    title: "Supervisor Start Here",
-    prompt: "What do I need to manage first?",
-    quickAnswer:
-      "Begin with attendance, PPE, team assignments, wellness review, daily observations, and parent-safe notes.",
-    nextAction: "Open Supervisor Center",
-    relatedScreen: "supervisor",
-    week: "All",
-  },
-  {
-    id: "parent-start",
-    audience: ["Parent"],
-    title: "Parent Start Here",
-    prompt: "What should I know first?",
-    quickAnswer:
-      "Your youth is learning safety, teamwork, responsibility, agriculture, communication, and career readiness through hands-on work.",
-    nextAction: "Open Parent Portal",
-    relatedScreen: "parent",
-    week: "All",
-  },
-  {
-    id: "guest-start",
-    audience: ["Guest"],
-    title: "First Time Here?",
-    prompt: "What is Bronson Family Farm?",
-    quickAnswer:
-      "Bronson Family Farm is a connected food ecosystem where agriculture, youth workforce development, marketplace activity, and community partnerships work together.",
-    nextAction: "Start Guided Demo",
-    relatedScreen: "demo",
-    week: "All",
-  },
-];
-
-type FarmHumorItem = {
-  audience: DiscoveryAudience[];
-  category: string;
-  text: string;
-};
-
-const farmHumor: FarmHumorItem[] = [
-  {
-    audience: ["Youth", "Supervisor"],
-    category: "Safety Smile",
-    text: "Closed-toe shoes today. The soil does not need to meet your toes personally.",
-  },
-  {
-    audience: ["Youth", "Parent", "Guest"],
-    category: "Farm Funny",
-    text: "Why did the tomato blush? Because it saw the salad dressing.",
-  },
-  {
-    audience: ["Supervisor"],
-    category: "Supervisor Smile",
-    text: "If everyone has water, shoes, and a task, you are already winning.",
-  },
-  {
-    audience: ["Youth"],
-    category: "Reflection Smile",
-    text: "Farm rule: if you drop a seed, you may have accidentally started a future.",
-  },
-];
-
-type GuidedMediaItem = {
-  id: string;
-  title: string;
-  audience: DiscoveryAudience[];
-  week?: number | "All";
-  purpose: string;
-  mediaType: "video" | "photo" | "document" | "link";
-  relatedScreen?: Screen;
-  tags: string[];
-};
-
-const guidedMediaItems: GuidedMediaItem[] = [
-  {
-    id: "fan-demo",
-    title: "Fan Template & Design Demonstration",
-    audience: ["Youth", "Supervisor"],
-    week: 1,
-    purpose:
-      "Watch this before the Cooling Station Challenge so youth understand the template, assembly, and hand-powered fan concept.",
-    mediaType: "video",
-    relatedScreen: "media",
-    tags: ["Cooling Station", "Design", "Manufacturing"],
-  },
-  {
-    id: "supervisor-orientation",
-    title: "Supervisor Orientation Media",
-    audience: ["Supervisor", "Admin"],
-    week: "All",
-    purpose:
-      "Use this for site rules, youth safety, daily workflow, emergency procedures, parent-safe communication, and platform training.",
-    mediaType: "video",
-    relatedScreen: "media",
-    tags: ["Supervisor", "Training", "Safety"],
-  },
-  {
-    id: "portfolio-evidence",
-    title: "Portfolio Evidence",
-    audience: ["Youth", "Parent", "Supervisor"],
-    week: "All",
-    purpose:
-      "Photos, video clips, reflections, and supervisor assessments become evidence of work, growth, and future career readiness.",
-    mediaType: "photo",
-    relatedScreen: "media",
-    tags: ["Portfolio", "Evidence", "Achievements"],
-  },
-];
-
-function getWeekUnlockDate(week: number) {
-  const found = youthCurriculumWeeks.find((item) => item.week === week);
-  return found?.unlockDate || "2026-06-07T00:00:00";
-}
-
-function getUnlockedWeek() {
-  const now = new Date();
-  const unlocked = youthCurriculumWeeks
-    .filter((week) => now >= new Date(week.unlockDate))
-    .map((week) => week.week);
-  return Math.min(8, Math.max(1, unlocked.length ? Math.max(...unlocked) : 1));
-}
-
-function formatUnlockDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function canPreviewAllCurriculum(activeUser: EcosystemUser | null) {
-  return (
-    activeUser?.accessLevel === "staff" ||
-    activeUser?.accessLevel === "admin" ||
-    activeUser?.accessLevel === "board" ||
-    activeUser?.role === "Supervisor / Staff" ||
-    activeUser?.role === "Administrator" ||
-    activeUser?.role === "Board / Funder"
-  );
-}
-
-function GuidedDiscovery({
-  audience,
-  week,
-  setScreen,
-}: {
-  audience: DiscoveryAudience;
-  week?: number;
-  setScreen: (screen: Screen) => void;
-}) {
-  const items = guidedDiscoveryItems.filter(
-    (item) =>
-      item.audience.includes(audience) &&
-      (!item.week || item.week === "All" || item.week === week)
-  );
-
-  if (!items.length) return null;
-
-  return (
-    <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-black/35 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Guided Discovery</div>
-      <h2 className="mt-2 text-2xl font-black">Start Here</h2>
-      <p className="mt-2 text-sm leading-7 text-white/75">
-        You do not need to know what to ask. The ecosystem will guide you to what matters now.
-      </p>
-      <div className="mt-4 grid gap-3">
-        {items.map((item) => (
-          <div key={item.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-            <div className="text-lg font-black">{item.title}</div>
-            <p className="mt-2 text-sm text-emerald-100">{item.prompt}</p>
-            <p className="mt-2 text-sm leading-6 text-white/78">{item.quickAnswer}</p>
-            {item.relatedScreen && (
-              <button
-                type="button"
-                onClick={() => setScreen(item.relatedScreen!)}
-                className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black"
-              >
-                {item.nextAction}
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FarmHumorCard({ audience }: { audience: DiscoveryAudience }) {
-  const item = farmHumor.find((entry) => entry.audience.includes(audience));
-  if (!item) return null;
-
-  return (
-    <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/10 p-4 text-sm leading-6 text-amber-50">
-      <b>{item.category}:</b> {item.text}
-    </div>
-  );
-}
-
-function GuidedMedia({
-  audience,
-  week,
-  setScreen,
-}: {
-  audience: DiscoveryAudience;
-  week?: number;
-  setScreen: (screen: Screen) => void;
-}) {
-  const items = guidedMediaItems.filter(
-    (item) =>
-      item.audience.includes(audience) &&
-      (!item.week || item.week === "All" || item.week === week)
-  );
-
-  if (!items.length) return null;
-
-  return (
-    <div className="mt-6 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">Media That Matters Now</div>
-      <h2 className="mt-2 text-2xl font-black">Photos, Videos, and Portfolio Evidence</h2>
-      <div className="mt-4 grid gap-3">
-        {items.map((item) => (
-          <div key={item.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
-            <div className="text-lg font-black">{item.title}</div>
-            <p className="mt-2 text-sm leading-6 text-white/78">{item.purpose}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {item.tags.map((tag) => (
-                <span key={tag} className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-black">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            {item.relatedScreen && (
-              <button
-                type="button"
-                onClick={() => setScreen(item.relatedScreen!)}
-                className="mt-3 rounded-full border border-white/15 bg-white/10 px-5 py-2 text-sm font-black"
-              >
-                Open Media
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 
 
 type LaunchVideo = {
@@ -2403,9 +1926,11 @@ function Shell({
   const workspaceTarget = role ? routeForRole(role) : "roles";
   const roleNav: { label: string; screen: Screen; roles?: Role[] }[] = role === "Youth Workforce Participant"
     ? [
+        { label: "Start Day", screen: "wellness" },
         { label: "My Day", screen: "youth" },
         { label: "Today", screen: "launchProject" },
-        { label: "My Portfolio", screen: "youth" },
+        { label: "Ecosystem", screen: "demo" },
+        { label: "Marketplace", screen: "marketplace" },
         { label: "Media", screen: "media" },
         { label: "Reflection", screen: "feedback" },
       ]
@@ -2520,6 +2045,13 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("demo")} className={buttonClass("demo")}>Guided Portal</button>
+              <button type="button" onClick={() => setScreen("guest")} className={buttonClass("guest")}>Guest</button>
+              <button type="button" onClick={() => setScreen("marketplace")} className={buttonClass("marketplace")}>Marketplace</button>
+              <button type="button" onClick={() => setScreen("grower")} className={buttonClass("grower")}>Grower</button>
+              <button type="button" onClick={() => setScreen("partner")} className={buttonClass("partner")}>Partner</button>
+              <button type="button" onClick={() => setScreen("support")} className={buttonClass("support")}>Support</button>
+              <button type="button" onClick={() => setScreen("valueAdded")} className={buttonClass("valueAdded")}>Value-Added</button>
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
@@ -3150,8 +2682,8 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <>
       <SimplePathway
         title="Guest Pathway"
-        image={IMG.forest}
-        text="Guests enter through the farm story first, then learn how the connected food ecosystem works through youth, growers, families, customers, and partners."
+        image={IMG.ecosystem}
+        text="Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together."
         setScreen={setScreen}
         extra={
           <>
@@ -3161,10 +2693,6 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </>
         }
       />
-      <Card>
-        <GuidedDiscovery audience="Guest" setScreen={setScreen} />
-        <FarmHumorCard audience="Guest" />
-      </Card>
       <LaunchAuditDetailGrid
         title="Guest journey now has a complete launch story."
         items={[
@@ -3469,194 +2997,175 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const unlockedWeek = getUnlockedWeek();
-  const canPreviewWeeks = canPreviewAllCurriculum(activeUser);
-  const currentWeek = youthCurriculumWeeks[Math.max(0, Math.min(unlockedWeek, youthCurriculumWeeks.length) - 1)];
-  const completionPercent = Math.round((unlockedWeek / youthCurriculumWeeks.length) * 100);
+  const currentWeek = youthCurriculumWeeks[0];
+  const completionPercent = 12.5;
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[380px_1fr]">
+    <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 Start My Day</h1>
-        <p className="mt-4 text-base leading-7 text-white/84">
-          Start here. Check in, confirm safety, see today&apos;s project, then begin work with your team.
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
+        <p className="mt-5 text-base leading-8 text-white/86">
+          Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
         </p>
 
+        <LargerPictureCard layerKey="Youth Workforce Pathway" />
+
+        <CultureCard language={language} variant="today" />
+
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/15 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today&apos;s Priority</div>
-          <h2 className="mt-2 text-2xl font-black">{featuredProject.shortTitle}</h2>
-          <p className="mt-3 text-sm leading-6 text-white/82">
-            {featuredProject.objective}
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Start Here</div>
+          <h2 className="mt-2 text-2xl font-black">Start My Day is the priority.</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">
+            Begin with check-in, PPE, water, assignment, and readiness. The rest of the ecosystem stays available through Ecosystem, Marketplace, Media, and More tools.
           </p>
-          <div className="mt-4 grid gap-3 text-sm">
+          <button type="button" onClick={() => setScreen("wellness")} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+        </div>
+
+        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
+          <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.objective}</p>
+          <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Date:</strong> {featuredProject.launchDate}</div>
             <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Start:</strong> {featuredProject.startTime}</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Current Badge:</strong> {currentWeek.badge}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Week:</strong> Week 1</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Badge:</strong> {currentWeek.badge}</div>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3">
-          <button type="button" onClick={() => setScreen("wellness")} className="w-full rounded-full bg-emerald-300 px-7 py-4 text-lg font-black text-black">
-            Start My Day
-          </button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="w-full rounded-full border border-emerald-200/25 bg-emerald-300/15 px-7 py-4 font-black text-emerald-50">
-            Open Today&apos;s Project
-          </button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
+          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
         </div>
-
-        <div className="mt-6 rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Before You Start</div>
-          <div className="mt-3 grid gap-2 text-sm text-white/82">
-            <div>✓ Closed-toe shoes</div>
-            <div>✓ Water bottle</div>
-            <div>✓ Weather-ready clothing</div>
-            <div>✓ PPE when assigned</div>
-            <div>✓ Positive attitude</div>
-          </div>
-        </div>
-
-        <FarmHumorCard audience="Youth" />
       </Card>
 
       <div className="grid gap-5">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today</div>
-          <h2 className="mt-3 text-4xl font-black">One Day. One Priority.</h2>
-          <p className="mt-3 text-base leading-8 text-white/82">
-            Youth do not need to sort through the whole ecosystem first. Today starts with check-in, safety, team assignment, project work, and reflection.
-          </p>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-5">
-            {[
-              ["1", "Check In", "Attendance and wellness"],
-              ["2", "Safety", "Shoes, water, PPE"],
-              ["3", "Team", "Know your assignment"],
-              ["4", "Work", "Cooling Station Challenge"],
-              ["5", "Reflect", "What did I learn?"],
-            ].map(([step, title, body]) => (
-              <div key={step} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-300 text-sm font-black text-black">{step}</div>
-                <div className="mt-3 text-lg font-black">{title}</div>
-                <p className="mt-2 text-xs leading-5 text-white/70">{body}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Week</div>
-              <div className="mt-2 text-xl font-black">Week {currentWeek.week}: {currentWeek.title}</div>
-              <p className="mt-2 text-xs leading-5 text-white/72">{currentWeek.theme}</p>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
+          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
+              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
             </div>
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
               <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
-              </div>
             </div>
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
-              <div className="mt-2 text-lg font-black">{currentWeek.badge}</div>
-              <p className="mt-2 text-xs leading-5 text-white/70">Earned through orientation, safety, teamwork, and reflection.</p>
+              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
             </div>
           </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">This Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Required Outcomes</div>
-              <ul className="mt-3 space-y-2 text-sm leading-5 text-white/78">
-                {currentWeek.requiredOutcomes.map((item) => (
-                  <li key={item}>✓ {item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Today Can Include</div>
-              <ul className="mt-3 space-y-2 text-sm leading-5 text-white/78">
-                {currentWeek.flexibleActivities.slice(0, 5).map((item) => (
-                  <li key={item}>• {item}</li>
-                ))}
-              </ul>
-            </div>
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
           </div>
-
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
               <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
             ))}
           </div>
         </Card>
 
-        <details className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5">
-          <summary className="cursor-pointer text-2xl font-black">View 8-Week Roadmap</summary>
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
+          <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {youthCurriculumWeeks.map((week) => {
-              const isUnlocked = week.week <= unlockedWeek;
-              const isPreview = canPreviewWeeks && !isUnlocked;
-              const isCurrent = week.week === currentWeek.week;
-              return (
-                <div
-                  key={week.week}
-                  className={`rounded-[1.25rem] border p-4 ${
-                    isCurrent
-                      ? "border-emerald-200/35 bg-emerald-300/15"
-                      : isUnlocked || isPreview
-                        ? "border-white/10 bg-white/10"
-                        : "border-white/10 bg-black/30 opacity-80"
-                  }`}
-                >
-                  <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
-                  <h3 className="mt-2 text-lg font-black">{week.title}</h3>
-                  <p className="mt-2 text-xs font-black text-emerald-100">{week.theme}</p>
-                  {isUnlocked || isPreview ? (
-                    <>
-                      <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
-                      <div className="mt-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black">{week.badge}</div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="mt-3 rounded-xl border border-white/10 bg-black/35 px-3 py-2 text-xs font-black">
-                        🔒 Opens {formatUnlockDate(week.unlockDate)}
-                      </div>
-                      <p className="mt-2 text-xs leading-5 text-white/60">Future details open Sunday at 12:00 AM.</p>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </details>
-
-        <details className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5">
-          <summary className="cursor-pointer text-2xl font-black">Helpful When Needed</summary>
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div>
-              <GuidedDiscovery audience="Youth" week={currentWeek.week} setScreen={setScreen} />
-              <GuidedMedia audience="Youth" week={currentWeek.week} setScreen={setScreen} />
-            </div>
-            <div>
-              <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-                <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
-                <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
-                <p className="mt-3 text-sm leading-6 text-white/78">{currentWeek.resumeOutcome}</p>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
-                  {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Problem Solving", "Project Completion"].map((skill) => (
-                    <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
-                  ))}
-                </div>
+            {youthCurriculumWeeks.map((week) => (
+              <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
+                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
+                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
+                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
               </div>
-              <TeamWisdomGrid language={language} />
-            </div>
+            ))}
           </div>
-        </details>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Wisdom by Team</div>
+          <h2 className="mt-3 text-3xl font-black">Encouragement for Every Rotation</h2>
+          <TeamWisdomGrid language={language} />
+        </Card>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
+            <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated. This becomes a youth resume, portfolio, and achievement transcript.</p>
+            <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
+              <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Initiative", "Problem Solving", "Project Completion", "Career Exploration"].map((skill) => (
+                  <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs leading-5 text-white/70">Each check-in, project, reflection, badge, and supervisor assessment adds evidence toward a future resume and portfolio.</p>
+            </div>
+            <div className="mt-5 grid gap-3">
+              {youthPortfolioEntries.map((entry) => (
+                <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                  <div className="text-lg font-black">{entry.title}</div>
+                  <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
+                  <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.skills.map((skill) => (
+                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🏆 My Achievements</div>
+            <h2 className="mt-3 text-3xl font-black">Skills, Badges, and Recognition</h2>
+            <div className="mt-5 grid gap-3">
+              {youthAchievementBadges.map((badge) => (
+                <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg font-black">{badge.title}</div>
+                      <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
+                    </div>
+                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black">{badge.earned ? "Available Week 1" : "Upcoming"}</span>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+        <JourneyCompletionCard
+          title="Youth Workforce Journey Completion"
+          learned={[
+            "Safety and PPE",
+            "Teamwork and communication",
+            "Cooling Station Challenge",
+            "Portfolio evidence",
+            "Career and income connections",
+          ]}
+          nextSteps={[
+            { label: "Open Today's Project", screen: "supervisor" },
+            { label: "Complete Reflection", screen: "feedback" },
+            { label: "View Achievements", screen: "completion" },
+            { label: "Visit Marketplace", screen: "marketplace" },
+          ]}
+          impact={[
+            "Completed youth pathway",
+            "Built work-readiness skills",
+            "Connected today's work to future income",
+            "Added evidence toward achievement",
+          ]}
+          setScreen={setScreen}
+        />
       </div>
     </div>
   );
@@ -3717,9 +3226,6 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
         <SupervisorEncouragementCard language={language} />
-        <FarmHumorCard audience="Supervisor" />
-        <GuidedDiscovery audience="Supervisor" setScreen={setScreen} />
-        <GuidedMedia audience="Supervisor" setScreen={setScreen} />
         <div className="mt-5 grid gap-2">
           {tabs.map((item) => (
             <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
@@ -4611,9 +4117,6 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
       <LargerPictureCard layerKey="Parent / Guardian Portal" />
 
       <ParentEncouragementCard language={language} />
-      <FarmHumorCard audience="Parent" />
-      <GuidedDiscovery audience="Parent" week={getUnlockedWeek()} setScreen={setScreen} />
-      <GuidedMedia audience="Parent" week={getUnlockedWeek()} setScreen={setScreen} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {[
