@@ -364,16 +364,59 @@ const launchEvents = [
 ];
 
 const featuredProject = {
-  id: "cooling-center-2026",
-  title: "June 8 Workforce Production Challenge",
-  shortTitle: "63 Cooling Fan Challenge",
-  launchDate: "June 8, 2026",
+  id: "from-soil-to-seed-2026",
+  title: "From Soil to Seed",
+  shortTitle: "From Soil to Seed",
+  launchDate: "June 9, 2026",
   startTime: "8:00 AM",
-  status: "Launch Ready",
+  status: "Active Today",
   objective:
-    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.",
+    "Youth are preparing the grow area for successful crop production by spreading soil, leveling beds, creating rows, sowing seeds, planting crops, applying grass mulch, completing fencing, and creating Bubble Babies.",
   farmConnection:
-    "Bronson Family Farm is the customer that needs a cooling station. A contractor is hired to build it. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce. This teaches the business cycle, production, value creation, and how farm operations connect to real work.",
+    "Every harvest begins with preparation. Before food can be grown, farmers prepare soil, create rows, sow seeds, protect moisture, and secure the growing area. Today's work creates future harvest capacity for families, the marketplace, and the community.",
+};
+
+const todaysProject = {
+  title: "From Soil to Seed",
+  subtitle: "Preparing Today's Harvest. Building Tomorrow's Food System.",
+  phase: "Week 1 • Workplace Foundations & Safety",
+  image: IMG.grow,
+  mission:
+    "Prepare the grow area for successful crop production through soil preparation, planting, mulching, fencing, and Bubble Babies enterprise work.",
+  visualFlow: ["Soil", "Rows", "Seeds", "Plants", "Harvest", "Marketplace", "Family", "Community"],
+  progress: [
+    { label: "Soil Preparation", icon: "🌱", value: 0 },
+    { label: "Row Creation", icon: "🌾", value: 0 },
+    { label: "Planting", icon: "🌿", value: 0 },
+    { label: "Grass Mulch", icon: "🍃", value: 0 },
+    { label: "Fence Completion", icon: "🛠", value: 70 },
+    { label: "Bubble Babies", icon: "🫧", value: 0 },
+  ],
+  teams: [
+    { name: "Soil Team", icon: "🌱", task: "Spread and level soil", skills: ["Soil preparation", "Teamwork", "Quality standards"] },
+    { name: "Planting Team", icon: "🌾", task: "Create rows and plant seeds", skills: ["Planning", "Spacing", "Responsibility"] },
+    { name: "Infrastructure Team", icon: "🛠", task: "Complete fencing", skills: ["Construction", "Protection", "Problem solving"] },
+    { name: "Bubble Babies Team", icon: "🫧", task: "Create, count, and package", skills: ["Entrepreneurship", "Inventory", "Product development"] },
+    { name: "Storytelling Team", icon: "🎥", task: "Capture photos and interviews", skills: ["Media", "Communication", "Documentation"] },
+    { name: "Pollinator Team", icon: "🐝", task: "Observe insects and habitat", skills: ["Observation", "Ecology", "Stewardship"] },
+  ],
+  almanac: {
+    groundMoisture: "Excellent",
+    plantingConditions: "Good",
+    mulchingConditions: "Excellent",
+    fenceWork: "Suitable",
+    heatRisk: "Monitor",
+    question: "Why is preparation important before planting?",
+  },
+  parentConnection: "Ask your Cultivator why grass was placed around the plants.",
+  portfolioEvidence: [
+    "Attendance",
+    "Team Assignment",
+    "Photo Evidence",
+    "Reflection",
+    "Supervisor Observation",
+    "Leadership Moment",
+  ],
 };
 
 const coolingCenterTeams = [
@@ -447,9 +490,9 @@ const youthCurriculumWeeks = [
   {
     week: 1,
     title: "Workplace Foundations & Safety",
-    focus: "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.",
-    project: "Farm Worker Heat Safety & Cooling Station Challenge",
-    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Following Instructions"],
+    focus: "Youth are learning attendance, safety, teamwork, communication, responsibility, and problem solving through real farm projects including soil preparation, planting, mulching, fencing, and Bubble Babies.",
+    project: "From Soil to Seed",
+    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Responsibility", "Environmental Stewardship", "Agriculture", "Entrepreneurship"],
     badge: "🏅 Workplace Foundations",
     status: "Current Week",
   },
@@ -527,11 +570,11 @@ const youthAchievementBadges = youthCurriculumWeeks.map((week) => ({
 
 const youthPortfolioEntries = [
   {
-    title: "Cooling Station Challenge",
-    date: "June 8, 2026",
-    team: "Design • Engineering • Manufacturing • Contractor",
-    evidence: "Check-in, fan demonstration video, project photos, team deliverables, reflection, and supervisor assessment.",
-    skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Farm Operations"],
+    title: "From Soil to Seed",
+    date: "June 9, 2026",
+    team: "Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators",
+    evidence: "Check-in, team assignment, soil preparation photos, row creation, seeds planted, mulch placement, fencing progress, Bubble Babies count, reflection, and supervisor observation.",
+    skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Agriculture", "Environmental Stewardship", "Entrepreneurship"],
   },
 ];
 
@@ -568,7 +611,7 @@ const launchVideos: LaunchVideo[] = [
     tags: ["Orientation", "Staff", "Safety"],
   },
   {
-    title: "June 8 Cooling Station Challenge Introduction Video",
+    title: "From Soil to Seed Introduction Video",
     purpose: "Introduces youth to the farm worker heat-safety problem, the four-team production flow, and the connection to real farm operations.",
     file: "/videos/june8-cooling-station-introduction.mp4",
     fallback: "Cooling Station Introduction: This training section introduces the farm worker heat-safety challenge, team assignments, safety expectations, and the connection to real farm operations.",
@@ -576,17 +619,17 @@ const launchVideos: LaunchVideo[] = [
   },
   {
     title: "Fan Template & Design Demonstration Video",
-    purpose: "Watch the cardboard fan demonstration before the June 8 Cooling Station Challenge. Youth use this to understand how the template, assembly, and hand-powered fan concept works before Design, Engineering, Manufacturing, and Contractor teams begin their work.",
+    purpose: "Watch the cardboard fan demonstration before the From Soil to Seed. Youth use this to understand how the template, assembly, and hand-powered fan concept works before Design, Engineering, Manufacturing, and Contractor teams begin their work.",
     embedUrl: "https://www.youtube.com/embed/dtYzf3avkT4",
     embedTitle: "DIY Cardboard Fan | Cardboard Fan no motor no battery",
-    fallback: "Training Resource Available: Fan template and design demonstration for the Cooling Station Challenge.",
+    fallback: "Training Resource Available: Fan template and design demonstration for the From Soil to Seed.",
     tags: ["Fan Video", "Design", "Templates", "June 8"],
   },
   {
     title: "Manufacturing: Assemble, Paint, Personalize, and Quality Check",
     purpose: "Documents the Manufacturing Team assembling, painting, branding, personalizing, and quality-checking the fans.",
     file: "/videos/fan-manufacturing-painting.mp4",
-    fallback: "Manufacturing Team Training Module: This section demonstrates assembly, painting, personalization, branding, and quality review procedures used during the Cooling Station Challenge.",
+    fallback: "Manufacturing Team Training Module: This section demonstrates assembly, painting, personalization, branding, and quality review procedures used during the From Soil to Seed.",
     tags: ["Fan Video", "Manufacturing", "Painting"],
   },
   {
@@ -657,8 +700,8 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Comunicación",
     "Problem Solving": "Resolución de Problemas",
     "Following Instructions": "Seguir Instrucciones",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
-    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
+    "From Soil to Seed": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
+    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the From Soil to Seed.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
     "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
     "Today's Project": "Proyecto de Hoy",
@@ -687,8 +730,8 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Komunikasyon",
     "Problem Solving": "Paglutas ng Problema",
     "Following Instructions": "Pagsunod sa Panuto",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
-    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang June 8 Cooling Station Challenge.",
+    "From Soil to Seed": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
+    "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the From Soil to Seed.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang From Soil to Seed.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang portfolio at mga nakamit.",
     "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
     "Today's Project": "Proyekto Ngayon",
@@ -717,7 +760,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Comunicazione",
     "Problem Solving": "Risoluzione dei Problemi",
     "Following Instructions": "Seguire le Istruzioni",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "Sfida per la Sicurezza dal Calore e Stazione di Raffreddamento dei Lavoratori Agricoli",
+    "From Soil to Seed": "Sfida per la Sicurezza dal Calore e Stazione di Raffreddamento dei Lavoratori Agricoli",
     "Today's Project": "Progetto di Oggi",
   },
   he: {
@@ -744,7 +787,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "תקשורת",
     "Problem Solving": "פתרון בעיות",
     "Following Instructions": "ציות להוראות",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "אתגר בטיחות מחום ותחנת קירור לעובדי חווה",
+    "From Soil to Seed": "אתגר בטיחות מחום ותחנת קירור לעובדי חווה",
     "Today's Project": "הפרויקט של היום",
   },
   fr: {
@@ -771,7 +814,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Communication",
     "Problem Solving": "Résolution de Problèmes",
     "Following Instructions": "Suivre les Instructions",
-    "Farm Worker Heat Safety & Cooling Station Challenge": "Défi de Sécurité Contre la Chaleur et Station de Refroidissement des Travailleurs Agricoles",
+    "From Soil to Seed": "Défi de Sécurité Contre la Chaleur et Station de Refroidissement des Travailleurs Agricoles",
     "Today's Project": "Projet d’Aujourd’hui",
   },
 };
@@ -812,7 +855,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Reports convert daily records into launch readiness and program impact.": "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.",
     "Welcome Back / Journey Memory": "Bienvenido de nuevo / Memoria del recorrido",
     "🌞 My Day": "🌞 Mi Día",
-    "June 8 Launch Assignment": "Asignación de lanzamiento del 8 de junio",
+    "From Soil to Seed": "Asignación de lanzamiento del 8 de junio",
     "Pathway": "Ruta",
     "Guest Pathway": "Ruta de visitante",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados avanzan juntos.",
@@ -893,7 +936,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Reports convert daily records into launch readiness and program impact.": "Ginagawang launch readiness at program impact ng reports ang daily records.",
     "Welcome Back / Journey Memory": "Welcome Back / Journey Memory",
     "🌞 My Day": "🌞 Aking Araw",
-    "June 8 Launch Assignment": "June 8 Launch Assignment",
+    "From Soil to Seed": "From Soil to Seed",
     "Pathway": "Landas",
     "Guest Pathway": "Landas ng Bisita",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
@@ -1045,10 +1088,10 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Bronson Family Farm": "Bronson Family Farm",
     "Launch Focus": "Pokus sa Launch",
     "🌞 My Day": "🌞 Aking Araw",
-    "June 8 Launch Assignment": "Takdang Gawain sa Hunyo 8",
-    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
+    "From Soil to Seed": "Takdang Gawain sa Hunyo 8",
+    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, prepare soil, create rows, plant seeds, mulch with grass, complete fencing, and create Bubble Babies, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
     "Project": "Proyekto",
-    "Cooling Station Challenge": "Cooling Station Challenge",
+    "From Soil to Seed": "From Soil to Seed",
     "Teams": "Mga Team",
     "Design • Engineering • Manufacturing • Contractor": "Design • Engineering • Manufacturing • Contractor",
     "Next Step": "Susunod na Hakbang",
@@ -1083,7 +1126,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Staff Orientation": "Orientation ng Staff",
     "Youth Workforce Launch": "Youth Workforce Launch",
     "Featured Project": "Pangunahing Proyekto",
-    "63 Cooling Fan Challenge": "Hamon: 63 Cooling Fans",
+    "From Soil to Seed": "Hamon: 63 Cooling Fans",
     "Project Teams": "Mga Team ng Proyekto",
     "Design | Engineering | Manufacturing | Contractor": "Design | Engineering | Manufacturing | Contractor",
     "Photo / Video Documentation": "Photo / Video Documentation",
@@ -1101,7 +1144,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Staff Orientation: June 5, 2026 — 9:30 AM": "Staff Orientation: Hunyo 5, 2026 — 9:30 AM",
     "Youth Workforce Launch: June 8, 2026 — 8:00 AM": "Youth Workforce Launch: Hunyo 8, 2026 — 8:00 AM",
     "We Grow Green to Harvest Dreams.": "We Grow Green to Harvest Dreams.",
-    "Open June 8 Project": "Buksan ang Proyekto ng Hunyo 8",
+    "Open Today's Project": "Buksan ang Proyekto ng Hunyo 8",
     "Events & Orientation": "Events at Orientation",
     "Supervisor Center": "Supervisor Center",
     "Operations": "Operasyon",
@@ -1109,7 +1152,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Beginning of Day": "Simula ng Araw",
     "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments.": "QR/manual check-in, PPE, tubig, heat-safety awareness para sa farm workers, daily proverb, weather awareness, at assignments.",
     "June 8 Featured Project": "Pangunahing Proyekto ng Hunyo 8",
-    "Farm Worker Heat Safety & Cooling Station Challenge: Design, Engineering, Manufacturing, and Contractor teams work in sequence.": "Farm Worker Heat Safety at Cooling Station Challenge: Design, Engineering, Manufacturing, at Contractor teams ay gagana nang sunod-sunod.",
+    "From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence.": "Farm Worker Heat Safety at From Soil to Seed: Design, Engineering, Manufacturing, at Contractor teams ay gagana nang sunod-sunod.",
     "During Program": "Habang Programa",
     "Supervisor observations, wellness support, safety follow-up, team progress, task completion, incident documentation.": "Supervisor observations, wellness support, safety follow-up, team progress, task completion, at incident documentation.",
     "End of Day": "Pagtatapos ng Araw",
@@ -1118,7 +1161,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Real Supervisor Operations Center": "Tunay na Supervisor Operations Center",
     "Morning-to-end-of-day control room.": "Control room mula umaga hanggang pagtatapos ng araw.",
     "Dashboard": "Dashboard",
-    "6/8 Cooling Station": "6/8 Cooling Station",
+    "Today's Project": "Today's Project",
     "Youth Roster": "Youth Roster",
     "Attendance / PPE": "Attendance / PPE",
     "Wellness Review": "Wellness Review",
@@ -1182,7 +1225,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registros de incidentes",
     "Project Items Complete": "Elementos del proyecto completos",
     "Open Supervisor Center": "Abrir centro de supervisores",
-    "Open June 8 Project": "Abrir proyecto del 8 de junio"
+    "Open Today's Project": "Abrir proyecto del 8 de junio"
   },
   fr: {
     "Launch-day readiness status.": "État de préparation du jour du lancement.",
@@ -1198,7 +1241,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registres d’incidents",
     "Project Items Complete": "Éléments du projet terminés",
     "Open Supervisor Center": "Ouvrir le centre superviseur",
-    "Open June 8 Project": "Ouvrir le projet du 8 juin"
+    "Open Today's Project": "Ouvrir le projet du 8 juin"
   },
   it: {
     "Launch-day readiness status.": "Stato di preparazione per il giorno del lancio.",
@@ -1214,7 +1257,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registri incidenti",
     "Project Items Complete": "Elementi del progetto completati",
     "Open Supervisor Center": "Apri centro supervisori",
-    "Open June 8 Project": "Apri progetto dell’8 giugno"
+    "Open Today's Project": "Apri progetto dell’8 giugno"
   },
   he: {
     "Launch-day readiness status.": "מצב מוכנות ליום ההשקה.",
@@ -1230,7 +1273,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "יומני אירועים",
     "Project Items Complete": "פריטי פרויקט הושלמו",
     "Open Supervisor Center": "פתח מרכז מדריכים",
-    "Open June 8 Project": "פתח פרויקט 8 ביוני"
+    "Open Today's Project": "פתח פרויקט 8 ביוני"
   }
 };
 
@@ -1648,7 +1691,7 @@ function screenLabel(screen: Screen) {
     operations: "Operations",
     events: "Events & Orientation",
     media: "Media Center",
-    launchProject: "June 8 Cooling Station Challenge",
+    launchProject: "From Soil to Seed",
     feedback: "Feedback / Comments",
     completion: "Achievement Center",
     startDay: "Start Day",
@@ -3409,19 +3452,19 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">🌞 My Day</div>
-      <div className="mt-2 text-2xl font-black">June 8 Launch Assignment</div>
+      <div className="mt-2 text-2xl font-black">From Soil to Seed</div>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82">
-        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.
+        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, prepare soil, create rows, plant seeds, mulch with grass, complete fencing, and create Bubble Babies, reflect, and see what happens tomorrow.
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Project</div>
-          <div className="mt-1 text-sm font-black">Cooling Station Challenge</div>
+          <div className="mt-1 text-sm font-black">From Soil to Seed</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Teams</div>
-          <div className="mt-1 text-sm font-black">Design • Engineering • Manufacturing • Contractor</div>
+          <div className="mt-1 text-sm font-black">Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Next Step</div>
@@ -3429,14 +3472,14 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Goal</div>
-          <div className="mt-1 text-sm font-black">Farm worker heat safety</div>
+          <div className="mt-1 text-sm font-black">Future harvest preparation</div>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload / View Photos</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
       </div>
 
@@ -3996,7 +4039,7 @@ function MyWorkspace({
       show: isYouth || isStaff,
     },
     {
-      title: "June 8 Cooling Station Challenge",
+      title: "From Soil to Seed",
       subtitle: "Farm worker heat safety production module: Design, Engineering, Manufacturing, and Contractor teams build a real cooling station.",
       screen: "launchProject",
       show: isYouth || isStaff || isParent,
@@ -4299,7 +4342,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
           <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload / View Photos</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
           <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
         </div>
@@ -4410,7 +4453,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           learned={[
             "Safety and PPE",
             "Teamwork and communication",
-            "Cooling Station Challenge",
+            "From Soil to Seed",
             "Portfolio evidence",
             "Career and income connections",
           ]}
@@ -4470,7 +4513,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
-    { key: "project", label: "6/8 Cooling Station" },
+    { key: "project", label: "Today's Project" },
     { key: "roster", label: "Youth Roster" },
     { key: "attendance", label: "Attendance / PPE" },
     { key: "wellness", label: "Wellness Review" },
@@ -5437,7 +5480,7 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
             </div>
           ))}
         </div>
-        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View June 8 Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View Today's Project</button>
       </div>
 
       <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
@@ -5494,7 +5537,7 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
           "Family engagement options",
         ]}
         nextSteps={[
-          { label: "View June 8 Project", screen: "supervisor" },
+          { label: "View Today's Project", screen: "supervisor" },
           { label: "Send Parent Feedback", screen: "feedback" },
           { label: "View Achievements", screen: "completion" },
           { label: "Return to Workspace", screen: "roles" },
@@ -6006,7 +6049,7 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <p className="mt-3 text-sm leading-7 text-white/78">{featuredProject.farmConnection}</p>
       </div>
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project Module</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project Module</button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Media Center</button>
         <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Choose Workspace</button>
       </div>
@@ -6018,14 +6061,14 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function VideoLibrary({ compact = false }: { compact?: boolean }) {
   const moduleCard = (video: LaunchVideo) => {
     const isSupervisor = video.title.includes("Supervisor") || video.title.includes("June 5");
-    const isCoolingIntro = video.title.includes("Cooling Station Challenge Introduction") || video.title.includes("June 8 Cooling Station");
+    const isCoolingIntro = video.title.includes("From Soil to Seed Introduction") || video.title.includes("June 8 Cooling Station");
     const isManufacturing = video.title.includes("Manufacturing");
     const isCompletion = video.title.includes("Final Cooling Station");
 
     const heading = isSupervisor
       ? "June 5 Staff & Supervisor Orientation"
       : isCoolingIntro
-        ? "June 8 Cooling Station Challenge Launch Brief"
+        ? "From Soil to Seed Launch Brief"
         : isManufacturing
           ? "Manufacturing Team Training Module"
           : isCompletion
@@ -6102,7 +6145,7 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
       <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
       <h2 className="mt-3 text-2xl font-black">June 5 and June 8 media documentation</h2>
       <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78">
-        This section organizes the staff orientation, the June 8 Cooling Station Challenge, the fan demonstration, manufacturing/painting documentation, youth interviews, and the final project completion record. Missing live recordings are now shown as active training cards so reviewers do not see empty black video boxes.
+        This section organizes the staff orientation, the From Soil to Seed, the fan demonstration, manufacturing/painting documentation, youth interviews, and the final project completion record. Missing live recordings are now shown as active training cards so reviewers do not see empty black video boxes.
       </p>
       <div className={`mt-5 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}>
         {launchVideos.map((video) => (
@@ -6149,7 +6192,7 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
 function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const folders = [
     ["June 5 Staff Orientation Video", "Staff and supervisor training, site rules, safety expectations, platform use, and emergency procedures."],
-    ["June 8 Cooling Station Challenge Video", "Full project documentation for the farm worker heat-safety challenge."],
+    ["From Soil to Seed Video", "Full project documentation for the farm worker heat-safety challenge."],
     ["Fan Template & Design Video", "The fan template process, design decisions, and prototype demonstration."],
     ["Manufacturing Fan Painting Video", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
     ["Design Team Gallery", "Templates, prototypes, design sketches, signage, and worker instructions."],
@@ -6291,7 +6334,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
       </div>
     </Card>
@@ -6307,20 +6350,22 @@ function CoolingCenterProjectModule({
   activeUser: EcosystemUser | null;
   compact?: boolean;
 }) {
-  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.coolingCenterProgress", []));
-  const [selectedTeam, setSelectedTeam] = useState<string>("Manufacturing Team");
+  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.fromSoilToSeedProgress", []));
+  const [selectedTeam, setSelectedTeam] = useState<string>(todaysProject.teams[0].name);
   const [contributions, setContributions] = useState<string[]>(() => safeRead<string[]>("bff.launch.myContributions", []));
   const [learning, setLearning] = useState<string[]>(() => safeRead<string[]>("bff.launch.whatILearned", []));
   const [visionBefore, setVisionBefore] = useState(() => safeRead<string>("bff.launch.visionBefore", ""));
   const [visionAfter, setVisionAfter] = useState(() => safeRead<string>("bff.launch.visionAfter", ""));
   const [oneAcre, setOneAcre] = useState(() => safeRead<string>("bff.launch.oneAcre", ""));
+  const [bubbleCount, setBubbleCount] = useState(() => safeRead<string>("bff.launch.bubbleBabiesToday", "0"));
+  const [soilNote, setSoilNote] = useState(() => safeRead<string>("bff.launch.soilToSeedNote", ""));
 
-  const selectedTeamInfo = coolingCenterTeams.find((team) => team.name === selectedTeam) || coolingCenterTeams[2];
+  const selectedTeamInfo = todaysProject.teams.find((team) => team.name === selectedTeam) || todaysProject.teams[0];
 
   const toggleSaved = (item: string) => {
     const next = savedItems.includes(item) ? savedItems.filter((x) => x !== item) : [item, ...savedItems];
     setSavedItems(next);
-    safeWrite("bff.launch.coolingCenterProgress", next);
+    safeWrite("bff.launch.fromSoilToSeedProgress", next);
   };
 
   const toggleContribution = (item: string) => {
@@ -6339,101 +6384,136 @@ function CoolingCenterProjectModule({
     safeWrite("bff.launch.visionBefore", visionBefore);
     safeWrite("bff.launch.visionAfter", visionAfter);
     safeWrite("bff.launch.oneAcre", oneAcre);
+    safeWrite("bff.launch.bubbleBabiesToday", bubbleCount);
+    safeWrite("bff.launch.soilToSeedNote", soilNote);
   };
 
   const contributionItems = [
-    "Creating ideas",
-    "Solving problems",
-    "Building products",
-    "Supporting my team",
-    "Helping a customer",
-    "Creating value",
-    "Learning a new skill",
-    "Improving a process",
-    "Helping someone succeed",
-    "Demonstrating leadership",
-    "Showing creativity",
-    "Practicing responsibility",
-    "Completing assigned tasks",
-    "Maintaining quality standards",
-    "Supporting safety",
+    "Spread soil",
+    "Leveled growing beds",
+    "Created rows",
+    "Sowed seeds",
+    "Planted seeds",
+    "Placed grass mulch",
+    "Completed fencing",
+    "Created Bubble Babies",
+    "Counted inventory",
+    "Captured photos",
+    "Observed pollinators",
+    "Helped another Cultivator",
+    "Asked a powerful question",
+    "Demonstrated leadership",
+    "Supported safety",
   ];
 
   const learningItems = [
-    "How businesses work",
-    "How customers and contractors work together",
-    "How products are manufactured",
-    "How quality affects customer satisfaction",
-    "How creativity creates value",
-    "How teamwork improves results",
-    "How communication helps projects succeed",
-    "How planning saves time and money",
-    "How ideas become products",
-    "How products create opportunities",
-    "How entrepreneurs identify opportunities",
-    "How money is earned by solving problems",
-    "How food moves from farms to customers",
-    "How rising costs affect businesses and families",
-    "How workforce skills prepare me for future opportunities",
-    "How Bronson Family Farm creates value for the community",
-    "That I am capable of more than I realized",
+    "Why soil preparation matters",
+    "How moisture supports seeds",
+    "How grass mulch protects plants from heat",
+    "Why rows and spacing matter",
+    "Why fencing protects food before harvest",
+    "How seeds can become a product",
+    "How Bubble Babies connect seeds to entrepreneurship",
+    "How farms use inventory",
+    "How teamwork helps work move faster",
+    "How photos become portfolio evidence",
+    "How food moves from soil to family",
+    "That preparation creates future harvests",
   ];
 
   const productionItems = [
     "Youth checked in",
     "PPE and water confirmed",
-    "Why this project matters lesson completed",
-    "Entrepreneur example discussed",
-    "Vision challenge completed",
-    "My Contribution selected",
-    "Teams assigned",
-    "Customer order explained: 63 fans",
-    "Business cycle explained",
-    "Design standards approved",
-    "Engineering quality checklist completed",
-    "Manufacturing stations active",
-    "Fans assembled",
-    "Fans painted and personalized",
-    "Quality check completed",
-    "Fans counted for delivery",
-    "Fans delivered to Contractor Team",
+    "Daily Almanac reviewed",
+    "Soil Team assigned",
+    "Planting Team assigned",
+    "Infrastructure Team assigned",
+    "Bubble Babies Team assigned",
+    "Storytelling Team assigned",
+    "Pollinator Team assigned",
+    "Soil spread",
+    "Soil leveled",
+    "Rows created",
+    "Seeds sown",
+    "Seeds planted",
+    "Grass mulch placed",
+    "Fence sections completed",
+    "Bubble Babies created",
+    "Bubble Babies counted",
+    "Photos uploaded",
     "Reflection completed",
-    "What I Learned completed",
-    "Career interest selected",
-    "Achievement celebrated",
+    "Parent conversation starter sent",
   ];
 
-  const productionMetrics = [
-    ["Customer Order", "63 fans"],
-    ["Material Cost", "$0.06 each"],
-    ["Markup", "20%"],
-    ["Sale Price", "$0.072 each"],
-    ["Material Cost Total", "$3.78"],
-    ["Contract Value", "$4.54"],
+  const valueMetrics = [
+    ["Soil Prepared", savedItems.includes("Soil spread") ? "Started" : "Pending"],
+    ["Rows Created", savedItems.includes("Rows created") ? "Started" : "Pending"],
+    ["Seeds Planted", savedItems.includes("Seeds planted") ? "Started" : "Pending"],
+    ["Fence Completion", "70%+"],
+    ["Bubble Babies", bubbleCount],
+    ["Future Harvest", "In Progress"],
   ];
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
-      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
-        Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.
-      </p>
+      <div className="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today's Project • From Soil to Seed</div>
+          <h1 className="mt-4 text-4xl font-black md:text-6xl">{todaysProject.title}</h1>
+          <p className="mt-4 max-w-4xl text-xl font-black text-emerald-50/90">{todaysProject.subtitle}</p>
+          <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">{todaysProject.mission}</p>
+          <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/30">
+            <img src={todaysProject.image} alt="Grow area prepared for soil and planting" className="h-64 w-full object-cover opacity-90" />
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">🌤 Today's Almanac</div>
+          <div className="mt-4 grid gap-2">
+            {[
+              ["Ground Moisture", todaysProject.almanac.groundMoisture],
+              ["Planting Conditions", todaysProject.almanac.plantingConditions],
+              ["Mulching Conditions", todaysProject.almanac.mulchingConditions],
+              ["Fence Work", todaysProject.almanac.fenceWork],
+              ["Heat Risk", todaysProject.almanac.heatRisk],
+            ].map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
+                <span className="text-white/72">{label}</span>
+                <b>{value}</b>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm font-black leading-7 text-white/86">
+            Question: {todaysProject.almanac.question}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Connected Food Ecosystem Flow</div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {todaysProject.visualFlow.map((step, index) => (
+            <React.Fragment key={step}>
+              <div className={`rounded-full px-5 py-3 text-sm font-black ${index <= 2 ? "bg-emerald-300 text-black" : "bg-black/25 text-white"}`}>{step}</div>
+              {index < todaysProject.visualFlow.length - 1 && <div className="text-2xl font-black text-white/50">→</div>}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Business Story</div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Farm Story</div>
           <p className="mt-3 text-sm leading-7 text-white/84">
-            Bronson Family Farm is the customer. A contractor is hired to build the cooling station. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce.
+            Every harvest begins with preparation. Before food can be grown, farmers prepare soil, create planting rows, sow seeds, protect moisture, and secure the growing area.
           </p>
           <div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-7 text-white/86">
-            Bronson Family Farm ↓ Contractor ↓ Youth Manufacturing Workforce ↓ Product Delivery ↓ Installation ↓ Customer Satisfaction
+            Soil ↓ Rows ↓ Seeds ↓ Plants ↓ Harvest ↓ Marketplace ↓ Family ↓ Community
           </div>
         </div>
         <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">The Money Side</div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">Today's Value Creation</div>
           <div className="mt-3 grid gap-2">
-            {productionMetrics.map(([label, value]) => (
+            {valueMetrics.map(([label, value]) => (
               <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
                 <span className="text-white/72">{label}</span>
                 <b>{value}</b>
@@ -6444,7 +6524,7 @@ function CoolingCenterProjectModule({
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <div className="text-xs font-black uppercase tracking-[0.22em] text-white/65">Why It Matters</div>
           <p className="mt-3 text-sm leading-7 text-white/82">
-            Food prices are rising because every step costs money: growing, harvesting, packaging, transportation, labor, storage, marketing, and selling. This project helps youth understand how solving problems creates value, income, careers, and stronger communities.
+            Food begins long before harvest. The quality of the harvest depends on the quality of preparation. Today's work teaches responsibility, teamwork, environmental stewardship, entrepreneurship, and workforce skills while improving the farm's ability to grow healthy food.
           </p>
         </div>
       </div>
@@ -6452,177 +6532,100 @@ function CoolingCenterProjectModule({
       {!compact && (
         <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.95fr]">
           <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
-            <h2 className="mt-3 text-2xl font-black">Fan Prototype Demonstration</h2>
-            <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
-              Watch how a simple fan idea can become a product. Youth should look for ideas they can improve, paint, personalize, and prepare for the contractor's order.
-            </p>
-            <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/dtYzf3avkT4"
-                title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                className="h-full w-full"
-              />
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Grow Area Progress</div>
+            <h2 className="mt-3 text-2xl font-black">Live Farm Dashboard</h2>
+            <div className="mt-5 grid gap-3">
+              {todaysProject.progress.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                  <div className="flex items-center justify-between text-sm font-black"><span>{item.icon} {item.label}</span><span>{item.value}%</span></div>
+                  <div className="mt-3 h-3 rounded-full bg-black/35"><div className="h-3 rounded-full bg-emerald-300" style={{ width: `${item.value}%` }} /></div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Entrepreneurship Example</div>
-            <h2 className="mt-3 text-2xl font-black">A 13-Year-Old Saw Opportunity</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">
-              Use the young entrepreneur snack-selling example to start the conversation. The lesson is not snacks. The lesson is that opportunity begins when someone sees a need, creates value, and serves a customer.
-            </p>
-            <a
-              href="https://www.tiktok.com/@kasi_hustlers/video/7610048087100362002"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-5 block rounded-2xl bg-emerald-300 px-5 py-4 text-center font-black text-black"
-            >
-              Open Inspiration Video
-            </a>
-            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-6 text-white/78">
-              Discussion: What problem was he solving? Who was his customer? What opportunity could you create at Bronson Family Farm?
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Teams</div>
+            <h2 className="mt-3 text-2xl font-black">Today's Cultivator Teams</h2>
+            <div className="mt-4 grid gap-2">
+              {todaysProject.teams.map((team) => (
+                <button key={team.name} type="button" onClick={() => setSelectedTeam(team.name)} className={`rounded-2xl border p-4 text-left ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300/20" : "border-white/10 bg-black/25"}`}>
+                  <div className="text-lg font-black">{team.icon} {team.name}</div>
+                  <div className="mt-1 text-sm text-white/72">{team.task}</div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Vision Challenge</div>
-        <h2 className="mt-3 text-2xl font-black">What Opportunity Do You See?</h2>
-        <div className="mt-5 grid gap-4 lg:grid-cols-3">
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">This morning I see...</span>
-            <textarea value={visionBefore} onChange={(e) => setVisionBefore(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Example: I see a fan, a tomato, a field, or a problem." />
-          </label>
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">If I had one acre at Bronson Family Farm, I would...</span>
-            <textarea value={oneAcre} onChange={(e) => setOneAcre(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Grow, build, sell, host, teach, create..." />
-          </label>
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">Now I see...</span>
-            <textarea value={visionAfter} onChange={(e) => setVisionAfter(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="What opportunity do you see now?" />
-          </label>
+      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Selected Team Mission</div>
+        <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.icon} {selectedTeamInfo.name}</h2>
+        <p className="mt-2 text-white/80">{selectedTeamInfo.task}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {selectedTeamInfo.skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}
         </div>
-        <button type="button" onClick={saveVision} className="mt-4 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save My Vision</button>
       </div>
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-[.8fr_1fr]">
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Choose / View My Team</div>
-          <div className="mt-4 grid gap-2">
-            {coolingCenterTeams.map((team) => (
-              <button
-                type="button"
-                key={team.name}
-                onClick={() => setSelectedTeam(team.name)}
-                className={`rounded-2xl border p-4 text-left transition ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}
-              >
-                <div className="text-lg font-black">{team.icon} {team.name}</div>
-                <div className="mt-1 text-sm font-bold opacity-80">{team.identity}</div>
-              </button>
+      <div className="mt-7 grid gap-5 lg:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">My Contribution</div>
+          <h2 className="mt-3 text-2xl font-black">What did I help build today?</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {contributionItems.map((item) => (
+              <button key={item} type="button" onClick={() => toggleContribution(item)} className={`rounded-full px-4 py-2 text-sm font-black ${contributions.includes(item) ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{item}</button>
             ))}
           </div>
         </div>
-        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <div className="text-4xl">{selectedTeamInfo.icon}</div>
-          <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.name}</h2>
-          <p className="mt-2 text-lg font-black text-emerald-100">{selectedTeamInfo.identity}</p>
-          <p className="mt-3 text-sm font-bold text-white/70">Recommended assignment: {selectedTeamInfo.recommendedShare}</p>
-          <p className="mt-4 text-sm leading-7 text-white/82">{selectedTeamInfo.mission}</p>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.skills.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Careers</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.careers.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">What Did I Learn?</div>
+          <h2 className="mt-3 text-2xl font-black">Turn farm work into portfolio evidence.</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {learningItems.map((item) => (
+              <button key={item} type="button" onClick={() => toggleLearning(item)} className={`rounded-full px-4 py-2 text-sm font-black ${learning.includes(item) ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{item}</button>
+            ))}
           </div>
+        </div>
+      </div>
+
+      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Today's Work Checklist</div>
+        <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          {productionItems.map((item) => (
+            <button key={item} type="button" onClick={() => toggleSaved(item)} className={`rounded-2xl p-4 text-left text-sm font-black ${savedItems.includes(item) ? "bg-emerald-300 text-black" : "bg-black/25 text-white"}`}>{savedItems.includes(item) ? "✓ " : "□ "}{item}</button>
+          ))}
         </div>
       </div>
 
       {!compact && (
-        <>
-          <div className="mt-7 grid gap-5 lg:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-              <h2 className="text-2xl font-black">My Contribution</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">Choose the ways you will contribute today. This becomes part of your achievement record.</p>
-              <div className="mt-4 grid gap-2 md:grid-cols-2">
-                {contributionItems.map((item) => {
-                  const active = contributions.includes(item);
-                  return <button type="button" key={item} onClick={() => toggleContribution(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
-                })}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-              <h2 className="text-2xl font-black">What Did I Learn?</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">Complete this at the end of the project.</p>
-              <div className="mt-4 grid gap-2 md:grid-cols-2">
-                {learningItems.map((item) => {
-                  const active = learning.includes(item);
-                  return <button type="button" key={item} onClick={() => toggleLearning(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-amber-200 bg-amber-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
-                })}
-              </div>
+        <div className="mt-7 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Bubble Babies Enterprise</div>
+            <h2 className="mt-3 text-2xl font-black">Seeds become products.</h2>
+            <Field label="Bubble Babies Created Today" value={bubbleCount} onChange={setBubbleCount} placeholder="0" />
+            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-7 text-white/82">
+              Track created, packaged, ready for marketplace, and inventory value. This connects agriculture to entrepreneurship.
             </div>
           </div>
-
-          <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.85fr]">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-              <h2 className="text-2xl font-black">Production Board</h2>
-              <p className="mt-3 text-sm leading-7 text-white/78">Tap each item as the launch team completes the work. These are saved locally for launch review.</p>
-              <div className="mt-5 grid gap-2 md:grid-cols-2">
-                {productionItems.map((item) => {
-                  const active = savedItems.includes(item);
-                  return (
-                    <button type="button" key={item} onClick={() => toggleSaved(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/30 text-white"}`}>
-                      {active ? "✅" : "☐"} {item}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-              <h2 className="text-2xl font-black">Supervisor Role Today</h2>
-              <p className="mt-3 text-sm leading-7 text-white/82">Supervisors guide youth success. They do not do the work for the youth.</p>
-              {[
-                "Safety Leader: PPE, hydration, heat awareness, tool safety, emergency response.",
-                "Workforce Coach: encouragement, problem solving, positive behavior, conflict resolution.",
-                "Team Facilitator: keep time, organize teams, support deliverables, keep youth focused.",
-                "Assessor: observe communication, teamwork, responsibility, problem solving, participation.",
-                "Wellness Observer: notice fatigue, frustration, withdrawal, escalation, or need for support.",
-              ].map((item) => <div key={item} className="mt-3 rounded-2xl bg-white/10 p-3 text-sm leading-6 text-white/80">✓ {item}</div>)}
-            </div>
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Reflection + Parent Connection</div>
+            <h2 className="mt-3 text-2xl font-black">{todaysProject.parentConnection}</h2>
+            <TextArea label="What did you notice about soil, seeds, mulch, or teamwork?" value={soilNote} onChange={setSoilNote} />
           </div>
-
-          <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-            <h2 className="text-2xl font-black">Celebration & Achievement</h2>
-            <p className="mt-4 text-lg leading-8 text-white/88">
-              Today we are not just building fans. We are learning how to see opportunity, imagine solutions, design ideas, build products, deliver value, take ownership, and connect our work to future careers.
-            </p>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {["Opportunity Seeker", "Problem Solver", "Team Builder", "Creative Thinker", "Quality Champion", "Workforce Ready", "Entrepreneurial Mindset", "Value Creator", "Future Builder"].map((badge) => (
-                <div key={badge} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-black">🏆 {badge}</div>
-              ))}
-            </div>
-          </div>
-        </>
+        </div>
       )}
 
-      <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Start Youth Check-In</button>
-        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Tracking</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Reflection / Feedback</button>
+      <div className="mt-7 grid gap-5 lg:grid-cols-3">
+        <TextArea label="SEE IT — What did you see in the grow area?" value={visionBefore} onChange={setVisionBefore} />
+        <TextArea label="DESIGN IT — What would you improve tomorrow?" value={visionAfter} onChange={setVisionAfter} />
+        <TextArea label="OWN IT — What are you proud of today?" value={oneAcre} onChange={setOneAcre} />
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={saveVision} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Portfolio Evidence</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Upload / View Photos</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Complete Reflection</button>
+        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-7 py-4 font-black text-emerald-50">Record Achievement</button>
       </div>
     </Card>
   );
@@ -6697,7 +6700,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
       <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
       </div>
@@ -6932,7 +6935,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments."],
-          ["June 8 Featured Project", "Farm Worker Heat Safety & Cooling Station Challenge: Design, Engineering, Manufacturing, and Contractor teams work in sequence."],
+          ["June 8 Featured Project", "From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence."],
           ["During Program", "Supervisor observations, wellness support, safety follow-up, team progress, task completion, incident documentation."],
           ["End of Day", "Youth reflection, supervisor assessment, parent-safe summary, media documentation, reports."],
         ].map(([title, text]) => (
@@ -6945,7 +6948,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <OperationsInventoryPanel />
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open June 8 Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Today's Project</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
       </div>
     </Card>
@@ -6982,7 +6985,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
     {
       title: "5. June 8 Farm Worker Heat Safety Project",
       text: "Youth work through Design, Engineering, Manufacturing, and Contractor teams to build a real cooling station for farm worker and visitor heat safety.",
-      action: "Open Cooling Station Challenge",
+      action: "Open From Soil to Seed",
       target: "launchProject" as Screen,
     },
     {
