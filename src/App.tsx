@@ -41,7 +41,11 @@ type Screen =
   | "media"
   | "launchProject"
   | "feedback"
-  | "completion";
+  | "completion"
+  | "startDay"
+  | "dailyBriefing"
+  | "liveWeek"
+  | "supervisorPinSetup";
 
 type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
 
@@ -1647,6 +1651,10 @@ function screenLabel(screen: Screen) {
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
     completion: "Achievement Center",
+    startDay: "Start Day",
+    dailyBriefing: "Daily Farm Briefing",
+    liveWeek: "Week 1 Live Curriculum",
+    supervisorPinSetup: "Supervisor PIN Setup",
   };
   return labels[screen];
 }
@@ -1817,11 +1825,1269 @@ function SupportResponseFrameworkCard() {
   );
 }
 
+
+// =======================================================
+// CULTIVATOR LAUNCH OPERATING LAYER — WEEK 1 / JUNE 2026
+// Integrated without rebuilding the existing ecosystem.
+// Youth enter as Cultivators. Organization is tracked behind the scenes.
+// =======================================================
+
+type SupervisorPinProfile = {
+  id: string;
+  name: string;
+  email: string;
+  pin: string;
+  role: "Supervisor" | "Lead Supervisor" | "Administrator";
+  created_at: string;
+};
+
+type LaunchYouthRecord = {
+  id: string;
+  worksite: string;
+  organization: "Bronson Family Farm" | "Farm & Family Alliance";
+  firstName: string;
+  lastName: string;
+  pin: string;
+  email?: string;
+  phone?: string;
+  status: "Active" | "Temporary" | "Pending Verification" | "Inactive";
+  team: string;
+  supervisor: string;
+};
+
+const SUPERVISOR_PIN_KEY = "bff.launch.supervisorPins";
+const DAY_RECORD_KEY = "bff.launch.dayRecords";
+const LAUNCH_YOUTH_ROSTER_KEY = "bff.launch.cultivatorRoster";
+
+const approvedSupervisors: { email: string; name: string; role: "Supervisor" | "Lead Supervisor" | "Administrator" }[] = [
+  { email: "bhchatman@gmail.com", name: "B. H. Chatman", role: "Supervisor" },
+  { email: "msdaisy0607@icloud.com", name: "TreDayzah", role: "Supervisor" },
+  { email: "foresthalljr2@gmail.com", name: "Forest Hall Jr.", role: "Supervisor" },
+  { email: "sifajax@gmail.com", name: "Kisha Parker", role: "Lead Supervisor" },
+  { email: "jess3deery87@gmail.com", name: "Jessica Deery", role: "Supervisor" },
+  { email: "awnesty2@gmail.com", name: "Robin Hall", role: "Supervisor" },
+  { email: "iwpublishing228@gmail.com", name: "IW Publishing", role: "Supervisor" },
+];
+
+const launchCultivatorRoster: LaunchYouthRecord[] = [
+  {
+    "id": "YTH-001",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Tim'Ondre",
+    "lastName": "Bellamy",
+    "pin": "0601",
+    "email": "moffettnell40@gmail.com",
+    "phone": "330.233.2244",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-002",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Laniya",
+    "lastName": "Blair",
+    "pin": "0432",
+    "email": "From Children's Home- no info",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-003",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Laniya",
+    "lastName": "Blair- Group Home",
+    "pin": "0431",
+    "email": "none@aol.com100",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-004",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Dominique",
+    "lastName": "Bratton",
+    "pin": "0219",
+    "email": "shirellem2323@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-005",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Gianna",
+    "lastName": "Brown",
+    "pin": "0254",
+    "email": "pinkcookie5@icloud.com",
+    "phone": "330.261.2375",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-006",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Deyanna",
+    "lastName": "Carpenter",
+    "pin": "0214",
+    "email": "deedee.carpenter.822@gmail.com",
+    "phone": "773-708-2508",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-007",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Ryan",
+    "lastName": "Carpenter",
+    "pin": "0559",
+    "email": "Cory22mack09@gmail.com",
+    "phone": "773-708-2508",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-008",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Airielle",
+    "lastName": "Carter",
+    "pin": "0091",
+    "email": "beezybaby3211@icloud.com",
+    "phone": "330.423.2976",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-009",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Tawaun",
+    "lastName": "Ceasar Jr",
+    "pin": "0596",
+    "email": "alieaperry1@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-010",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kelis",
+    "lastName": "Cochrane",
+    "pin": "0392",
+    "email": "kelis8819@gmail.com",
+    "phone": "724-971-1930",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-011",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "",
+    "lastName": "Conner",
+    "pin": "0000",
+    "email": "none@aol.com6",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-012",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kadyn",
+    "lastName": "Conner",
+    "pin": "0370",
+    "email": "kadyn3186@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-013",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Keviin",
+    "lastName": "Daniels",
+    "pin": "0402",
+    "email": "aj212209@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-014",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Jordan-Lebron",
+    "lastName": "Evans",
+    "pin": "0351",
+    "email": "jordanlebronevans0408@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-015",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Natalee",
+    "lastName": "Fair",
+    "pin": "0508",
+    "email": "fairnatalee9@gmail.com",
+    "phone": "330-937-1616",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-016",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Angel",
+    "lastName": "Feliciano",
+    "pin": "0113",
+    "email": "angelfeliciano1217@ycsd.org",
+    "phone": "330-502-2846",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-017",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Naomi",
+    "lastName": "Fields",
+    "pin": "0506",
+    "email": "none@aol.com7",
+    "phone": "330-951-2762",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-018",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Da'Vone",
+    "lastName": "Green",
+    "pin": "0182",
+    "email": "devonegreen0621@gmail.com",
+    "phone": "234-439-2597",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-019",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "O'Tayveon",
+    "lastName": "Green",
+    "pin": "0526",
+    "email": "otayveongreen0117@gmail.com",
+    "phone": "234.442.2253",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-020",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Ra'Kai",
+    "lastName": "Green",
+    "pin": "0536",
+    "email": "rakaigreen56@gmail.com",
+    "phone": "330.881.0475",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-021",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Leah",
+    "lastName": "Hall",
+    "pin": "0444",
+    "email": "leah.hall1002@icloud.com",
+    "phone": "330.301.5880",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-022",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Jason",
+    "lastName": "Harmon",
+    "pin": "0305",
+    "email": "tye931lati@icloud.com",
+    "phone": "234.313.3902",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-023",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Don-Nasia",
+    "lastName": "Harris",
+    "pin": "0220",
+    "email": "nasiaharris2008@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-024",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Jackson",
+    "lastName": "Heath",
+    "pin": "0276",
+    "email": "jacksonheath1001@ycsd.org",
+    "phone": "330.766.7388",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-025",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kalil",
+    "lastName": "Johnson",
+    "pin": "0375",
+    "email": "kaliljohnson356911@gmail.com",
+    "phone": "330.518.7270",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-026",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kamren",
+    "lastName": "Johnson",
+    "pin": "0382",
+    "email": "weep3266@gmail.com",
+    "phone": "330.406.8347",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-027",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kia",
+    "lastName": "Jones",
+    "pin": "0412",
+    "email": "joneskia0722@gmail.com",
+    "phone": "234.704.9184",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-028",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Ron'Del",
+    "lastName": "Jones",
+    "pin": "0554",
+    "email": "jgt469951@gmail.com",
+    "phone": "330-423-2624",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-029",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Key'Shawn",
+    "lastName": "Jordan",
+    "pin": "0404",
+    "email": "keyshawnjordan5@gmail.com",
+    "phone": "330-774-3338",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-030",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Stace'On",
+    "lastName": "Mahone",
+    "pin": "0591",
+    "email": "staceon1212@gmail.com",
+    "phone": "706-877-9873",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-031",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Cabrina",
+    "lastName": "Martin",
+    "pin": "0159",
+    "email": "cabrinamartin940@gmail.com",
+    "phone": "567-868-0008",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-032",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Jamire",
+    "lastName": "Mitchell",
+    "pin": "0298",
+    "email": "jhud122@yahoo.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-033",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Santonio",
+    "lastName": "Monserrat",
+    "pin": "0568",
+    "email": "tonelfstopic@gmail.com",
+    "phone": "234.817.5763",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-034",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kah'Ron",
+    "lastName": "Oates",
+    "pin": "0371",
+    "email": "ktoates17@icloud.com",
+    "phone": "330.774.7116",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-035",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Darnell",
+    "lastName": "Patterson",
+    "pin": "0195",
+    "email": "donpistoljr@gmail.com",
+    "phone": "(330) 540-9946",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-036",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Lyndale",
+    "lastName": "Riley",
+    "pin": "0454",
+    "email": "none@aol.com8",
+    "phone": "234.313.5240",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-037",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Brayion",
+    "lastName": "Solid",
+    "pin": "0150",
+    "email": "brayionsolid@gmail.com",
+    "phone": "504-405-4963",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-038",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Brylen",
+    "lastName": "Solid",
+    "pin": "0158",
+    "email": "brylensolid@gmail.com",
+    "phone": "504-405-4963",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-039",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Dawn",
+    "lastName": "Taylor",
+    "pin": "0199",
+    "email": "taylorkinshasa69@gmail.com",
+    "phone": "234-313-4451",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-040",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Jerniyahlynn",
+    "lastName": "Thomas",
+    "pin": "0336",
+    "email": "jerniyahlynnthomas0922@ycsd.org",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-041",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Neyshmarie",
+    "lastName": "Vega Ramos",
+    "pin": "0516",
+    "email": "neyshmarievega06@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-042",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kenaysia",
+    "lastName": "Walker",
+    "pin": "0394",
+    "email": "damonawalker17@gmail.com",
+    "phone": "234-855-5653",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-043",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Que'Shawn",
+    "lastName": "Walker",
+    "pin": "0533",
+    "email": "queshawnwalker@icloud.com",
+    "phone": "330.716.2989",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-044",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Areille",
+    "lastName": "Whitfield-Tubbs",
+    "pin": "0129",
+    "email": "areilletubbs1@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-045",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Kristina",
+    "lastName": "Wiggins",
+    "pin": "0421",
+    "email": "unique0921@icloud.com",
+    "phone": "330-651-0063",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-046",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Reddrick",
+    "lastName": "Willis",
+    "pin": "0544",
+    "email": "willisreddrick@gmail.com",
+    "phone": "330-330-5062",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-047",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "Koreay",
+    "lastName": "Womack",
+    "pin": "0420",
+    "email": "koreaywomack11@yahoo.com",
+    "phone": "330.921.1988",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-048",
+    "worksite": "Bronson Family Farm",
+    "organization": "Bronson Family Farm",
+    "firstName": "King",
+    "lastName": "Xavier Brown",
+    "pin": "0416",
+    "email": "kingxavierbrown03@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-049",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Zxachi",
+    "lastName": "Adair",
+    "pin": "0635",
+    "email": "adairzar10@gmail.com",
+    "phone": "330.402.0054",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-050",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Zamarion",
+    "lastName": "Agee-Robinson",
+    "pin": "0625",
+    "email": "zdageerobinson2011@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-051",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Bobbie",
+    "lastName": "Batchelor",
+    "pin": "0146",
+    "email": "bobbiebatchelor75@gmail.com",
+    "phone": "330-507-3809",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-052",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Khaliq",
+    "lastName": "Bazemore",
+    "pin": "0410",
+    "email": "bazemorekhaliq3@gmail.com",
+    "phone": "919-723-8793",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-053",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Fabian",
+    "lastName": "Bellard Jr",
+    "pin": "0245",
+    "email": "fabianbellard08@gmail.com",
+    "phone": "234.287.7427",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-054",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Karmreon",
+    "lastName": "Black",
+    "pin": "0386",
+    "email": "kamreonblack327@gmail.com",
+    "phone": "330-318-0775",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-055",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Trinity",
+    "lastName": "Clinkscale",
+    "pin": "0608",
+    "email": "trinityclinkscale8@gmail.com",
+    "phone": "234-855-5653",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-056",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Alexis",
+    "lastName": "Delgado Sanchez",
+    "pin": "0096",
+    "email": "alexisdelgadosanchez5@gmail.com",
+    "phone": "267.963.1900",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-057",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Zion",
+    "lastName": "Dubois",
+    "pin": "0630",
+    "email": "ashcat03140911@gmail.com",
+    "phone": "3308120016",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-058",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Rece",
+    "lastName": "Evans",
+    "pin": "0543",
+    "email": "grandsgreatest@gmail.com",
+    "phone": "330-540-0278",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-059",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Isaiah",
+    "lastName": "Figueroa",
+    "pin": "0265",
+    "email": "none@aol.com89",
+    "phone": "234-699-0828",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-060",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Brielle",
+    "lastName": "Fleeton",
+    "pin": "0157",
+    "email": "bribriibri1@gmail.com",
+    "phone": "234.287.7616",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-061",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Keylen",
+    "lastName": "Gregory",
+    "pin": "0406",
+    "email": "keylengregory158@gmail.com",
+    "phone": "330-233-5777",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-062",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Caleb",
+    "lastName": "Harrison",
+    "pin": "0160",
+    "email": "iamcaleb1@icloud.com",
+    "phone": "330-501-0765",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-063",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Akilah",
+    "lastName": "Heflin",
+    "pin": "0092",
+    "email": "heflinakilah65@gmail.com",
+    "phone": "330.330.6308",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-064",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Ricky",
+    "lastName": "Robbins",
+    "pin": "0548",
+    "email": "robbinsr923@gmail.com",
+    "phone": "234-313-3430",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-065",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Kei'Ara",
+    "lastName": "Robinson",
+    "pin": "0389",
+    "email": "keiararobinson990@gmail.com",
+    "phone": "330.623.1370",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-066",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "R'Manii",
+    "lastName": "Robinson",
+    "pin": "0535",
+    "email": "rmaniirobinson1432@gmail.com",
+    "phone": "",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-067",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Cameron",
+    "lastName": "Robinson Jr",
+    "pin": "0163",
+    "email": "cameronr030111@gmail.com",
+    "phone": "330.531.1553",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-068",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "London",
+    "lastName": "Smith",
+    "pin": "0448",
+    "email": "danialondon234@gmail.com",
+    "phone": "330-519-2217",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-069",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "K-Shaun",
+    "lastName": "Weaver",
+    "pin": "0367",
+    "email": "kshaunweaver15@icloud.com",
+    "phone": "330.774.6068",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-070",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Tayvon",
+    "lastName": "Weaver",
+    "pin": "0599",
+    "email": "samyerin22891@gmail.com",
+    "phone": "330.501.0825",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  },
+  {
+    "id": "YTH-071",
+    "worksite": "Farm and Family Alliance",
+    "organization": "Farm & Family Alliance",
+    "firstName": "Nya",
+    "lastName": "Wright",
+    "pin": "0522",
+    "email": "nyalanay9@gmail.com",
+    "phone": "330-556-2887",
+    "status": "Active",
+    "team": "Unassigned",
+    "supervisor": "Unassigned"
+  }
+];
+
+const dayOneEcosystemRecord = {
+  id: "DAY-001",
+  date: "June 8, 2026",
+  title: "Day 1 Ecosystem Record",
+  week: "Week 1: Workplace Foundations & Safety",
+  theme: "Launch Day",
+  organizations: ["Bronson Family Farm", "Farm & Family Alliance"],
+  summary:
+    "The first day of the 2026 Cultivator Program was successful. Youth participated in the fan activity, worked in the grow area, spread soil, continued fence construction, gathered twine, moved cut grass, and demonstrated strong teamwork.",
+  youthEngagement: [
+    "Youth participated in the fan activity.",
+    "Youth demonstrated teamwork in the grow area.",
+    "Youth wanted to upload and share photos.",
+    "Youth questioned how the fan worked, showing critical thinking.",
+  ],
+  farmProgress: [
+    "Soil movement started.",
+    "Fence construction continued.",
+    "Twine was gathered.",
+    "Cut grass was moved cooperatively.",
+  ],
+  parentEngagement:
+    "Parents responded positively to knowing what their youth are learning.",
+  supervisorObservation:
+    "Supervisor/aide successfully coordinated youth teamwork and response to farm needs.",
+  incidentSummary:
+    "A verbal conflict occurred at dismissal involving families with prior history. Staff intervened to prevent escalation and separate parties. This revealed the need for dismissal protocol, private supervisor debrief, and incident response training.",
+  lessonsLearned: [
+    "Attendance must come first.",
+    "Some youth do not have phones.",
+    "Shared-device and paper participation are needed.",
+    "Parent pathway is important.",
+    "Photo uploads should become portfolio evidence.",
+    "Supervisor disagreement must be handled privately after stabilization.",
+  ],
+  status: "Official Record #001",
+};
+
+const weekOneLaunchCurriculum = [
+  {
+    date: "Tuesday, June 9, 2026",
+    title: "From Soil to Seed",
+    theme: "Everything begins with the soil.",
+    almanacQuestion:
+      "The ground and grass are soaked. How can moisture help seeds and plants survive heat?",
+    proverb: "The farmer who prepares the soil today harvests tomorrow.",
+    work: [
+      "Spread soil",
+      "Level soil",
+      "Create rows",
+      "Sow seeds",
+      "Plant seeds",
+      "Place soaked grass around plants",
+      "Continue fencing",
+      "Create and count Bubble Babies",
+    ],
+    parentQuestion: "Ask your youth why grass was placed around the plants.",
+  },
+  {
+    date: "Wednesday, June 10, 2026",
+    title: "Protect What We Grow",
+    theme: "A harvest must be protected before it can feed people.",
+    almanacQuestion: "Why should crops be protected before harvest?",
+    proverb: "A good fence protects tomorrow’s food.",
+    work: [
+      "Complete fencing",
+      "Check fence gaps",
+      "Inspect planted rows",
+      "Add grass mulch where needed",
+      "Label planted areas",
+      "Update grow area progress",
+    ],
+    parentQuestion: "Ask your youth why fencing matters on a farm.",
+  },
+  {
+    date: "Thursday, June 11, 2026",
+    title: "Observe, Care, and Improve",
+    theme: "Farmers notice what others overlook.",
+    almanacQuestion:
+      "What signs tell a farmer that soil, plants, or pollinators need attention?",
+    proverb: "Observation is the beginning of wisdom.",
+    work: [
+      "Inspect planted areas",
+      "Check soil moisture",
+      "Observe pollinators",
+      "Document insects or wildlife",
+      "Repair weak areas",
+      "Organize tools and materials",
+      "Continue Bubble Babies inventory",
+    ],
+    parentQuestion: "Ask your youth what they observed on the farm today.",
+  },
+  {
+    date: "Friday, June 12, 2026",
+    title: "Week 1 Reflection and Portfolio Day",
+    theme: "What we build together becomes evidence of growth.",
+    almanacQuestion:
+      "What did we build this week that future crops and future workers depend on?",
+    proverb: "Growth is easier to see when we record the journey.",
+    work: [
+      "Review grow area progress",
+      "Count Bubble Babies",
+      "Confirm fence status",
+      "Upload best photos",
+      "Complete weekly reflection",
+      "Recognize teamwork and leadership",
+      "Prepare parent-safe summary",
+    ],
+    parentQuestion: "Ask your youth what they are most proud of from Week 1.",
+  },
+];
+
+const liveFarmMetrics = [
+  "Soil Spread",
+  "Soil Leveled",
+  "Rows Created",
+  "Seeds Planted",
+  "Grass Mulch Added",
+  "Fence Completion",
+  "Bubble Babies Created",
+  "Photos Uploaded",
+  "Leadership Moments",
+  "Parent Connections",
+];
+
+function seedLaunchRosterAndRecords() {
+  const existingRoster = safeRead<LaunchYouthRecord[]>(LAUNCH_YOUTH_ROSTER_KEY, []);
+  if (!existingRoster.length) safeWrite(LAUNCH_YOUTH_ROSTER_KEY, launchCultivatorRoster);
+  const existingDayRecords = safeRead<any[]>(DAY_RECORD_KEY, []);
+  if (!existingDayRecords.some((record) => record.id === dayOneEcosystemRecord.id)) {
+    safeWrite(DAY_RECORD_KEY, [dayOneEcosystemRecord, ...existingDayRecords]);
+  }
+}
+
+function SupervisorPinSetup({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [email, setEmail] = useState("");
+  const [pin, setPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [message, setMessage] = useState("");
+  const normalizedEmail = email.trim().toLowerCase();
+  const approved = approvedSupervisors.find((item) => item.email.toLowerCase() === normalizedEmail);
+
+  const saveSupervisor = () => {
+    if (!approved) {
+      setMessage("Email not authorized for supervisor access. Contact the program administrator.");
+      return;
+    }
+    if (!/^\d{4}$/.test(pin)) {
+      setMessage("Create a 4-digit PIN.");
+      return;
+    }
+    if (pin !== confirmPin) {
+      setMessage("PINs do not match.");
+      return;
+    }
+    const existing = safeRead<SupervisorPinProfile[]>(SUPERVISOR_PIN_KEY, []);
+    const filtered = existing.filter((row) => row.email.toLowerCase() !== approved.email.toLowerCase());
+    const profile: SupervisorPinProfile = {
+      id: `SUP-${String(filtered.length + 1).padStart(3, "0")}`,
+      name: approved.name,
+      email: approved.email,
+      pin,
+      role: approved.role,
+      created_at: new Date().toISOString(),
+    };
+    safeWrite(SUPERVISOR_PIN_KEY, [profile, ...filtered]);
+    setMessage(`Supervisor activated: ${profile.name} • ${profile.role}`);
+  };
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Supervisor Email Confirmation</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Create Supervisor PIN</h1>
+      <p className="mt-3 max-w-3xl text-white/78">
+        Only approved supervisor emails can create access. The email confirms the person; the PIN makes daily login simple at the farm.
+      </p>
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Approved supervisor email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Create 4-digit PIN" value={pin} onChange={(e) => setPin(e.target.value)} maxLength={4} />
+        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Confirm PIN" value={confirmPin} onChange={(e) => setConfirmPin(e.target.value)} maxLength={4} />
+      </div>
+      {approved && <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm font-bold text-emerald-50">Approved: {approved.name} • {approved.role}</div>}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={saveSupervisor} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Activate Supervisor</button>
+        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Supervisor Center</button>
+      </div>
+      {message && <Notice text={message} />}
+    </Card>
+  );
+}
+
+function StartDayScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const roster = safeRead<LaunchYouthRecord[]>(LAUNCH_YOUTH_ROSTER_KEY, launchCultivatorRoster);
+  const bffCount = roster.filter((youth) => youth.organization === "Bronson Family Farm").length;
+  const ffaCount = roster.filter((youth) => youth.organization === "Farm & Family Alliance").length;
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Start Day</div>
+      <h1 className="mt-4 text-5xl font-black md:text-7xl">Welcome Cultivator</h1>
+      <p className="mt-3 max-w-3xl text-lg text-white/78">Youth enter one ecosystem as Cultivators. Bronson Family Farm and Farm & Family Alliance are tracked behind the scenes for reporting.</p>
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-3xl bg-emerald-300 p-6 text-left font-black text-black">Youth Check-In<br /><span className="text-sm">Name + roster PIN or temporary entry</span></button>
+        <button type="button" onClick={() => setScreen("supervisorPinSetup")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Supervisor Setup<br /><span className="text-sm text-white/70">Approved email + self-created PIN</span></button>
+        <button type="button" onClick={() => setScreen("dailyBriefing")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Daily Farm Briefing<br /><span className="text-sm text-white/70">Almanac, proverb, mission, teams</span></button>
+        <button type="button" onClick={() => setScreen("parent")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Parent Portal<br /><span className="text-sm text-white/70">Youth PIN + parent phone/email</span></button>
+      </div>
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{roster.length}</div><div className="text-sm text-white/65">Cultivators loaded</div></div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{bffCount}</div><div className="text-sm text-white/65">Bronson Family Farm records</div></div>
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{ffaCount}</div><div className="text-sm text-white/65">Farm & Family Alliance records</div></div>
+      </div>
+    </Card>
+  );
+}
+
+function DailyFarmBriefing() {
+  const today = weekOneLaunchCurriculum[0];
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Farm Briefing</div>
+      <h1 className="mt-4 text-5xl font-black md:text-7xl">{today.title}</h1>
+      <p className="mt-3 text-xl text-white/80">{today.theme}</p>
+      <div className="mt-6 rounded-3xl border border-white/10 bg-white/10 p-5">
+        <h2 className="text-2xl font-black">🌤 Almanac Question</h2>
+        <p className="mt-2 text-white/80">{today.almanacQuestion}</p>
+      </div>
+      <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-5">
+        <h2 className="text-2xl font-black">📖 Daily Proverb</h2>
+        <p className="mt-2 text-white/80">{today.proverb}</p>
+      </div>
+      <div className="mt-6 grid gap-3 md:grid-cols-2">
+        {today.work.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-black/20 p-4 font-bold">✅ {item}</div>)}
+      </div>
+      <div className="mt-6 rounded-3xl bg-emerald-300 p-5 text-black">
+        <h2 className="text-2xl font-black">Parent Connection</h2>
+        <p className="mt-2 font-bold">{today.parentQuestion}</p>
+      </div>
+    </Card>
+  );
+}
+
+function LiveWeekScreen() {
+  useEffect(() => seedLaunchRosterAndRecords(), []);
+  const records = safeRead<any[]>(DAY_RECORD_KEY, [dayOneEcosystemRecord]);
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Week 1 Launch Curriculum</div>
+        <h1 className="mt-4 text-5xl font-black md:text-7xl">Live Curriculum + Farm Operations</h1>
+        <p className="mt-3 text-white/75">Curriculum drives the meaning. Farm work provides the real-world practice.</p>
+        <div className="mt-6 grid gap-4">
+          {weekOneLaunchCurriculum.map((day) => (
+            <div key={day.date} className="rounded-3xl border border-white/10 bg-white/10 p-5">
+              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/75">{day.date}</div>
+              <h2 className="mt-2 text-3xl font-black">{day.title}</h2>
+              <p className="mt-2 text-white/75">{day.theme}</p>
+              <p className="mt-3 font-bold">🌤 {day.almanacQuestion}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {day.work.map((task) => <span key={task} className="rounded-full bg-black/25 px-4 py-2 text-sm font-bold">{task}</span>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <Card>
+        <h2 className="text-3xl font-black">Mission Control Record #001</h2>
+        <p className="mt-3 text-white/75">{records[0]?.summary || dayOneEcosystemRecord.summary}</p>
+      </Card>
+      <Card>
+        <h2 className="text-3xl font-black">Live Farm Dashboard</h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {liveFarmMetrics.map((metric) => (
+            <div key={metric} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+              <div className="text-lg font-black">{metric}</div>
+              <div className="mt-3 h-3 rounded-full bg-black/30"><div className="h-3 w-1/4 rounded-full bg-emerald-300" /></div>
+              <div className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-white/60">In Progress</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
   const [message, setMessage] = useState("");
   const [language, setLanguage] = useState<LanguageCode>(() => safeRead<LanguageCode>(LANGUAGE_KEY, "en"));
+
+  useEffect(() => {
+    seedLaunchRosterAndRecords();
+  }, []);
 
   const changeLanguage = (next: LanguageCode) => {
     setLanguage(next);
@@ -1880,6 +3146,10 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "startDay" && <StartDayScreen setScreen={setScreen} />}
+      {screen === "dailyBriefing" && <DailyFarmBriefing />}
+      {screen === "liveWeek" && <LiveWeekScreen />}
+      {screen === "supervisorPinSetup" && <SupervisorPinSetup setScreen={setScreen} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -1929,6 +3199,9 @@ function Shell({
   // The primary navigation always shows the full ecosystem.
   // Role-specific workspaces, such as Youth Start Day, stay in a secondary row.
   const primaryNav: { label: string; screen: Screen }[] = [
+    { label: "Start Day", screen: "startDay" },
+    { label: "Daily Briefing", screen: "dailyBriefing" },
+    { label: "Week 1 Live", screen: "liveWeek" },
     { label: "Guest", screen: "guest" },
     { label: "Youth Workforce", screen: "youth" },
     { label: "Parent", screen: "parent" },
@@ -1940,10 +3213,12 @@ function Shell({
     { label: "Mission Control", screen: "reports" },
   ];
 
-  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion"];
+  const youthScreens: Screen[] = ["startDay", "dailyBriefing", "liveWeek", "youth", "wellness", "launchProject", "media", "feedback", "completion"];
   const showYouthWorkspace = role === "Youth Workforce Participant" || youthScreens.includes(screen);
   const youthWorkspaceNav: { label: string; screen: Screen }[] = [
-    { label: "Start Day", screen: "wellness" },
+    { label: "Start Day", screen: "startDay" },
+    { label: "Daily Briefing", screen: "dailyBriefing" },
+    { label: "Week 1 Live", screen: "liveWeek" },
     { label: "My Day", screen: "youth" },
     { label: "Today’s Project", screen: "launchProject" },
     { label: "My Week", screen: "youth" },
@@ -2025,6 +3300,10 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("startDay")} className={buttonClass("startDay")}>Start Day</button>
+              <button type="button" onClick={() => setScreen("dailyBriefing")} className={buttonClass("dailyBriefing")}>Daily Briefing</button>
+              <button type="button" onClick={() => setScreen("liveWeek")} className={buttonClass("liveWeek")}>Week 1 Live</button>
+              <button type="button" onClick={() => setScreen("supervisorPinSetup")} className={buttonClass("supervisorPinSetup")}>Supervisor Setup</button>
               <button type="button" onClick={() => setScreen("demo")} className={buttonClass("demo")}>Guided Portal</button>
               <button type="button" onClick={() => setScreen("guest")} className={buttonClass("guest")}>Guest</button>
               <button type="button" onClick={() => setScreen("youth")} className={buttonClass("youth")}>Youth Workforce</button>
