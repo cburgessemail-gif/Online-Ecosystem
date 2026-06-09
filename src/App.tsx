@@ -1441,10 +1441,10 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Marketplace': 'Mercado',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
     'Launch Candidate 3.0': 'Candidato de lanzamiento 3.0',
-    'The forest reveals itself one layer at a time.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
-    'Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
-    'Every role starts with one clear action before seeing the deeper resources.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
-    'The full ecosystem remains available through expandable sections and More tools.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
     'Daily Rhythm': 'Ritmo diario',
     'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
     'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
@@ -1468,10 +1468,10 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Marketplace': 'Marketplace',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
     'Launch Candidate 3.0': 'Launch Candidate 3.0',
-    'The forest reveals itself one layer at a time.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
-    'Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
-    'Every role starts with one clear action before seeing the deeper resources.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
-    'The full ecosystem remains available through expandable sections and More tools.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
     'Daily Rhythm': 'Daily Rhythm',
     'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
     'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
@@ -1495,10 +1495,10 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Marketplace': 'Mercato',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
     'Launch Candidate 3.0': 'Candidato di lancio 3.0',
-    'The forest reveals itself one layer at a time.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
-    'Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
-    'Every role starts with one clear action before seeing the deeper resources.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
-    'The full ecosystem remains available through expandable sections and More tools.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
     'Daily Rhythm': 'Ritmo quotidiano',
     'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
     'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
@@ -1522,10 +1522,10 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Marketplace': 'שוק',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'עיינו במזון, מוצרים, אירועים, הזדמנויות למגדלים ורכישה דרך GrownBy.',
     'Launch Candidate 3.0': 'מועמד השקה 3.0',
-    'The forest reveals itself one layer at a time.': 'מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ניגשים ישר לעבודה.',
-    'Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.': 'מבקרים ציבוריים יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.',
-    'Every role starts with one clear action before seeing the deeper resources.': 'משתתפי הנוער של Nesco אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.',
-    'The full ecosystem remains available through expandable sections and More tools.': 'אין צורך בטלפון: בני נוער יכולים להיכנס עם מזהה משתתף ושם משפחה או באמצעות חיפוש מדריך.',
+    'New visitors enter the story. Returning users go straight to work.': 'מבקרים חדשים נכנסים לסיפור. משתמשים חוזרים ניגשים ישר לעבודה.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'מבקרים ציבוריים יכולים לחקור את השער, הסיפור, האירועים והשוק ללא הרשמה.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'משתתפי הנוער של Nesco אמורים כבר להיות במערכת. הם מאמתים מידע במקום להירשם מחדש.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'אין צורך בטלפון: בני נוער יכולים להיכנס עם מזהה משתתף ושם משפחה או באמצעות חיפוש מדריך.',
     'Daily Rhythm': 'קצב יומי',
     'Today → Progress → Tomorrow': 'היום → התקדמות → מחר',
     'Today: team, project, supervisor, location, start time.': 'היום: צוות, פרויקט, מדריך, מיקום ושעת התחלה.',
@@ -1549,10 +1549,10 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Marketplace': 'Marché',
     'Browse food, products, events, grower opportunities, and GrownBy-connected purchasing.': 'Explore alimentos, productos, eventos, oportunidades para productores y compras conectadas con GrownBy.',
     'Launch Candidate 3.0': 'Candidat de lancement 3.0',
-    'The forest reveals itself one layer at a time.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
-    'Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
-    'Every role starts with one clear action before seeing the deeper resources.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
-    'The full ecosystem remains available through expandable sections and More tools.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
+    'New visitors enter the story. Returning users go straight to work.': 'Los nuevos visitantes entran en la historia. Los usuarios que regresan van directo al trabajo.',
+    'Public visitors can explore the portal, story, events, and marketplace without registering.': 'Los visitantes públicos pueden explorar el portal, la historia, los eventos y el mercado sin registrarse.',
+    'Nesco youth participants should already be in the system. They verify information instead of re-registering.': 'Los jóvenes participantes de Nesco ya deben estar en el sistema. Verifican su información en lugar de registrarse nuevamente.',
+    'No phone required: youth can enter with Participant ID plus last name or supervisor lookup.': 'No se requiere teléfono: los jóvenes pueden entrar con ID de participante más apellido o búsqueda del supervisor.',
     'Daily Rhythm': 'Rythme quotidien',
     'Today → Progress → Tomorrow': 'Hoy → Progreso → Mañana',
     'Today: team, project, supervisor, location, start time.': 'Hoy: equipo, proyecto, supervisor, ubicación y hora de inicio.',
@@ -1995,30 +1995,26 @@ function Shell({
   const role = activeUser?.role;
   const workspaceTarget = role ? routeForRole(role) : "roles";
 
-  // Launch 4.0 ecosystem shell restoration:
-  // The primary navigation always shows the full ecosystem.
-  // Role-specific workspaces, such as Youth Start Day, stay in a secondary row.
+  // Layered launch shell: the public top bar shows only the three doors.
+  // Guided Tour = ecosystem pathway. Workforce Program = youth, parent/guardian, supervisor, admin.
+  // Marketplace remains a direct public door. Details stay inside each workspace or More tools.
   const primaryNav: { label: string; screen: Screen }[] = [
-    { label: "Guest", screen: "guest" },
-    { label: "Youth Workforce", screen: "youth" },
-    { label: "Parent", screen: "parent" },
-    { label: "Supervisor", screen: "supervisor" },
-    { label: "Grower", screen: "grower" },
+    { label: "Guided Tour", screen: "demo" },
+    { label: "Workforce Program", screen: "roles" },
     { label: "Marketplace", screen: "marketplace" },
-    { label: "Partner", screen: "partner" },
-    { label: "Value-Added", screen: "valueAdded" },
-    { label: "Mission Control", screen: "reports" },
   ];
 
-  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion"];
-  const showYouthWorkspace = role === "Youth Workforce Participant" || youthScreens.includes(screen);
+  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion", "parent", "supervisor", "reports"];
+  const showYouthWorkspace =
+    role === "Youth Workforce Participant" ||
+    role === "Parent / Guardian" ||
+    role === "Supervisor / Staff" ||
+    role === "Administrator" ||
+    youthScreens.includes(screen);
   const youthWorkspaceNav: { label: string; screen: Screen }[] = [
-    { label: "Start Day", screen: "wellness" },
-    { label: "My Day", screen: "youth" },
+    { label: "Start My Day", screen: "wellness" },
     { label: "Today’s Project", screen: "launchProject" },
-    { label: "My Week", screen: "youth" },
-    { label: "Portfolio", screen: "completion" },
-    { label: "Media", screen: "media" },
+    { label: "Photo", screen: "media" },
     { label: "Reflection", screen: "feedback" },
   ];
 
@@ -2069,7 +2065,7 @@ function Shell({
           {showYouthWorkspace && (
             <div className="mt-2 rounded-2xl border border-emerald-200/12 bg-emerald-300/[0.055] p-2">
               <div className="mb-2 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">
-                Youth Workspace
+                Workforce Program
               </div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {youthWorkspaceNav.map((item) => (
@@ -2136,36 +2132,6 @@ function Notice({ text }: { text: string }) {
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <div className={`rounded-[2rem] border border-white/10 bg-black/32 p-5 shadow-[0_35px_100px_rgba(0,0,0,.48)] backdrop-blur-2xl ${className}`}>{children}</div>;
-}
-
-function RevealSection({
-  title,
-  subtitle,
-  children,
-  defaultOpen = false,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) {
-  return (
-    <details
-      open={defaultOpen}
-      className="rounded-[1.35rem] border border-white/10 bg-white/[0.055] p-4 transition open:bg-white/[0.075]"
-    >
-      <summary className="cursor-pointer list-none">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-lg font-black leading-tight">{title}</div>
-            {subtitle && <div className="mt-1 text-sm leading-5 text-white/68">{subtitle}</div>}
-          </div>
-          <span className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-emerald-50">Open</span>
-        </div>
-      </summary>
-      <div className="mt-4">{children}</div>
-    </details>
-  );
 }
 
 function Metric({ title, value }: { title: string; value: string | number }) {
@@ -2282,14 +2248,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
   const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("🌱 I Am Working"), subtitle: TT("Youth start with today: check in, see the mission, add photo evidence, and reflect."), screen: "youth" },
-    { title: TT("👷 I Am Leading"), subtitle: TT("Supervisors begin with attendance, assignments, support needs, and today's team."), screen: "supervisor" },
-    { title: TT("❤️ I Am Supporting"), subtitle: TT("Parents see today's update, photos, accomplishments, and a conversation starter."), screen: "parent" },
-    { title: TT("🌲 I Am Exploring"), subtitle: TT("Guests can visit, learn, shop, support, or follow the guided ecosystem story."), screen: "guest" },
-    { title: TT("🛒 I Want To Shop"), subtitle: TT("Go directly to produce, plants, value-added goods, events, and marketplace activity."), screen: "marketplace" },
-    { title: TT("🤝 I Want To Help"), subtitle: TT("Partners, volunteers, supporters, and growers can choose how to connect."), screen: "partner" },
+    { title: TT("🌲 Take Guided Tour"), subtitle: TT("Experience the ecosystem story one layer at a time."), screen: "demo" },
+    { title: TT("👷 Workforce Program"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Sign in to verify role: youth, parent/guardian, supervisor, or administrator."), screen: workspaceTarget },
+    { title: TT("🛒 Marketplace"), subtitle: TT("Shop, browse products, and connect to farm opportunities."), screen: "marketplace" },
   ];
-
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
@@ -2315,7 +2277,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
               </p>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
               {quickChoices.map((choice) => (
                 <button
                   key={choice.title}
@@ -2336,17 +2298,17 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
         <CultureCard language={language} variant="seed" />
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("The forest reveals itself one layer at a time.")}</h2>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("The Forest Reveals Itself")}</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Choose one clear door. Details appear only when needed.")}</h2>
           <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Layer 1 shows what matters now. Layer 2 reveals today. Layer 3 shows growth. Layer 4 connects the larger ecosystem.")}
+              {TT("Public visitors can explore the portal, story, events, and marketplace without registering.")}
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Every role starts with one clear action before seeing the deeper resources.")}
+              {TT("Nesco youth participants should already be in the system. They verify information instead of re-registering.")}
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("The full ecosystem remains available through expandable sections and More tools.")}
+              {TT("No phone required: youth can enter with Participant ID plus last name or supervisor lookup.")}
             </div>
           </div>
         </Card>
@@ -3087,178 +3049,99 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   const completionPercent = 12.5;
 
   return (
-    <div className="grid gap-5">
-      <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[58vh]">
-          <img
-            src={IMG.grow}
-            alt="Grow area"
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => (event.currentTarget.src = IMG.backup)}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.35),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[58vh] flex-col justify-between p-5 md:p-8">
-            <div>
-              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                NOW
-              </div>
-              <h1 className="mt-5 text-4xl font-black leading-[0.96] md:text-7xl">🌞 Start My Day</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/86 md:text-lg">
-                Good morning, Cultivator. Start here first. Your supervisor will give the exact assignment.
-              </p>
+    <div className="grid gap-4">
+      <Card className="min-h-[calc(100vh-190px)] p-4 md:p-6">
+        <div className="grid h-full gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[1.75rem] border border-emerald-200/18 bg-emerald-300/[0.08] p-4 md:p-5">
+            <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Now</div>
+            <h1 className="mt-3 text-4xl font-black leading-[0.95] md:text-6xl">🌞 Start My Day</h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">
+              Good morning, Cultivator. Start here, then follow your supervisor’s assignment.
+            </p>
+            <button type="button" onClick={() => setScreen("wellness")} className="mt-5 w-full rounded-[1.3rem] bg-emerald-300 px-6 py-5 text-xl font-black text-black shadow-[0_18px_50px_rgba(16,185,129,.22)]">
+              Start My Day
+            </button>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-white/10 bg-black/26 p-4 md:p-5">
+            <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Today</div>
+            <h2 className="mt-3 text-3xl font-black leading-tight md:text-5xl">🌱 {todaysMission.title}</h2>
+            <p className="mt-3 text-base font-bold text-white/86">Prepare the grow area for planting.</p>
+
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {["Spread Soil", "Level Beds", "Create Rows", "Plant Seeds", "Apply Grass Mulch", "Complete Fence", "Create Bubble Babies"].map((item) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black">
+                  ✓ {item}
+                </div>
+              ))}
             </div>
 
-            <div className="mt-6 grid gap-3 md:grid-cols-4">
-              <button type="button" onClick={() => setScreen("wellness")} className="rounded-[1.35rem] bg-emerald-300 p-5 text-left font-black text-black shadow-[0_15px_45px_rgba(0,0,0,.35)]">
-                Start My Day
-                <div className="mt-2 text-sm font-bold text-black/70">Check in, readiness, PPE, water.</div>
-              </button>
-              <button type="button" onClick={() => setScreen("launchProject")} className="rounded-[1.35rem] border border-white/12 bg-black/45 p-5 text-left font-black backdrop-blur-xl">
-                Today’s Mission
-                <div className="mt-2 text-sm font-bold text-white/70">{todaysMission.title}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("media")} className="rounded-[1.35rem] border border-white/12 bg-black/45 p-5 text-left font-black backdrop-blur-xl">
-                📸 Photo
-                <div className="mt-2 text-sm font-bold text-white/70">Add evidence from the farm.</div>
-              </button>
-              <button type="button" onClick={() => setScreen("feedback")} className="rounded-[1.35rem] border border-white/12 bg-black/45 p-5 text-left font-black backdrop-blur-xl">
-                ⭐ Reflection
-                <div className="mt-2 text-sm font-bold text-white/70">What did you learn today?</div>
-              </button>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <button type="button" onClick={() => setScreen("launchProject")} className="rounded-[1.15rem] border border-emerald-200/25 bg-emerald-300/15 px-4 py-4 font-black text-emerald-50">Today’s Project</button>
+              <button type="button" onClick={() => setScreen("media")} className="rounded-[1.15rem] border border-white/15 bg-white/10 px-4 py-4 font-black">📸 Photo</button>
+              <button type="button" onClick={() => setScreen("feedback")} className="rounded-[1.15rem] border border-white/15 bg-white/10 px-4 py-4 font-black">⭐ Reflection</button>
             </div>
           </div>
         </div>
       </Card>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">TODAY</div>
-        <h2 className="mt-3 text-4xl font-black">🌱 {todaysMission.title}</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-          Today we are preparing the grow area for planting. Do the work, capture one piece of evidence, and reflect before leaving.
-        </p>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {todaysMission.objectives.slice(0, 4).map((objective) => (
-            <div key={objective} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black">
-              ✓ {objective}
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black">▶ Growth: My Week, Skills, Portfolio</summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">My Week</div>
+            <h3 className="mt-2 text-2xl font-black">Week 1: {currentWeek.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-white/78">{currentWeek.focus}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-black/24 p-4"><div className="text-[10px] uppercase tracking-[0.2em] text-emerald-100/70">Project</div><div className="mt-1 font-black">{currentWeek.project}</div></div>
+              <div className="rounded-2xl bg-black/24 p-4"><div className="text-[10px] uppercase tracking-[0.2em] text-emerald-100/70">Progress</div><div className="mt-1 text-2xl font-black">{completionPercent}%</div></div>
+              <div className="rounded-2xl bg-black/24 p-4"><div className="text-[10px] uppercase tracking-[0.2em] text-emerald-100/70">Badge</div><div className="mt-1 font-black">{currentWeek.badge}</div></div>
             </div>
-          ))}
+          </div>
+
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Portfolio Evidence</div>
+            <h3 className="mt-2 text-2xl font-black">Evidence of Work</h3>
+            <p className="mt-2 text-sm leading-6 text-white/78">Photos, reflections, attendance, supervisor notes, and project work become portfolio evidence.</p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+              {["Safety", "Teamwork", "Responsibility", "Agriculture", "Problem Solving", "Environmental Stewardship", "Entrepreneurship"].map((skill) => (
+                <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-emerald-50">{skill}</span>
+              ))}
+            </div>
+          </div>
         </div>
-        <RevealSection title="Show all today's objectives" subtitle="Open only when you need the full list.">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {todaysMission.objectives.map((objective) => (
-              <div key={objective} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black">
-                ✓ {objective}
-              </div>
-            ))}
-          </div>
-        </RevealSection>
-      </Card>
+      </details>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <RevealSection title="GROWTH — My Week" subtitle="Skills, progress, and the current badge.">
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
-              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-4 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black">▶ Ecosystem: How Today Connects</summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[1.25rem] border border-emerald-200/15 bg-emerald-300/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Food Flow</div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-black">
+              {todaysMission.ecosystemFlow.map((step, index) => (
+                <React.Fragment key={step}>
+                  <span className="rounded-full border border-white/10 bg-black/25 px-3 py-2">{step}</span>
+                  {index < todaysMission.ecosystemFlow.length - 1 && <span className="text-white/50">→</span>}
+                </React.Fragment>
+              ))}
             </div>
           </div>
-          <p className="mt-4 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {currentWeek.skills.map((skill) => (
-              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
-            ))}
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">My 8-Week Journey</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {youthCurriculumWeeks.map((week) => (
+                <div key={week.week} className={`rounded-2xl border p-3 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-black/20"}`}>
+                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Week {week.week}</div>
+                  <div className="mt-1 text-sm font-black">{week.title}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </RevealSection>
-
-        <RevealSection title="GROWTH — My Portfolio" subtitle="Photos, reflections, skills, and evidence.">
-          <p className="text-sm leading-7 text-white/82">Every check-in, project, reflection, photo, badge, and supervisor assessment can become evidence toward a future resume and portfolio.</p>
-          <div className="mt-4 grid gap-3">
-            {youthPortfolioEntries.map((entry) => (
-              <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                <div className="text-lg font-black">{entry.title}</div>
-                <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
-                <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
-              </div>
-            ))}
-          </div>
-        </RevealSection>
-
-        <RevealSection title="ECOSYSTEM — My Journey" subtitle="The 8-week roadmap lives here, not on the first screen.">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {youthCurriculumWeeks.map((week) => (
-              <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">Week {week.week}</div>
-                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
-              </div>
-            ))}
-          </div>
-        </RevealSection>
-
-        <RevealSection title="ECOSYSTEM — How today connects" subtitle="Soil → Seed → Plant → Harvest → Marketplace → Family → Community.">
-          <div className="flex flex-wrap items-center gap-2">
-            {todaysMission.ecosystemFlow.map((step, index) => (
-              <React.Fragment key={step}>
-                <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-sm font-black">{step}</span>
-                {index < todaysMission.ecosystemFlow.length - 1 && <span className="text-white/40">→</span>}
-              </React.Fragment>
-            ))}
-          </div>
-          <LargerPictureCard layerKey="Youth Workforce Pathway" />
-        </RevealSection>
-
-        <RevealSection title="Learn More — Team wisdom" subtitle="Open when you want encouragement by rotation.">
-          <TeamWisdomGrid language={language} />
-        </RevealSection>
-
-        <RevealSection title="Achievements" subtitle="Badges and recognition are available when you want to see them.">
-          <div className="grid gap-3">
-            {youthAchievementBadges.map((badge) => (
-              <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-lg font-black">{badge.title}</div>
-                <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
-                <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
-              </div>
-            ))}
-          </div>
-        </RevealSection>
-      </div>
-
-      <JourneyCompletionCard
-        title="Youth Workforce Journey Completion"
-        learned={[
-          "Safety and PPE",
-          "Teamwork and communication",
-          "From Soil to Seed",
-          "Portfolio evidence",
-          "Career and income connections",
-        ]}
-        nextSteps={[
-          { label: "Open Today's Project", screen: "launchProject" },
-          { label: "Complete Reflection", screen: "feedback" },
-          { label: "View Achievements", screen: "completion" },
-          { label: "Visit Marketplace", screen: "marketplace" },
-        ]}
-        impact={[
-          "Completed youth pathway",
-          "Built work-readiness skills",
-          "Connected today's work to future income",
-          "Added evidence toward achievement",
-        ]}
-        setScreen={setScreen}
-      />
+        </div>
+      </details>
     </div>
   );
 }
-
 
 function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const [tab, setTab] = useState<"dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports">("dashboard");
@@ -3312,36 +3195,16 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
   return (
     <div className="grid gap-5 xl:grid-cols-[310px_1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">NOW</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight">👷 Today’s Team</h1>
-        <p className="mt-3 text-sm leading-7 text-white/82">
-          Supervisors start with attendance, assignments, support needs, and today's mission. Deeper tools are below.
-        </p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
+        <SupervisorEncouragementCard language={language} />
         <div className="mt-5 grid gap-2">
-          {[
-            { key: "attendance" as const, label: "Take Attendance" },
-            { key: "project" as const, label: "Today’s Mission" },
-            { key: "assessment" as const, label: "Leadership / Notes" },
-            { key: "incident" as const, label: "Support / Incident" },
-          ].map((item) => (
+          {tabs.map((item) => (
             <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
               {item.label}
             </button>
           ))}
         </div>
-
-        <RevealSection title="Manage Team" subtitle="Open for roster, wellness, parent summaries, feedback, and reports.">
-          <div className="grid gap-2">
-            {tabs.map((item) => (
-              <button type="button" key={item.key} onClick={() => { setTab(item.key); scrollToTop(); }} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black ${tab === item.key ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </RevealSection>
-
-        <SupervisorEncouragementCard language={language} />
-
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/84">
           Supervisor access protects youth information. Parents receive progress summaries, not private raw wellness notes.
         </div>
@@ -4216,125 +4079,120 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
   const latestSummary = summaries[0];
 
   return (
-    <div className="grid gap-5">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">NOW</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">❤️ My Cultivator Today</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
-          Parents see the most useful update first: attendance, today's learning, photos, accomplishments, and a conversation starter. Details stay available below.
-        </p>
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent / Guardian Portal</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">Progress, encouragement, and next steps.</h1>
+      <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
+        Parents see attendance, accomplishments, badges, goals, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
+      </p>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
-          {[
-            ["Present", String(presentCount)],
-            ["Absent", String(absentCount)],
-            ["Photos", "Media Center"],
-            ["Achievements", String(completions.length)],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-[1.5rem] border border-white/10 bg-black/28 p-5">
-              <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
-              <div className="mt-2 text-3xl font-black">{value}</div>
-            </div>
-          ))}
-        </div>
+      <LargerPictureCard layerKey="Parent / Guardian Portal" />
 
-        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">TODAY</div>
-          <h2 className="mt-2 text-3xl font-black">{featuredProject.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">
-            Today your Cultivator is helping prepare the grow area for future harvests through soil, planting, mulching, fencing, teamwork, and Bubble Babies.
-          </p>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
-            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/70">Conversation Starter</div>
-            <p className="mt-2 text-lg font-black">{todaysMission.parentQuestion}</p>
+      <ParentEncouragementCard language={language} />
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        {[
+          ["Present", String(presentCount)],
+          ["Absent", String(absentCount)],
+          ["Assessments", String(assessments.length)],
+          ["Achievements", String(completions.length)],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[1.5rem] border border-white/10 bg-black/28 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/70">{label}</div>
+            <div className="mt-2 text-4xl font-black">{value}</div>
           </div>
-          <button type="button" onClick={() => setScreen("media")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View / Add Photos</button>
-        </div>
-      </Card>
+        ))}
+      </div>
 
-      <RevealSection title="TODAY — Learning details" subtitle="Open for learning objectives, career connections, and evidence.">
-        <div className="grid gap-4 md:grid-cols-3">
+      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Workforce Project</div>
+        <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
+        <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.farmConnection}</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
           <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
             <h3 className="font-black">Learning Objectives</h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>✓ Practice teamwork and communication</li>
-              <li>✓ Prepare soil and planting areas</li>
-              <li>✓ Understand mulch and moisture</li>
-              <li>✓ Connect seeds to future harvests</li>
+              <li>✓ Understand heat stress risks</li>
+              <li>✓ Follow PPE requirements</li>
+              <li>✓ Complete assigned team role</li>
+              <li>✓ Participate in final presentation</li>
             </ul>
           </div>
           <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
             <h3 className="font-black">Career Connections</h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>Agriculture</li>
-              <li>Construction / Infrastructure</li>
-              <li>Entrepreneurship</li>
-              <li>Environmental Stewardship</li>
-              <li>Media and Storytelling</li>
+              <li>Manufacturing Technician</li>
+              <li>Construction Trades</li>
+              <li>Product Designer</li>
+              <li>Quality Control</li>
+              <li>Entrepreneur</li>
             </ul>
           </div>
           <div className="rounded-[1.25rem] border border-white/10 bg-amber-300/12 p-4">
             <h3 className="font-black">Completion Evidence</h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>☐ Attendance</li>
-              <li>☐ Team participation</li>
-              <li>☐ Photo or story evidence</li>
-              <li>☐ End-of-day reflection</li>
+              <li>☐ Watched demonstration</li>
+              <li>☐ Participated in team assignment</li>
+              <li>☐ Practiced safe work procedures</li>
+              <li>☐ Added evidence to portfolio</li>
             </ul>
           </div>
         </div>
-      </RevealSection>
-
-      <RevealSection title="GROWTH — Progress and portfolio" subtitle="Open to see skills, badges, summaries, and portfolio growth.">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <h2 className="text-2xl font-black">Parent-Safe Supervisor Summary</h2>
-            {latestSummary ? (
-              <p className="mt-3 text-sm leading-7 text-white/86">{latestSummary.parent_safe_message}</p>
-            ) : (
-              <p className="mt-3 text-sm leading-7 text-white/76">Your youth is building workforce habits, teamwork, safety awareness, communication, problem-solving, leadership, and future opportunity interests. Supervisors can add individual parent-safe summaries from the Supervisor Operations Center.</p>
-            )}
-          </div>
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <h2 className="text-2xl font-black">Workforce Growth</h2>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {["Badges Earned", "Projects Completed", "Skills Demonstrated", "Supervisor Strengths"].map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black">{item}</div>
-              ))}
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {coolingCenterTeams.map((team) => (
+            <div key={team.name} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="text-2xl">{team.icon}</div>
+              <div className="mt-2 font-black">{team.name}</div>
+              <div className="mt-2 text-xs leading-5 text-white/70">{team.mission}</div>
             </div>
-          </div>
-        </div>
-      </RevealSection>
-
-      <RevealSection title="ECOSYSTEM — How this connects" subtitle="Open for the larger Bronson Family Farm and Farm & Family Alliance picture.">
-        <LargerPictureCard layerKey="Parent / Guardian Portal" />
-        <ParentEncouragementCard language={language} />
-      </RevealSection>
-
-      <RevealSection title="Parent Actions" subtitle="Open for feedback, questions, volunteer interest, and updates.">
-        <div className="flex flex-wrap gap-3">
-          {["Send Encouragement", "Ask Question", "Report Concern", "Volunteer Interest", "Receive Weekly Updates"].map((action) => (
-            <button key={action} type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-black/30 px-5 py-3 text-sm font-black">{action}</button>
           ))}
         </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Parent Feedback</button>
-        </div>
-      </RevealSection>
+        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View Today’s Mission</button>
+      </div>
 
-      {summaries.length > 0 && (
-        <RevealSection title="Saved parent summaries" subtitle="Open to view recent parent-safe messages.">
-          <div className="grid gap-3">
-            {summaries.slice(0, 6).map((summary) => (
-              <div key={summary.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <div className="text-xs font-black uppercase tracking-[0.2em] text-white/65">{summary.date} • {summary.participant_id}</div>
-                <p className="mt-2 text-sm leading-7 text-white/88">{summary.parent_safe_message}</p>
-              </div>
+      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Child's Workforce Progress</div>
+        <h2 className="mt-2 text-2xl font-black">Resume and Portfolio Growth</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-5">
+          {["Badges Earned", "Projects Completed", "Skills Demonstrated", "Supervisor Strengths", "Career Interests"].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black">{item}</div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm leading-7 text-white/75">Families can see how daily work becomes evidence for future employment, education, trade programs, internships, and leadership opportunities.</p>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Parent-Safe Supervisor Summary</h2>
+          {latestSummary ? (
+            <p className="mt-3 text-sm leading-7 text-white/86">{latestSummary.parent_safe_message}</p>
+          ) : (
+            <p className="mt-3 text-sm leading-7 text-white/76">Your youth is building workforce habits, teamwork, safety awareness, communication, problem-solving, leadership, and future opportunity interests. Supervisors can add individual parent-safe summaries from the Supervisor Operations Center.</p>
+          )}
+        </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <h2 className="text-2xl font-black">Parent Actions</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {["Send Encouragement", "Ask Question", "Report Concern", "Volunteer Interest", "Receive Weekly Updates"].map((action) => (
+              <button key={action} type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-black/30 px-5 py-3 text-sm font-black">{action}</button>
             ))}
           </div>
-        </RevealSection>
-      )}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3">
+        {summaries.slice(0, 6).map((summary) => (
+          <div key={summary.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-white/65">{summary.date} • {summary.participant_id}</div>
+            <p className="mt-2 text-sm leading-7 text-white/88">{summary.parent_safe_message}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Parent Feedback</button>
+      </div>
 
       <JourneyCompletionCard
         title="Parent / Guardian Journey Completion"
@@ -4346,7 +4204,7 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
           "Family engagement options",
         ]}
         nextSteps={[
-          { label: "View Today’s Mission", screen: "launchProject" },
+          { label: "View Today’s Mission", screen: "supervisor" },
           { label: "Send Parent Feedback", screen: "feedback" },
           { label: "View Achievements", screen: "completion" },
           { label: "Return to Workspace", screen: "roles" },
@@ -4359,10 +4217,9 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
         ]}
         setScreen={setScreen}
       />
-    </div>
+    </Card>
   );
 }
-
 
 const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
   {
@@ -6084,50 +5941,21 @@ function SimplePathway({
   setScreen: (screen: Screen) => void;
   extra?: React.ReactNode;
 }) {
-  const actionLabel =
-    title.includes("Guest") ? "Start Exploring" :
-    title.includes("Grower") ? "Find What I Need" :
-    title.includes("Partner") ? "Choose How To Help" :
-    title.includes("Support") ? "Offer Support" :
-    title.includes("Value-Added") ? "Build My Product Path" :
-    "Start This Pathway";
-
   return (
     <>
       <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">NOW</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
           <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
-
+          <LargerPictureCard layerKey={title} />
           <div className="mt-8 flex flex-wrap gap-3">
             {extra}
-            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{actionLabel}</button>
-            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace</button>
-          </div>
-
-          <div className="mt-6 grid gap-3">
-            <RevealSection title="TODAY — What can I do next?" subtitle="Open for immediate actions.">
-              <div className="flex flex-wrap gap-3">
-                {extra}
-                <button type="button" onClick={() => setScreen("registration")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Register / Update Profile</button>
-                <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Events</button>
-                <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Ask / Comment</button>
-              </div>
-            </RevealSection>
-
-            <RevealSection title="GROWTH — Role resources" subtitle="Open when you want the deeper pathway details.">
-              <LargerPictureCard layerKey={title} />
-            </RevealSection>
-
-            <RevealSection title="ECOSYSTEM — More connections" subtitle="Open for marketplace, feedback, achievements, and other roles.">
-              <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
-                <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-                <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
-                <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
-              </div>
-            </RevealSection>
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
+            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
+            <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
+            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
           </div>
         </Card>
         <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
@@ -6135,34 +5963,31 @@ function SimplePathway({
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
         </div>
       </div>
-      <RevealSection title={`${title} Completion`} subtitle="Open when you are ready to record or review this pathway.">
-        <JourneyCompletionCard
-          title={`${title} Completion`}
-          learned={[
-            "Explored this pathway",
-            "Viewed role-specific resources",
-            "Identified a next step",
-            "Connected the pathway to ecosystem impact",
-          ]}
-          nextSteps={[
-            { label: "Visit Marketplace", screen: "marketplace" },
-            { label: "Register / Update Profile", screen: "registration" },
-            { label: "Share Feedback", screen: "feedback" },
-            { label: "Record Achievement", screen: "completion" },
-          ]}
-          impact={[
-            "Explored pathway",
-            "Viewed resources",
-            "Identified opportunity",
-            "Stayed connected",
-          ]}
-          setScreen={setScreen}
-        />
-      </RevealSection>
+      <JourneyCompletionCard
+        title={`${title} Completion`}
+        learned={[
+          "Explored this pathway",
+          "Viewed role-specific resources",
+          "Identified a next step",
+          "Connected the pathway to ecosystem impact",
+        ]}
+        nextSteps={[
+          { label: "Visit Marketplace", screen: "marketplace" },
+          { label: "Register / Update Profile", screen: "registration" },
+          { label: "Share Feedback", screen: "feedback" },
+          { label: "Record Achievement", screen: "completion" },
+        ]}
+        impact={[
+          "Explored pathway",
+          "Viewed resources",
+          "Identified opportunity",
+          "Stayed connected",
+        ]}
+        setScreen={setScreen}
+      />
     </>
   );
 }
-
 
 
 function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
