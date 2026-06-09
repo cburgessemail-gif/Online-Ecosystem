@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
+ * LAUNCH CANDIDATE 2.0 - WEEKLY ROTATION + PARENT PORTAL LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -652,7 +652,8 @@ type YouthFamilyIntake = {
   guardianRelationship: string;
   guardianEmail: string;
   guardianPhone: string;
-  portalInviteStatus: "ready_to_invite" | "sent" | "declined";
+  guardianPreferredLanguage: LanguageCode;
+  portalInviteStatus: "ready_to_invite" | "sent" | "activated" | "declined";
   created_at: string;
   updated_at: string;
 };
@@ -760,6 +761,25 @@ function getSubjectCounts(weekId = getCurrentWeekId()) {
   }, {});
 }
 
+function getParentLanguageBreakdown() {
+  const rows = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
+  return rows.reduce<Record<string, number>>((acc, row) => {
+    const label = languageOptions.find((option) => option.code === row.guardianPreferredLanguage)?.label || "English";
+    acc[label] = (acc[label] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function getParentInvitationCounts() {
+  const rows = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
+  return {
+    total: rows.length,
+    ready: rows.filter((row) => row.portalInviteStatus === "ready_to_invite").length,
+    sent: rows.filter((row) => row.portalInviteStatus === "sent").length,
+    activated: rows.filter((row) => row.portalInviteStatus === "activated").length,
+  };
+}
+
 function getYouthFamilyIntake(youthUserId: string) {
   return safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []).find((item) => item.youthUserId === youthUserId);
 }
@@ -772,6 +792,19 @@ function saveYouthFamilyIntake(row: YouthFamilyIntake) {
     : [row, ...rows];
   safeWrite(YOUTH_FAMILY_INTAKE_KEY, updated);
   return row;
+}
+
+function getParentInvitationPreview(languageCode: LanguageCode) {
+  if (languageCode === "es") {
+    return {
+      subject: "Bienvenido al Portal para Padres de Bronson Family Farm",
+      body: "Su Cultivador lo ha identificado como padre, madre o tutor. Use el enlace del portal para ver asistencia, aprendizaje, fotos y actualizaciones del programa.",
+    };
+  }
+  return {
+    subject: "Welcome to the Bronson Family Farm Parent Portal",
+    body: "Your Cultivator has listed you as a parent or guardian. Use the portal link to see attendance, learning, photos, and program updates.",
+  };
 }
 
 function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) {
@@ -3139,9 +3172,14 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [guardianName, setGuardianName] = useState("");
   const [guardianPhone, setGuardianPhone] = useState("");
   const [guardianEmail, setGuardianEmail] = useState("");
+  const [guardianPreferredLanguage, setGuardianPreferredLanguage] = useState<LanguageCode>("en");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [programGoal, setProgramGoal] = useState("");
   const [saved, setSaved] = useState("");
+
+  useEffect(() => {
+    setRole("Youth Workforce Participant");
+  }, []);
 
   const save = async () => {
     setSaved("Saving...");
@@ -3207,6 +3245,24 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       };
       const youthResult = await insertRow("youth_participants", YOUTH_KEY, youth);
       if (!youthResult.ok) errors.push(`youth_participants: ${String((youthResult.error as any)?.message || youthResult.error)}`);
+
+      saveYouthFamilyIntake({
+        id: uuid(),
+        youthUserId: profile.id,
+        youthName: fullName,
+        youthFirstName: cleanFirst,
+        youthLastName: cleanLast,
+        youthPhone: phone.trim(),
+        youthEmail: email.trim(),
+        guardianName: guardianName.trim(),
+        guardianRelationship: "Parent / Guardian",
+        guardianEmail: guardianEmail.trim(),
+        guardianPhone: guardianPhone.trim(),
+        guardianPreferredLanguage,
+        portalInviteStatus: "ready_to_invite",
+        created_at: profile.created_at,
+        updated_at: profile.created_at,
+      });
     }
 
     if (errors.length) {
@@ -3221,8 +3277,12 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Registration Center</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Create the profile once. Reuse it everywhere.</h1>
+      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Workforce Program Role</div>
+        <div className="mt-1 text-2xl font-black">Youth Workforce Participant</div>
+        <p className="mt-2 text-sm leading-6 text-white/72">Youth registration is preselected and locked to prevent choosing the wrong role. Parents are created from the parent/guardian information below.</p>
+      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <SelectField label="Role / Registration Type" value={role} onChange={(v) => setRole(v as Role)} options={roles} />
         <Field label="Preferred Name" value={preferredName} onChange={setPreferredName} />
         <Field label="First Name" value={firstName} onChange={setFirstName} />
         <Field label="Last Name" value={lastName} onChange={setLastName} />
@@ -3238,6 +3298,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
             <Field label="Guardian Name" value={guardianName} onChange={setGuardianName} />
             <Field label="Guardian Phone" value={guardianPhone} onChange={setGuardianPhone} />
             <Field label="Guardian Email" value={guardianEmail} onChange={setGuardianEmail} />
+            <SelectField label="Guardian Preferred Language" value={guardianPreferredLanguage} onChange={(v) => setGuardianPreferredLanguage(v as LanguageCode)} options={languageOptions.map((option) => option.code)} />
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <TextArea label="Medical / allergy notes" value={medicalNotes} onChange={setMedicalNotes} />
@@ -3278,6 +3339,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     guardianRelationship: existingFamilyIntake?.guardianRelationship || "Parent / Guardian",
     guardianEmail: existingFamilyIntake?.guardianEmail || "",
     guardianPhone: existingFamilyIntake?.guardianPhone || "",
+    guardianPreferredLanguage: existingFamilyIntake?.guardianPreferredLanguage || language || "en",
   });
   const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone);
   const canChooseWeeklySubject = checkedInToday && familyInfoComplete;
@@ -3311,6 +3373,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       guardianRelationship: familyForm.guardianRelationship.trim() || "Parent / Guardian",
       guardianEmail: familyForm.guardianEmail.trim(),
       guardianPhone: familyForm.guardianPhone.trim(),
+      guardianPreferredLanguage: familyForm.guardianPreferredLanguage as LanguageCode,
       portalInviteStatus: "ready_to_invite",
       created_at: existingFamilyIntake?.created_at || now,
       updated_at: now,
@@ -3374,6 +3437,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 <div className="mt-3 grid gap-2 text-sm font-black text-emerald-50">
                   <div>✅ Parent/guardian contact saved: {existingFamilyIntake?.guardianName}</div>
                   <div>📧 Portal invite ready for: {existingFamilyIntake?.guardianEmail}</div>
+                  <div>🌎 Parent portal language: {languageOptions.find((option) => option.code === existingFamilyIntake?.guardianPreferredLanguage)?.label || "English"}</div>
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -3385,10 +3449,27 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian phone" value={familyForm.guardianPhone} onChange={(e) => setFamilyForm({ ...familyForm, guardianPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth phone optional" value={familyForm.youthPhone} onChange={(e) => setFamilyForm({ ...familyForm, youthPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth email optional" value={familyForm.youthEmail} onChange={(e) => setFamilyForm({ ...familyForm, youthEmail: e.target.value })} />
+                  <label className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white">
+                    <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-white/60">Parent preferred language</span>
+                    <select
+                      value={familyForm.guardianPreferredLanguage}
+                      onChange={(e) => setFamilyForm({ ...familyForm, guardianPreferredLanguage: e.target.value as LanguageCode })}
+                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm font-black text-white outline-none"
+                    >
+                      {languageOptions.map((option) => (
+                        <option key={option.code} value={option.code} className="bg-black text-white">{option.label}</option>
+                      ))}
+                    </select>
+                  </label>
                   <button type="button" onClick={saveFamilyInformation} className="sm:col-span-2 rounded-[1.1rem] bg-sky-300 px-5 py-4 font-black text-black">Save Parent Portal Contact</button>
                 </div>
               )}
               {familyMessage && <Notice text={familyMessage} />}
+              <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs leading-5 text-white/72">
+                <div className="font-black text-white">Parent invitation preview</div>
+                <div className="mt-1">{getParentInvitationPreview((familyForm.guardianPreferredLanguage || "en") as LanguageCode).subject}</div>
+                <div>{getParentInvitationPreview((familyForm.guardianPreferredLanguage || "en") as LanguageCode).body}</div>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-start justify-between gap-3">
