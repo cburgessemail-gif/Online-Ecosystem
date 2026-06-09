@@ -41,11 +41,7 @@ type Screen =
   | "media"
   | "launchProject"
   | "feedback"
-  | "completion"
-  | "startDay"
-  | "dailyBriefing"
-  | "liveWeek"
-  | "supervisorPinSetup";
+  | "completion";
 
 type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
 
@@ -323,6 +319,32 @@ const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
+const APPROVED_SUPERVISOR_EMAILS = [
+  "bhchatman@gmail.com",
+  "msdaisy0607@icloud.com",
+  "foresthalljr2@gmail.com",
+  "sifajax@gmail.com",
+  "jess3deery87@gmail.com",
+  "awnesty2@gmail.com",
+  "iwpublishing228@gmail.com",
+];
+
+const missionControlRecord001 = {
+  id: "DAY-001",
+  title: "Launch Day",
+  date: "June 8, 2026",
+  summary:
+    "Youth participated in the launch activity, worked in the grow area, spread soil, gathered twine, moved grass, continued fence construction, demonstrated teamwork, and helped reveal the next operational needs for the ecosystem.",
+  lessonsLearned: [
+    "Some youth do not have phones.",
+    "Parents want visibility into learning.",
+    "Photo uploads are important portfolio evidence.",
+    "Attendance must come first.",
+    "Supervisor onboarding needs email verification.",
+    "Conflict prevention and dismissal procedures should be strengthened.",
+  ],
+};
+
 
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
@@ -364,123 +386,90 @@ const launchEvents = [
 ];
 
 const featuredProject = {
-  id: "from-soil-to-seed-2026",
+  id: "soil-to-seed-2026",
   title: "From Soil to Seed",
   shortTitle: "From Soil to Seed",
   launchDate: "June 9, 2026",
   startTime: "8:00 AM",
-  status: "Active Today",
+  status: "Active",
   objective:
-    "Youth are preparing the grow area for successful crop production by spreading soil, leveling beds, creating rows, sowing seeds, planting crops, applying grass mulch, completing fencing, and creating Bubble Babies.",
+    "Youth will prepare the grow area for production by spreading soil, leveling beds, creating rows, sowing seeds, planting, applying grass mulch, completing fencing, and creating Bubble Babies.",
   farmConnection:
-    "Every harvest begins with preparation. Before food can be grown, farmers prepare soil, create rows, sow seeds, protect moisture, and secure the growing area. Today's work creates future harvest capacity for families, the marketplace, and the community.",
-};
-
-const todaysProject = {
-  title: "From Soil to Seed",
-  subtitle: "Preparing Today's Harvest. Building Tomorrow's Food System.",
-  phase: "Week 1 • Workplace Foundations & Safety",
-  image: IMG.grow,
-  mission:
-    "Prepare the grow area for successful crop production through soil preparation, planting, mulching, fencing, and Bubble Babies enterprise work.",
-  visualFlow: ["Soil", "Rows", "Seeds", "Plants", "Harvest", "Marketplace", "Family", "Community"],
-  progress: [
-    { label: "Soil Preparation", icon: "🌱", value: 0 },
-    { label: "Row Creation", icon: "🌾", value: 0 },
-    { label: "Planting", icon: "🌿", value: 0 },
-    { label: "Grass Mulch", icon: "🍃", value: 0 },
-    { label: "Fence Completion", icon: "🛠", value: 70 },
-    { label: "Bubble Babies", icon: "🫧", value: 0 },
-  ],
-  teams: [
-    { name: "Soil Team", icon: "🌱", task: "Spread and level soil", skills: ["Soil preparation", "Teamwork", "Quality standards"] },
-    { name: "Planting Team", icon: "🌾", task: "Create rows and plant seeds", skills: ["Planning", "Spacing", "Responsibility"] },
-    { name: "Infrastructure Team", icon: "🛠", task: "Complete fencing", skills: ["Construction", "Protection", "Problem solving"] },
-    { name: "Bubble Babies Team", icon: "🫧", task: "Create, count, and package", skills: ["Entrepreneurship", "Inventory", "Product development"] },
-    { name: "Storytelling Team", icon: "🎥", task: "Capture photos and interviews", skills: ["Media", "Communication", "Documentation"] },
-    { name: "Pollinator Team", icon: "🐝", task: "Observe insects and habitat", skills: ["Observation", "Ecology", "Stewardship"] },
-  ],
-  almanac: {
-    groundMoisture: "Excellent",
-    plantingConditions: "Good",
-    mulchingConditions: "Excellent",
-    fenceWork: "Suitable",
-    heatRisk: "Monitor",
-    question: "Why is preparation important before planting?",
-  },
-  parentConnection: "Ask your Cultivator why grass was placed around the plants.",
-  portfolioEvidence: [
-    "Attendance",
-    "Team Assignment",
-    "Photo Evidence",
-    "Reflection",
-    "Supervisor Observation",
-    "Leadership Moment",
-  ],
+    "Every harvest begins with preparation. Today's work connects soil, seeds, plants, harvest, marketplace, family, and community while building teamwork, responsibility, agriculture, entrepreneurship, and environmental stewardship.",
 };
 
 const coolingCenterTeams = [
   {
-    name: "Design Team",
-    icon: "🎨",
-    identity: "We help people see possibilities.",
-    recommendedShare: "Small team: 6–8 youth",
-    mission: "Create the visual direction for the 63-fan customer order and help the team imagine how simple materials can become useful products.",
-    deliverables: ["Color ideas", "Fan design standards", "Signs or labels", "Presentation support"],
-    skills: ["Creativity", "Branding", "Communication", "Design Thinking"],
-    careers: ["Graphic Designer", "Product Designer", "Architect", "Marketing Specialist", "Brand Designer"],
+    name: "Soil Team",
+    icon: "🌱",
+    identity: "We prepare the foundation.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Spread soil, break clumps, level growing beds, and prepare the grow area for planting.",
+    deliverables: ["Soil spread", "Beds leveled", "Clumps removed", "Before/after photo"],
+    skills: ["Teamwork", "Soil Preparation", "Following Directions", "Responsibility"],
+    careers: ["Farmer", "Soil Technician", "Landscape Worker", "Agricultural Technician"],
   },
   {
-    name: "Engineering Team",
-    icon: "📐",
-    identity: "We improve ideas.",
-    recommendedShare: "Small team: 5–7 youth",
-    mission: "Review how the fan works, improve the process, reduce waste, and help the production teams meet quality and safety standards.",
-    deliverables: ["Quality checklist", "Process improvements", "Material-use recommendations", "Safety review"],
-    skills: ["Problem Solving", "Testing", "Measurement", "Process Improvement"],
-    careers: ["Engineer", "Technician", "Quality Specialist", "Construction Planner", "Process Improvement Specialist"],
+    name: "Planting Team",
+    icon: "🌾",
+    identity: "We turn preparation into growth.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Create rows, sow seeds, plant carefully, and label planting areas.",
+    deliverables: ["Rows created", "Seeds planted", "Rows labeled", "Seed log updated"],
+    skills: ["Agriculture", "Precision", "Planning", "Patience"],
+    careers: ["Grower", "Nursery Worker", "Crop Specialist", "Horticulture Assistant"],
   },
   {
-    name: "Manufacturing Team",
-    icon: "🔧",
-    identity: "We turn ideas into products.",
-    recommendedShare: "Largest team: 25–30 youth",
-    mission: "Produce the customer order by measuring, assembling, and preparing 63 cooling fans for finishing and delivery.",
-    deliverables: ["63 assembled fans", "Production count", "Safe assembly process", "Completed components"],
-    skills: ["Production", "Assembly", "Following Instructions", "Teamwork", "Responsibility"],
-    careers: ["Manufacturing Technician", "Fabricator", "Production Manager", "Machine Operator", "Assembler"],
+    name: "Infrastructure Team",
+    icon: "🛠",
+    identity: "We protect what will grow.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Complete fencing, inspect weak points, and help protect the grow area.",
+    deliverables: ["Fence sections completed", "Weak spots identified", "Materials organized", "Progress photo"],
+    skills: ["Construction", "Tool Safety", "Problem Solving", "Project Completion"],
+    careers: ["Construction Worker", "Fence Installer", "Project Assistant", "Facilities Worker"],
   },
   {
-    name: "Finishing & Creative Team",
-    icon: "🖌",
-    identity: "We create value through quality and presentation.",
-    recommendedShare: "Medium team: 10–12 youth",
-    mission: "Paint, personalize, and prepare the fans so the final products look finished, intentional, and ready for the customer.",
-    deliverables: ["Painted fans", "Personalized designs", "Finished appearance", "Quality-ready products"],
-    skills: ["Painting", "Attention to Detail", "Creativity", "Quality Control"],
-    careers: ["Painter", "Finishing Specialist", "Product Inspector", "Quality Control Technician"],
+    name: "Bubble Babies Team",
+    icon: "🫧",
+    identity: "We turn seeds into opportunity.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Create Bubble Babies, count inventory, package product, and prepare marketplace-ready seed products.",
+    deliverables: ["Bubble Babies created", "Inventory counted", "Packages prepared", "Value tracked"],
+    skills: ["Entrepreneurship", "Inventory", "Product Development", "Quality Control"],
+    careers: ["Entrepreneur", "Inventory Clerk", "Product Maker", "Marketplace Assistant"],
   },
   {
-    name: "Logistics & Contractor Team",
-    icon: "📦",
-    identity: "We connect products to people.",
-    recommendedShare: "Medium team: 8–10 youth",
-    mission: "Organize materials, track inventory, manage drying and delivery staging, and help the contractor prepare the fans for the cooling station.",
-    deliverables: ["Materials organized", "Inventory count", "Drying area managed", "Delivery-ready order"],
-    skills: ["Logistics", "Inventory", "Project Management", "Customer Service"],
-    careers: ["Supply Chain Manager", "Warehouse Manager", "Transportation Coordinator", "Project Manager", "Operations Specialist"],
+    name: "Storytelling Team",
+    icon: "🎥",
+    identity: "We document the journey.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Capture photos, document teamwork, record progress, and help build Cultivator portfolios.",
+    deliverables: ["Photos uploaded", "Teamwork captured", "Progress documented", "Story notes collected"],
+    skills: ["Media", "Communication", "Documentation", "Observation"],
+    careers: ["Photographer", "Content Creator", "Reporter", "Marketing Assistant"],
+  },
+  {
+    name: "Pollinator Team",
+    icon: "🐝",
+    identity: "We notice life around the farm.",
+    recommendedShare: "Team assignment already defined by supervisors",
+    mission: "Observe bees, butterflies, earthworms, insects, and habitat conditions that support the farm ecosystem.",
+    deliverables: ["Pollinator observation", "Habitat note", "Photo evidence", "Discovery shared"],
+    skills: ["Observation", "Environmental Stewardship", "Science", "Care"],
+    careers: ["Environmental Scientist", "Beekeeper", "Conservation Worker", "Farm Educator"],
   },
 ];
 
 const coolingCenterReflectionQuestions = [
   "What team did you work on today?",
   "What was your responsibility?",
-  "What did your team create?",
+  "What did your team prepare, plant, protect, create, or document?",
   "What challenge did your team face?",
   "How did your team solve the problem?",
-  "Which team depended on your work?",
-  "How does a cooling station help farm workers, volunteers, or visitors?",
-  "What message or design did you place on a fan, and why?",
+  "How does soil preparation help future harvests?",
+  "Why did we place grass around the plants?",
+  "How can seeds become a business opportunity through Bubble Babies?",
   "What career pathway interested you most today?",
   "What are you proud of today?",
 ];
@@ -490,9 +479,9 @@ const youthCurriculumWeeks = [
   {
     week: 1,
     title: "Workplace Foundations & Safety",
-    focus: "Youth are learning attendance, safety, teamwork, communication, responsibility, and problem solving through real farm projects including soil preparation, planting, mulching, fencing, and Bubble Babies.",
+    focus: "Attendance, safety, teamwork, communication, responsibility, soil preparation, planting, mulching, fencing, and Bubble Babies through real farm work.",
     project: "From Soil to Seed",
-    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Responsibility", "Environmental Stewardship", "Agriculture", "Entrepreneurship"],
+    skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Responsibility", "Agriculture", "Environmental Stewardship", "Entrepreneurship"],
     badge: "🏅 Workplace Foundations",
     status: "Current Week",
   },
@@ -573,10 +562,44 @@ const youthPortfolioEntries = [
     title: "From Soil to Seed",
     date: "June 9, 2026",
     team: "Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators",
-    evidence: "Check-in, team assignment, soil preparation photos, row creation, seeds planted, mulch placement, fencing progress, Bubble Babies count, reflection, and supervisor observation.",
-    skills: ["Safety", "Teamwork", "Problem Solving", "Communication", "Agriculture", "Environmental Stewardship", "Entrepreneurship"],
+    evidence: "Attendance, team assignment, soil preparation, row creation, seed planting, grass mulch, fence progress, Bubble Babies production, photo evidence, reflection, and supervisor observation.",
+    skills: ["Safety", "Teamwork", "Responsibility", "Agriculture", "Problem Solving", "Environmental Stewardship", "Entrepreneurship"],
+  },
+  {
+    title: "Launch Day Evidence",
+    date: "June 8, 2026",
+    team: "Cultivator Program",
+    evidence: "Fan activity, grow area teamwork, soil movement, twine gathering, grass movement, fence progress, parent engagement, and Day 1 lessons learned.",
+    skills: ["Teamwork", "Critical Thinking", "Communication", "Farm Operations"],
   },
 ];
+
+const todaysMission = {
+  title: "From Soil to Seed",
+  subtitle: "Preparing Today's Harvest. Building Tomorrow's Food System.",
+  question: "Why is preparation important before planting?",
+  proverb: "The farmer who prepares the soil today harvests tomorrow.",
+  parentQuestion: "Ask your Cultivator why grass was placed around the plants.",
+  objectives: [
+    "Spread Soil",
+    "Level Growing Beds",
+    "Create Rows",
+    "Sow Seeds",
+    "Plant Seeds",
+    "Apply Grass Mulch",
+    "Complete Fencing",
+    "Create Bubble Babies",
+  ],
+  ecosystemFlow: ["Soil", "Seed", "Plant", "Harvest", "Marketplace", "Family", "Community"],
+  progress: [
+    { label: "Soil Preparation", icon: "🌱", value: 0 },
+    { label: "Row Creation", icon: "🌾", value: 0 },
+    { label: "Planting", icon: "🌿", value: 0 },
+    { label: "Grass Mulch", icon: "🍃", value: 0 },
+    { label: "Fence Completion", icon: "🛠", value: 70 },
+    { label: "Bubble Babies", icon: "🫧", value: 0 },
+  ],
+};
 
 
 type LaunchVideo = {
@@ -627,14 +650,14 @@ const launchVideos: LaunchVideo[] = [
   },
   {
     title: "Manufacturing: Assemble, Paint, Personalize, and Quality Check",
-    purpose: "Documents the Manufacturing Team assembling, painting, branding, personalizing, and quality-checking the fans.",
+    purpose: "Documents the Manufacturing Team assembling, painting, branding, personalizing, and quality-checking the farm tasks.",
     file: "/videos/fan-manufacturing-painting.mp4",
     fallback: "Manufacturing Team Training Module: This section demonstrates assembly, painting, personalization, branding, and quality review procedures used during the From Soil to Seed.",
     tags: ["Fan Video", "Manufacturing", "Painting"],
   },
   {
-    title: "Final Cooling Station Completion Video",
-    purpose: "Shows the Contractor Team collecting fans, building the cooling station, and presenting the final farm heat-safety solution.",
+    title: "Final Grow Area Progress Evidence",
+    purpose: "Shows the Contractor Team collecting farm tasks, building the cooling station, and presenting the final farm heat-safety solution.",
     file: "/videos/cooling-station-completion.mp4",
     fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and portfolio evidence.",
     tags: ["Completion", "Contractor", "Farm Infrastructure"],
@@ -700,10 +723,10 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Comunicación",
     "Problem Solving": "Resolución de Problemas",
     "Following Instructions": "Seguir Instrucciones",
-    "From Soil to Seed": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
+    "Farm Worker Heat Safety & From Soil to Seed": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the From Soil to Seed.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
-    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
+    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling farm tasks for a contractor building a cooling station at Bronson Family Farm.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
     "Today's Project": "Proyecto de Hoy",
   },
   tl: {
@@ -730,10 +753,10 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Komunikasyon",
     "Problem Solving": "Paglutas ng Problema",
     "Following Instructions": "Pagsunod sa Panuto",
-    "From Soil to Seed": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
+    "Farm Worker Heat Safety & From Soil to Seed": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the From Soil to Seed.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang From Soil to Seed.",
     "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang portfolio at mga nakamit.",
-    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
+    "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling farm tasks for a contractor building a cooling station at Bronson Family Farm.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
     "Today's Project": "Proyekto Ngayon",
   },
   it: {
@@ -760,7 +783,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Comunicazione",
     "Problem Solving": "Risoluzione dei Problemi",
     "Following Instructions": "Seguire le Istruzioni",
-    "From Soil to Seed": "Sfida per la Sicurezza dal Calore e Stazione di Raffreddamento dei Lavoratori Agricoli",
+    "Farm Worker Heat Safety & From Soil to Seed": "Sfida per la Sicurezza dal Calore e Stazione di Raffreddamento dei Lavoratori Agricoli",
     "Today's Project": "Progetto di Oggi",
   },
   he: {
@@ -787,7 +810,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "תקשורת",
     "Problem Solving": "פתרון בעיות",
     "Following Instructions": "ציות להוראות",
-    "From Soil to Seed": "אתגר בטיחות מחום ותחנת קירור לעובדי חווה",
+    "Farm Worker Heat Safety & From Soil to Seed": "אתגר בטיחות מחום ותחנת קירור לעובדי חווה",
     "Today's Project": "הפרויקט של היום",
   },
   fr: {
@@ -814,7 +837,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Communication": "Communication",
     "Problem Solving": "Résolution de Problèmes",
     "Following Instructions": "Suivre les Instructions",
-    "From Soil to Seed": "Défi de Sécurité Contre la Chaleur et Station de Refroidissement des Travailleurs Agricoles",
+    "Farm Worker Heat Safety & From Soil to Seed": "Défi de Sécurité Contre la Chaleur et Station de Refroidissement des Travailleurs Agricoles",
     "Today's Project": "Projet d’Aujourd’hui",
   },
 };
@@ -855,7 +878,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Reports convert daily records into launch readiness and program impact.": "Los informes convierten los registros diarios en preparación para el lanzamiento e impacto del programa.",
     "Welcome Back / Journey Memory": "Bienvenido de nuevo / Memoria del recorrido",
     "🌞 My Day": "🌞 Mi Día",
-    "From Soil to Seed": "Asignación de lanzamiento del 8 de junio",
+    "June 8 Launch Assignment": "Asignación de lanzamiento del 8 de junio",
     "Pathway": "Ruta",
     "Guest Pathway": "Ruta de visitante",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados avanzan juntos.",
@@ -936,7 +959,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Reports convert daily records into launch readiness and program impact.": "Ginagawang launch readiness at program impact ng reports ang daily records.",
     "Welcome Back / Journey Memory": "Welcome Back / Journey Memory",
     "🌞 My Day": "🌞 Aking Araw",
-    "From Soil to Seed": "From Soil to Seed",
+    "June 8 Launch Assignment": "June 8 Launch Assignment",
     "Pathway": "Landas",
     "Guest Pathway": "Landas ng Bisita",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
@@ -1088,18 +1111,18 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Bronson Family Farm": "Bronson Family Farm",
     "Launch Focus": "Pokus sa Launch",
     "🌞 My Day": "🌞 Aking Araw",
-    "From Soil to Seed": "Takdang Gawain sa Hunyo 8",
-    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, prepare soil, create rows, plant seeds, mulch with grass, complete fencing, and create Bubble Babies, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
+    "June 8 Launch Assignment": "Takdang Gawain sa Hunyo 8",
+    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the From Soil to Seed work block, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
     "Project": "Proyekto",
     "From Soil to Seed": "From Soil to Seed",
     "Teams": "Mga Team",
-    "Design • Engineering • Manufacturing • Contractor": "Design • Engineering • Manufacturing • Contractor",
+    "Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators": "Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators",
     "Next Step": "Susunod na Hakbang",
     "Start My Day": "Simulan ang Aking Araw",
     "Goal": "Layunin",
     "Farm worker heat safety": "Heat safety ng manggagawa sa farm",
     "Open Today's Project": "Buksan ang Proyekto Ngayon",
-    "Watch Fan Video": "Panoorin ang Fan Video",
+    "Upload Photo / Story": "Panoorin ang Fan Video",
     "Reflection": "Reflection",
     "Recent Activity": "Kamakailang Aktibidad",
     "Regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms.": "Regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms.",
@@ -1126,15 +1149,15 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Staff Orientation": "Orientation ng Staff",
     "Youth Workforce Launch": "Youth Workforce Launch",
     "Featured Project": "Pangunahing Proyekto",
-    "From Soil to Seed": "Hamon: 63 Cooling Fans",
+    "From Soil to Seed": "Hamon: 63 Cooling Farm tasks",
     "Project Teams": "Mga Team ng Proyekto",
-    "Design | Engineering | Manufacturing | Contractor": "Design | Engineering | Manufacturing | Contractor",
+    "Soil | Planting | Infrastructure | Bubble Babies | Storytelling | Pollinators": "Soil | Planting | Infrastructure | Bubble Babies | Storytelling | Pollinators",
     "Photo / Video Documentation": "Photo / Video Documentation",
     "Media Center Ready": "Handa ang Media Center",
-    "Fan Template / Design Video": "Fan Template / Design Video",
+    "Photo / Story Evidence": "Photo / Story Evidence",
     "Ready for upload": "Handa para i-upload",
-    "Manufacturing Fan Painting Video": "Manufacturing Fan Painting Video",
-    "Cooling Station Completion Video": "Cooling Station Completion Video",
+    "Bubble Babies / Planting Evidence": "Bubble Babies / Planting Evidence",
+    "Grow Area Progress Evidence": "Grow Area Progress Evidence",
     "Translation Coverage": "Saklaw ng Translation",
     "Audit In Progress": "Nagaganap ang Audit",
     "Launch Decision": "Desisyon sa Launch",
@@ -1144,7 +1167,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Staff Orientation: June 5, 2026 — 9:30 AM": "Staff Orientation: Hunyo 5, 2026 — 9:30 AM",
     "Youth Workforce Launch: June 8, 2026 — 8:00 AM": "Youth Workforce Launch: Hunyo 8, 2026 — 8:00 AM",
     "We Grow Green to Harvest Dreams.": "We Grow Green to Harvest Dreams.",
-    "Open Today's Project": "Buksan ang Proyekto ng Hunyo 8",
+    "Open Today’s Mission": "Buksan ang Proyekto ng Hunyo 8",
     "Events & Orientation": "Events at Orientation",
     "Supervisor Center": "Supervisor Center",
     "Operations": "Operasyon",
@@ -1152,7 +1175,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Beginning of Day": "Simula ng Araw",
     "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments.": "QR/manual check-in, PPE, tubig, heat-safety awareness para sa farm workers, daily proverb, weather awareness, at assignments.",
     "June 8 Featured Project": "Pangunahing Proyekto ng Hunyo 8",
-    "From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence.": "Farm Worker Heat Safety at From Soil to Seed: Design, Engineering, Manufacturing, at Contractor teams ay gagana nang sunod-sunod.",
+    "Farm Worker Heat Safety & From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence.": "Farm Worker Heat Safety at From Soil to Seed: Design, Engineering, Manufacturing, at Contractor teams ay gagana nang sunod-sunod.",
     "During Program": "Habang Programa",
     "Supervisor observations, wellness support, safety follow-up, team progress, task completion, incident documentation.": "Supervisor observations, wellness support, safety follow-up, team progress, task completion, at incident documentation.",
     "End of Day": "Pagtatapos ng Araw",
@@ -1161,7 +1184,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Real Supervisor Operations Center": "Tunay na Supervisor Operations Center",
     "Morning-to-end-of-day control room.": "Control room mula umaga hanggang pagtatapos ng araw.",
     "Dashboard": "Dashboard",
-    "Today's Project": "Today's Project",
+    "From Soil to Seed": "From Soil to Seed",
     "Youth Roster": "Youth Roster",
     "Attendance / PPE": "Attendance / PPE",
     "Wellness Review": "Wellness Review",
@@ -1225,7 +1248,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registros de incidentes",
     "Project Items Complete": "Elementos del proyecto completos",
     "Open Supervisor Center": "Abrir centro de supervisores",
-    "Open Today's Project": "Abrir proyecto del 8 de junio"
+    "Open Today’s Mission": "Abrir proyecto del 8 de junio"
   },
   fr: {
     "Launch-day readiness status.": "État de préparation du jour du lancement.",
@@ -1241,7 +1264,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registres d’incidents",
     "Project Items Complete": "Éléments du projet terminés",
     "Open Supervisor Center": "Ouvrir le centre superviseur",
-    "Open Today's Project": "Ouvrir le projet du 8 juin"
+    "Open Today’s Mission": "Ouvrir le projet du 8 juin"
   },
   it: {
     "Launch-day readiness status.": "Stato di preparazione per il giorno del lancio.",
@@ -1257,7 +1280,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "Registri incidenti",
     "Project Items Complete": "Elementi del progetto completati",
     "Open Supervisor Center": "Apri centro supervisori",
-    "Open Today's Project": "Apri progetto dell’8 giugno"
+    "Open Today’s Mission": "Apri progetto dell’8 giugno"
   },
   he: {
     "Launch-day readiness status.": "מצב מוכנות ליום ההשקה.",
@@ -1273,7 +1296,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Incident Logs": "יומני אירועים",
     "Project Items Complete": "פריטי פרויקט הושלמו",
     "Open Supervisor Center": "פתח מרכז מדריכים",
-    "Open Today's Project": "פתח פרויקט 8 ביוני"
+    "Open Today’s Mission": "פתח פרויקט 8 ביוני"
   }
 };
 
@@ -1694,10 +1717,6 @@ function screenLabel(screen: Screen) {
     launchProject: "From Soil to Seed",
     feedback: "Feedback / Comments",
     completion: "Achievement Center",
-    startDay: "Start Day",
-    dailyBriefing: "Daily Farm Briefing",
-    liveWeek: "Week 1 Live Curriculum",
-    supervisorPinSetup: "Supervisor PIN Setup",
   };
   return labels[screen];
 }
@@ -1868,1269 +1887,11 @@ function SupportResponseFrameworkCard() {
   );
 }
 
-
-// =======================================================
-// CULTIVATOR LAUNCH OPERATING LAYER — WEEK 1 / JUNE 2026
-// Integrated without rebuilding the existing ecosystem.
-// Youth enter as Cultivators. Organization is tracked behind the scenes.
-// =======================================================
-
-type SupervisorPinProfile = {
-  id: string;
-  name: string;
-  email: string;
-  pin: string;
-  role: "Supervisor" | "Lead Supervisor" | "Administrator";
-  created_at: string;
-};
-
-type LaunchYouthRecord = {
-  id: string;
-  worksite: string;
-  organization: "Bronson Family Farm" | "Farm & Family Alliance";
-  firstName: string;
-  lastName: string;
-  pin: string;
-  email?: string;
-  phone?: string;
-  status: "Active" | "Temporary" | "Pending Verification" | "Inactive";
-  team: string;
-  supervisor: string;
-};
-
-const SUPERVISOR_PIN_KEY = "bff.launch.supervisorPins";
-const DAY_RECORD_KEY = "bff.launch.dayRecords";
-const LAUNCH_YOUTH_ROSTER_KEY = "bff.launch.cultivatorRoster";
-
-const approvedSupervisors: { email: string; name: string; role: "Supervisor" | "Lead Supervisor" | "Administrator" }[] = [
-  { email: "bhchatman@gmail.com", name: "B. H. Chatman", role: "Supervisor" },
-  { email: "msdaisy0607@icloud.com", name: "TreDayzah", role: "Supervisor" },
-  { email: "foresthalljr2@gmail.com", name: "Forest Hall Jr.", role: "Supervisor" },
-  { email: "sifajax@gmail.com", name: "Kisha Parker", role: "Lead Supervisor" },
-  { email: "jess3deery87@gmail.com", name: "Jessica Deery", role: "Supervisor" },
-  { email: "awnesty2@gmail.com", name: "Robin Hall", role: "Supervisor" },
-  { email: "iwpublishing228@gmail.com", name: "IW Publishing", role: "Supervisor" },
-];
-
-const launchCultivatorRoster: LaunchYouthRecord[] = [
-  {
-    "id": "YTH-001",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Tim'Ondre",
-    "lastName": "Bellamy",
-    "pin": "0601",
-    "email": "moffettnell40@gmail.com",
-    "phone": "330.233.2244",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-002",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Laniya",
-    "lastName": "Blair",
-    "pin": "0432",
-    "email": "From Children's Home- no info",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-003",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Laniya",
-    "lastName": "Blair- Group Home",
-    "pin": "0431",
-    "email": "none@aol.com100",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-004",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Dominique",
-    "lastName": "Bratton",
-    "pin": "0219",
-    "email": "shirellem2323@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-005",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Gianna",
-    "lastName": "Brown",
-    "pin": "0254",
-    "email": "pinkcookie5@icloud.com",
-    "phone": "330.261.2375",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-006",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Deyanna",
-    "lastName": "Carpenter",
-    "pin": "0214",
-    "email": "deedee.carpenter.822@gmail.com",
-    "phone": "773-708-2508",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-007",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Ryan",
-    "lastName": "Carpenter",
-    "pin": "0559",
-    "email": "Cory22mack09@gmail.com",
-    "phone": "773-708-2508",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-008",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Airielle",
-    "lastName": "Carter",
-    "pin": "0091",
-    "email": "beezybaby3211@icloud.com",
-    "phone": "330.423.2976",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-009",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Tawaun",
-    "lastName": "Ceasar Jr",
-    "pin": "0596",
-    "email": "alieaperry1@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-010",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kelis",
-    "lastName": "Cochrane",
-    "pin": "0392",
-    "email": "kelis8819@gmail.com",
-    "phone": "724-971-1930",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-011",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "",
-    "lastName": "Conner",
-    "pin": "0000",
-    "email": "none@aol.com6",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-012",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kadyn",
-    "lastName": "Conner",
-    "pin": "0370",
-    "email": "kadyn3186@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-013",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Keviin",
-    "lastName": "Daniels",
-    "pin": "0402",
-    "email": "aj212209@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-014",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Jordan-Lebron",
-    "lastName": "Evans",
-    "pin": "0351",
-    "email": "jordanlebronevans0408@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-015",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Natalee",
-    "lastName": "Fair",
-    "pin": "0508",
-    "email": "fairnatalee9@gmail.com",
-    "phone": "330-937-1616",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-016",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Angel",
-    "lastName": "Feliciano",
-    "pin": "0113",
-    "email": "angelfeliciano1217@ycsd.org",
-    "phone": "330-502-2846",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-017",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Naomi",
-    "lastName": "Fields",
-    "pin": "0506",
-    "email": "none@aol.com7",
-    "phone": "330-951-2762",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-018",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Da'Vone",
-    "lastName": "Green",
-    "pin": "0182",
-    "email": "devonegreen0621@gmail.com",
-    "phone": "234-439-2597",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-019",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "O'Tayveon",
-    "lastName": "Green",
-    "pin": "0526",
-    "email": "otayveongreen0117@gmail.com",
-    "phone": "234.442.2253",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-020",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Ra'Kai",
-    "lastName": "Green",
-    "pin": "0536",
-    "email": "rakaigreen56@gmail.com",
-    "phone": "330.881.0475",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-021",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Leah",
-    "lastName": "Hall",
-    "pin": "0444",
-    "email": "leah.hall1002@icloud.com",
-    "phone": "330.301.5880",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-022",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Jason",
-    "lastName": "Harmon",
-    "pin": "0305",
-    "email": "tye931lati@icloud.com",
-    "phone": "234.313.3902",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-023",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Don-Nasia",
-    "lastName": "Harris",
-    "pin": "0220",
-    "email": "nasiaharris2008@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-024",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Jackson",
-    "lastName": "Heath",
-    "pin": "0276",
-    "email": "jacksonheath1001@ycsd.org",
-    "phone": "330.766.7388",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-025",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kalil",
-    "lastName": "Johnson",
-    "pin": "0375",
-    "email": "kaliljohnson356911@gmail.com",
-    "phone": "330.518.7270",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-026",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kamren",
-    "lastName": "Johnson",
-    "pin": "0382",
-    "email": "weep3266@gmail.com",
-    "phone": "330.406.8347",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-027",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kia",
-    "lastName": "Jones",
-    "pin": "0412",
-    "email": "joneskia0722@gmail.com",
-    "phone": "234.704.9184",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-028",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Ron'Del",
-    "lastName": "Jones",
-    "pin": "0554",
-    "email": "jgt469951@gmail.com",
-    "phone": "330-423-2624",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-029",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Key'Shawn",
-    "lastName": "Jordan",
-    "pin": "0404",
-    "email": "keyshawnjordan5@gmail.com",
-    "phone": "330-774-3338",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-030",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Stace'On",
-    "lastName": "Mahone",
-    "pin": "0591",
-    "email": "staceon1212@gmail.com",
-    "phone": "706-877-9873",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-031",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Cabrina",
-    "lastName": "Martin",
-    "pin": "0159",
-    "email": "cabrinamartin940@gmail.com",
-    "phone": "567-868-0008",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-032",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Jamire",
-    "lastName": "Mitchell",
-    "pin": "0298",
-    "email": "jhud122@yahoo.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-033",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Santonio",
-    "lastName": "Monserrat",
-    "pin": "0568",
-    "email": "tonelfstopic@gmail.com",
-    "phone": "234.817.5763",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-034",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kah'Ron",
-    "lastName": "Oates",
-    "pin": "0371",
-    "email": "ktoates17@icloud.com",
-    "phone": "330.774.7116",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-035",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Darnell",
-    "lastName": "Patterson",
-    "pin": "0195",
-    "email": "donpistoljr@gmail.com",
-    "phone": "(330) 540-9946",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-036",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Lyndale",
-    "lastName": "Riley",
-    "pin": "0454",
-    "email": "none@aol.com8",
-    "phone": "234.313.5240",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-037",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Brayion",
-    "lastName": "Solid",
-    "pin": "0150",
-    "email": "brayionsolid@gmail.com",
-    "phone": "504-405-4963",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-038",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Brylen",
-    "lastName": "Solid",
-    "pin": "0158",
-    "email": "brylensolid@gmail.com",
-    "phone": "504-405-4963",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-039",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Dawn",
-    "lastName": "Taylor",
-    "pin": "0199",
-    "email": "taylorkinshasa69@gmail.com",
-    "phone": "234-313-4451",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-040",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Jerniyahlynn",
-    "lastName": "Thomas",
-    "pin": "0336",
-    "email": "jerniyahlynnthomas0922@ycsd.org",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-041",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Neyshmarie",
-    "lastName": "Vega Ramos",
-    "pin": "0516",
-    "email": "neyshmarievega06@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-042",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kenaysia",
-    "lastName": "Walker",
-    "pin": "0394",
-    "email": "damonawalker17@gmail.com",
-    "phone": "234-855-5653",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-043",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Que'Shawn",
-    "lastName": "Walker",
-    "pin": "0533",
-    "email": "queshawnwalker@icloud.com",
-    "phone": "330.716.2989",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-044",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Areille",
-    "lastName": "Whitfield-Tubbs",
-    "pin": "0129",
-    "email": "areilletubbs1@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-045",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Kristina",
-    "lastName": "Wiggins",
-    "pin": "0421",
-    "email": "unique0921@icloud.com",
-    "phone": "330-651-0063",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-046",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Reddrick",
-    "lastName": "Willis",
-    "pin": "0544",
-    "email": "willisreddrick@gmail.com",
-    "phone": "330-330-5062",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-047",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "Koreay",
-    "lastName": "Womack",
-    "pin": "0420",
-    "email": "koreaywomack11@yahoo.com",
-    "phone": "330.921.1988",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-048",
-    "worksite": "Bronson Family Farm",
-    "organization": "Bronson Family Farm",
-    "firstName": "King",
-    "lastName": "Xavier Brown",
-    "pin": "0416",
-    "email": "kingxavierbrown03@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-049",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Zxachi",
-    "lastName": "Adair",
-    "pin": "0635",
-    "email": "adairzar10@gmail.com",
-    "phone": "330.402.0054",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-050",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Zamarion",
-    "lastName": "Agee-Robinson",
-    "pin": "0625",
-    "email": "zdageerobinson2011@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-051",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Bobbie",
-    "lastName": "Batchelor",
-    "pin": "0146",
-    "email": "bobbiebatchelor75@gmail.com",
-    "phone": "330-507-3809",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-052",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Khaliq",
-    "lastName": "Bazemore",
-    "pin": "0410",
-    "email": "bazemorekhaliq3@gmail.com",
-    "phone": "919-723-8793",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-053",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Fabian",
-    "lastName": "Bellard Jr",
-    "pin": "0245",
-    "email": "fabianbellard08@gmail.com",
-    "phone": "234.287.7427",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-054",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Karmreon",
-    "lastName": "Black",
-    "pin": "0386",
-    "email": "kamreonblack327@gmail.com",
-    "phone": "330-318-0775",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-055",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Trinity",
-    "lastName": "Clinkscale",
-    "pin": "0608",
-    "email": "trinityclinkscale8@gmail.com",
-    "phone": "234-855-5653",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-056",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Alexis",
-    "lastName": "Delgado Sanchez",
-    "pin": "0096",
-    "email": "alexisdelgadosanchez5@gmail.com",
-    "phone": "267.963.1900",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-057",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Zion",
-    "lastName": "Dubois",
-    "pin": "0630",
-    "email": "ashcat03140911@gmail.com",
-    "phone": "3308120016",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-058",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Rece",
-    "lastName": "Evans",
-    "pin": "0543",
-    "email": "grandsgreatest@gmail.com",
-    "phone": "330-540-0278",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-059",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Isaiah",
-    "lastName": "Figueroa",
-    "pin": "0265",
-    "email": "none@aol.com89",
-    "phone": "234-699-0828",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-060",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Brielle",
-    "lastName": "Fleeton",
-    "pin": "0157",
-    "email": "bribriibri1@gmail.com",
-    "phone": "234.287.7616",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-061",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Keylen",
-    "lastName": "Gregory",
-    "pin": "0406",
-    "email": "keylengregory158@gmail.com",
-    "phone": "330-233-5777",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-062",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Caleb",
-    "lastName": "Harrison",
-    "pin": "0160",
-    "email": "iamcaleb1@icloud.com",
-    "phone": "330-501-0765",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-063",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Akilah",
-    "lastName": "Heflin",
-    "pin": "0092",
-    "email": "heflinakilah65@gmail.com",
-    "phone": "330.330.6308",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-064",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Ricky",
-    "lastName": "Robbins",
-    "pin": "0548",
-    "email": "robbinsr923@gmail.com",
-    "phone": "234-313-3430",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-065",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Kei'Ara",
-    "lastName": "Robinson",
-    "pin": "0389",
-    "email": "keiararobinson990@gmail.com",
-    "phone": "330.623.1370",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-066",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "R'Manii",
-    "lastName": "Robinson",
-    "pin": "0535",
-    "email": "rmaniirobinson1432@gmail.com",
-    "phone": "",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-067",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Cameron",
-    "lastName": "Robinson Jr",
-    "pin": "0163",
-    "email": "cameronr030111@gmail.com",
-    "phone": "330.531.1553",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-068",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "London",
-    "lastName": "Smith",
-    "pin": "0448",
-    "email": "danialondon234@gmail.com",
-    "phone": "330-519-2217",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-069",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "K-Shaun",
-    "lastName": "Weaver",
-    "pin": "0367",
-    "email": "kshaunweaver15@icloud.com",
-    "phone": "330.774.6068",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-070",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Tayvon",
-    "lastName": "Weaver",
-    "pin": "0599",
-    "email": "samyerin22891@gmail.com",
-    "phone": "330.501.0825",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  },
-  {
-    "id": "YTH-071",
-    "worksite": "Farm and Family Alliance",
-    "organization": "Farm & Family Alliance",
-    "firstName": "Nya",
-    "lastName": "Wright",
-    "pin": "0522",
-    "email": "nyalanay9@gmail.com",
-    "phone": "330-556-2887",
-    "status": "Active",
-    "team": "Unassigned",
-    "supervisor": "Unassigned"
-  }
-];
-
-const dayOneEcosystemRecord = {
-  id: "DAY-001",
-  date: "June 8, 2026",
-  title: "Day 1 Ecosystem Record",
-  week: "Week 1: Workplace Foundations & Safety",
-  theme: "Launch Day",
-  organizations: ["Bronson Family Farm", "Farm & Family Alliance"],
-  summary:
-    "The first day of the 2026 Cultivator Program was successful. Youth participated in the fan activity, worked in the grow area, spread soil, continued fence construction, gathered twine, moved cut grass, and demonstrated strong teamwork.",
-  youthEngagement: [
-    "Youth participated in the fan activity.",
-    "Youth demonstrated teamwork in the grow area.",
-    "Youth wanted to upload and share photos.",
-    "Youth questioned how the fan worked, showing critical thinking.",
-  ],
-  farmProgress: [
-    "Soil movement started.",
-    "Fence construction continued.",
-    "Twine was gathered.",
-    "Cut grass was moved cooperatively.",
-  ],
-  parentEngagement:
-    "Parents responded positively to knowing what their youth are learning.",
-  supervisorObservation:
-    "Supervisor/aide successfully coordinated youth teamwork and response to farm needs.",
-  incidentSummary:
-    "A verbal conflict occurred at dismissal involving families with prior history. Staff intervened to prevent escalation and separate parties. This revealed the need for dismissal protocol, private supervisor debrief, and incident response training.",
-  lessonsLearned: [
-    "Attendance must come first.",
-    "Some youth do not have phones.",
-    "Shared-device and paper participation are needed.",
-    "Parent pathway is important.",
-    "Photo uploads should become portfolio evidence.",
-    "Supervisor disagreement must be handled privately after stabilization.",
-  ],
-  status: "Official Record #001",
-};
-
-const weekOneLaunchCurriculum = [
-  {
-    date: "Tuesday, June 9, 2026",
-    title: "From Soil to Seed",
-    theme: "Everything begins with the soil.",
-    almanacQuestion:
-      "The ground and grass are soaked. How can moisture help seeds and plants survive heat?",
-    proverb: "The farmer who prepares the soil today harvests tomorrow.",
-    work: [
-      "Spread soil",
-      "Level soil",
-      "Create rows",
-      "Sow seeds",
-      "Plant seeds",
-      "Place soaked grass around plants",
-      "Continue fencing",
-      "Create and count Bubble Babies",
-    ],
-    parentQuestion: "Ask your youth why grass was placed around the plants.",
-  },
-  {
-    date: "Wednesday, June 10, 2026",
-    title: "Protect What We Grow",
-    theme: "A harvest must be protected before it can feed people.",
-    almanacQuestion: "Why should crops be protected before harvest?",
-    proverb: "A good fence protects tomorrow’s food.",
-    work: [
-      "Complete fencing",
-      "Check fence gaps",
-      "Inspect planted rows",
-      "Add grass mulch where needed",
-      "Label planted areas",
-      "Update grow area progress",
-    ],
-    parentQuestion: "Ask your youth why fencing matters on a farm.",
-  },
-  {
-    date: "Thursday, June 11, 2026",
-    title: "Observe, Care, and Improve",
-    theme: "Farmers notice what others overlook.",
-    almanacQuestion:
-      "What signs tell a farmer that soil, plants, or pollinators need attention?",
-    proverb: "Observation is the beginning of wisdom.",
-    work: [
-      "Inspect planted areas",
-      "Check soil moisture",
-      "Observe pollinators",
-      "Document insects or wildlife",
-      "Repair weak areas",
-      "Organize tools and materials",
-      "Continue Bubble Babies inventory",
-    ],
-    parentQuestion: "Ask your youth what they observed on the farm today.",
-  },
-  {
-    date: "Friday, June 12, 2026",
-    title: "Week 1 Reflection and Portfolio Day",
-    theme: "What we build together becomes evidence of growth.",
-    almanacQuestion:
-      "What did we build this week that future crops and future workers depend on?",
-    proverb: "Growth is easier to see when we record the journey.",
-    work: [
-      "Review grow area progress",
-      "Count Bubble Babies",
-      "Confirm fence status",
-      "Upload best photos",
-      "Complete weekly reflection",
-      "Recognize teamwork and leadership",
-      "Prepare parent-safe summary",
-    ],
-    parentQuestion: "Ask your youth what they are most proud of from Week 1.",
-  },
-];
-
-const liveFarmMetrics = [
-  "Soil Spread",
-  "Soil Leveled",
-  "Rows Created",
-  "Seeds Planted",
-  "Grass Mulch Added",
-  "Fence Completion",
-  "Bubble Babies Created",
-  "Photos Uploaded",
-  "Leadership Moments",
-  "Parent Connections",
-];
-
-function seedLaunchRosterAndRecords() {
-  const existingRoster = safeRead<LaunchYouthRecord[]>(LAUNCH_YOUTH_ROSTER_KEY, []);
-  if (!existingRoster.length) safeWrite(LAUNCH_YOUTH_ROSTER_KEY, launchCultivatorRoster);
-  const existingDayRecords = safeRead<any[]>(DAY_RECORD_KEY, []);
-  if (!existingDayRecords.some((record) => record.id === dayOneEcosystemRecord.id)) {
-    safeWrite(DAY_RECORD_KEY, [dayOneEcosystemRecord, ...existingDayRecords]);
-  }
-}
-
-function SupervisorPinSetup({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [email, setEmail] = useState("");
-  const [pin, setPin] = useState("");
-  const [confirmPin, setConfirmPin] = useState("");
-  const [message, setMessage] = useState("");
-  const normalizedEmail = email.trim().toLowerCase();
-  const approved = approvedSupervisors.find((item) => item.email.toLowerCase() === normalizedEmail);
-
-  const saveSupervisor = () => {
-    if (!approved) {
-      setMessage("Email not authorized for supervisor access. Contact the program administrator.");
-      return;
-    }
-    if (!/^\d{4}$/.test(pin)) {
-      setMessage("Create a 4-digit PIN.");
-      return;
-    }
-    if (pin !== confirmPin) {
-      setMessage("PINs do not match.");
-      return;
-    }
-    const existing = safeRead<SupervisorPinProfile[]>(SUPERVISOR_PIN_KEY, []);
-    const filtered = existing.filter((row) => row.email.toLowerCase() !== approved.email.toLowerCase());
-    const profile: SupervisorPinProfile = {
-      id: `SUP-${String(filtered.length + 1).padStart(3, "0")}`,
-      name: approved.name,
-      email: approved.email,
-      pin,
-      role: approved.role,
-      created_at: new Date().toISOString(),
-    };
-    safeWrite(SUPERVISOR_PIN_KEY, [profile, ...filtered]);
-    setMessage(`Supervisor activated: ${profile.name} • ${profile.role}`);
-  };
-
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Supervisor Email Confirmation</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Create Supervisor PIN</h1>
-      <p className="mt-3 max-w-3xl text-white/78">
-        Only approved supervisor emails can create access. The email confirms the person; the PIN makes daily login simple at the farm.
-      </p>
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
-        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Approved supervisor email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Create 4-digit PIN" value={pin} onChange={(e) => setPin(e.target.value)} maxLength={4} />
-        <input className="rounded-2xl border border-white/10 bg-black/45 px-4 py-4 text-white placeholder:text-white/40" placeholder="Confirm PIN" value={confirmPin} onChange={(e) => setConfirmPin(e.target.value)} maxLength={4} />
-      </div>
-      {approved && <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm font-bold text-emerald-50">Approved: {approved.name} • {approved.role}</div>}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={saveSupervisor} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Activate Supervisor</button>
-        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Supervisor Center</button>
-      </div>
-      {message && <Notice text={message} />}
-    </Card>
-  );
-}
-
-function StartDayScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const roster = safeRead<LaunchYouthRecord[]>(LAUNCH_YOUTH_ROSTER_KEY, launchCultivatorRoster);
-  const bffCount = roster.filter((youth) => youth.organization === "Bronson Family Farm").length;
-  const ffaCount = roster.filter((youth) => youth.organization === "Farm & Family Alliance").length;
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Start Day</div>
-      <h1 className="mt-4 text-5xl font-black md:text-7xl">Welcome Cultivator</h1>
-      <p className="mt-3 max-w-3xl text-lg text-white/78">Youth enter one ecosystem as Cultivators. Bronson Family Farm and Farm & Family Alliance are tracked behind the scenes for reporting.</p>
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <button type="button" onClick={() => setScreen("youth")} className="rounded-3xl bg-emerald-300 p-6 text-left font-black text-black">Youth Check-In<br /><span className="text-sm">Name + roster PIN or temporary entry</span></button>
-        <button type="button" onClick={() => setScreen("supervisorPinSetup")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Supervisor Setup<br /><span className="text-sm text-white/70">Approved email + self-created PIN</span></button>
-        <button type="button" onClick={() => setScreen("dailyBriefing")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Daily Farm Briefing<br /><span className="text-sm text-white/70">Almanac, proverb, mission, teams</span></button>
-        <button type="button" onClick={() => setScreen("parent")} className="rounded-3xl border border-white/10 bg-white/10 p-6 text-left font-black">Parent Portal<br /><span className="text-sm text-white/70">Youth PIN + parent phone/email</span></button>
-      </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{roster.length}</div><div className="text-sm text-white/65">Cultivators loaded</div></div>
-        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{bffCount}</div><div className="text-sm text-white/65">Bronson Family Farm records</div></div>
-        <div className="rounded-2xl border border-white/10 bg-black/25 p-5"><div className="text-3xl font-black">{ffaCount}</div><div className="text-sm text-white/65">Farm & Family Alliance records</div></div>
-      </div>
-    </Card>
-  );
-}
-
-function DailyFarmBriefing() {
-  const today = weekOneLaunchCurriculum[0];
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Farm Briefing</div>
-      <h1 className="mt-4 text-5xl font-black md:text-7xl">{today.title}</h1>
-      <p className="mt-3 text-xl text-white/80">{today.theme}</p>
-      <div className="mt-6 rounded-3xl border border-white/10 bg-white/10 p-5">
-        <h2 className="text-2xl font-black">🌤 Almanac Question</h2>
-        <p className="mt-2 text-white/80">{today.almanacQuestion}</p>
-      </div>
-      <div className="mt-4 rounded-3xl border border-white/10 bg-white/10 p-5">
-        <h2 className="text-2xl font-black">📖 Daily Proverb</h2>
-        <p className="mt-2 text-white/80">{today.proverb}</p>
-      </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-2">
-        {today.work.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-black/20 p-4 font-bold">✅ {item}</div>)}
-      </div>
-      <div className="mt-6 rounded-3xl bg-emerald-300 p-5 text-black">
-        <h2 className="text-2xl font-black">Parent Connection</h2>
-        <p className="mt-2 font-bold">{today.parentQuestion}</p>
-      </div>
-    </Card>
-  );
-}
-
-function LiveWeekScreen() {
-  useEffect(() => seedLaunchRosterAndRecords(), []);
-  const records = safeRead<any[]>(DAY_RECORD_KEY, [dayOneEcosystemRecord]);
-  return (
-    <div className="grid gap-5">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Week 1 Launch Curriculum</div>
-        <h1 className="mt-4 text-5xl font-black md:text-7xl">Live Curriculum + Farm Operations</h1>
-        <p className="mt-3 text-white/75">Curriculum drives the meaning. Farm work provides the real-world practice.</p>
-        <div className="mt-6 grid gap-4">
-          {weekOneLaunchCurriculum.map((day) => (
-            <div key={day.date} className="rounded-3xl border border-white/10 bg-white/10 p-5">
-              <div className="text-xs uppercase tracking-[0.25em] text-emerald-100/75">{day.date}</div>
-              <h2 className="mt-2 text-3xl font-black">{day.title}</h2>
-              <p className="mt-2 text-white/75">{day.theme}</p>
-              <p className="mt-3 font-bold">🌤 {day.almanacQuestion}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {day.work.map((task) => <span key={task} className="rounded-full bg-black/25 px-4 py-2 text-sm font-bold">{task}</span>)}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-      <Card>
-        <h2 className="text-3xl font-black">Mission Control Record #001</h2>
-        <p className="mt-3 text-white/75">{records[0]?.summary || dayOneEcosystemRecord.summary}</p>
-      </Card>
-      <Card>
-        <h2 className="text-3xl font-black">Live Farm Dashboard</h2>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {liveFarmMetrics.map((metric) => (
-            <div key={metric} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-              <div className="text-lg font-black">{metric}</div>
-              <div className="mt-3 h-3 rounded-full bg-black/30"><div className="h-3 w-1/4 rounded-full bg-emerald-300" /></div>
-              <div className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-white/60">In Progress</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
 function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
   const [message, setMessage] = useState("");
   const [language, setLanguage] = useState<LanguageCode>(() => safeRead<LanguageCode>(LANGUAGE_KEY, "en"));
-
-  useEffect(() => {
-    seedLaunchRosterAndRecords();
-  }, []);
 
   const changeLanguage = (next: LanguageCode) => {
     setLanguage(next);
@@ -3189,10 +1950,6 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
-      {screen === "startDay" && <StartDayScreen setScreen={setScreen} />}
-      {screen === "dailyBriefing" && <DailyFarmBriefing />}
-      {screen === "liveWeek" && <LiveWeekScreen />}
-      {screen === "supervisorPinSetup" && <SupervisorPinSetup setScreen={setScreen} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -3242,9 +1999,6 @@ function Shell({
   // The primary navigation always shows the full ecosystem.
   // Role-specific workspaces, such as Youth Start Day, stay in a secondary row.
   const primaryNav: { label: string; screen: Screen }[] = [
-    { label: "Start Day", screen: "startDay" },
-    { label: "Daily Briefing", screen: "dailyBriefing" },
-    { label: "Week 1 Live", screen: "liveWeek" },
     { label: "Guest", screen: "guest" },
     { label: "Youth Workforce", screen: "youth" },
     { label: "Parent", screen: "parent" },
@@ -3256,12 +2010,10 @@ function Shell({
     { label: "Mission Control", screen: "reports" },
   ];
 
-  const youthScreens: Screen[] = ["startDay", "dailyBriefing", "liveWeek", "youth", "wellness", "launchProject", "media", "feedback", "completion"];
+  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion"];
   const showYouthWorkspace = role === "Youth Workforce Participant" || youthScreens.includes(screen);
   const youthWorkspaceNav: { label: string; screen: Screen }[] = [
-    { label: "Start Day", screen: "startDay" },
-    { label: "Daily Briefing", screen: "dailyBriefing" },
-    { label: "Week 1 Live", screen: "liveWeek" },
+    { label: "Start Day", screen: "wellness" },
     { label: "My Day", screen: "youth" },
     { label: "Today’s Project", screen: "launchProject" },
     { label: "My Week", screen: "youth" },
@@ -3343,10 +2095,6 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
-              <button type="button" onClick={() => setScreen("startDay")} className={buttonClass("startDay")}>Start Day</button>
-              <button type="button" onClick={() => setScreen("dailyBriefing")} className={buttonClass("dailyBriefing")}>Daily Briefing</button>
-              <button type="button" onClick={() => setScreen("liveWeek")} className={buttonClass("liveWeek")}>Week 1 Live</button>
-              <button type="button" onClick={() => setScreen("supervisorPinSetup")} className={buttonClass("supervisorPinSetup")}>Supervisor Setup</button>
               <button type="button" onClick={() => setScreen("demo")} className={buttonClass("demo")}>Guided Portal</button>
               <button type="button" onClick={() => setScreen("guest")} className={buttonClass("guest")}>Guest</button>
               <button type="button" onClick={() => setScreen("youth")} className={buttonClass("youth")}>Youth Workforce</button>
@@ -3452,9 +2200,9 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">🌞 My Day</div>
-      <div className="mt-2 text-2xl font-black">From Soil to Seed</div>
+      <div className="mt-2 text-2xl font-black">June 8 Launch Assignment</div>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82">
-        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, prepare soil, create rows, plant seeds, mulch with grass, complete fencing, and create Bubble Babies, reflect, and see what happens tomorrow.
+        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the From Soil to Seed work block, reflect, and see what happens tomorrow.
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -3472,14 +2220,14 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Goal</div>
-          <div className="mt-1 text-sm font-black">Future harvest preparation</div>
+          <div className="mt-1 text-sm font-black">Farm worker heat safety</div>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload / View Photos</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload Photo / Story</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
       </div>
 
@@ -4040,7 +2788,7 @@ function MyWorkspace({
     },
     {
       title: "From Soil to Seed",
-      subtitle: "Farm worker heat safety production module: Design, Engineering, Manufacturing, and Contractor teams build a real cooling station.",
+      subtitle: "Today’s farm mission: soil preparation, row creation, seed planting, grass mulch, fencing, Bubble Babies, and portfolio evidence.",
       screen: "launchProject",
       show: isYouth || isStaff || isParent,
     },
@@ -4342,7 +3090,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
           <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload / View Photos</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload Photo / Story</button>
           <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
           <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
         </div>
@@ -4513,7 +3261,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
-    { key: "project", label: "Today's Project" },
+    { key: "project", label: "From Soil to Seed" },
     { key: "roster", label: "Youth Roster" },
     { key: "attendance", label: "Attendance / PPE" },
     { key: "wellness", label: "Wellness Review" },
@@ -5480,7 +4228,7 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
             </div>
           ))}
         </div>
-        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View Today's Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View Today’s Mission</button>
       </div>
 
       <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
@@ -5537,7 +4285,7 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
           "Family engagement options",
         ]}
         nextSteps={[
-          { label: "View Today's Project", screen: "supervisor" },
+          { label: "View Today’s Mission", screen: "supervisor" },
           { label: "Send Parent Feedback", screen: "feedback" },
           { label: "View Achievements", screen: "completion" },
           { label: "Return to Workspace", screen: "roles" },
@@ -6049,7 +4797,7 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <p className="mt-3 text-sm leading-7 text-white/78">{featuredProject.farmConnection}</p>
       </div>
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project Module</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today’s Mission Module</button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Media Center</button>
         <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Choose Workspace</button>
       </div>
@@ -6104,7 +4852,7 @@ function VideoLibrary({ compact = false }: { compact?: boolean }) {
             ]
           : isCompletion
             ? [
-                "Completed fans collected from production teams",
+                "Completed farm tasks collected from production teams",
                 "Cooling station setup and presentation area prepared",
                 "Final team presentation and project documentation",
                 "Youth achievement evidence saved for portfolios",
@@ -6194,7 +4942,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
     ["June 5 Staff Orientation Video", "Staff and supervisor training, site rules, safety expectations, platform use, and emergency procedures."],
     ["From Soil to Seed Video", "Full project documentation for the farm worker heat-safety challenge."],
     ["Fan Template & Design Video", "The fan template process, design decisions, and prototype demonstration."],
-    ["Manufacturing Fan Painting Video", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
+    ["Bubble Babies / Planting Evidence", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
     ["Design Team Gallery", "Templates, prototypes, design sketches, signage, and worker instructions."],
     ["Engineering Team Gallery", "Cardboard layout planning, material efficiency, tracing, cutting, and waste-reduction documentation."],
     ["Manufacturing Team Gallery", "Assembly, painting, personalization, finishing, branding, and quality-control documentation."],
@@ -6334,7 +5082,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today’s Mission</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
       </div>
     </Card>
@@ -6350,22 +5098,20 @@ function CoolingCenterProjectModule({
   activeUser: EcosystemUser | null;
   compact?: boolean;
 }) {
-  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.fromSoilToSeedProgress", []));
-  const [selectedTeam, setSelectedTeam] = useState<string>(todaysProject.teams[0].name);
+  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.coolingCenterProgress", []));
+  const [selectedTeam, setSelectedTeam] = useState<string>("Manufacturing Team");
   const [contributions, setContributions] = useState<string[]>(() => safeRead<string[]>("bff.launch.myContributions", []));
   const [learning, setLearning] = useState<string[]>(() => safeRead<string[]>("bff.launch.whatILearned", []));
   const [visionBefore, setVisionBefore] = useState(() => safeRead<string>("bff.launch.visionBefore", ""));
   const [visionAfter, setVisionAfter] = useState(() => safeRead<string>("bff.launch.visionAfter", ""));
   const [oneAcre, setOneAcre] = useState(() => safeRead<string>("bff.launch.oneAcre", ""));
-  const [bubbleCount, setBubbleCount] = useState(() => safeRead<string>("bff.launch.bubbleBabiesToday", "0"));
-  const [soilNote, setSoilNote] = useState(() => safeRead<string>("bff.launch.soilToSeedNote", ""));
 
-  const selectedTeamInfo = todaysProject.teams.find((team) => team.name === selectedTeam) || todaysProject.teams[0];
+  const selectedTeamInfo = coolingCenterTeams.find((team) => team.name === selectedTeam) || coolingCenterTeams[2];
 
   const toggleSaved = (item: string) => {
     const next = savedItems.includes(item) ? savedItems.filter((x) => x !== item) : [item, ...savedItems];
     setSavedItems(next);
-    safeWrite("bff.launch.fromSoilToSeedProgress", next);
+    safeWrite("bff.launch.coolingCenterProgress", next);
   };
 
   const toggleContribution = (item: string) => {
@@ -6384,136 +5130,101 @@ function CoolingCenterProjectModule({
     safeWrite("bff.launch.visionBefore", visionBefore);
     safeWrite("bff.launch.visionAfter", visionAfter);
     safeWrite("bff.launch.oneAcre", oneAcre);
-    safeWrite("bff.launch.bubbleBabiesToday", bubbleCount);
-    safeWrite("bff.launch.soilToSeedNote", soilNote);
   };
 
   const contributionItems = [
-    "Spread soil",
-    "Leveled growing beds",
-    "Created rows",
-    "Sowed seeds",
-    "Planted seeds",
-    "Placed grass mulch",
-    "Completed fencing",
-    "Created Bubble Babies",
-    "Counted inventory",
-    "Captured photos",
-    "Observed pollinators",
-    "Helped another Cultivator",
-    "Asked a powerful question",
-    "Demonstrated leadership",
-    "Supported safety",
+    "Creating ideas",
+    "Solving problems",
+    "Building products",
+    "Supporting my team",
+    "Helping a customer",
+    "Creating value",
+    "Learning a new skill",
+    "Improving a process",
+    "Helping someone succeed",
+    "Demonstrating leadership",
+    "Showing creativity",
+    "Practicing responsibility",
+    "Completing assigned tasks",
+    "Maintaining quality standards",
+    "Supporting safety",
   ];
 
   const learningItems = [
-    "Why soil preparation matters",
-    "How moisture supports seeds",
-    "How grass mulch protects plants from heat",
-    "Why rows and spacing matter",
-    "Why fencing protects food before harvest",
-    "How seeds can become a product",
-    "How Bubble Babies connect seeds to entrepreneurship",
-    "How farms use inventory",
-    "How teamwork helps work move faster",
-    "How photos become portfolio evidence",
-    "How food moves from soil to family",
-    "That preparation creates future harvests",
+    "How businesses work",
+    "How customers and contractors work together",
+    "How products are manufactured",
+    "How quality affects customer satisfaction",
+    "How creativity creates value",
+    "How teamwork improves results",
+    "How communication helps projects succeed",
+    "How planning saves time and money",
+    "How ideas become products",
+    "How products create opportunities",
+    "How entrepreneurs identify opportunities",
+    "How money is earned by solving problems",
+    "How food moves from farms to customers",
+    "How rising costs affect businesses and families",
+    "How workforce skills prepare me for future opportunities",
+    "How Bronson Family Farm creates value for the community",
+    "That I am capable of more than I realized",
   ];
 
   const productionItems = [
     "Youth checked in",
     "PPE and water confirmed",
-    "Daily Almanac reviewed",
-    "Soil Team assigned",
-    "Planting Team assigned",
-    "Infrastructure Team assigned",
-    "Bubble Babies Team assigned",
-    "Storytelling Team assigned",
-    "Pollinator Team assigned",
-    "Soil spread",
-    "Soil leveled",
-    "Rows created",
-    "Seeds sown",
-    "Seeds planted",
-    "Grass mulch placed",
-    "Fence sections completed",
-    "Bubble Babies created",
-    "Bubble Babies counted",
-    "Photos uploaded",
+    "Why this project matters lesson completed",
+    "Entrepreneur example discussed",
+    "Vision challenge completed",
+    "My Contribution selected",
+    "Teams assigned",
+    "Customer order explained: 63 farm tasks",
+    "Business cycle explained",
+    "Design standards approved",
+    "Engineering quality checklist completed",
+    "Manufacturing stations active",
+    "Farm tasks assembled",
+    "Farm tasks painted and personalized",
+    "Quality check completed",
+    "Farm tasks counted for delivery",
+    "Farm tasks delivered to Contractor Team",
     "Reflection completed",
-    "Parent conversation starter sent",
+    "What I Learned completed",
+    "Career interest selected",
+    "Achievement celebrated",
   ];
 
-  const valueMetrics = [
-    ["Soil Prepared", savedItems.includes("Soil spread") ? "Started" : "Pending"],
-    ["Rows Created", savedItems.includes("Rows created") ? "Started" : "Pending"],
-    ["Seeds Planted", savedItems.includes("Seeds planted") ? "Started" : "Pending"],
-    ["Fence Completion", "70%+"],
-    ["Bubble Babies", bubbleCount],
-    ["Future Harvest", "In Progress"],
+  const productionMetrics = [
+    ["Customer Order", "63 farm tasks"],
+    ["Material Cost", "$0.06 each"],
+    ["Markup", "20%"],
+    ["Sale Price", "$0.072 each"],
+    ["Material Cost Total", "$3.78"],
+    ["Contract Value", "$4.54"],
   ];
 
   return (
     <Card>
-      <div className="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
-        <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today's Project • From Soil to Seed</div>
-          <h1 className="mt-4 text-4xl font-black md:text-6xl">{todaysProject.title}</h1>
-          <p className="mt-4 max-w-4xl text-xl font-black text-emerald-50/90">{todaysProject.subtitle}</p>
-          <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">{todaysProject.mission}</p>
-          <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/30">
-            <img src={todaysProject.image} alt="Grow area prepared for soil and planting" className="h-64 w-full object-cover opacity-90" />
-          </div>
-        </div>
-        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">🌤 Today's Almanac</div>
-          <div className="mt-4 grid gap-2">
-            {[
-              ["Ground Moisture", todaysProject.almanac.groundMoisture],
-              ["Planting Conditions", todaysProject.almanac.plantingConditions],
-              ["Mulching Conditions", todaysProject.almanac.mulchingConditions],
-              ["Fence Work", todaysProject.almanac.fenceWork],
-              ["Heat Risk", todaysProject.almanac.heatRisk],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
-                <span className="text-white/72">{label}</span>
-                <b>{value}</b>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm font-black leading-7 text-white/86">
-            Question: {todaysProject.almanac.question}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Connected Food Ecosystem Flow</div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          {todaysProject.visualFlow.map((step, index) => (
-            <React.Fragment key={step}>
-              <div className={`rounded-full px-5 py-3 text-sm font-black ${index <= 2 ? "bg-emerald-300 text-black" : "bg-black/25 text-white"}`}>{step}</div>
-              {index < todaysProject.visualFlow.length - 1 && <div className="text-2xl font-black text-white/50">→</div>}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
+      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
+        Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling farm tasks for a contractor building a cooling station at Bronson Family Farm.
+      </p>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Farm Story</div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Business Story</div>
           <p className="mt-3 text-sm leading-7 text-white/84">
-            Every harvest begins with preparation. Before food can be grown, farmers prepare soil, create planting rows, sow seeds, protect moisture, and secure the growing area.
+            Bronson Family Farm is the customer. A contractor is hired to build the cooling station. The contractor becomes the customer when ordering 63 farm tasks from the youth manufacturing workforce.
           </p>
           <div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-7 text-white/86">
-            Soil ↓ Rows ↓ Seeds ↓ Plants ↓ Harvest ↓ Marketplace ↓ Family ↓ Community
+            Bronson Family Farm ↓ Contractor ↓ Youth Manufacturing Workforce ↓ Product Delivery ↓ Installation ↓ Customer Satisfaction
           </div>
         </div>
         <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">Today's Value Creation</div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">The Money Side</div>
           <div className="mt-3 grid gap-2">
-            {valueMetrics.map(([label, value]) => (
+            {productionMetrics.map(([label, value]) => (
               <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
                 <span className="text-white/72">{label}</span>
                 <b>{value}</b>
@@ -6524,7 +5235,7 @@ function CoolingCenterProjectModule({
         <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <div className="text-xs font-black uppercase tracking-[0.22em] text-white/65">Why It Matters</div>
           <p className="mt-3 text-sm leading-7 text-white/82">
-            Food begins long before harvest. The quality of the harvest depends on the quality of preparation. Today's work teaches responsibility, teamwork, environmental stewardship, entrepreneurship, and workforce skills while improving the farm's ability to grow healthy food.
+            Food prices are rising because every step costs money: growing, harvesting, packaging, transportation, labor, storage, marketing, and selling. This project helps youth understand how solving problems creates value, income, careers, and stronger communities.
           </p>
         </div>
       </div>
@@ -6532,100 +5243,177 @@ function CoolingCenterProjectModule({
       {!compact && (
         <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.95fr]">
           <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Grow Area Progress</div>
-            <h2 className="mt-3 text-2xl font-black">Live Farm Dashboard</h2>
-            <div className="mt-5 grid gap-3">
-              {todaysProject.progress.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                  <div className="flex items-center justify-between text-sm font-black"><span>{item.icon} {item.label}</span><span>{item.value}%</span></div>
-                  <div className="mt-3 h-3 rounded-full bg-black/35"><div className="h-3 rounded-full bg-emerald-300" style={{ width: `${item.value}%` }} /></div>
-                </div>
-              ))}
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
+            <h2 className="mt-3 text-2xl font-black">Fan Prototype Demonstration</h2>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
+              Watch how a simple fan idea can become a product. Youth should look for ideas they can improve, paint, personalize, and prepare for the contractor's order.
+            </p>
+            <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/dtYzf3avkT4"
+                title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="h-full w-full"
+              />
             </div>
           </div>
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Teams</div>
-            <h2 className="mt-3 text-2xl font-black">Today's Cultivator Teams</h2>
-            <div className="mt-4 grid gap-2">
-              {todaysProject.teams.map((team) => (
-                <button key={team.name} type="button" onClick={() => setSelectedTeam(team.name)} className={`rounded-2xl border p-4 text-left ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300/20" : "border-white/10 bg-black/25"}`}>
-                  <div className="text-lg font-black">{team.icon} {team.name}</div>
-                  <div className="mt-1 text-sm text-white/72">{team.task}</div>
-                </button>
-              ))}
+          <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Entrepreneurship Example</div>
+            <h2 className="mt-3 text-2xl font-black">A 13-Year-Old Saw Opportunity</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">
+              Use the young entrepreneur snack-selling example to start the conversation. The lesson is not snacks. The lesson is that opportunity begins when someone sees a need, creates value, and serves a customer.
+            </p>
+            <a
+              href="https://www.tiktok.com/@kasi_hustlers/video/7610048087100362002"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 block rounded-2xl bg-emerald-300 px-5 py-4 text-center font-black text-black"
+            >
+              Open Inspiration Video
+            </a>
+            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-6 text-white/78">
+              Discussion: What problem was he solving? Who was his customer? What opportunity could you create at Bronson Family Farm?
             </div>
           </div>
         </div>
       )}
 
-      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Selected Team Mission</div>
-        <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.icon} {selectedTeamInfo.name}</h2>
-        <p className="mt-2 text-white/80">{selectedTeamInfo.task}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {selectedTeamInfo.skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}
+      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Vision Challenge</div>
+        <h2 className="mt-3 text-2xl font-black">What Opportunity Do You See?</h2>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">This morning I see...</span>
+            <textarea value={visionBefore} onChange={(e) => setVisionBefore(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Example: I see a fan, a tomato, a field, or a problem." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">If I had one acre at Bronson Family Farm, I would...</span>
+            <textarea value={oneAcre} onChange={(e) => setOneAcre(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Grow, build, sell, host, teach, create..." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">Now I see...</span>
+            <textarea value={visionAfter} onChange={(e) => setVisionAfter(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="What opportunity do you see now?" />
+          </label>
         </div>
+        <button type="button" onClick={saveVision} className="mt-4 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save My Vision</button>
       </div>
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">My Contribution</div>
-          <h2 className="mt-3 text-2xl font-black">What did I help build today?</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {contributionItems.map((item) => (
-              <button key={item} type="button" onClick={() => toggleContribution(item)} className={`rounded-full px-4 py-2 text-sm font-black ${contributions.includes(item) ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{item}</button>
+      <div className="mt-7 grid gap-5 lg:grid-cols-[.8fr_1fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Choose / View My Team</div>
+          <div className="mt-4 grid gap-2">
+            {coolingCenterTeams.map((team) => (
+              <button
+                type="button"
+                key={team.name}
+                onClick={() => setSelectedTeam(team.name)}
+                className={`rounded-2xl border p-4 text-left transition ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}
+              >
+                <div className="text-lg font-black">{team.icon} {team.name}</div>
+                <div className="mt-1 text-sm font-bold opacity-80">{team.identity}</div>
+              </button>
             ))}
           </div>
         </div>
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">What Did I Learn?</div>
-          <h2 className="mt-3 text-2xl font-black">Turn farm work into portfolio evidence.</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {learningItems.map((item) => (
-              <button key={item} type="button" onClick={() => toggleLearning(item)} className={`rounded-full px-4 py-2 text-sm font-black ${learning.includes(item) ? "bg-emerald-300 text-black" : "bg-white/10 text-white"}`}>{item}</button>
-            ))}
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-4xl">{selectedTeamInfo.icon}</div>
+          <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.name}</h2>
+          <p className="mt-2 text-lg font-black text-emerald-100">{selectedTeamInfo.identity}</p>
+          <p className="mt-3 text-sm font-bold text-white/70">Recommended assignment: {selectedTeamInfo.recommendedShare}</p>
+          <p className="mt-4 text-sm leading-7 text-white/82">{selectedTeamInfo.mission}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.skills.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Careers</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.careers.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Today's Work Checklist</div>
-        <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-          {productionItems.map((item) => (
-            <button key={item} type="button" onClick={() => toggleSaved(item)} className={`rounded-2xl p-4 text-left text-sm font-black ${savedItems.includes(item) ? "bg-emerald-300 text-black" : "bg-black/25 text-white"}`}>{savedItems.includes(item) ? "✓ " : "□ "}{item}</button>
-          ))}
         </div>
       </div>
 
       {!compact && (
-        <div className="mt-7 grid gap-5 lg:grid-cols-2">
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Bubble Babies Enterprise</div>
-            <h2 className="mt-3 text-2xl font-black">Seeds become products.</h2>
-            <Field label="Bubble Babies Created Today" value={bubbleCount} onChange={setBubbleCount} placeholder="0" />
-            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-7 text-white/82">
-              Track created, packaged, ready for marketplace, and inventory value. This connects agriculture to entrepreneurship.
+        <>
+          <div className="mt-7 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+              <h2 className="text-2xl font-black">My Contribution</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Choose the ways you will contribute today. This becomes part of your achievement record.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {contributionItems.map((item) => {
+                  const active = contributions.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleContribution(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
+            </div>
+            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
+              <h2 className="text-2xl font-black">What Did I Learn?</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Complete this at the end of the project.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {learningItems.map((item) => {
+                  const active = learning.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleLearning(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-amber-200 bg-amber-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
             </div>
           </div>
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Reflection + Parent Connection</div>
-            <h2 className="mt-3 text-2xl font-black">{todaysProject.parentConnection}</h2>
-            <TextArea label="What did you notice about soil, seeds, mulch, or teamwork?" value={soilNote} onChange={setSoilNote} />
+
+          <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.85fr]">
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+              <h2 className="text-2xl font-black">Production Board</h2>
+              <p className="mt-3 text-sm leading-7 text-white/78">Tap each item as the launch team completes the work. These are saved locally for launch review.</p>
+              <div className="mt-5 grid gap-2 md:grid-cols-2">
+                {productionItems.map((item) => {
+                  const active = savedItems.includes(item);
+                  return (
+                    <button type="button" key={item} onClick={() => toggleSaved(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/30 text-white"}`}>
+                      {active ? "✅" : "☐"} {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+              <h2 className="text-2xl font-black">Supervisor Role Today</h2>
+              <p className="mt-3 text-sm leading-7 text-white/82">Supervisors guide youth success. They do not do the work for the youth.</p>
+              {[
+                "Safety Leader: PPE, hydration, heat awareness, tool safety, emergency response.",
+                "Workforce Coach: encouragement, problem solving, positive behavior, conflict resolution.",
+                "Team Facilitator: keep time, organize teams, support deliverables, keep youth focused.",
+                "Assessor: observe communication, teamwork, responsibility, problem solving, participation.",
+                "Wellness Observer: notice fatigue, frustration, withdrawal, escalation, or need for support.",
+              ].map((item) => <div key={item} className="mt-3 rounded-2xl bg-white/10 p-3 text-sm leading-6 text-white/80">✓ {item}</div>)}
+            </div>
           </div>
-        </div>
+
+          <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <h2 className="text-2xl font-black">Celebration & Achievement</h2>
+            <p className="mt-4 text-lg leading-8 text-white/88">
+              Today we are not just building farm tasks. We are learning how to see opportunity, imagine solutions, design ideas, build products, deliver value, take ownership, and connect our work to future careers.
+            </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {["Opportunity Seeker", "Problem Solver", "Team Builder", "Creative Thinker", "Quality Champion", "Workforce Ready", "Entrepreneurial Mindset", "Value Creator", "Future Builder"].map((badge) => (
+                <div key={badge} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-black">🏆 {badge}</div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-3">
-        <TextArea label="SEE IT — What did you see in the grow area?" value={visionBefore} onChange={setVisionBefore} />
-        <TextArea label="DESIGN IT — What would you improve tomorrow?" value={visionAfter} onChange={setVisionAfter} />
-        <TextArea label="OWN IT — What are you proud of today?" value={oneAcre} onChange={setOneAcre} />
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={saveVision} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Portfolio Evidence</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Upload / View Photos</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Complete Reflection</button>
-        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-7 py-4 font-black text-emerald-50">Record Achievement</button>
+      <div className="mt-7 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Start Youth Check-In</button>
+        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Tracking</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Reflection / Feedback</button>
       </div>
     </Card>
   );
@@ -6649,11 +5437,11 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
     ["Staff Orientation", "June 5, 2026 — 9:30 AM"],
     ["Youth Workforce Launch", "June 8, 2026 — 8:00 AM"],
     ["Featured Project", featuredProject.shortTitle],
-    ["Project Teams", "Design | Engineering | Manufacturing | Contractor"],
+    ["Project Teams", "Soil | Planting | Infrastructure | Bubble Babies | Storytelling | Pollinators"],
     ["Photo / Video Documentation", "Media Center Ready"],
-    ["Fan Template / Design Video", "Ready for upload"],
-    ["Manufacturing Fan Painting Video", "Ready for upload"],
-    ["Cooling Station Completion Video", "Ready for upload"],
+    ["Photo / Story Evidence", "Ready for upload"],
+    ["Bubble Babies / Planting Evidence", "Ready for upload"],
+    ["Grow Area Progress Evidence", "Ready for upload"],
     ["Translation Coverage", "Audit In Progress"],
     ["Launch Decision", "Validate Pathways + Launch"],
   ];
@@ -6700,7 +5488,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
       <div className="mt-7"><SupportResponseFrameworkCard /></div>
       <VideoLibrary />
       <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today's Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today’s Mission</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
       </div>
@@ -6935,7 +5723,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments."],
-          ["June 8 Featured Project", "From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence."],
+          ["June 8 Featured Project", "Farm Worker Heat Safety & From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence."],
           ["During Program", "Supervisor observations, wellness support, safety follow-up, team progress, task completion, incident documentation."],
           ["End of Day", "Youth reflection, supervisor assessment, parent-safe summary, media documentation, reports."],
         ].map(([title, text]) => (
@@ -6948,7 +5736,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <OperationsInventoryPanel />
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Supervisor Center</button>
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Today's Project</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Today’s Mission</button>
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
       </div>
     </Card>
