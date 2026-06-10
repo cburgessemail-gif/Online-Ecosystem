@@ -41,6 +41,8 @@ type Screen =
   | "media"
   | "launchProject"
   | "feedback"
+  | "emergencyContacts"
+  | "incidentReport"
   | "workToday"
   | "learn"
   | "explore"
@@ -1930,6 +1932,8 @@ function screenLabel(screen: Screen) {
     media: "Media Center",
     launchProject: "From Soil to Seed",
     feedback: "Feedback / Comments",
+    emergencyContacts: "Emergency Contacts",
+    incidentReport: "Incident Report",
     workToday: "Work Today",
     learn: "Learn",
     explore: "Explore the Ecosystem",
@@ -2169,6 +2173,8 @@ function App() {
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "workToday" && <WorkTodayScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "emergencyContacts" && <EmergencyContactsScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "incidentReport" && <IncidentReportQuickScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "learn" && <LearnScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "explore" && <ExploreEcosystemScreen setScreen={setScreen} />}
       {screen === "resources" && <ResourcesScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
@@ -2441,8 +2447,8 @@ function EmergencyStrip({ setScreen }: { setScreen: (screen: Screen) => void }) 
           <div className="text-xs font-bold text-red-50/88">Injury, safety concern, parent contact, nurse line, or urgent support must be one tap away.</div>
         </div>
         <div className="grid grid-cols-2 gap-2 md:min-w-[360px]">
-          <button type="button" onClick={() => setScreen("support")} className="rounded-full bg-red-100 px-4 py-3 text-sm font-black text-red-900">Emergency Contacts</button>
-          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-orange-300 px-4 py-3 text-sm font-black text-black">Incident Report</button>
+          <button type="button" onClick={() => setScreen("emergencyContacts")} className="rounded-full bg-red-100 px-4 py-3 text-sm font-black text-red-900">Emergency Contacts</button>
+          <button type="button" onClick={() => setScreen("incidentReport")} className="rounded-full bg-orange-300 px-4 py-3 text-sm font-black text-black">Incident Report</button>
         </div>
       </div>
     </div>
@@ -2511,8 +2517,8 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
         <Card>
           <h2 className="text-2xl font-black">Command Center</h2>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <ActionButton urgent icon="🚨" title="Emergency Contacts" note="Nurse line, 911, site lead" onClick={() => setScreen("support")} />
-            <ActionButton urgent icon="📝" title="Incident Report" note="Injury or safety event" onClick={() => setScreen("supervisor")} />
+            <ActionButton urgent icon="🚨" title="Emergency Contacts" note="Nurse line, 911, site lead" onClick={() => setScreen("emergencyContacts")} />
+            <ActionButton urgent icon="📝" title="Incident Report" note="Injury or safety event" onClick={() => setScreen("incidentReport")} />
             <ActionButton icon="✅" title="Attendance" note="Present, late, absent, PPE" onClick={() => setScreen(isYouth ? "wellness" : "supervisor")} />
             <ActionButton icon="👥" title="Assign Youth" note="Supervisor + topic area" onClick={() => setScreen("supervisor")} />
             <ActionButton icon="📸" title="Media Upload" note="Photos and video evidence" onClick={() => setScreen("media")} />
@@ -2538,6 +2544,166 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
             );
           })}
         </div>
+      </Card>
+    </div>
+  );
+}
+
+
+function EmergencyContactsScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const familyRows = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
+  const currentYouthFamily = activeUser?.role === "Youth Workforce Participant" ? getYouthFamilyIntake(activeUser.id) : undefined;
+
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-red-100/85">WORK TODAY • EMERGENCY</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">🚨 Emergency Contacts</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
+          This screen is for injuries, safety issues, parent contact, urgent support, and documentation. It is separate from Explore the Ecosystem.
+        </p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <a href="tel:911" className="rounded-[1.35rem] border border-red-200/40 bg-red-600/35 p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,.28)]">
+            <div className="text-3xl">🚑</div>
+            <div className="mt-2 text-xl font-black">Call 911</div>
+            <div className="mt-1 text-sm text-white/75">Life-threatening emergency</div>
+          </a>
+          <button type="button" onClick={() => setScreen("incidentReport")} className="rounded-[1.35rem] border border-orange-200/40 bg-orange-500/30 p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,.28)]">
+            <div className="text-3xl">📝</div>
+            <div className="mt-2 text-xl font-black">Incident Report</div>
+            <div className="mt-1 text-sm text-white/75">Document injury or safety event</div>
+          </button>
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,.28)]">
+            <div className="text-3xl">👥</div>
+            <div className="mt-2 text-xl font-black">Supervisor Center</div>
+            <div className="mt-1 text-sm text-white/75">Roster, parent logs, assessments</div>
+          </button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,.28)]">
+            <div className="text-3xl">📸</div>
+            <div className="mt-2 text-xl font-black">Upload Evidence</div>
+            <div className="mt-1 text-sm text-white/75">Photo or video documentation</div>
+          </button>
+        </div>
+      </Card>
+
+      <Card>
+        <h2 className="text-2xl font-black">Immediate Procedure</h2>
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {["Stop work in the area and move youth to safety.", "Assess urgency. Call 911 for emergency medical danger.", "Notify program lead / site supervisor.", "Contact parent or guardian when appropriate.", "Complete incident report before leaving the site.", "Upload photo evidence only when appropriate and respectful."].map((step, index) => (
+            <div key={step} className="rounded-2xl border border-white/10 bg-black/28 p-4 text-sm font-bold"><span className="mr-2 rounded-full bg-white/15 px-2 py-1 text-xs">{index + 1}</span>{step}</div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <h2 className="text-2xl font-black">Parent / Guardian Contacts</h2>
+        {currentYouthFamily ? (
+          <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="font-black">{currentYouthFamily.youthName}</div>
+            <div className="mt-1 text-sm text-white/75">Guardian: {currentYouthFamily.guardianName} • {currentYouthFamily.guardianRelationship}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <a href={`tel:${currentYouthFamily.guardianPhone}`} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Call Guardian</a>
+              <a href={`mailto:${currentYouthFamily.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Email Guardian</a>
+            </div>
+          </div>
+        ) : familyRows.length ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {familyRows.slice(0, 12).map((row) => (
+              <div key={row.id} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                <div className="font-black">{row.youthName}</div>
+                <div className="mt-1 text-sm text-white/75">{row.guardianName}</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <a href={`tel:${row.guardianPhone}`} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Call</a>
+                  <a href={`mailto:${row.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Email</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-white/75">No guardian contacts have been entered yet. Use the Youth / Parent intake workflow to add guardian information.</p>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+function IncidentReportQuickScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [participantId, setParticipantId] = useState("");
+  const [incidentType, setIncidentType] = useState<IncidentRecord["incident_type"]>("injury");
+  const [urgency, setUrgency] = useState<IncidentRecord["urgency"]>("medium");
+  const [summary, setSummary] = useState("");
+  const [actionTaken, setActionTaken] = useState("");
+  const [parentContacted, setParentContacted] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
+  const youthRows = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+
+  const saveIncident = async () => {
+    if (!summary.trim() || !actionTaken.trim()) {
+      setSavedMessage("Add a short summary and action taken before saving.");
+      return;
+    }
+    const row: IncidentRecord = {
+      id: uuid(),
+      participant_id: participantId || undefined,
+      staff_id: activeUser?.id,
+      incident_type: incidentType,
+      urgency,
+      summary: summary.trim(),
+      action_taken: actionTaken.trim(),
+      parent_contacted: parentContacted,
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("incidents", INCIDENT_KEY, row);
+    setSavedMessage(saveModeMessage("Incident report", result));
+    setSummary("");
+    setActionTaken("");
+    setParentContacted(false);
+  };
+
+  return (
+    <div className="grid gap-4">
+      <EmergencyStrip setScreen={setScreen} />
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-orange-100/85">WORK TODAY • INCIDENT</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">📝 Incident Report</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Use this for injury, nail stick, safety concern, behavior incident, wellness concern, transportation issue, or parent contact documentation.</p>
+      </Card>
+      <Card>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth / Participant</span>
+            <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none focus:border-emerald-200">
+              <option value="">Select youth if known</option>
+              {youthRows.map((row) => <option key={row.id} value={row.participant_id}>{row.participant_id} • {row.guardian_name ? row.guardian_name : "Youth participant"}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Incident Type</span>
+            <select value={incidentType} onChange={(e) => setIncidentType(e.target.value as IncidentRecord["incident_type"])} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none focus:border-emerald-200">
+              {(["injury", "behavior", "conflict", "wellness", "safety", "transportation", "parent_contact", "other"] as IncidentRecord["incident_type"][]).map((type) => <option key={type} value={type}>{type.replace("_", " ")}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Urgency</span>
+            <select value={urgency} onChange={(e) => setUrgency(e.target.value as IncidentRecord["urgency"])} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-white outline-none focus:border-emerald-200">
+              {(["low", "medium", "high", "emergency"] as IncidentRecord["urgency"][]).map((level) => <option key={level} value={level}>{level}</option>)}
+            </select>
+          </label>
+          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/28 p-4 text-sm font-bold">
+            <input type="checkbox" checked={parentContacted} onChange={(e) => setParentContacted(e.target.checked)} />
+            Parent / guardian contacted
+          </label>
+        </div>
+        <div className="mt-4 grid gap-4">
+          <TextArea label="What happened?" value={summary} onChange={setSummary} placeholder="Example: Youth stepped on / was stuck by nail near..." />
+          <TextArea label="Action taken" value={actionTaken} onChange={setActionTaken} placeholder="Example: Area secured, youth assessed, parent contacted, nurse line/medical advice..." />
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={saveIncident} className="rounded-full bg-orange-300 px-6 py-3 font-black text-black">Save Incident Report</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Upload Photo Evidence</button>
+          <button type="button" onClick={() => setScreen("emergencyContacts")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Emergency Contacts</button>
+        </div>
+        {savedMessage && <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-bold">{savedMessage}</div>}
       </Card>
     </div>
   );
@@ -2569,7 +2735,7 @@ function LearnScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <Card>
         <h2 className="text-2xl font-black">Learning Actions</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <ActionButton icon="🧭" title="Weekly Topic Selection" note="Choose one topic; full at 15" onClick={() => setScreen("youth")} />
+          <ActionButton icon="🧭" title="Weekly Rotation" note="Week 1 choice; Week 2+ assigned rotation" onClick={() => setScreen("workToday")} />
           <ActionButton icon="🌦" title="Farm Almanac" note="Weather, season, proverb" onClick={() => setScreen("resources")} />
           <ActionButton icon="📁" title="Portfolio" note="Evidence and accomplishments" onClick={() => setScreen("completion")} />
           <ActionButton icon="📄" title="Resume Builder" note="Turn work into career language" onClick={() => setScreen("completion")} />
