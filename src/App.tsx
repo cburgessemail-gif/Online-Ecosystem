@@ -4,7 +4,39 @@ import "./App.css";
 type Role = "youth" | "parent" | "supervisor" | "mission" | "guest";
 type Lang = "en" | "es";
 
+type YouthRecord = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  pin: string;
+  worksite: string;
+  completedTopics: string[];
+  currentWeekTopic: string;
+};
+
 const TOPIC_CAP = 15;
+const WORKSITE_NAME = "Bronson Family Farm";
+
+const employerYouthList: YouthRecord[] = [
+  {
+    id: "y001",
+    firstName: "Jordan",
+    lastName: "Smith",
+    pin: "1234",
+    worksite: "Bronson Family Farm",
+    completedTopics: ["Agriculture"],
+    currentWeekTopic: "",
+  },
+  {
+    id: "y002",
+    firstName: "Taylor",
+    lastName: "Brown",
+    pin: "5678",
+    worksite: "Bronson Family Farm",
+    completedTopics: [],
+    currentWeekTopic: "",
+  },
+];
 
 const topicAreas = [
   "Agriculture",
@@ -73,7 +105,7 @@ const translations = {
     mission: "Mission Control",
     guest: "Guest / Reviewer",
     chooseTopic: "Choose Your Topic Area",
-    saveTopic: "Save Topic Choice",
+    saveTopic: "Submit / Save Topic Choice",
     full: "Full",
     spots: "spots left",
     tools: "Tools & Resources",
@@ -94,7 +126,7 @@ const translations = {
     mission: "Control de Misión",
     guest: "Invitado / Revisor",
     chooseTopic: "Elige Tu Área de Tema",
-    saveTopic: "Guardar Selección",
+    saveTopic: "Enviar / Guardar Selección",
     full: "Lleno",
     spots: "lugares disponibles",
     tools: "Herramientas y Recursos",
@@ -119,6 +151,9 @@ export default function App() {
   const [savedTopic, setSavedTopic] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
+  const [validationError, setValidationError] = useState("");
+
   const t = translations[lang];
 
   const topicCounts = useMemo(
@@ -135,17 +170,35 @@ export default function App() {
     []
   );
 
-  // Example history: this would later come from the youth record/database.
-  const youthHistory = ["Agriculture"];
+  function normalize(value: string) {
+    return value.trim().toLowerCase().replace(/\s+/g, " ");
+  }
 
-  const alreadySignedUpThisWeek = Boolean(savedTopic);
+  function findYouthMatch() {
+    return employerYouthList.find((youth) => {
+      const fullName = `${youth.firstName} ${youth.lastName}`;
 
-  function canYouthChooseTopic(topic: string) {
+      return (
+        normalize(fullName) === normalize(youthName) &&
+        youth.pin.trim() === pin.trim() &&
+        youth.worksite === WORKSITE_NAME
+      );
+    });
+  }
+
+  const youthHistory = validatedYouth?.completedTopics || [];
+  const alreadySignedUpThisWeek =
+    Boolean(savedTopic) || Boolean(validatedYouth?.currentWeekTopic);
+
+  function canYouthChooseTopic(topic: string, youth?: YouthRecord | null) {
     const count = topicCounts[topic as keyof typeof topicCounts];
     const isFull = count >= TOPIC_CAP;
-    const alreadyCompleted = youthHistory.includes(topic);
+    const completedTopics = youth?.completedTopics || youthHistory;
+    const alreadyCompleted = completedTopics.includes(topic);
+    const hasCurrentTopic =
+      Boolean(savedTopic) || Boolean(youth?.currentWeekTopic || validatedYouth?.currentWeekTopic);
 
-    return !isFull && !alreadyCompleted && !alreadySignedUpThisWeek;
+    return !isFull && !alreadyCompleted && !hasCurrentTopic;
   }
 
   function getTopicStatus(topic: string) {
@@ -160,9 +213,6 @@ export default function App() {
     return `${TOPIC_CAP - count} ${t.spots}`;
   }
 
-  const topicCanBeSaved =
-    selectedTopic && canYouthChooseTopic(selectedTopic);
-
   const missingFields: string[] = [];
 
   if (!youthName.trim()) missingFields.push("Youth name is required.");
@@ -174,22 +224,69 @@ export default function App() {
   }
   if (!selectedTopic) missingFields.push("Choose a topic area.");
 
-  if (selectedTopic && !canYouthChooseTopic(selectedTopic)) {
-    missingFields.push(
-      "This topic cannot be selected for weekly sign-up. Youth may review it, but must choose an available area."
-    );
-  }
-
-  const canSave = missingFields.length === 0 && Boolean(topicCanBeSaved);
+  const canAttemptSubmit =
+    youthName.trim() &&
+    pin.trim() &&
+    parentName.trim() &&
+    parentEmail.trim() &&
+    parentEmail.includes("@") &&
+    Boolean(selectedTopic);
 
   function resetHome() {
     setRole(null);
     setSubmitted(false);
+    setValidationError("");
   }
 
   function saveYouthDay() {
-    if (!canSave) return;
+    setValidationError("");
 
+    if (!canAttemptSubmit) {
+      setValidationError("Please complete all required fields before submitting.");
+      return;
+    }
+
+    const match = findYouthMatch();
+
+    if (!match) {
+      setValidatedYouth(null);
+      setValidationError(
+        "Youth name and PIN do not match the employer list. Please ask a supervisor for help."
+      );
+      return;
+    }
+
+    if (!canYouthChooseTopic(selectedTopic, match)) {
+      setValidatedYouth(match);
+
+      if (match.currentWeekTopic) {
+        setValidationError(
+          `You are already signed up for ${match.currentWeekTopic} this week. Please ask a supervisor if this needs to change.`
+        );
+        return;
+      }
+
+      if (match.completedTopics.includes(selectedTopic)) {
+        setValidationError(
+          "You have already completed this topic area. Please choose a new area."
+        );
+        return;
+      }
+
+      if (topicCounts[selectedTopic as keyof typeof topicCounts] >= TOPIC_CAP) {
+        setValidationError(
+          "This topic area is full. Please choose another available area."
+        );
+        return;
+      }
+
+      setValidationError(
+        "This topic cannot be selected. Please choose an available weekly topic."
+      );
+      return;
+    }
+
+    setValidatedYouth(match);
     setSavedTopic(selectedTopic);
     setSubmitted(true);
   }
@@ -230,8 +327,8 @@ export default function App() {
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
             <p>
               Welcome to the Bronson Family Farm Youth Workforce Program.
-              Youth should use their assigned PIN number as their password.
-              Parents and supervisors have separate access.
+              Youth must enter their name and assigned PIN number. Today’s work
+              opens only after the name and PIN match the employer list.
             </p>
           </div>
 
@@ -253,29 +350,65 @@ export default function App() {
           {!submitted ? (
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="Youth Check-In">
-                <label>Youth Name</label>
-                <input value={youthName} onChange={(e) => setYouthName(e.target.value)} />
+                <p>
+                  Enter your full name exactly as it appears on the employer list
+                  and your assigned PIN number.
+                </p>
+
+                <label>Youth Full Name</label>
+                <input
+                  value={youthName}
+                  onChange={(e) => {
+                    setYouthName(e.target.value);
+                    setValidatedYouth(null);
+                    setValidationError("");
+                  }}
+                  placeholder="First Last"
+                />
 
                 <label>Assigned PIN Number / Password</label>
-                <input value={pin} onChange={(e) => setPin(e.target.value)} />
+                <input
+                  value={pin}
+                  onChange={(e) => {
+                    setPin(e.target.value);
+                    setValidatedYouth(null);
+                    setValidationError("");
+                  }}
+                  placeholder="PIN number"
+                />
 
                 <label>Parent / Guardian Name</label>
-                <input value={parentName} onChange={(e) => setParentName(e.target.value)} />
+                <input
+                  value={parentName}
+                  onChange={(e) => setParentName(e.target.value)}
+                />
 
                 <label>Parent / Guardian Email</label>
-                <input value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} />
+                <input
+                  value={parentEmail}
+                  onChange={(e) => setParentEmail(e.target.value)}
+                  placeholder="parent@example.com"
+                />
+
+                {validationError && (
+                  <div className="bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
+                    {validationError}
+                  </div>
+                )}
               </Card>
 
               <Card title={t.chooseTopic}>
                 <p className="mb-4">
                   Click any curriculum category to learn about it. Your official
-                  weekly sign-up is not final until you save. Full categories,
-                  completed categories, and weekly duplicate choices cannot be saved.
+                  weekly sign-up is not final until you submit. Today’s work opens
+                  only after your name and PIN match the employer list.
                 </p>
 
                 <div className="space-y-3">
                   {topicAreas.map((topic) => {
-                    const available = canYouthChooseTopic(topic);
+                    const count = topicCounts[topic as keyof typeof topicCounts];
+                    const full = count >= TOPIC_CAP;
+                    const isSelected = selectedTopic === topic;
 
                     return (
                       <button
@@ -283,14 +416,16 @@ export default function App() {
                         type="button"
                         onClick={() => setSelectedTopic(topic)}
                         className={`w-full text-left p-4 rounded-2xl border ${
-                          selectedTopic === topic
+                          isSelected
                             ? "bg-[#d8a23a] border-[#8a5a00]"
                             : "bg-[#f7f3e8]"
-                        } ${!available ? "opacity-75" : ""}`}
+                        } ${full ? "opacity-75" : ""}`}
                       >
                         <strong>{topic}</strong>
                         <br />
-                        <span>{getTopicStatus(topic)}</span>
+                        <span>
+                          {full ? t.full : `${TOPIC_CAP - count} ${t.spots}`}
+                        </span>
                         <br />
                         <small>
                           Click to learn what this category does before signing up.
@@ -316,7 +451,7 @@ export default function App() {
 
                 {missingFields.length > 0 && (
                   <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
-                    <strong>Please fix before saving:</strong>
+                    <strong>Please fix before submitting:</strong>
                     <ul className="mt-2 list-disc list-inside">
                       {missingFields.map((item) => (
                         <li key={item}>{item}</li>
@@ -326,7 +461,7 @@ export default function App() {
                 )}
 
                 <button
-                  disabled={!canSave}
+                  disabled={!canAttemptSubmit}
                   onClick={saveYouthDay}
                   className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
                 >
@@ -338,7 +473,16 @@ export default function App() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="You Are Checked In">
                 <p>
-                  Welcome, <strong>{youthName}</strong>.
+                  Welcome,{" "}
+                  <strong>
+                    {validatedYouth
+                      ? `${validatedYouth.firstName} ${validatedYouth.lastName}`
+                      : youthName}
+                  </strong>
+                  .
+                </p>
+                <p>
+                  Employer-list access validated. Today’s work is now open.
                 </p>
                 <p>
                   This week’s topic area: <strong>{savedTopic}</strong>
@@ -383,14 +527,12 @@ export default function App() {
       {role === "parent" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
-
           <Card title={t.parentInfo}>
             <p>
               Parents and guardians can review safety expectations, proper
               attire, pickup rules, program contacts, and youth orientation
               information.
             </p>
-
             <Checklist
               items={[
                 "Closed-toe shoes required.",
@@ -408,12 +550,12 @@ export default function App() {
       {role === "supervisor" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
-
           <div className="grid lg:grid-cols-2 gap-6">
             <Card title={t.supervisorTools}>
               <Checklist
                 items={[
                   "Confirm youth attendance.",
+                  "Confirm youth name and PIN if access fails.",
                   "Confirm PPE and proper shoes.",
                   "Assign youth to topic area supervisor.",
                   "Monitor 15 youth per aide.",
@@ -448,13 +590,12 @@ export default function App() {
       {role === "mission" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
-
           <div className="grid md:grid-cols-3 gap-5">
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
             <StatusCard label="Supervisor Ratio" value="1:15" />
+            <StatusCard label="Employer Validation" value="Required" />
             <StatusCard label="Nurse Line" value="Visible" />
-            <StatusCard label="Parent Portal" value="Active" />
             <StatusCard label="Launch Status" value="Ready" />
           </div>
         </section>
@@ -463,7 +604,6 @@ export default function App() {
       {role === "guest" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
-
           <Card title="Guest / Reviewer View">
             <p>
               Guests can experience the youth workforce ecosystem, understand
@@ -471,9 +611,9 @@ export default function App() {
               connects youth development, agriculture, safety, workforce
               learning, and community food systems.
             </p>
-
             <Checklist
               items={[
+                "Youth must match the employer list before work opens.",
                 "Youth choose a topic area weekly.",
                 "Youth can browse curriculum before committing.",
                 "Full topic areas cannot be saved.",
@@ -481,7 +621,6 @@ export default function App() {
                 "Youth receive tools and resources for the work they are doing.",
                 "Parents have access to program expectations.",
                 "Supervisors can track attendance, safety, and skill development.",
-                "Mission Control can monitor launch readiness.",
               ]}
             />
           </Card>
