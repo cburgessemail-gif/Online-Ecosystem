@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
+ * LAUNCH CANDIDATE 2.1 - ECOSYSTEM GATEWAY + WORKFORCE / ENTERPRISE SPLIT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -610,8 +610,7 @@ const todaysMission = {
 
 // =======================================================
 // Weekly Workforce Rotation Model
-// Week 1: youth choose their first subject area. Each subject area holds 15 youth.
-// Week 2 and after: youth do NOT choose; the platform assigns the next available rotation.
+// Youth choose ONE subject area per week. Each subject area holds 15 youth.
 // Youth cannot repeat a subject area they already completed.
 // Supervisors / subject matter experts are assigned by the administrator or lead supervisor.
 // =======================================================
@@ -659,9 +658,6 @@ type YouthFamilyIntake = {
   guardianRelationship: string;
   guardianEmail: string;
   guardianPhone: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  emergencyContactRelationship: string;
   portalInviteStatus: "ready_to_invite" | "sent" | "declined";
   created_at: string;
   updated_at: string;
@@ -788,9 +784,6 @@ function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) 
   const youthUserId = user?.id || "temporary-youth";
   const youthName = user?.name || "Youth Participant";
   const weekNumber = getProgramWeekNumber();
-  if (weekNumber !== 1) {
-    return autoAssignYouthRotation(user);
-  }
   const weekId = getCurrentWeekId();
   const rotations = safeRead<WeeklyRotationAssignment[]>(WEEKLY_ROTATION_KEY, []);
   const existingThisWeek = rotations.find((item) => item.youthUserId === youthUserId && item.weekId === weekId);
@@ -806,45 +799,6 @@ function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) 
     throw new Error("This subject area is full. Choose another available rotation.");
   }
 
-  const supervisor = getSupervisorForSubject(subject.id);
-  const row: WeeklyRotationAssignment = {
-    id: uuid(),
-    youthUserId,
-    youthName,
-    weekId,
-    weekNumber,
-    subjectId: subject.id,
-    subjectTitle: subject.title,
-    supervisorEmail: supervisor?.supervisorEmail,
-    supervisorName: supervisor?.supervisorName,
-    status: "active",
-    created_at: new Date().toISOString(),
-  };
-  safeWrite(WEEKLY_ROTATION_KEY, [row, ...rotations]);
-  return row;
-}
-
-function autoAssignYouthRotation(user: EcosystemUser | null) {
-  const youthUserId = user?.id || "temporary-youth";
-  const youthName = user?.name || "Youth Participant";
-  const weekNumber = getProgramWeekNumber();
-  const weekId = getCurrentWeekId();
-  const rotations = safeRead<WeeklyRotationAssignment[]>(WEEKLY_ROTATION_KEY, []);
-  const existingThisWeek = rotations.find((item) => item.youthUserId === youthUserId && item.weekId === weekId);
-  if (existingThisWeek) return existingThisWeek;
-
-  const completedSubjects = new Set(rotations.filter((item) => item.youthUserId === youthUserId).map((item) => item.subjectId));
-  const openSubjects = workforceSubjectAreas.filter((subject) => {
-    const count = rotations.filter((item) => item.weekId === weekId && item.subjectId === subject.id).length;
-    return !completedSubjects.has(subject.id) && count < subject.capacity;
-  });
-
-  if (!openSubjects.length) {
-    throw new Error("No open rotation areas are available. A supervisor must assign this youth manually.");
-  }
-
-  const startIndex = Math.abs([...youthUserId].reduce((sum, char) => sum + char.charCodeAt(0), 0) + weekNumber) % openSubjects.length;
-  const subject = openSubjects[startIndex];
   const supervisor = getSupervisorForSubject(subject.id);
   const row: WeeklyRotationAssignment = {
     id: uuid(),
@@ -2108,22 +2062,38 @@ function routeForRole(role: Role): Screen {
     "Parent / Guardian": "parent",
     "Supervisor / Staff": "workToday",
     "Case Manager": "workToday",
-    Grower: "explore",
+    Grower: "grower",
     "Marketplace Customer": "marketplace",
-    Volunteer: "explore",
-    Partner: "explore",
+    Volunteer: "support",
+    Partner: "partner",
     Administrator: "workToday",
-    "Value-Added Producer": "explore",
+    "Value-Added Producer": "valueAdded",
     "Board / Funder": "reports",
   };
   return map[role];
 }
 
 function canEnter(user: EcosystemUser | null, screen: Screen) {
-  // Launch demo mode: all role pathways must be auditable from the nav.
-  // The Supervisor Center still separates private staff notes inside the workflow,
-  // but the button should not redirect reviewers back to the Grower workspace.
-  return true;
+  const publicScreens: Screen[] = ["portal", "roles", "registration", "explore", "guest", "demo", "events", "feedback", "marketplace", "support"];
+  if (publicScreens.includes(screen)) return true;
+  if (!user) return false;
+
+  const staffRoles: Role[] = ["Supervisor / Staff", "Administrator", "Case Manager", "Board / Funder"];
+  if (staffRoles.includes(user.role)) return true;
+
+  const youthScreens: Screen[] = ["workToday", "learn", "resources", "youth", "wellness", "launchProject", "media", "completion", "incidentReport", "emergencyContacts"];
+  if (user.role === "Youth Workforce Participant") return youthScreens.includes(screen);
+
+  const parentScreens: Screen[] = ["parent", "learn", "resources", "explore", "feedback", "media", "launchProject", "emergencyContacts"];
+  if (user.role === "Parent / Guardian") return parentScreens.includes(screen);
+
+  const growerScreens: Screen[] = ["grower", "resources", "marketplace", "explore", "media", "feedback", "events"];
+  if (user.role === "Grower") return growerScreens.includes(screen);
+
+  const enterpriseScreens: Screen[] = ["partner", "valueAdded", "marketplace", "resources", "explore", "media", "feedback", "events", "support"];
+  if (["Partner", "Volunteer", "Value-Added Producer", "Marketplace Customer"].includes(user.role)) return enterpriseScreens.includes(screen);
+
+  return false;
 }
 
 
@@ -2190,9 +2160,9 @@ function App() {
     scrollToTop();
   };
 
-  const signIn = (role: Role, name?: string) => {
+  const signIn = (role: Role, name?: string, forcedId?: string) => {
     const user: EcosystemUser = {
-      id: uuid(),
+      id: forcedId || uuid(),
       name: name?.trim() || `${role} User`,
       role,
       accessLevel: roleAccess[role],
@@ -2538,7 +2508,7 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">WORK TODAY</div>
         <h1 className="mt-3 text-4xl font-black md:text-6xl">What needs to happen now?</h1>
-        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Daily operations are separated from curriculum and ecosystem exploration so supervisors and youth can act quickly on a phone.</p>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">This is the workforce development command center. Youth develop responsibility, teamwork, communication, problem solving, safety, and documentation through real farm work.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Metric title="Attendance Records" value={attendance.length} />
           <Metric title="Open Incidents" value={incidents.length} />
@@ -2561,7 +2531,7 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
         </div>
 
         <Card>
-          <h2 className="text-2xl font-black">Command Center</h2>
+          <h2 className="text-2xl font-black">Field Command Center</h2>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <ActionButton urgent icon="🚨" title="Emergency Contacts" note="Nurse line, 911, site lead" onClick={() => setScreen("emergencyContacts")} />
             <ActionButton urgent icon="📝" title="Incident Report" note="Injury or safety event" onClick={() => setScreen("incidentReport")} />
@@ -2570,7 +2540,7 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
             <ActionButton icon="📸" title="Media Upload" note="Photos and video evidence" onClick={() => setScreen("media")} />
             <ActionButton icon="📞" title="Parent Contacts" note="Guardian information" onClick={() => setScreen(isStaff ? "supervisor" : "parent")} />
             <ActionButton icon="🏅" title="Assessments" note="Skills and progress" onClick={() => setScreen("supervisor")} />
-            <ActionButton icon="🧰" title="Resources" note="Crop planner, inventory, library" onClick={() => setScreen("resources")} />
+            <ActionButton icon="🧰" title="Tools & Materials" note="Check out, return, report damage" onClick={() => setScreen("resources")} />
           </div>
         </Card>
       </div>
@@ -2650,7 +2620,6 @@ function EmergencyContactsScreen({ setScreen, activeUser }: { setScreen: (screen
             <div className="mt-2 flex flex-wrap gap-2">
               <a href={`tel:${currentYouthFamily.guardianPhone}`} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Call Guardian</a>
               <a href={`mailto:${currentYouthFamily.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Email Guardian</a>
-              {currentYouthFamily.emergencyContactPhone && <a href={`tel:${currentYouthFamily.emergencyContactPhone}`} className="rounded-full bg-red-300 px-4 py-2 text-sm font-black text-black">Call Emergency Contact</a>}
             </div>
           </div>
         ) : familyRows.length ? (
@@ -2658,8 +2627,7 @@ function EmergencyContactsScreen({ setScreen, activeUser }: { setScreen: (screen
             {familyRows.slice(0, 12).map((row) => (
               <div key={row.id} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
                 <div className="font-black">{row.youthName}</div>
-                <div className="mt-1 text-sm text-white/75">Guardian: {row.guardianName}</div>
-                {row.emergencyContactName && <div className="mt-1 text-xs text-red-100/80">Emergency: {row.emergencyContactName} • {row.emergencyContactPhone}</div>}
+                <div className="mt-1 text-sm text-white/75">{row.guardianName}</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <a href={`tel:${row.guardianPhone}`} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Call</a>
                   <a href={`mailto:${row.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Email</a>
@@ -2847,7 +2815,7 @@ function ResourcesScreen({ setScreen, activeUser, language }: { setScreen: (scre
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">RESOURCES</div>
         <h1 className="mt-3 text-4xl font-black md:text-6xl">Tools, references, forms, media, and memory.</h1>
-        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Resources replace the word Systems. This is the ecosystem toolbox for crop planning, inventory, almanac, media, forms, and lessons learned.</p>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Resources is the shared toolbox. Workforce users see tools, materials, safety guides, evidence, and career resources. Growers and enterprise users see crop planning, inventory, assets, marketplace, and ecosystem memory.</p>
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -2965,50 +2933,143 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+
+type LaunchAccessRecord = {
+  id: string;
+  role: "youth" | "supervisor" | "parent" | "grower" | "partner" | "volunteer" | "value_added";
+  firstName: string;
+  lastName: string;
+  pin?: string;
+  email?: string;
+  phone?: string;
+  farmName?: string;
+  youthFirstName?: string;
+  youthLastName?: string;
+  status: "approved" | "pending" | "inactive";
+};
+
+const ACCESS_ROSTER_KEY = "bff.launch.accessRoster";
+
+const defaultLaunchAccessRoster: LaunchAccessRecord[] = [
+  {
+    id: "demo-youth-0000",
+    role: "youth",
+    firstName: "Demo",
+    lastName: "Youth",
+    pin: "0000",
+    status: "approved",
+  },
+  {
+    id: "demo-supervisor-0000",
+    role: "supervisor",
+    firstName: "Demo",
+    lastName: "Supervisor",
+    pin: "0000",
+    status: "approved",
+  },
+];
+
+function rosterRows() {
+  return safeRead<LaunchAccessRecord[]>(ACCESS_ROSTER_KEY, defaultLaunchAccessRoster);
+}
+
+function normalizeInput(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function lastFour(value: string) {
+  return value.replace(/\D/g, "").slice(-4);
+}
+
+function findRosterMatch(role: LaunchAccessRecord["role"], firstName: string, lastName: string, credential?: string) {
+  const rows = rosterRows();
+  return rows.find((row) => {
+    const nameMatch = normalizeInput(row.firstName) === normalizeInput(firstName) && normalizeInput(row.lastName) === normalizeInput(lastName);
+    if (!nameMatch || row.role !== role || row.status !== "approved") return false;
+    if (!credential) return true;
+    if (role === "youth" || role === "supervisor") return (row.pin || "") === credential.trim();
+    return true;
+  });
+}
+
+function findParentAccess(youthFirstName: string, youthLastName: string, parentPhoneLast4: string) {
+  const intakes = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
+  return intakes.find((row) => {
+    const youthMatch = normalizeInput(row.youthFirstName) === normalizeInput(youthFirstName) && normalizeInput(row.youthLastName) === normalizeInput(youthLastName);
+    return youthMatch && lastFour(row.guardianPhone) === lastFour(parentPhoneLast4);
+  });
+}
+
+function findGrowerAccess(firstName: string, lastName: string, farmName: string, emailOrPhone: string) {
+  const rows = rosterRows();
+  return rows.find((row) => {
+    const nameMatch = normalizeInput(row.firstName) === normalizeInput(firstName) && normalizeInput(row.lastName) === normalizeInput(lastName);
+    const farmMatch = !farmName || normalizeInput(row.farmName || "") === normalizeInput(farmName);
+    const contactMatch = normalizeInput(row.email || "") === normalizeInput(emailOrPhone) || lastFour(row.phone || "") === lastFour(emailOrPhone);
+    return row.role === "grower" && row.status === "approved" && nameMatch && farmMatch && contactMatch;
+  });
+}
+
+function autoAssignYouthToNextSubject(user: EcosystemUser) {
+  const weekId = getCurrentWeekId();
+  const rotations = safeRead<WeeklyRotationAssignment[]>(WEEKLY_ROTATION_KEY, []);
+  const existingThisWeek = rotations.find((item) => item.youthUserId === user.id && item.weekId === weekId);
+  if (existingThisWeek) return existingThisWeek;
+  const completed = rotations.filter((item) => item.youthUserId === user.id).map((item) => item.subjectId);
+  const counts = getSubjectCounts(weekId);
+  const next = workforceSubjectAreas.find((subject) => !completed.includes(subject.id) && (counts[subject.id] || 0) < subject.capacity);
+  if (!next) throw new Error("No rotation spaces are currently available. Please see a supervisor.");
+  return assignYouthToSubject(user, next);
+}
+
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
-  const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
-  const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("🦺 WORK TODAY"), subtitle: TT("Attendance, assignments, emergency contacts, incident reports, media upload, and parent contacts."), screen: "workToday" },
-    { title: TT("📚 LEARN"), subtitle: TT("Today's activity, curriculum, weekly topic selection, skills, portfolio, and almanac."), screen: "learn" },
-    { title: TT("🌍 EXPLORE THE ECOSYSTEM"), subtitle: TT("Farm story, marketplace, growers, partners, guests, volunteers, and community pathways."), screen: "explore" },
-    { title: TT("🧰 RESOURCES"), subtitle: TT("Crop planner, inventory, resource library, media library, and ecosystem memory."), screen: "resources" },
+  const cards = [
+    {
+      title: "Guest",
+      subtitle: "I am exploring the farm, ecosystem, marketplace, or partnership story.",
+      icon: "👋",
+      action: () => setScreen("explore" as Screen),
+    },
+    {
+      title: "New Participant",
+      subtitle: "This is my first time. I need to create or complete my profile.",
+      icon: "🌱",
+      action: () => setScreen("roles" as Screen),
+    },
+    {
+      title: "Returning Participant",
+      subtitle: "I already have access. I need to sign in and continue.",
+      icon: "🔑",
+      action: () => setScreen("roles" as Screen),
+    },
   ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
+    <div className="grid gap-4">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[70vh] sm:min-h-[68vh]">
-          <img
-            src={IMG.forest}
-            alt="Bronson Family Farm forest gate entry"
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => (event.currentTarget.src = IMG.backup)}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.32),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
-            <div>
-              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                {TT("Forest Gate Portal")}
-              </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
-                {TT("Enter the Living Ecosystem")}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
-                {TT("Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.")}
-              </p>
+        <div className="relative min-h-[560px]">
+          <img src={IMG.forest} alt="Bronson Family Farm grow area" className="absolute inset-0 h-full w-full object-cover opacity-72" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/88 via-emerald-950/78 to-black/70" />
+          <div className="relative z-10 grid min-h-[560px] content-center gap-8 p-5 md:p-10">
+            <div className="max-w-4xl">
+              <div className="text-xs uppercase tracking-[0.45em] text-emerald-100/75">{TT("Ecosystem Gateway")}</div>
+              <h1 className="mt-4 text-5xl font-black leading-[0.95] md:text-7xl">Bronson Family Farm<br />Farm & Family Alliance</h1>
+              <p className="mt-5 max-w-3xl text-base leading-8 text-white/84">One entry point. Choose Guest, New Participant, or Returning Participant. Operational areas unlock only after validation.</p>
             </div>
 
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {quickChoices.map((choice) => (
+            <div className="grid gap-4 md:grid-cols-3">
+              {cards.map((card) => (
                 <button
-                  key={choice.title}
+                  key={card.title}
                   type="button"
-                  onClick={() => setScreen(choice.screen)}
-                  className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18"
+                  onClick={card.action}
+                  className="rounded-[2rem] border border-white/12 bg-black/42 p-6 text-left shadow-[0_22px_70px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300 hover:text-black"
                 >
-                  <div className="text-lg font-black leading-tight">{choice.title}</div>
-                  <div className="mt-2 text-sm leading-5 text-white/74">{choice.subtitle}</div>
+                  <div className="text-5xl">{card.icon}</div>
+                  <div className="mt-5 text-2xl font-black">{card.title}</div>
+                  <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
                 </button>
               ))}
             </div>
@@ -3016,37 +3077,16 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
         </div>
       </Card>
 
-      <div className="grid gap-4">
-        <CultureCard language={language} variant="seed" />
-
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("The Forest Reveals Itself")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Choose one clear door. Details appear only when needed.")}</h2>
-          <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Public visitors can explore the portal, story, events, and marketplace without registering.")}
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Nesco youth participants should already be in the system. They verify information instead of re-registering.")}
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("No phone required: youth can enter with Participant ID plus last name or supervisor lookup.")}
-            </div>
-          </div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Workforce Development</div>
+          <h2 className="mt-3 text-3xl font-black">Youth develop work readiness through real farm projects.</h2>
+          <p className="mt-3 text-sm leading-7 text-white/78">Youth do not enter Work Today until they validate with name and PIN, provide parent information, provide emergency contact information, and complete Week 1 topic selection.</p>
         </Card>
-
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
-          <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
-          <div className="mt-4 grid gap-2 text-sm text-white/82">
-            <div className="rounded-xl bg-black/28 p-3">{TT("Today: team, project, supervisor, location, start time.")}</div>
-            <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
-            <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{TT("Choose Role")}</button>
-            <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{TT("Go to Workspace")}</button>
-          </div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Growing & Entrepreneurship</div>
+          <h2 className="mt-3 text-3xl font-black">Growers, producers, partners, and marketplace users grow food, businesses, and opportunity.</h2>
+          <p className="mt-3 text-sm leading-7 text-white/78">Growers and partners are validated before accessing operational tools. Guests may explore the ecosystem story without signing in.</p>
         </Card>
       </div>
     </div>
@@ -3478,164 +3518,259 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
 function MyWorkspace({
   signIn,
   activeUser,
   setScreen,
 }: {
-  signIn: (role: Role, name?: string) => void;
+  signIn: (role: Role, name?: string, forcedId?: string) => void;
   activeUser: EcosystemUser | null;
   setScreen: (screen: Screen) => void;
 }) {
-  const [name, setName] = useState("");
-  const [showAccessTools, setShowAccessTools] = useState(!activeUser);
+  const [mode, setMode] = useState<"new" | "returning">("new");
+  const [role, setRole] = useState<Role>("Youth Workforce Participant");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [pin, setPin] = useState("");
+  const [parentName, setParentName] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+  const [emergencyName, setEmergencyName] = useState("");
+  const [emergencyPhone, setEmergencyPhone] = useState("");
+  const [emergencyRelationship, setEmergencyRelationship] = useState("");
+  const [farmName, setFarmName] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState(workforceSubjectAreas[0]?.id || "agriculture");
+  const [status, setStatus] = useState("");
 
-  const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
-  const isYouth = activeUser?.role === "Youth Workforce Participant";
-  const isParent = activeUser?.role === "Parent / Guardian";
-  const isGrower = activeUser?.role === "Grower";
-  const isMarketplace = activeUser?.role === "Marketplace Customer" || activeUser?.role === "Value-Added Producer";
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+  const isYouth = role === "Youth Workforce Participant";
+  const isParent = role === "Parent / Guardian";
+  const isSupervisor = role === "Supervisor / Staff" || role === "Administrator" || role === "Case Manager";
+  const isGrower = role === "Grower";
+  const isEnterprise = ["Grower", "Partner", "Volunteer", "Value-Added Producer", "Marketplace Customer"].includes(role);
+  const weekNumber = getProgramWeekNumber();
+  const counts = getSubjectCounts();
 
-  const workspaceCards: { title: string; subtitle: string; screen: Screen; show: boolean }[] = [
-    {
-      title: "Youth Daily Check-In",
-      subtitle: "Start My Day: attendance, date/time, PPE, wellness, goal, and support request.",
-      screen: "youth",
-      show: isYouth || isStaff,
-    },
-    {
-      title: "From Soil to Seed",
-      subtitle: "Today’s farm mission: soil preparation, row creation, seed planting, grass mulch, fencing, Bubble Babies, and portfolio evidence.",
-      screen: "launchProject",
-      show: isYouth || isStaff || isParent,
-    },
-    {
-      title: "Supervisor Operations Center",
-      subtitle: "Attendance, PPE, wellness review, assessments, incidents, parent summaries, and reports.",
-      screen: "supervisor",
-      show: isStaff,
-    },
-    {
-      title: "Parent Portal",
-      subtitle: "Parent-safe attendance, progress notes, announcements, and family updates.",
-      screen: "parent",
-      show: isParent || isStaff,
-    },
-    {
-      title: "Grower Operations Center",
-      subtitle: "Weather, crop plans, grower tasks, field notes, inventory, and marketplace demand.",
-      screen: "grower",
-      show: isGrower || isStaff,
-    },
-    {
-      title: "Partner Collaboration",
-      subtitle: "Organizations, schools, businesses, funders, and community groups can explore collaboration opportunities.",
-      screen: "partner",
-      show: activeUser?.role === "Partner" || isStaff || !activeUser,
-    },
-    {
-      title: "Support the Ecosystem",
-      subtitle: "Volunteer, mentor, donate, share resources, sponsor youth, or support infrastructure.",
-      screen: "support",
-      show: activeUser?.role === "Volunteer" || isStaff || !activeUser,
-    },
-    {
-      title: "Value-Added Producer",
-      subtitle: "Develop products, packaging, pricing, and marketplace opportunities from harvests and ideas.",
-      screen: "valueAdded",
-      show: activeUser?.role === "Value-Added Producer" || isGrower || isStaff || !activeUser,
-    },
-    {
-      title: "Marketplace Operations",
-      subtitle: "GrownBy + direct sales, products, inventory, orders, SNAP awareness, and fulfillment.",
-      screen: "marketplace",
-      show: isMarketplace || isGrower || isStaff || !activeUser,
-    },
-    {
-      title: "Executive Reports",
-      subtitle: "Program metrics, workforce status, youth readiness, marketplace activity, and impact reporting.",
-      screen: "reports",
-      show: isStaff,
-    },
-    {
-      title: "Guest Experience",
-      subtitle: "Public story, farm ecosystem, historic place, and community pathway.",
-      screen: "guest",
-      show: !activeUser,
-    },
-    {
-      title: "Registration / Profile",
-      subtitle: "Create one profile once, then reuse it across every workspace.",
-      screen: "registration",
-      show: true,
-    },
-  ];
+  const completeYouthProfileAndEnter = () => {
+    const rosterMatch = findRosterMatch("youth", firstName, lastName, pin);
+    if (!rosterMatch) {
+      setStatus("Youth access not validated. The youth name and PIN must match the employee list before Work Today opens.");
+      return;
+    }
+    if (!parentName.trim() || !parentPhone.trim() || !parentEmail.trim()) {
+      setStatus("Parent / guardian name, phone, and email are required before Work Today opens.");
+      return;
+    }
+    if (!emergencyName.trim() || !emergencyPhone.trim()) {
+      setStatus("Emergency contact name and phone are required before Work Today opens.");
+      return;
+    }
 
-  const visibleCards = workspaceCards.filter((card) => card.show);
+    const userId = rosterMatch.id || `youth-${pin.trim()}-${normalizeInput(lastName)}`;
+    const user: EcosystemUser = { id: userId, name: fullName, role: "Youth Workforce Participant", accessLevel: "participant", status: "active", lastSeen: nowLabel() };
+
+    saveYouthFamilyIntake({
+      id: uuid(),
+      youthUserId: userId,
+      youthName: fullName,
+      youthFirstName: firstName.trim(),
+      youthLastName: lastName.trim(),
+      guardianName: parentName.trim(),
+      guardianRelationship: "Parent / Guardian",
+      guardianEmail: parentEmail.trim(),
+      guardianPhone: parentPhone.trim(),
+      portalInviteStatus: "ready_to_invite",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+    const existingYouth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+    const youthRow: YouthRegistration = {
+      id: uuid(),
+      profile_id: userId,
+      participant_id: pin.trim(),
+      age_range: "Youth Workforce",
+      crew: weekNumber === 1 ? selectedSubjectId : "Automatic Rotation",
+      guardian_name: parentName.trim(),
+      guardian_phone: parentPhone.trim(),
+      guardian_email: parentEmail.trim(),
+      emergency_contact: `${emergencyName.trim()} — ${emergencyRelationship.trim()} — ${emergencyPhone.trim()}`,
+      medical_notes: "",
+      transportation_plan: "",
+      program_goal: "Workforce development through farm-based projects",
+    };
+    safeWrite(YOUTH_KEY, [youthRow, ...existingYouth.filter((row) => row.profile_id !== userId)]);
+
+    try {
+      if (weekNumber === 1) {
+        const subject = workforceSubjectAreas.find((item) => item.id === selectedSubjectId) || workforceSubjectAreas[0];
+        assignYouthToSubject(user, subject);
+      } else {
+        autoAssignYouthToNextSubject(user);
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The rotation assignment could not be completed.");
+      return;
+    }
+
+    signIn("Youth Workforce Participant", fullName, userId);
+  };
+
+  const returningAccess = () => {
+    if (isYouth) {
+      const rosterMatch = findRosterMatch("youth", firstName, lastName, pin);
+      if (!rosterMatch) {
+        setStatus("Youth access not validated. First name, last name, and PIN must match the employee list.");
+        return;
+      }
+      signIn("Youth Workforce Participant", fullName, rosterMatch.id);
+      return;
+    }
+    if (isParent) {
+      const parentMatch = findParentAccess(firstName, lastName, pin);
+      if (!parentMatch) {
+        setStatus("Parent access not validated. Enter the youth name and the last 4 digits of the parent phone number saved in the profile.");
+        return;
+      }
+      signIn("Parent / Guardian", parentMatch.guardianName || "Parent / Guardian", `parent-${parentMatch.id}`);
+      return;
+    }
+    if (isSupervisor) {
+      const supervisorMatch = findRosterMatch("supervisor", firstName, lastName, pin);
+      if (!supervisorMatch) {
+        setStatus("Supervisor access not validated. Name and staff PIN must match the approved staff list.");
+        return;
+      }
+      signIn(role, fullName, supervisorMatch.id);
+      return;
+    }
+    if (isGrower) {
+      const growerMatch = findGrowerAccess(firstName, lastName, farmName, emailOrPhone);
+      if (!growerMatch) {
+        setStatus("Grower access not validated. Submit or update a grower profile for approval before using grower tools.");
+        return;
+      }
+      signIn("Grower", fullName, growerMatch.id);
+      return;
+    }
+    signIn(role, fullName || `${role} User`);
+  };
+
+  const submit = () => {
+    setStatus("");
+    if (mode === "new" && isYouth) {
+      completeYouthProfileAndEnter();
+      return;
+    }
+    if (mode === "new" && isEnterprise) {
+      const row: LaunchAccessRecord = {
+        id: uuid(),
+        role: role === "Grower" ? "grower" : role === "Value-Added Producer" ? "value_added" : role === "Volunteer" ? "volunteer" : "partner",
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: emailOrPhone.includes("@") ? emailOrPhone.trim() : undefined,
+        phone: emailOrPhone.includes("@") ? undefined : emailOrPhone.trim(),
+        farmName: farmName.trim(),
+        status: "pending",
+      };
+      safeWrite(ACCESS_ROSTER_KEY, [row, ...rosterRows()]);
+      setStatus("Profile submitted for review. Public ecosystem exploration remains available while operational access is pending.");
+      return;
+    }
+    returningAccess();
+  };
+
+  const roleOptions: Role[] = ["Youth Workforce Participant", "Parent / Guardian", "Supervisor / Staff", "Grower", "Partner", "Volunteer", "Value-Added Producer", "Marketplace Customer"];
 
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Workspace</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">
-        {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
-      </h1>
-      <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
-        This is the role center. Public visitors may explore without registering. Registered users should open only the workspace assigned to their role.
-      </p>
-
-      {activeUser && (
-        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
-          <div className="mt-2 text-2xl font-black">{activeUser.role}</div>
-          <div className="mt-1 text-sm text-white/72">Access level: {activeUser.accessLevel}</div>
-        </div>
-      )}
-
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {visibleCards.map((card) => (
-          <button type="button"
-            key={card.title}
-            onClick={() => setScreen(card.screen)}
-            className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
-          >
-            <div className="text-xl font-black">{card.title}</div>
-            <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-        <button
-          type="button"
-          onClick={() => setShowAccessTools((value) => !value)}
-          className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
-        >
-          {showAccessTools ? "Hide Sign-In / Access Tools" : "Sign In / Verify Role"}
-        </button>
-        {showAccessTools && (
-          <div className="mt-5">
-            <div className="max-w-xl">
-              <Field label="Name / Participant ID for this session" value={name} onChange={setName} placeholder="Example: BFF-825435 or Supervisor Aide" />
-            </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {roles.map((role) => (
-                <button type="button"
-                  key={role}
-                  onClick={() => signIn(role, name)}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
-                >
-                  <div className="text-lg font-black">{role}</div>
-                  <div className="mt-2 text-sm opacity-85">Workspace: {screenLabel(routeForRole(role))}</div>
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 text-xs leading-6 text-white/60">
-              Youth participating through Nesco should already be in the system. They verify information instead of re-registering. Youth do not need a phone: use Participant ID + last name, badge QR, or supervisor lookup.
-            </div>
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Validated Access</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Guest. New. Returning.</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Operational access requires validation. Youth validate with name + PIN from the employee list. Parents validate with youth name + last 4 digits of parent phone. Supervisors validate with name + staff PIN. Growers validate before entering grower tools.</p>
+        {activeUser && (
+          <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
+            <div className="mt-2 text-2xl font-black">{activeUser.name}</div>
+            <div className="mt-1 text-sm text-white/72">{activeUser.role} • {activeUser.accessLevel}</div>
           </div>
         )}
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-[.72fr_1.28fr]">
+        <Card>
+          <h2 className="text-2xl font-black">Entry Type</h2>
+          <div className="mt-4 grid gap-3">
+            <button type="button" onClick={() => setScreen("explore")} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4 text-left font-black transition hover:bg-emerald-300 hover:text-black">👋 Guest — Explore Only</button>
+            <button type="button" onClick={() => setMode("new")} className={`rounded-[1.25rem] border p-4 text-left font-black transition ${mode === "new" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 hover:bg-white/20"}`}>🌱 New Participant</button>
+            <button type="button" onClick={() => setMode("returning")} className={`rounded-[1.25rem] border p-4 text-left font-black transition ${mode === "returning" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 hover:bg-white/20"}`}>🔑 Returning Participant</button>
+          </div>
+
+          <div className="mt-6">
+            <SelectField label="Role" value={role} onChange={(value) => setRole(value as Role)} options={roleOptions} />
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="text-2xl font-black">{mode === "new" ? "New Participant Setup" : "Returning Sign In"}</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <Field label={isParent ? "Youth First Name" : "First Name"} value={firstName} onChange={setFirstName} />
+            <Field label={isParent ? "Youth Last Name" : "Last Name"} value={lastName} onChange={setLastName} />
+            {(isYouth || isSupervisor) && <Field label={isYouth ? "Youth PIN" : "Staff PIN"} value={pin} onChange={setPin} />}
+            {isParent && <Field label="Last 4 of Parent Phone" value={pin} onChange={setPin} />}
+            {isEnterprise && <Field label="Email or Phone" value={emailOrPhone} onChange={setEmailOrPhone} />}
+            {isGrower && <Field label="Farm / Garden Name" value={farmName} onChange={setFarmName} />}
+          </div>
+
+          {mode === "new" && isYouth && (
+            <>
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                <Field label="Parent / Guardian Name" value={parentName} onChange={setParentName} />
+                <Field label="Parent Phone" value={parentPhone} onChange={setParentPhone} />
+                <Field label="Parent Email" value={parentEmail} onChange={setParentEmail} type="email" />
+                <Field label="Emergency Contact" value={emergencyName} onChange={setEmergencyName} />
+                <Field label="Emergency Phone" value={emergencyPhone} onChange={setEmergencyPhone} />
+                <Field label="Relationship" value={emergencyRelationship} onChange={setEmergencyRelationship} />
+              </div>
+
+              <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
+                <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{weekNumber === 1 ? "Week 1 Topic Area" : "Week 2+ Rotation"}</div>
+                <h3 className="mt-2 text-2xl font-black">{weekNumber === 1 ? "Choose the first topic area only." : "The system assigns the next rotation."}</h3>
+                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {workforceSubjectAreas.map((subject) => {
+                    const used = counts[subject.id] || 0;
+                    const full = used >= subject.capacity;
+                    const selected = selectedSubjectId === subject.id;
+                    return (
+                      <button
+                        key={subject.id}
+                        type="button"
+                        disabled={weekNumber !== 1 || full}
+                        onClick={() => setSelectedSubjectId(subject.id)}
+                        className={`rounded-[1.25rem] border p-4 text-left transition ${selected ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 hover:bg-white/15"} ${full ? "cursor-not-allowed opacity-45" : ""}`}
+                      >
+                        <div className="text-3xl">{subject.icon}</div>
+                        <div className="mt-2 font-black">{subject.title}</div>
+                        <div className="mt-2 text-xs opacity-80">{used}/{subject.capacity} filled</div>
+                        <div className="mt-1 text-xs font-black">{full ? "FULL" : weekNumber === 1 ? "Available" : "Assigned by rotation"}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button type="button" onClick={submit} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{mode === "new" ? "Validate & Continue" : "Sign In"}</button>
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Back to Gateway</button>
+          </div>
+          {status && <div className="mt-5 rounded-2xl border border-amber-200/30 bg-amber-300/15 p-4 text-sm font-black text-amber-50">{status}</div>}
+        </Card>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -3789,24 +3924,10 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     guardianRelationship: existingFamilyIntake?.guardianRelationship || "Parent / Guardian",
     guardianEmail: existingFamilyIntake?.guardianEmail || "",
     guardianPhone: existingFamilyIntake?.guardianPhone || "",
-    emergencyContactName: existingFamilyIntake?.emergencyContactName || "",
-    emergencyContactPhone: existingFamilyIntake?.emergencyContactPhone || "",
-    emergencyContactRelationship: existingFamilyIntake?.emergencyContactRelationship || "Emergency Contact",
   });
-  const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone && existingFamilyIntake?.emergencyContactName && existingFamilyIntake?.emergencyContactPhone);
-  const canChooseWeeklySubject = weekNumber === 1 && familyInfoComplete;
+  const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone);
+  const canChooseWeeklySubject = checkedInToday && familyInfoComplete;
   const completionPercent = Math.round((new Set(rotations.filter((item) => item.youthUserId === youthUserId).map((item) => item.subjectId)).size / workforceSubjectAreas.length) * 100);
-
-  useEffect(() => {
-    if (weekNumber > 1 && familyInfoComplete && !currentRotation) {
-      try {
-        const assigned = autoAssignYouthRotation(activeUser);
-        setRotationMessage(`Week ${weekNumber} rotation assigned: ${assigned.subjectTitle}${assigned.supervisorName ? ` with ${assigned.supervisorName}` : ""}.`);
-      } catch (error) {
-        setRotationMessage(error instanceof Error ? error.message : "A supervisor must assign this week's rotation.");
-      }
-    }
-  }, [activeUser?.id, currentRotation?.id, familyInfoComplete, weekNumber]);
 
   const handleSelectSubject = (subject: SubjectArea) => {
     try {
@@ -3819,8 +3940,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   };
 
   const saveFamilyInformation = () => {
-    if (!familyForm.youthFirstName.trim() || !familyForm.youthLastName.trim() || !familyForm.guardianName.trim() || !familyForm.guardianEmail.trim() || !familyForm.guardianPhone.trim() || !familyForm.emergencyContactName.trim() || !familyForm.emergencyContactPhone.trim()) {
-      setFamilyMessage("Please enter youth name, parent/guardian contact, and emergency contact information.");
+    if (!familyForm.youthFirstName.trim() || !familyForm.youthLastName.trim() || !familyForm.guardianName.trim() || !familyForm.guardianEmail.trim() || !familyForm.guardianPhone.trim()) {
+      setFamilyMessage("Please enter your name and parent/guardian name, email, and phone number.");
       return;
     }
     const now = new Date().toISOString();
@@ -3836,9 +3957,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       guardianRelationship: familyForm.guardianRelationship.trim() || "Parent / Guardian",
       guardianEmail: familyForm.guardianEmail.trim(),
       guardianPhone: familyForm.guardianPhone.trim(),
-      emergencyContactName: familyForm.emergencyContactName.trim(),
-      emergencyContactPhone: familyForm.emergencyContactPhone.trim(),
-      emergencyContactRelationship: familyForm.emergencyContactRelationship.trim() || "Emergency Contact",
       portalInviteStatus: "ready_to_invite",
       created_at: existingFamilyIntake?.created_at || now,
       updated_at: now,
@@ -3882,7 +4000,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/82">
               <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Weekly Rule</div>
-              <div className="mt-2 font-bold">Week 1: choose your first topic area. Week 2 and after: the program rotates you automatically. You stay with the assigned topic and supervisor for the week.</div>
+              <div className="mt-2 font-bold">Choose one subject area per week. Stay with that subject and supervisor for the week. Next week, choose a different subject.</div>
             </div>
           </section>
 
@@ -3902,7 +4020,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 <div className="mt-3 grid gap-2 text-sm font-black text-emerald-50">
                   <div>✅ Parent/guardian contact saved: {existingFamilyIntake?.guardianName}</div>
                   <div>📧 Portal invite ready for: {existingFamilyIntake?.guardianEmail}</div>
-                  <div>🚨 Emergency contact saved: {existingFamilyIntake?.emergencyContactName} • {existingFamilyIntake?.emergencyContactPhone}</div>
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -3912,9 +4029,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Relationship" value={familyForm.guardianRelationship} onChange={(e) => setFamilyForm({ ...familyForm, guardianRelationship: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian email" value={familyForm.guardianEmail} onChange={(e) => setFamilyForm({ ...familyForm, guardianEmail: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian phone" value={familyForm.guardianPhone} onChange={(e) => setFamilyForm({ ...familyForm, guardianPhone: e.target.value })} />
-                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency contact name" value={familyForm.emergencyContactName} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactName: e.target.value })} />
-                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency contact phone" value={familyForm.emergencyContactPhone} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactPhone: e.target.value })} />
-                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency relationship" value={familyForm.emergencyContactRelationship} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactRelationship: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth phone optional" value={familyForm.youthPhone} onChange={(e) => setFamilyForm({ ...familyForm, youthPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth email optional" value={familyForm.youthEmail} onChange={(e) => setFamilyForm({ ...familyForm, youthEmail: e.target.value })} />
                   <button type="button" onClick={saveFamilyInformation} className="sm:col-span-2 rounded-[1.1rem] bg-sky-300 px-5 py-4 font-black text-black">Save Parent Portal Contact</button>
@@ -3959,7 +4073,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 </div>
               ) : (
                 <p className="mt-2 text-sm font-bold leading-6 text-white/82">
-                  Week 1 requires one topic area choice. Week 2 and after are assigned automatically by rotation. Areas close when they reach 15 youth.
+                  After check-in and parent/guardian contact, choose one subject area for this week. Areas close when they reach 15 youth.
                 </p>
               )}
             </div>
@@ -3975,9 +4089,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <section className="mt-4 rounded-[1.75rem] border-2 border-white/12 bg-black/30 p-4 md:p-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Weekly Topic Area</div>
-              <h2 className="mt-2 text-3xl font-black">{weekNumber === 1 ? "Choose Week 1 Topic Area" : "Assigned Rotation"}</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">Week 1 is the only youth choice. Week 2 and after are assigned automatically. Completed subject areas cannot repeat.</p>
+              <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Weekly Rotation Choice</div>
+              <h2 className="mt-2 text-3xl font-black">Choose Subject Area</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">One choice per week. Completed subject areas cannot be selected again.</p>
             </div>
             <div className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white/75">Week {weekNumber}</div>
           </div>
@@ -3986,15 +4100,11 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
           {currentRotation ? (
             <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-4 text-sm font-bold leading-6 text-emerald-50">
-              This week is locked. You will remain in <span className="font-black">{currentRotation.subjectTitle}</span> with your assigned supervisor / subject matter expert for the week.
-            </div>
-          ) : weekNumber > 1 ? (
-            <div className="mt-4 rounded-2xl border border-sky-200/25 bg-sky-300/12 p-4 text-sm font-bold leading-6 text-sky-50">
-              Week {weekNumber} is assigned by rotation. No youth choice is needed. If your assignment is not showing, ask a supervisor to refresh Mission Control or assign you manually.
+              Weekly choice saved. You will remain in <span className="font-black">{currentRotation.subjectTitle}</span> with your assigned supervisor / subject matter expert for this week.
             </div>
           ) : !canChooseWeeklySubject ? (
             <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">
-              Save parent/guardian and emergency contact information first. Week 1 topic selection unlocks after profile information is complete. Week 2 and after are assigned automatically.
+              Complete check-in and save parent/guardian contact information first. Subject area selection unlocks after both are recorded.
             </div>
           ) : (
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -6432,7 +6542,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         ))}
       </div>
       <div className="mt-7 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5 text-center">
-        <h2 className="text-3xl font-black">🌲 Bronson Family Farm Launch Command Center</h2>
+        <h2 className="text-3xl font-black">🌲 Bronson Family Farm Launch Field Command Center</h2>
         <p className="mt-3 text-lg font-bold">Community Beta Launch Phase</p>
         <p className="mt-3 text-sm text-white/80">Staff Orientation: June 5, 2026 — 9:30 AM</p>
         <p className="text-sm text-white/80">Youth Workforce Launch: June 8, 2026 — 8:00 AM</p>
