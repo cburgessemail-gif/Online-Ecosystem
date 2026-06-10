@@ -109,10 +109,12 @@ const translations = {
 export default function App() {
   const [lang, setLang] = useState<Lang>("en");
   const [role, setRole] = useState<Role | null>(null);
+
   const [youthName, setYouthName] = useState("");
   const [pin, setPin] = useState("");
   const [parentName, setParentName] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+
   const [selectedTopic, setSelectedTopic] = useState("");
   const [savedTopic, setSavedTopic] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -133,13 +135,52 @@ export default function App() {
     []
   );
 
-  const canSave =
-    youthName.trim() &&
-    pin.trim() &&
-    parentName.trim() &&
-    parentEmail.trim() &&
-    selectedTopic &&
-    topicCounts[selectedTopic as keyof typeof topicCounts] < TOPIC_CAP;
+  // Example history: this would later come from the youth record/database.
+  const youthHistory = ["Agriculture"];
+
+  const alreadySignedUpThisWeek = Boolean(savedTopic);
+
+  function canYouthChooseTopic(topic: string) {
+    const count = topicCounts[topic as keyof typeof topicCounts];
+    const isFull = count >= TOPIC_CAP;
+    const alreadyCompleted = youthHistory.includes(topic);
+
+    return !isFull && !alreadyCompleted && !alreadySignedUpThisWeek;
+  }
+
+  function getTopicStatus(topic: string) {
+    const count = topicCounts[topic as keyof typeof topicCounts];
+    const isFull = count >= TOPIC_CAP;
+    const alreadyCompleted = youthHistory.includes(topic);
+
+    if (alreadySignedUpThisWeek) return "You already selected a topic this week.";
+    if (alreadyCompleted) return "Already completed — choose a new area.";
+    if (isFull) return t.full;
+
+    return `${TOPIC_CAP - count} ${t.spots}`;
+  }
+
+  const topicCanBeSaved =
+    selectedTopic && canYouthChooseTopic(selectedTopic);
+
+  const missingFields: string[] = [];
+
+  if (!youthName.trim()) missingFields.push("Youth name is required.");
+  if (!pin.trim()) missingFields.push("Assigned PIN number is required.");
+  if (!parentName.trim()) missingFields.push("Parent / guardian name is required.");
+  if (!parentEmail.trim()) missingFields.push("Parent / guardian email is required.");
+  if (parentEmail.trim() && !parentEmail.includes("@")) {
+    missingFields.push("Enter a valid parent / guardian email.");
+  }
+  if (!selectedTopic) missingFields.push("Choose a topic area.");
+
+  if (selectedTopic && !canYouthChooseTopic(selectedTopic)) {
+    missingFields.push(
+      "This topic cannot be selected for weekly sign-up. Youth may review it, but must choose an available area."
+    );
+  }
+
+  const canSave = missingFields.length === 0 && Boolean(topicCanBeSaved);
 
   function resetHome() {
     setRole(null);
@@ -148,13 +189,13 @@ export default function App() {
 
   function saveYouthDay() {
     if (!canSave) return;
+
     setSavedTopic(selectedTopic);
     setSubmitted(true);
   }
 
   return (
     <main className="min-h-screen bg-[#f7f3e8] text-[#18392b]">
-      {/* ALWAYS VISIBLE SAFETY BAR */}
       <section className="sticky top-0 z-50 bg-red-700 text-white px-4 py-3 shadow-md">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <strong>{t.nurse}: Visible At All Times</strong>
@@ -165,7 +206,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* HEADER */}
       <header className="bg-[#18392b] text-white px-5 py-6">
         <div className="max-w-6xl mx-auto flex flex-wrap justify-between gap-4">
           <div>
@@ -184,7 +224,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* HOME PORTAL */}
       {!role && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
@@ -207,7 +246,6 @@ export default function App() {
         </section>
       )}
 
-      {/* YOUTH */}
       {role === "youth" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
@@ -230,34 +268,62 @@ export default function App() {
 
               <Card title={t.chooseTopic}>
                 <p className="mb-4">
-                  Choose a topic area for this week. Your choice is not final
-                  until you save or submit. Full areas become unavailable.
+                  Click any curriculum category to learn about it. Your official
+                  weekly sign-up is not final until you save. Full categories,
+                  completed categories, and weekly duplicate choices cannot be saved.
                 </p>
 
                 <div className="space-y-3">
                   {topicAreas.map((topic) => {
-                    const count = topicCounts[topic as keyof typeof topicCounts];
-                    const full = count >= TOPIC_CAP;
-                    const left = TOPIC_CAP - count;
+                    const available = canYouthChooseTopic(topic);
 
                     return (
                       <button
                         key={topic}
-                        disabled={full}
+                        type="button"
                         onClick={() => setSelectedTopic(topic)}
                         className={`w-full text-left p-4 rounded-2xl border ${
                           selectedTopic === topic
                             ? "bg-[#d8a23a] border-[#8a5a00]"
                             : "bg-[#f7f3e8]"
-                        } ${full ? "opacity-40 cursor-not-allowed" : ""}`}
+                        } ${!available ? "opacity-75" : ""}`}
                       >
                         <strong>{topic}</strong>
                         <br />
-                        <span>{full ? t.full : `${left} ${t.spots}`}</span>
+                        <span>{getTopicStatus(topic)}</span>
+                        <br />
+                        <small>
+                          Click to learn what this category does before signing up.
+                        </small>
                       </button>
                     );
                   })}
                 </div>
+
+                {selectedTopic && (
+                  <div className="mt-5 bg-[#f7f3e8] rounded-2xl p-4">
+                    <h3 className="font-bold mb-2">{selectedTopic}</h3>
+                    <p className="mb-2">
+                      This category includes the following tools and resources:
+                    </p>
+                    <ul className="list-disc list-inside">
+                      {(resources[selectedTopic] || []).map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {missingFields.length > 0 && (
+                  <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
+                    <strong>Please fix before saving:</strong>
+                    <ul className="mt-2 list-disc list-inside">
+                      {missingFields.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <button
                   disabled={!canSave}
@@ -314,7 +380,6 @@ export default function App() {
         </section>
       )}
 
-      {/* PARENT */}
       {role === "parent" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
@@ -340,7 +405,6 @@ export default function App() {
         </section>
       )}
 
-      {/* SUPERVISOR */}
       {role === "supervisor" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
@@ -381,7 +445,6 @@ export default function App() {
         </section>
       )}
 
-      {/* MISSION CONTROL */}
       {role === "mission" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
@@ -397,7 +460,6 @@ export default function App() {
         </section>
       )}
 
-      {/* GUEST / REVIEWER */}
       {role === "guest" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
@@ -413,7 +475,9 @@ export default function App() {
             <Checklist
               items={[
                 "Youth choose a topic area weekly.",
-                "Full topic areas become unavailable.",
+                "Youth can browse curriculum before committing.",
+                "Full topic areas cannot be saved.",
+                "Youth cannot repeat an area they already completed.",
                 "Youth receive tools and resources for the work they are doing.",
                 "Parents have access to program expectations.",
                 "Supervisors can track attendance, safety, and skill development.",
