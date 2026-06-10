@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 2.1 - ECOSYSTEM GATEWAY + WORKFORCE / ENTERPRISE SPLIT
+ * LAUNCH CANDIDATE 2.2 - ONE-SCREEN GATEWAY + WORKFORCE OPERATIONS + TOOLS & MATERIALS
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -337,17 +337,18 @@ const APPROVED_SUPERVISOR_EMAILS = [
 
 const missionControlRecord001 = {
   id: "DAY-001",
-  title: "Launch Day",
-  date: "June 8, 2026",
+  title: "Launch Week Field Memory",
+  date: "June 8–10, 2026",
   summary:
-    "Youth participated in the launch activity, worked in the grow area, spread soil, gathered twine, moved grass, continued fence construction, demonstrated teamwork, and helped reveal the next operational needs for the ecosystem.",
+    "Youth entered the grow area as workforce participants. They worked with staff to install deer fence wire, moved soil even when tools were missing, improvised with large metal post containers, transported two bales of grass mulch for moisture retention, worked through light rain without losing enthusiasm, and prepared to plant Bubble Babies germination rolls.",
   lessonsLearned: [
-    "Some youth do not have phones.",
-    "Parents want visibility into learning.",
-    "Photo uploads are important portfolio evidence.",
-    "Attendance must come first.",
-    "Supervisor onboarding needs email verification.",
-    "Conflict prevention and dismissal procedures should be strengthened.",
+    "Youth workforce development is the primary youth purpose; agriculture is the work-based classroom.",
+    "Emergency contacts and incident reporting must stay one tap away for supervisors.",
+    "Tools and materials must be tracked because missing or broken tools change the workday.",
+    "Youth demonstrated problem solving when tools were unavailable.",
+    "Light rain did not stop engagement; weather conditions should be captured as workforce evidence.",
+    "Parent and emergency contact information must be collected before operational access is complete.",
+    "Week 1 topic choice is allowed; Week 2 and beyond must be automatic rotation.",
   ],
 };
 
@@ -395,13 +396,13 @@ const featuredProject = {
   id: "soil-to-seed-2026",
   title: "From Soil to Seed",
   shortTitle: "From Soil to Seed",
-  launchDate: "June 9, 2026",
+  launchDate: "June 9–10, 2026",
   startTime: "8:00 AM",
   status: "Active",
   objective:
-    "Youth will prepare the grow area for production by spreading soil, leveling beds, creating rows, sowing seeds, planting, applying grass mulch, completing fencing, and creating Bubble Babies.",
+    "Youth will finish grow area preparation, complete deer fence support tasks, inspect tools and materials, plant Bubble Babies germination rolls, apply grass mulch for moisture retention, document evidence, and reflect on the workforce skills demonstrated through the work.",
   farmConnection:
-    "Every harvest begins with preparation. Today's work connects soil, seeds, plants, harvest, marketplace, family, and community while building teamwork, responsibility, agriculture, entrepreneurship, and environmental stewardship.",
+    "The farm is the work-based classroom. Today connects responsibility, teamwork, problem solving, tool stewardship, planting, moisture retention, documentation, and entrepreneurship through real production work.",
 };
 
 const coolingCenterTeams = [
@@ -568,8 +569,8 @@ const youthPortfolioEntries = [
     title: "From Soil to Seed",
     date: "June 9, 2026",
     team: "Soil • Planting • Infrastructure • Bubble Babies • Storytelling • Pollinators",
-    evidence: "Attendance, team assignment, soil preparation, row creation, seed planting, grass mulch, fence progress, Bubble Babies production, photo evidence, reflection, and supervisor observation.",
-    skills: ["Safety", "Teamwork", "Responsibility", "Agriculture", "Problem Solving", "Environmental Stewardship", "Entrepreneurship"],
+    evidence: "Attendance, team assignment, deer fence wire progress, soil movement using improvised metal post containers when tools were missing, two grass bales moved for moisture retention, Bubble Babies germination roll planting, photo evidence, reflection, and supervisor observation.",
+    skills: ["Safety", "Teamwork", "Responsibility", "Problem Solving", "Adaptability", "Tool Stewardship", "Environmental Stewardship", "Entrepreneurship"],
   },
   {
     title: "Launch Day Evidence",
@@ -582,28 +583,28 @@ const youthPortfolioEntries = [
 
 const todaysMission = {
   title: "From Soil to Seed",
-  subtitle: "Preparing Today's Harvest. Building Tomorrow's Food System.",
-  question: "Why is preparation important before planting?",
-  proverb: "The farmer who prepares the soil today harvests tomorrow.",
-  parentQuestion: "Ask your Cultivator why grass was placed around the plants.",
+  subtitle: "Workforce Skills Through Real Farm Production.",
+  question: "What workforce skills did your team use when tools, weather, or conditions changed?",
+  proverb: "Preparation turns effort into harvest.",
+  parentQuestion: "Ask your Cultivator how the team solved problems when tools were missing and why grass mulch helps the grow area.",
   objectives: [
-    "Spread Soil",
-    "Level Growing Beds",
-    "Create Rows",
-    "Sow Seeds",
-    "Plant Seeds",
+    "Sign In / Attendance",
+    "PPE and Safety Check",
+    "Inspect Tools & Materials",
+    "Finish Deer Fence Support",
+    "Prepare Growing Beds",
+    "Plant Bubble Babies Germination Rolls",
     "Apply Grass Mulch",
-    "Complete Fencing",
-    "Create Bubble Babies",
+    "Capture Evidence and Reflect",
   ],
-  ecosystemFlow: ["Soil", "Seed", "Plant", "Harvest", "Marketplace", "Family", "Community"],
+  ecosystemFlow: ["Workforce", "Tools", "Teamwork", "Planting", "Evidence", "Achievement", "Opportunity"],
   progress: [
-    { label: "Soil Preparation", icon: "🌱", value: 0 },
-    { label: "Row Creation", icon: "🌾", value: 0 },
-    { label: "Planting", icon: "🌿", value: 0 },
-    { label: "Grass Mulch", icon: "🍃", value: 0 },
-    { label: "Fence Completion", icon: "🛠", value: 70 },
-    { label: "Bubble Babies", icon: "🫧", value: 0 },
+    { label: "Fence / Wire Progress", icon: "🛠", value: 85 },
+    { label: "Tool & Materials Check", icon: "🧰", value: 35 },
+    { label: "Soil Movement", icon: "🌱", value: 75 },
+    { label: "Grass Mulch", icon: "🍃", value: 50 },
+    { label: "Bubble Babies Planting", icon: "🫧", value: 0 },
+    { label: "Evidence Capture", icon: "📸", value: 25 },
   ],
 };
 
@@ -1893,7 +1894,11 @@ type OperationsInventoryLog = {
 
 const defaultOperationsInventory: OperationsInventoryItem[] = [
   { id: "tool-shovels", name: "Shovels", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Count before youth arrive and again at end of day.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
-  { id: "tool-rakes", name: "Rakes", category: "Tools", total: 12, available: 12, location: "Tool area / trailer", status: "Ready", notes: "Separate garden rakes from leaf rakes if needed.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "tool-rakes", name: "Rakes", category: "Tools", total: 12, available: 10, location: "Tool area / trailer", status: "Needs Replacement", notes: "Launch week issue: one rake reported broken and one rake missing. Verify count before youth work begins.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "tool-metal-post-containers", name: "Large metal post containers", category: "Tools", total: 4, available: 4, location: "Fence / infrastructure area", status: "Ready", notes: "Youth used these to improvise soil movement when tools were unavailable. Track as field-use containers.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "materials-grass-bales", name: "Grass mulch bales", category: "Supplies", total: 2, available: 0, location: "Grow area", status: "Checked Out", notes: "Two bales moved to the grow area for moisture retention around planted areas.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "materials-deer-fence-wire", name: "Deer fence wire", category: "Supplies", total: 1, available: 0, location: "Fence line", status: "Checked Out", notes: "Youth worked with staff to install wire on the deer fence during launch week.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
+  { id: "materials-bubble-babies-rolls", name: "Bubble Babies germination rolls", category: "Supplies", total: 100, available: 100, location: "Planting / seed preparation area", status: "Ready", notes: "Ready for planting and documentation during From Soil to Seed.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
   { id: "water-pitchers", name: "Water pitchers", category: "Water", total: 8, available: 8, location: "Water station / shade station", status: "Ready", notes: "Use for hydration station and heat-safety support.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
   { id: "office-markers", name: "Markers", category: "Office", total: 24, available: 24, location: "Supervisor supply bin", status: "Ready", notes: "For name tags, team signs, fan design work, and daily boards.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
   { id: "office-scissors", name: "Scissors", category: "Office", total: 10, available: 10, location: "Supervisor supply bin", status: "Ready", notes: "Use for paper, cardboard, labels, and project preparation.", managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() },
@@ -2508,7 +2513,7 @@ function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (scre
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">WORK TODAY</div>
         <h1 className="mt-3 text-4xl font-black md:text-6xl">What needs to happen now?</h1>
-        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">This is the workforce development command center. Youth develop responsibility, teamwork, communication, problem solving, safety, and documentation through real farm work.</p>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">This is the workforce development command center. Youth develop responsibility, teamwork, communication, problem solving, safety, tool stewardship, and documentation through real farm work.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Metric title="Attendance Records" value={attendance.length} />
           <Metric title="Open Incidents" value={incidents.length} />
@@ -2838,7 +2843,7 @@ function ResourcesScreen({ setScreen, activeUser, language }: { setScreen: (scre
           <button type="button" onClick={() => setScreen("grower")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Grower View</button>
         </Card>
         <Card>
-          <h2 className="text-2xl font-black">📦 Inventory</h2>
+          <h2 className="text-2xl font-black">🧰 Tools & Materials / Inventory & Assets</h2>
           <div className="mt-4 grid gap-2">
             {inventory.slice(0, 6).map((item) => (
               <div key={item.id} className="flex items-center justify-between rounded-2xl bg-black/28 p-3 text-sm">
@@ -2846,7 +2851,7 @@ function ResourcesScreen({ setScreen, activeUser, language }: { setScreen: (scre
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setScreen("operations")} className="mt-5 rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Inventory</button>
+          <button type="button" onClick={() => setScreen("operations")} className="mt-5 rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Tools & Materials</button>
         </Card>
         <Card>
           <h2 className="text-2xl font-black">📚 Resource Library</h2>
@@ -3028,67 +3033,59 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   const cards = [
     {
       title: "Guest",
-      subtitle: "I am exploring the farm, ecosystem, marketplace, or partnership story.",
+      subtitle: "Explore only.",
       icon: "👋",
       action: () => setScreen("explore" as Screen),
     },
     {
-      title: "New Participant",
-      subtitle: "This is my first time. I need to create or complete my profile.",
+      title: "New",
+      subtitle: "Create / complete profile.",
       icon: "🌱",
       action: () => setScreen("roles" as Screen),
     },
     {
-      title: "Returning Participant",
-      subtitle: "I already have access. I need to sign in and continue.",
+      title: "Returning",
+      subtitle: "Sign in and continue.",
       icon: "🔑",
       action: () => setScreen("roles" as Screen),
     },
   ];
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-3">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[560px]">
-          <img src={IMG.forest} alt="Bronson Family Farm grow area" className="absolute inset-0 h-full w-full object-cover opacity-72" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-          <div className="absolute inset-0 bg-gradient-to-br from-black/88 via-emerald-950/78 to-black/70" />
-          <div className="relative z-10 grid min-h-[560px] content-center gap-8 p-5 md:p-10">
+        <div className="relative min-h-[calc(100vh-220px)] max-h-[720px]">
+          <img src={IMG.forest} alt="Bronson Family Farm grow area" className="absolute inset-0 h-full w-full object-cover opacity-68" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/88 via-emerald-950/76 to-black/70" />
+          <div className="relative z-10 grid min-h-[calc(100vh-220px)] max-h-[720px] content-center gap-5 p-5 md:p-8">
             <div className="max-w-4xl">
-              <div className="text-xs uppercase tracking-[0.45em] text-emerald-100/75">{TT("Ecosystem Gateway")}</div>
-              <h1 className="mt-4 text-5xl font-black leading-[0.95] md:text-7xl">Bronson Family Farm<br />Farm & Family Alliance</h1>
-              <p className="mt-5 max-w-3xl text-base leading-8 text-white/84">One entry point. Choose Guest, New Participant, or Returning Participant. Operational areas unlock only after validation.</p>
+              <div className="text-xs uppercase tracking-[0.4em] text-emerald-100/75">{TT("Ecosystem Gateway")}</div>
+              <h1 className="mt-3 text-4xl font-black leading-[0.95] md:text-6xl">Bronson Family Farm<br />Farm & Family Alliance</h1>
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-white/84">One entry only: Guest, New, or Returning. Operational areas unlock after validation.</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-3">
               {cards.map((card) => (
                 <button
                   key={card.title}
                   type="button"
                   onClick={card.action}
-                  className="rounded-[2rem] border border-white/12 bg-black/42 p-6 text-left shadow-[0_22px_70px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300 hover:text-black"
+                  className="rounded-[1.5rem] border border-white/14 bg-black/42 p-5 text-left shadow-[0_18px_55px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300 hover:text-black"
                 >
-                  <div className="text-5xl">{card.icon}</div>
-                  <div className="mt-5 text-2xl font-black">{card.title}</div>
-                  <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
+                  <div className="text-4xl">{card.icon}</div>
+                  <div className="mt-4 text-2xl font-black">{card.title}</div>
+                  <div className="mt-2 text-sm leading-5 opacity-85">{card.subtitle}</div>
                 </button>
               ))}
+            </div>
+
+            <div className="grid gap-3 text-xs font-bold text-white/80 md:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-3">Workforce: youth sign in with PIN, provide parent/emergency info, then Work Today.</div>
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-3">Enterprise: growers and producers validate before using grower tools.</div>
             </div>
           </div>
         </div>
       </Card>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Workforce Development</div>
-          <h2 className="mt-3 text-3xl font-black">Youth develop work readiness through real farm projects.</h2>
-          <p className="mt-3 text-sm leading-7 text-white/78">Youth do not enter Work Today until they validate with name and PIN, provide parent information, provide emergency contact information, and complete Week 1 topic selection.</p>
-        </Card>
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Growing & Entrepreneurship</div>
-          <h2 className="mt-3 text-3xl font-black">Growers, producers, partners, and marketplace users grow food, businesses, and opportunity.</h2>
-          <p className="mt-3 text-sm leading-7 text-white/78">Growers and partners are validated before accessing operational tools. Guests may explore the ecosystem story without signing in.</p>
-        </Card>
-      </div>
     </div>
   );
 }
