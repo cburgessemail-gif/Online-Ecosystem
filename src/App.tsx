@@ -105,7 +105,7 @@ const translations = {
     mission: "Mission Control",
     guest: "Guest / Reviewer",
     chooseTopic: "Choose Your Topic Area",
-    saveTopic: "Submit / Save Topic Choice",
+    saveTopic: "Submit / Open Today’s Work",
     full: "Full",
     spots: "spots left",
     tools: "Tools & Resources",
@@ -126,7 +126,7 @@ const translations = {
     mission: "Control de Misión",
     guest: "Invitado / Revisor",
     chooseTopic: "Elige Tu Área de Tema",
-    saveTopic: "Enviar / Guardar Selección",
+    saveTopic: "Enviar / Abrir Trabajo de Hoy",
     full: "Lleno",
     spots: "lugares disponibles",
     tools: "Herramientas y Recursos",
@@ -152,7 +152,9 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
 
   const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
-  const [validationError, setValidationError] = useState("");
+  const [needsSupervisorVerification, setNeedsSupervisorVerification] =
+    useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
 
   const t = translations[lang];
 
@@ -177,7 +179,6 @@ export default function App() {
   function findYouthMatch() {
     return employerYouthList.find((youth) => {
       const fullName = `${youth.firstName} ${youth.lastName}`;
-
       return (
         normalize(fullName) === normalize(youthName) &&
         youth.pin.trim() === pin.trim() &&
@@ -187,28 +188,16 @@ export default function App() {
   }
 
   const youthHistory = validatedYouth?.completedTopics || [];
-  const alreadySignedUpThisWeek =
-    Boolean(savedTopic) || Boolean(validatedYouth?.currentWeekTopic);
 
-  function canYouthChooseTopic(topic: string, youth?: YouthRecord | null) {
-    const count = topicCounts[topic as keyof typeof topicCounts];
-    const isFull = count >= TOPIC_CAP;
-    const completedTopics = youth?.completedTopics || youthHistory;
-    const alreadyCompleted = completedTopics.includes(topic);
-    const hasCurrentTopic =
-      Boolean(savedTopic) || Boolean(youth?.currentWeekTopic || validatedYouth?.currentWeekTopic);
-
-    return !isFull && !alreadyCompleted && !hasCurrentTopic;
+  function topicIsFull(topic: string) {
+    return topicCounts[topic as keyof typeof topicCounts] >= TOPIC_CAP;
   }
 
   function getTopicStatus(topic: string) {
     const count = topicCounts[topic as keyof typeof topicCounts];
-    const isFull = count >= TOPIC_CAP;
-    const alreadyCompleted = youthHistory.includes(topic);
 
-    if (alreadySignedUpThisWeek) return "You already selected a topic this week.";
-    if (alreadyCompleted) return "Already completed — choose a new area.";
-    if (isFull) return t.full;
+    if (topicIsFull(topic)) return t.full;
+    if (youthHistory.includes(topic)) return "Already completed — choose a new area.";
 
     return `${TOPIC_CAP - count} ${t.spots}`;
   }
@@ -217,32 +206,38 @@ export default function App() {
 
   if (!youthName.trim()) missingFields.push("Youth name is required.");
   if (!pin.trim()) missingFields.push("Assigned PIN number is required.");
-  if (!parentName.trim()) missingFields.push("Parent / guardian name is required.");
-  if (!parentEmail.trim()) missingFields.push("Parent / guardian email is required.");
-  if (parentEmail.trim() && !parentEmail.includes("@")) {
-    missingFields.push("Enter a valid parent / guardian email.");
-  }
   if (!selectedTopic) missingFields.push("Choose a topic area.");
 
-  const canAttemptSubmit =
+  const canSubmit =
     youthName.trim() &&
     pin.trim() &&
-    parentName.trim() &&
-    parentEmail.trim() &&
-    parentEmail.includes("@") &&
     Boolean(selectedTopic);
 
   function resetHome() {
     setRole(null);
     setSubmitted(false);
-    setValidationError("");
+    setValidationMessage("");
+    setNeedsSupervisorVerification(false);
   }
 
   function saveYouthDay() {
-    setValidationError("");
+    setValidationMessage("");
+    setNeedsSupervisorVerification(false);
 
-    if (!canAttemptSubmit) {
-      setValidationError("Please complete all required fields before submitting.");
+    if (!youthName.trim() || !pin.trim()) {
+      setValidationMessage("Enter youth name and PIN to submit.");
+      return;
+    }
+
+    if (!selectedTopic) {
+      setValidationMessage("Choose a topic area before submitting.");
+      return;
+    }
+
+    if (topicIsFull(selectedTopic)) {
+      setValidationMessage(
+        "This topic area is full. Please choose another available area."
+      );
       return;
     }
 
@@ -250,38 +245,24 @@ export default function App() {
 
     if (!match) {
       setValidatedYouth(null);
-      setValidationError(
-        "Youth name and PIN do not match the employer list. Please ask a supervisor for help."
+      setNeedsSupervisorVerification(true);
+      setSavedTopic(selectedTopic);
+      setSubmitted(true);
+      return;
+    }
+
+    if (match.currentWeekTopic) {
+      setValidatedYouth(match);
+      setValidationMessage(
+        `You are already signed up for ${match.currentWeekTopic} this week. Please ask a supervisor if this needs to change.`
       );
       return;
     }
 
-    if (!canYouthChooseTopic(selectedTopic, match)) {
+    if (match.completedTopics.includes(selectedTopic)) {
       setValidatedYouth(match);
-
-      if (match.currentWeekTopic) {
-        setValidationError(
-          `You are already signed up for ${match.currentWeekTopic} this week. Please ask a supervisor if this needs to change.`
-        );
-        return;
-      }
-
-      if (match.completedTopics.includes(selectedTopic)) {
-        setValidationError(
-          "You have already completed this topic area. Please choose a new area."
-        );
-        return;
-      }
-
-      if (topicCounts[selectedTopic as keyof typeof topicCounts] >= TOPIC_CAP) {
-        setValidationError(
-          "This topic area is full. Please choose another available area."
-        );
-        return;
-      }
-
-      setValidationError(
-        "This topic cannot be selected. Please choose an available weekly topic."
+      setValidationMessage(
+        "You have already completed this topic area. Please choose a new area."
       );
       return;
     }
@@ -326,9 +307,10 @@ export default function App() {
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
             <p>
-              Welcome to the Bronson Family Farm Youth Workforce Program.
-              Youth must enter their name and assigned PIN number. Today’s work
-              opens only after the name and PIN match the employer list.
+              Youth enter their full name and assigned PIN. If the name and PIN
+              match the employer list, today’s work opens as validated. If there
+              is no match, the youth can still submit and a supervisor will verify
+              manually.
             </p>
           </div>
 
@@ -351,8 +333,9 @@ export default function App() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="Youth Check-In">
                 <p>
-                  Enter your full name exactly as it appears on the employer list
-                  and your assigned PIN number.
+                  Enter your full name and assigned PIN. Your PIN is your
+                  password. If your name or PIN does not match, your submission
+                  will still be received for supervisor verification.
                 </p>
 
                 <label>Youth Full Name</label>
@@ -361,7 +344,7 @@ export default function App() {
                   onChange={(e) => {
                     setYouthName(e.target.value);
                     setValidatedYouth(null);
-                    setValidationError("");
+                    setValidationMessage("");
                   }}
                   placeholder="First Last"
                 />
@@ -372,7 +355,7 @@ export default function App() {
                   onChange={(e) => {
                     setPin(e.target.value);
                     setValidatedYouth(null);
-                    setValidationError("");
+                    setValidationMessage("");
                   }}
                   placeholder="PIN number"
                 />
@@ -381,33 +364,33 @@ export default function App() {
                 <input
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
+                  placeholder="Optional today if youth does not know"
                 />
 
                 <label>Parent / Guardian Email</label>
                 <input
                   value={parentEmail}
                   onChange={(e) => setParentEmail(e.target.value)}
-                  placeholder="parent@example.com"
+                  placeholder="Optional today if youth does not know"
                 />
 
-                {validationError && (
+                {validationMessage && (
                   <div className="bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
-                    {validationError}
+                    {validationMessage}
                   </div>
                 )}
               </Card>
 
               <Card title={t.chooseTopic}>
                 <p className="mb-4">
-                  Click any curriculum category to learn about it. Your official
-                  weekly sign-up is not final until you submit. Today’s work opens
-                  only after your name and PIN match the employer list.
+                  Click a curriculum category to learn about it. Your official
+                  weekly sign-up is submitted when you open today’s work.
                 </p>
 
                 <div className="space-y-3">
                   {topicAreas.map((topic) => {
                     const count = topicCounts[topic as keyof typeof topicCounts];
-                    const full = count >= TOPIC_CAP;
+                    const full = topicIsFull(topic);
                     const isSelected = selectedTopic === topic;
 
                     return (
@@ -451,7 +434,7 @@ export default function App() {
 
                 {missingFields.length > 0 && (
                   <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
-                    <strong>Please fix before submitting:</strong>
+                    <strong>Please complete before submitting:</strong>
                     <ul className="mt-2 list-disc list-inside">
                       {missingFields.map((item) => (
                         <li key={item}>{item}</li>
@@ -461,7 +444,7 @@ export default function App() {
                 )}
 
                 <button
-                  disabled={!canAttemptSubmit}
+                  disabled={!canSubmit}
                   onClick={saveYouthDay}
                   className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
                 >
@@ -471,7 +454,7 @@ export default function App() {
             </div>
           ) : (
             <div className="grid lg:grid-cols-2 gap-6">
-              <Card title="You Are Checked In">
+              <Card title="Submission Received">
                 <p>
                   Welcome,{" "}
                   <strong>
@@ -481,9 +464,18 @@ export default function App() {
                   </strong>
                   .
                 </p>
-                <p>
-                  Employer-list access validated. Today’s work is now open.
-                </p>
+
+                {needsSupervisorVerification ? (
+                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
+                    Submission received. Supervisor verification is required
+                    because the name and PIN did not match the employer list.
+                  </div>
+                ) : (
+                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                    Employer-list access validated. Today’s work is now open.
+                  </div>
+                )}
+
                 <p>
                   This week’s topic area: <strong>{savedTopic}</strong>
                 </p>
@@ -555,7 +547,7 @@ export default function App() {
               <Checklist
                 items={[
                   "Confirm youth attendance.",
-                  "Confirm youth name and PIN if access fails.",
+                  "Confirm youth name and PIN if access is marked for supervisor verification.",
                   "Confirm PPE and proper shoes.",
                   "Assign youth to topic area supervisor.",
                   "Monitor 15 youth per aide.",
@@ -594,8 +586,8 @@ export default function App() {
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
             <StatusCard label="Supervisor Ratio" value="1:15" />
-            <StatusCard label="Employer Validation" value="Required" />
-            <StatusCard label="Nurse Line" value="Visible" />
+            <StatusCard label="PIN Access" value="Enabled" />
+            <StatusCard label="Supervisor Override" value="Enabled" />
             <StatusCard label="Launch Status" value="Ready" />
           </div>
         </section>
@@ -606,18 +598,17 @@ export default function App() {
           <BackButton onClick={resetHome} />
           <Card title="Guest / Reviewer View">
             <p>
-              Guests can experience the youth workforce ecosystem, understand
-              the role of each topic area, and observe how Bronson Family Farm
-              connects youth development, agriculture, safety, workforce
-              learning, and community food systems.
+              Guests can experience the youth workforce ecosystem and observe
+              how Bronson Family Farm connects youth development, agriculture,
+              safety, workforce learning, and community food systems.
             </p>
             <Checklist
               items={[
-                "Youth must match the employer list before work opens.",
+                "Youth use their assigned PIN as their password.",
+                "Youth can submit even if employer validation needs supervisor review.",
                 "Youth choose a topic area weekly.",
                 "Youth can browse curriculum before committing.",
                 "Full topic areas cannot be saved.",
-                "Youth cannot repeat an area they already completed.",
                 "Youth receive tools and resources for the work they are doing.",
                 "Parents have access to program expectations.",
                 "Supervisors can track attendance, safety, and skill development.",
