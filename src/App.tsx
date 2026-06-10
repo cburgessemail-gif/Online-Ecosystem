@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 2.3 - PERSISTENT SAFETY + DAILY WORKFORCE ENGINE
+ * LAUNCH CANDIDATE 2.4 - LAUNCH READY ROUTING + PERSISTENT SAFETY
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -306,6 +306,7 @@ const supabase: SupabaseClient | null =
   SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const SESSION_KEY = "bff.launch.activeUser";
+const ENTRY_MODE_KEY = "bff.launch.entryMode";
 const PROFILE_KEY = "bff.launch.profiles";
 const REGISTRATION_KEY = "bff.launch.ecosystem_registrations";
 const YOUTH_KEY = "bff.launch.youth";
@@ -329,7 +330,7 @@ const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
 const NURSE_LINE_NUMBER = "ADD_NURSE_LINE_NUMBER";
 const NURSE_LINE_LABEL = "Nurse Line";
-const NURSE_LINE_NOTE = "Update NURSE_LINE_NUMBER with the official nurse line phone number before field use.";
+const NURSE_LINE_NOTE = "Use the official nurse line number provided during youth orientation. Replace this text/number before field use if it is not already set.";
 const APPROVED_SUPERVISOR_EMAILS = [
   "bhchatman@gmail.com",
   "msdaisy0607@icloud.com",
@@ -3246,13 +3247,19 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
       title: "New",
       subtitle: "Create / complete profile.",
       icon: "🌱",
-      action: () => setScreen("roles" as Screen),
+      action: () => {
+        safeWrite(ENTRY_MODE_KEY, "new");
+        setScreen("roles" as Screen);
+      },
     },
     {
       title: "Returning",
       subtitle: "Sign in and continue.",
       icon: "🔑",
-      action: () => setScreen("roles" as Screen),
+      action: () => {
+        safeWrite(ENTRY_MODE_KEY, "returning");
+        setScreen("roles" as Screen);
+      },
     },
   ];
 
@@ -3730,7 +3737,8 @@ function MyWorkspace({
   activeUser: EcosystemUser | null;
   setScreen: (screen: Screen) => void;
 }) {
-  const [mode, setMode] = useState<"new" | "returning">("new");
+  const initialEntryMode = safeRead<"new" | "returning">(ENTRY_MODE_KEY, "new");
+  const [mode, setMode] = useState<"new" | "returning">(initialEntryMode);
   const [role, setRole] = useState<Role>("Youth Workforce Participant");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -3889,9 +3897,13 @@ function MyWorkspace({
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Validated Access</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Guest. New. Returning.</h1>
-        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Operational access requires validation. Youth validate with name + PIN from the employee list. Parents validate with youth name + last 4 digits of parent phone. Supervisors validate with name + staff PIN. Growers validate before entering grower tools.</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{mode === "returning" ? "Returning Participant" : "New Participant"}</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">{mode === "returning" ? "Sign In" : "Create / Complete Profile"}</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
+          {mode === "returning"
+            ? "Returning users sign in only. Youth use first name, last name, and PIN. Parents use youth name and last 4 digits of parent phone. Supervisors use name and staff PIN. Growers validate before using grower tools."
+            : "New youth complete parent and emergency information once before Work Today opens. Week 1 pathway selection is saved only when the full setup is submitted."}
+        </p>
         {activeUser && (
           <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
             <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
@@ -3903,16 +3915,20 @@ function MyWorkspace({
 
       <div className="grid gap-4 lg:grid-cols-[.72fr_1.28fr]">
         <Card>
-          <h2 className="text-2xl font-black">Entry Type</h2>
-          <div className="mt-4 grid gap-3">
-            <button type="button" onClick={() => setScreen("explore")} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4 text-left font-black transition hover:bg-emerald-300 hover:text-black">👋 Guest — Explore Only</button>
-            <button type="button" onClick={() => setMode("new")} className={`rounded-[1.25rem] border p-4 text-left font-black transition ${mode === "new" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 hover:bg-white/20"}`}>🌱 New Participant</button>
-            <button type="button" onClick={() => setMode("returning")} className={`rounded-[1.25rem] border p-4 text-left font-black transition ${mode === "returning" ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 hover:bg-white/20"}`}>🔑 Returning Participant</button>
-          </div>
-
+          <h2 className="text-2xl font-black">Who are you?</h2>
+          <p className="mt-2 text-sm leading-6 text-white/72">
+            {mode === "returning" ? "Choose your role, then sign in. No registration screen." : "Choose your role to complete one-time setup."}
+          </p>
           <div className="mt-6">
             <SelectField label="Role" value={role} onChange={(value) => setRole(value as Role)} options={roleOptions} />
           </div>
+          <button
+            type="button"
+            onClick={() => setScreen("portal")}
+            className="mt-6 w-full rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
+          >
+            Back to Gateway
+          </button>
         </Card>
 
         <Card>
@@ -3961,6 +3977,22 @@ function MyWorkspace({
                     );
                   })}
                 </div>
+                {weekNumber === 1 && (() => {
+                  const selected = workforceSubjectAreas.find((item) => item.id === selectedSubjectId) || workforceSubjectAreas[0];
+                  return (
+                    <div className="mt-4 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+                      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Pathway Preview — not saved yet</div>
+                      <h4 className="mt-2 text-xl font-black">{selected.icon} {selected.title}</h4>
+                      <p className="mt-2 text-sm leading-6 text-white/78">{selected.shortDescription}</p>
+                      <div className="mt-3 grid gap-3 md:grid-cols-3">
+                        <div className="rounded-2xl bg-black/24 p-3"><div className="text-xs font-black uppercase text-white/55">Skills Practiced</div><div className="mt-1 text-sm font-bold">{selected.skills.join(" • ")}</div></div>
+                        <div className="rounded-2xl bg-black/24 p-3"><div className="text-xs font-black uppercase text-white/55">Today's Work</div><div className="mt-1 text-sm font-bold">{selected.dailyAssignment}</div></div>
+                        <div className="rounded-2xl bg-black/24 p-3"><div className="text-xs font-black uppercase text-white/55">Resources</div><div className="mt-1 text-sm font-bold">Bubble Babies • Companion Planting • Soil • Tools</div></div>
+                      </div>
+                      <div className="mt-3 text-xs font-bold text-emerald-50/80">The seat is reserved only after you press Validate & Continue.</div>
+                    </div>
+                  );
+                })()}
               </div>
             </>
           )}
