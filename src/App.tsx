@@ -3,6 +3,7 @@ import "./App.css";
 
 type Role = "youth" | "parent" | "supervisor" | "mission" | "guest";
 type Lang = "en" | "es";
+type YouthStep = "checkin" | "topic" | "submitted";
 
 type YouthRecord = {
   id: string;
@@ -105,7 +106,8 @@ const translations = {
     mission: "Mission Control",
     guest: "Guest / Reviewer",
     chooseTopic: "Choose Your Topic Area",
-    saveTopic: "Submit / Open Today’s Work",
+    continue: "Continue to Topic Selection",
+    submit: "Submit / Open Today’s Work",
     full: "Full",
     spots: "spots left",
     tools: "Tools & Resources",
@@ -126,7 +128,8 @@ const translations = {
     mission: "Control de Misión",
     guest: "Invitado / Revisor",
     chooseTopic: "Elige Tu Área de Tema",
-    saveTopic: "Enviar / Abrir Trabajo de Hoy",
+    continue: "Continuar a Selección de Tema",
+    submit: "Enviar / Abrir Trabajo de Hoy",
     full: "Lleno",
     spots: "lugares disponibles",
     tools: "Herramientas y Recursos",
@@ -141,6 +144,7 @@ const translations = {
 export default function App() {
   const [lang, setLang] = useState<Lang>("en");
   const [role, setRole] = useState<Role | null>(null);
+  const [step, setStep] = useState<YouthStep>("checkin");
 
   const [youthName, setYouthName] = useState("");
   const [pin, setPin] = useState("");
@@ -149,12 +153,11 @@ export default function App() {
 
   const [selectedTopic, setSelectedTopic] = useState("");
   const [savedTopic, setSavedTopic] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
   const [needsSupervisorVerification, setNeedsSupervisorVerification] =
     useState(false);
-  const [validationMessage, setValidationMessage] = useState("");
+  const [message, setMessage] = useState("");
 
   const t = translations[lang];
 
@@ -187,90 +190,77 @@ export default function App() {
     });
   }
 
-  const youthHistory = validatedYouth?.completedTopics || [];
-
   function topicIsFull(topic: string) {
     return topicCounts[topic as keyof typeof topicCounts] >= TOPIC_CAP;
   }
 
-  function getTopicStatus(topic: string) {
-    const count = topicCounts[topic as keyof typeof topicCounts];
-
-    if (topicIsFull(topic)) return t.full;
-    if (youthHistory.includes(topic)) return "Already completed — choose a new area.";
-
-    return `${TOPIC_CAP - count} ${t.spots}`;
-  }
-
-  const missingFields: string[] = [];
-
-  if (!youthName.trim()) missingFields.push("Youth name is required.");
-  if (!pin.trim()) missingFields.push("Assigned PIN number is required.");
-  if (!selectedTopic) missingFields.push("Choose a topic area.");
-
-  const canSubmit =
-    youthName.trim() &&
-    pin.trim() &&
-    Boolean(selectedTopic);
-
-  function resetHome() {
-    setRole(null);
-    setSubmitted(false);
-    setValidationMessage("");
-    setNeedsSupervisorVerification(false);
-  }
-
-  function saveYouthDay() {
-    setValidationMessage("");
+  function continueToTopicSelection() {
+    setMessage("");
     setNeedsSupervisorVerification(false);
 
-    if (!youthName.trim() || !pin.trim()) {
-      setValidationMessage("Enter youth name and PIN to submit.");
+    if (!youthName.trim()) {
+      setMessage("Enter youth name.");
       return;
     }
 
-    if (!selectedTopic) {
-      setValidationMessage("Choose a topic area before submitting.");
-      return;
-    }
-
-    if (topicIsFull(selectedTopic)) {
-      setValidationMessage(
-        "This topic area is full. Please choose another available area."
-      );
+    if (!pin.trim()) {
+      setMessage("Enter assigned PIN.");
       return;
     }
 
     const match = findYouthMatch();
 
-    if (!match) {
+    if (match) {
+      setValidatedYouth(match);
+      setNeedsSupervisorVerification(false);
+    } else {
       setValidatedYouth(null);
       setNeedsSupervisorVerification(true);
-      setSavedTopic(selectedTopic);
-      setSubmitted(true);
-      return;
     }
 
-    if (match.currentWeekTopic) {
-      setValidatedYouth(match);
-      setValidationMessage(
-        `You are already signed up for ${match.currentWeekTopic} this week. Please ask a supervisor if this needs to change.`
-      );
-      return;
-    }
-
-    if (match.completedTopics.includes(selectedTopic)) {
-      setValidatedYouth(match);
-      setValidationMessage(
-        "You have already completed this topic area. Please choose a new area."
-      );
-      return;
-    }
-
-    setValidatedYouth(match);
-    setSavedTopic(selectedTopic);
-    setSubmitted(true);
+    setStep("topic");
   }
+
+  function submitTodayWork() {
+    setMessage("");
+
+    if (!selectedTopic) {
+      setMessage("Choose a topic area before submitting.");
+      return;
+    }
+
+    if (topicIsFull(selectedTopic)) {
+      setMessage("This topic area is full. Please choose another available area.");
+      return;
+    }
+
+    if (validatedYouth?.currentWeekTopic) {
+      setMessage(
+        `You are already signed up for ${validatedYouth.currentWeekTopic} this week. Please ask a supervisor if this needs to change.`
+      );
+      return;
+    }
+
+    if (validatedYouth?.completedTopics.includes(selectedTopic)) {
+      setMessage("You have already completed this topic area. Please choose a new area.");
+      return;
+    }
+
+    setSavedTopic(selectedTopic);
+    setStep("submitted");
+  }
+
+  function resetHome() {
+    setRole(null);
+    setStep("checkin");
+    setMessage("");
+    setSelectedTopic("");
+    setSavedTopic("");
+    setNeedsSupervisorVerification(false);
+    setValidatedYouth(null);
+  }
+
+  const youthHistory = validatedYouth?.completedTopics || [];
 
   return (
     <main className="min-h-screen bg-[#f7f3e8] text-[#18392b]">
@@ -307,10 +297,9 @@ export default function App() {
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
             <p>
-              Youth enter their full name and assigned PIN. If the name and PIN
-              match the employer list, today’s work opens as validated. If there
-              is no match, the youth can still submit and a supervisor will verify
-              manually.
+              Youth use their assigned PIN as their password. If the name and
+              PIN do not match the employer list, youth can still continue and
+              a supervisor will verify manually.
             </p>
           </div>
 
@@ -329,68 +318,104 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
 
-          {!submitted ? (
+          {step === "checkin" && (
+            <Card title="Youth Check-In">
+              <p>
+                Enter your full name and assigned PIN. Your PIN is your password.
+                If your name or PIN does not match, you will still continue and
+                a supervisor will verify manually.
+              </p>
+
+              <label>Youth Full Name</label>
+              <input
+                value={youthName}
+                onChange={(e) => {
+                  setYouthName(e.target.value);
+                  setMessage("");
+                  setValidatedYouth(null);
+                  setNeedsSupervisorVerification(false);
+                }}
+                placeholder="First Last"
+              />
+
+              <label>Assigned PIN Number / Password</label>
+              <input
+                value={pin}
+                onChange={(e) => {
+                  setPin(e.target.value);
+                  setMessage("");
+                  setValidatedYouth(null);
+                  setNeedsSupervisorVerification(false);
+                }}
+                placeholder="PIN number"
+              />
+
+              <label>Parent / Guardian Name</label>
+              <input
+                value={parentName}
+                onChange={(e) => setParentName(e.target.value)}
+                placeholder="Optional today if youth does not know"
+              />
+
+              <label>Parent / Guardian Email</label>
+              <input
+                value={parentEmail}
+                onChange={(e) => setParentEmail(e.target.value)}
+                placeholder="Optional today if youth does not know"
+              />
+
+              {message && (
+                <div className="bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
+                  {message}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={continueToTopicSelection}
+                disabled={!youthName.trim() || !pin.trim()}
+                className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
+              >
+                {t.continue}
+              </button>
+            </Card>
+          )}
+
+          {step === "topic" && (
             <div className="grid lg:grid-cols-2 gap-6">
-              <Card title="Youth Check-In">
-                <p>
-                  Enter your full name and assigned PIN. Your PIN is your
-                  password. If your name or PIN does not match, your submission
-                  will still be received for supervisor verification.
-                </p>
-
-                <label>Youth Full Name</label>
-                <input
-                  value={youthName}
-                  onChange={(e) => {
-                    setYouthName(e.target.value);
-                    setValidatedYouth(null);
-                    setValidationMessage("");
-                  }}
-                  placeholder="First Last"
-                />
-
-                <label>Assigned PIN Number / Password</label>
-                <input
-                  value={pin}
-                  onChange={(e) => {
-                    setPin(e.target.value);
-                    setValidatedYouth(null);
-                    setValidationMessage("");
-                  }}
-                  placeholder="PIN number"
-                />
-
-                <label>Parent / Guardian Name</label>
-                <input
-                  value={parentName}
-                  onChange={(e) => setParentName(e.target.value)}
-                  placeholder="Optional today if youth does not know"
-                />
-
-                <label>Parent / Guardian Email</label>
-                <input
-                  value={parentEmail}
-                  onChange={(e) => setParentEmail(e.target.value)}
-                  placeholder="Optional today if youth does not know"
-                />
-
-                {validationMessage && (
-                  <div className="bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
-                    {validationMessage}
+              <Card title="Access Status">
+                {needsSupervisorVerification ? (
+                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
+                    You may continue. Supervisor verification is required because
+                    the name and PIN did not match the employer list.
+                  </div>
+                ) : (
+                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                    Access validated. Continue to today’s work.
                   </div>
                 )}
+
+                <p>
+                  Youth:{" "}
+                  <strong>
+                    {validatedYouth
+                      ? `${validatedYouth.firstName} ${validatedYouth.lastName}`
+                      : youthName}
+                  </strong>
+                </p>
               </Card>
 
               <Card title={t.chooseTopic}>
-                <p className="mb-4">
-                  Click a curriculum category to learn about it. Your official
-                  weekly sign-up is submitted when you open today’s work.
+                <p>
+                  Click a curriculum category to learn about it. Then submit to
+                  open today’s work.
                 </p>
 
                 <div className="space-y-3">
                   {topicAreas.map((topic) => {
                     const count = topicCounts[topic as keyof typeof topicCounts];
                     const full = topicIsFull(topic);
+                    const completed = youthHistory.includes(topic);
                     const isSelected = selectedTopic === topic;
 
                     return (
@@ -402,17 +427,17 @@ export default function App() {
                           isSelected
                             ? "bg-[#d8a23a] border-[#8a5a00]"
                             : "bg-[#f7f3e8]"
-                        } ${full ? "opacity-75" : ""}`}
+                        } ${full || completed ? "opacity-75" : ""}`}
                       >
                         <strong>{topic}</strong>
                         <br />
                         <span>
-                          {full ? t.full : `${TOPIC_CAP - count} ${t.spots}`}
+                          {completed
+                            ? "Already completed — choose a new area."
+                            : full
+                            ? t.full
+                            : `${TOPIC_CAP - count} ${t.spots}`}
                         </span>
-                        <br />
-                        <small>
-                          Click to learn what this category does before signing up.
-                        </small>
                       </button>
                     );
                   })}
@@ -421,9 +446,6 @@ export default function App() {
                 {selectedTopic && (
                   <div className="mt-5 bg-[#f7f3e8] rounded-2xl p-4">
                     <h3 className="font-bold mb-2">{selectedTopic}</h3>
-                    <p className="mb-2">
-                      This category includes the following tools and resources:
-                    </p>
                     <ul className="list-disc list-inside">
                       {(resources[selectedTopic] || []).map((item) => (
                         <li key={item}>{item}</li>
@@ -432,27 +454,25 @@ export default function App() {
                   </div>
                 )}
 
-                {missingFields.length > 0 && (
+                {message && (
                   <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">
-                    <strong>Please complete before submitting:</strong>
-                    <ul className="mt-2 list-disc list-inside">
-                      {missingFields.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
+                    {message}
                   </div>
                 )}
 
                 <button
-                  disabled={!canSubmit}
-                  onClick={saveYouthDay}
+                  type="button"
+                  disabled={!selectedTopic}
+                  onClick={submitTodayWork}
                   className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
                 >
-                  {t.saveTopic}
+                  {t.submit}
                 </button>
               </Card>
             </div>
-          ) : (
+          )}
+
+          {step === "submitted" && (
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="Submission Received">
                 <p>
@@ -467,8 +487,8 @@ export default function App() {
 
                 {needsSupervisorVerification ? (
                   <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
-                    Submission received. Supervisor verification is required
-                    because the name and PIN did not match the employer list.
+                    Supervisor verification required. Your submission was still
+                    received.
                   </div>
                 ) : (
                   <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
@@ -478,10 +498,6 @@ export default function App() {
 
                 <p>
                   This week’s topic area: <strong>{savedTopic}</strong>
-                </p>
-                <p>
-                  Your supervisor will confirm attendance, PPE, safety, and
-                  daily assignment.
                 </p>
               </Card>
 
@@ -507,7 +523,7 @@ export default function App() {
 
               <Card title={t.reflection}>
                 <textarea
-                  placeholder="What did you learn today? What skill did you practice? What question do you still have?"
+                  placeholder="What did you learn today?"
                   className="min-h-[160px]"
                 />
               </Card>
@@ -520,11 +536,6 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
           <Card title={t.parentInfo}>
-            <p>
-              Parents and guardians can review safety expectations, proper
-              attire, pickup rules, program contacts, and youth orientation
-              information.
-            </p>
             <Checklist
               items={[
                 "Closed-toe shoes required.",
@@ -532,7 +543,6 @@ export default function App() {
                 "Youth should dress for outdoor farm work.",
                 "Water, cooling station, and nurse line information are available.",
                 "Youth may not leave the private airport site until approved pickup.",
-                "Parent email is collected so the portal can send updates.",
               ]}
             />
           </Card>
@@ -542,40 +552,18 @@ export default function App() {
       {role === "supervisor" && (
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Card title={t.supervisorTools}>
-              <Checklist
-                items={[
-                  "Confirm youth attendance.",
-                  "Confirm youth name and PIN if access is marked for supervisor verification.",
-                  "Confirm PPE and proper shoes.",
-                  "Assign youth to topic area supervisor.",
-                  "Monitor 15 youth per aide.",
-                  "Report safety concerns immediately.",
-                  "Use daily assessment to track teamwork, effort, skill growth, and readiness.",
-                ]}
-              />
-            </Card>
-
-            <Card title="Supervisor Daily Assessment">
-              <label>Youth Name</label>
-              <input />
-
-              <label>Topic Area</label>
-              <select>
-                {topicAreas.map((topic) => (
-                  <option key={topic}>{topic}</option>
-                ))}
-              </select>
-
-              <label>Today’s Notes</label>
-              <textarea className="min-h-[140px]" />
-
-              <button className="mt-4 bg-[#18392b] text-white px-5 py-3 rounded-xl font-bold">
-                Save Assessment
-              </button>
-            </Card>
-          </div>
+          <Card title={t.supervisorTools}>
+            <Checklist
+              items={[
+                "Confirm youth attendance.",
+                "Verify youth manually if access is flagged.",
+                "Confirm PPE and proper shoes.",
+                "Assign youth to topic area supervisor.",
+                "Monitor 15 youth per aide.",
+                "Report safety concerns immediately.",
+              ]}
+            />
+          </Card>
         </section>
       )}
 
@@ -585,9 +573,9 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-5">
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
-            <StatusCard label="Supervisor Ratio" value="1:15" />
             <StatusCard label="PIN Access" value="Enabled" />
             <StatusCard label="Supervisor Override" value="Enabled" />
+            <StatusCard label="Nurse Line" value="Visible" />
             <StatusCard label="Launch Status" value="Ready" />
           </div>
         </section>
@@ -597,21 +585,13 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <BackButton onClick={resetHome} />
           <Card title="Guest / Reviewer View">
-            <p>
-              Guests can experience the youth workforce ecosystem and observe
-              how Bronson Family Farm connects youth development, agriculture,
-              safety, workforce learning, and community food systems.
-            </p>
             <Checklist
               items={[
                 "Youth use their assigned PIN as their password.",
-                "Youth can submit even if employer validation needs supervisor review.",
-                "Youth choose a topic area weekly.",
-                "Youth can browse curriculum before committing.",
+                "Youth can continue even if employer validation needs supervisor review.",
+                "Youth choose a weekly topic area.",
                 "Full topic areas cannot be saved.",
                 "Youth receive tools and resources for the work they are doing.",
-                "Parents have access to program expectations.",
-                "Supervisors can track attendance, safety, and skill development.",
               ]}
             />
           </Card>
