@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 2.0 - WEEKLY ROTATION + PARENT PORTAL LAUNCH
+ * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -41,6 +41,10 @@ type Screen =
   | "media"
   | "launchProject"
   | "feedback"
+  | "workToday"
+  | "learn"
+  | "explore"
+  | "resources"
   | "completion";
 
 type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
@@ -652,8 +656,7 @@ type YouthFamilyIntake = {
   guardianRelationship: string;
   guardianEmail: string;
   guardianPhone: string;
-  guardianPreferredLanguage: LanguageCode;
-  portalInviteStatus: "ready_to_invite" | "sent" | "activated" | "declined";
+  portalInviteStatus: "ready_to_invite" | "sent" | "declined";
   created_at: string;
   updated_at: string;
 };
@@ -761,25 +764,6 @@ function getSubjectCounts(weekId = getCurrentWeekId()) {
   }, {});
 }
 
-function getParentLanguageBreakdown() {
-  const rows = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
-  return rows.reduce<Record<string, number>>((acc, row) => {
-    const label = languageOptions.find((option) => option.code === row.guardianPreferredLanguage)?.label || "English";
-    acc[label] = (acc[label] || 0) + 1;
-    return acc;
-  }, {});
-}
-
-function getParentInvitationCounts() {
-  const rows = safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []);
-  return {
-    total: rows.length,
-    ready: rows.filter((row) => row.portalInviteStatus === "ready_to_invite").length,
-    sent: rows.filter((row) => row.portalInviteStatus === "sent").length,
-    activated: rows.filter((row) => row.portalInviteStatus === "activated").length,
-  };
-}
-
 function getYouthFamilyIntake(youthUserId: string) {
   return safeRead<YouthFamilyIntake[]>(YOUTH_FAMILY_INTAKE_KEY, []).find((item) => item.youthUserId === youthUserId);
 }
@@ -792,19 +776,6 @@ function saveYouthFamilyIntake(row: YouthFamilyIntake) {
     : [row, ...rows];
   safeWrite(YOUTH_FAMILY_INTAKE_KEY, updated);
   return row;
-}
-
-function getParentInvitationPreview(languageCode: LanguageCode) {
-  if (languageCode === "es") {
-    return {
-      subject: "Bienvenido al Portal para Padres de Bronson Family Farm",
-      body: "Su Cultivador lo ha identificado como padre, madre o tutor. Use el enlace del portal para ver asistencia, aprendizaje, fotos y actualizaciones del programa.",
-    };
-  }
-  return {
-    subject: "Welcome to the Bronson Family Farm Parent Portal",
-    body: "Your Cultivator has listed you as a parent or guardian. Use the portal link to see attendance, learning, photos, and program updates.",
-  };
 }
 
 function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) {
@@ -1959,6 +1930,10 @@ function screenLabel(screen: Screen) {
     media: "Media Center",
     launchProject: "From Soil to Seed",
     feedback: "Feedback / Comments",
+    workToday: "Work Today",
+    learn: "Learn",
+    explore: "Explore the Ecosystem",
+    resources: "Resources",
     completion: "Achievement Center",
   };
   return labels[screen];
@@ -2078,17 +2053,17 @@ function roleToProfileType(role: Role): ProfileType {
 
 function routeForRole(role: Role): Screen {
   const map: Record<Role, Screen> = {
-    Guest: "guest",
-    "Youth Workforce Participant": "youth",
+    Guest: "explore",
+    "Youth Workforce Participant": "workToday",
     "Parent / Guardian": "parent",
-    "Supervisor / Staff": "supervisor",
-    "Case Manager": "caseManager",
-    Grower: "grower",
+    "Supervisor / Staff": "workToday",
+    "Case Manager": "workToday",
+    Grower: "explore",
     "Marketplace Customer": "marketplace",
-    Volunteer: "support",
-    Partner: "partner",
-    Administrator: "operations",
-    "Value-Added Producer": "valueAdded",
+    Volunteer: "explore",
+    Partner: "explore",
+    Administrator: "workToday",
+    "Value-Added Producer": "explore",
     "Board / Funder": "reports",
   };
   return map[role];
@@ -2193,6 +2168,10 @@ function App() {
     <Shell screen={screen} setScreen={setScreen} activeUser={activeUser} signOut={signOut} language={language} changeLanguage={changeLanguage}>
       {message && <Notice text={message} />}
       {screen === "portal" && <Portal setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "workToday" && <WorkTodayScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "learn" && <LearnScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
+      {screen === "explore" && <ExploreEcosystemScreen setScreen={setScreen} />}
+      {screen === "resources" && <ResourcesScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
@@ -2242,12 +2221,13 @@ function Shell({
   // Guided Tour = ecosystem pathway. Workforce Program = youth, parent/guardian, supervisor, admin.
   // Marketplace remains a direct public door. Details stay inside each workspace or More tools.
   const primaryNav: { label: string; screen: Screen }[] = [
-    { label: "Guided Tour", screen: "demo" },
-    { label: "Workforce Program", screen: "roles" },
-    { label: "Marketplace", screen: "marketplace" },
+    { label: "Work Today", screen: "workToday" },
+    { label: "Learn", screen: "learn" },
+    { label: "Explore", screen: "explore" },
+    { label: "Resources", screen: "resources" },
   ];
 
-  const youthScreens: Screen[] = ["youth", "wellness", "launchProject", "media", "feedback", "completion", "parent", "supervisor", "reports"];
+  const youthScreens: Screen[] = ["workToday", "learn", "resources", "youth", "wellness", "launchProject", "media", "feedback", "completion", "parent", "supervisor", "reports"];
   const showYouthWorkspace =
     role === "Youth Workforce Participant" ||
     role === "Parent / Guardian" ||
@@ -2255,10 +2235,10 @@ function Shell({
     role === "Administrator" ||
     youthScreens.includes(screen);
   const youthWorkspaceNav: { label: string; screen: Screen }[] = [
-    { label: "Start My Day", screen: "wellness" },
-    { label: "Today’s Project", screen: "launchProject" },
+    { label: "Work Today", screen: "workToday" },
+    { label: "Learn", screen: "learn" },
+    { label: "Resources", screen: "resources" },
     { label: "Photo", screen: "media" },
-    { label: "Reflection", screen: "feedback" },
   ];
 
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
@@ -2335,6 +2315,10 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
+              <button type="button" onClick={() => setScreen("workToday")} className={buttonClass("workToday")}>Work Today</button>
+              <button type="button" onClick={() => setScreen("learn")} className={buttonClass("learn")}>Learn</button>
+              <button type="button" onClick={() => setScreen("explore")} className={buttonClass("explore")}>Explore</button>
+              <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>Resources</button>
               <button type="button" onClick={() => setScreen("demo")} className={buttonClass("demo")}>Guided Portal</button>
               <button type="button" onClick={() => setScreen("guest")} className={buttonClass("guest")}>Guest</button>
               <button type="button" onClick={() => setScreen("youth")} className={buttonClass("youth")}>Youth Workforce</button>
@@ -2433,6 +2417,285 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 }
 
 
+
+function ActionButton({ icon, title, note, onClick, urgent = false }: { icon: string; title: string; note?: string; onClick: () => void; urgent?: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-[1.35rem] border p-4 text-left shadow-[0_18px_55px_rgba(0,0,0,.28)] transition hover:-translate-y-0.5 ${urgent ? "border-red-200/35 bg-red-600/30 hover:bg-red-500/40" : "border-white/10 bg-white/10 hover:bg-emerald-300/18"}`}
+    >
+      <div className="text-3xl">{icon}</div>
+      <div className="mt-2 text-lg font-black leading-tight">{title}</div>
+      {note && <div className="mt-1 text-sm leading-5 text-white/72">{note}</div>}
+    </button>
+  );
+}
+
+function EmergencyStrip({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <div className="sticky top-[7.25rem] z-30 mb-4 rounded-[1.35rem] border-2 border-red-300/45 bg-red-700/38 p-3 shadow-[0_20px_70px_rgba(0,0,0,.35)] backdrop-blur-xl">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="text-lg font-black text-white">🚨 Emergency & Incident</div>
+          <div className="text-xs font-bold text-red-50/88">Injury, safety concern, parent contact, nurse line, or urgent support must be one tap away.</div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 md:min-w-[360px]">
+          <button type="button" onClick={() => setScreen("support")} className="rounded-full bg-red-100 px-4 py-3 text-sm font-black text-red-900">Emergency Contacts</button>
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-orange-300 px-4 py-3 text-sm font-black text-black">Incident Report</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TodaysActivityCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const currentWeek = youthCurriculumWeeks.find((week) => week.week === getProgramWeekNumber()) || youthCurriculumWeeks[0];
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today’s Activity Engine</div>
+      <h2 className="mt-3 text-3xl font-black">{todaysMission.title}</h2>
+      <p className="mt-2 text-sm font-bold text-white/78">Week {currentWeek.week}: {currentWeek.title}</p>
+      <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">{featuredProject.objective}</p>
+      <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+        {todaysMission.objectives.slice(0, 8).map((objective) => (
+          <div key={objective} className="rounded-2xl border border-white/10 bg-black/28 p-3 text-sm font-black">✓ {objective}</div>
+        ))}
+      </div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today’s Activity</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Capture Evidence</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflect</button>
+      </div>
+    </Card>
+  );
+}
+
+function WorkTodayScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
+  const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
+  const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
+  const media = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []);
+  const counts = getSubjectCounts();
+  const role = activeUser?.role || "Public / Guest";
+  const isStaff = role === "Supervisor / Staff" || role === "Administrator" || role === "Case Manager" || role === "Board / Funder";
+  const isYouth = role === "Youth Workforce Participant";
+
+  return (
+    <div className="grid gap-4">
+      <EmergencyStrip setScreen={setScreen} />
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">WORK TODAY</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">What needs to happen now?</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Daily operations are separated from curriculum and ecosystem exploration so supervisors and youth can act quickly on a phone.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric title="Attendance Records" value={attendance.length} />
+          <Metric title="Open Incidents" value={incidents.length} />
+          <Metric title="Media Assets" value={media.length} />
+          <Metric title="Current Week" value={getCurrentWeekId()} />
+        </div>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_.82fr]">
+        <div className="grid gap-4">
+          <TodaysActivityCard setScreen={setScreen} />
+          <Card>
+            <h2 className="text-2xl font-black">Daily Rhythm</h2>
+            <div className="mt-4 grid gap-2 md:grid-cols-3 xl:grid-cols-6">
+              {["Arrive", "Prepare", "Do the Work", "Capture Evidence", "Reflect", "Complete"].map((step) => (
+                <div key={step} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-center text-sm font-black">{step}</div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <Card>
+          <h2 className="text-2xl font-black">Command Center</h2>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <ActionButton urgent icon="🚨" title="Emergency Contacts" note="Nurse line, 911, site lead" onClick={() => setScreen("support")} />
+            <ActionButton urgent icon="📝" title="Incident Report" note="Injury or safety event" onClick={() => setScreen("supervisor")} />
+            <ActionButton icon="✅" title="Attendance" note="Present, late, absent, PPE" onClick={() => setScreen(isYouth ? "wellness" : "supervisor")} />
+            <ActionButton icon="👥" title="Assign Youth" note="Supervisor + topic area" onClick={() => setScreen("supervisor")} />
+            <ActionButton icon="📸" title="Media Upload" note="Photos and video evidence" onClick={() => setScreen("media")} />
+            <ActionButton icon="📞" title="Parent Contacts" note="Guardian information" onClick={() => setScreen(isStaff ? "supervisor" : "parent")} />
+            <ActionButton icon="🏅" title="Assessments" note="Skills and progress" onClick={() => setScreen("supervisor")} />
+            <ActionButton icon="🧰" title="Resources" note="Crop planner, inventory, library" onClick={() => setScreen("resources")} />
+          </div>
+        </Card>
+      </div>
+
+      <Card>
+        <h2 className="text-2xl font-black">Weekly Topic Capacity</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {workforceSubjectAreas.map((subject) => {
+            const count = counts[subject.id] || 0;
+            const full = count >= subject.capacity;
+            return (
+              <div key={subject.id} className={`rounded-[1.25rem] border p-4 ${full ? "border-red-200/30 bg-red-500/15" : "border-white/10 bg-white/10"}`}>
+                <div className="text-2xl">{subject.icon}</div>
+                <div className="mt-2 font-black">{subject.title}</div>
+                <div className="mt-1 text-sm text-white/75">{count}/{subject.capacity} {full ? "FULL" : "available"}</div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function LearnScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
+  const week = youthCurriculumWeeks.find((item) => item.week === getProgramWeekNumber()) || youthCurriculumWeeks[0];
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">LEARN</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">Today’s knowledge, skills, and growth.</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Curriculum, activity resources, weekly topic selection, almanac, skills, portfolio, and career language live here—not inside emergency operations.</p>
+      </Card>
+      <div className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
+        <Card>
+          <h2 className="text-2xl font-black">Current Week</h2>
+          <div className="mt-3 rounded-[1.35rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+            <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Week {week.week}</div>
+            <div className="mt-2 text-3xl font-black">{week.title}</div>
+            <p className="mt-3 text-sm leading-6 text-white/82">{week.focus}</p>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {week.skills.map((skill) => <div key={skill} className="rounded-2xl bg-black/28 p-3 text-sm font-black">✓ {skill}</div>)}
+          </div>
+        </Card>
+        <TodaysActivityCard setScreen={setScreen} />
+      </div>
+      <Card>
+        <h2 className="text-2xl font-black">Learning Actions</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <ActionButton icon="🧭" title="Weekly Topic Selection" note="Choose one topic; full at 15" onClick={() => setScreen("youth")} />
+          <ActionButton icon="🌦" title="Farm Almanac" note="Weather, season, proverb" onClick={() => setScreen("resources")} />
+          <ActionButton icon="📁" title="Portfolio" note="Evidence and accomplishments" onClick={() => setScreen("completion")} />
+          <ActionButton icon="📄" title="Resume Builder" note="Turn work into career language" onClick={() => setScreen("completion")} />
+        </div>
+      </Card>
+      <Card>
+        <h2 className="text-2xl font-black">8-Week Cultivator Journey</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {youthCurriculumWeeks.map((item) => (
+            <div key={item.week} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Week {item.week}</div>
+              <div className="mt-2 font-black">{item.title}</div>
+              <p className="mt-2 text-xs leading-5 text-white/72">{item.project}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function ExploreEcosystemScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">EXPLORE THE ECOSYSTEM</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">See how food, people, land, learning, and opportunity connect.</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">This is where the larger Bronson Family Farm and Farm & Family Alliance vision belongs. It stays available without cluttering daily field operations.</p>
+      </Card>
+      <div className="grid gap-4 lg:grid-cols-[1fr_.85fr]">
+        <Card>
+          <h2 className="text-2xl font-black">Pathways</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <ActionButton icon="🌲" title="Guest Journey" note="Farm story and place" onClick={() => setScreen("guest")} />
+            <ActionButton icon="🛒" title="Marketplace" note="Food moves, not the farmer" onClick={() => setScreen("marketplace")} />
+            <ActionButton icon="🌾" title="Grower Pathway" note="Crop planning and production" onClick={() => setScreen("grower")} />
+            <ActionButton icon="🤝" title="Partner Pathway" note="Projects and resources" onClick={() => setScreen("partner")} />
+            <ActionButton icon="🍯" title="Value-Added Producer" note="Products and packaging" onClick={() => setScreen("valueAdded")} />
+            <ActionButton icon="🎬" title="Guided Demo" note="Full ecosystem tour" onClick={() => setScreen("demo")} />
+          </div>
+        </Card>
+        <div className="relative min-h-[430px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
+          <img src={IMG.ecosystem} alt="Connected Food Ecosystem" className="absolute inset-0 h-full w-full object-contain p-4" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
+            <div className="text-xl font-black">Connected Food Ecosystem</div>
+            <div className="mt-1 text-sm text-white/78">Explore the image here—not inside Work Today.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResourcesScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
+  const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
+  const media = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []);
+  const memories = [missionControlRecord001, { id: "SAFETY-NAIL-LESSON", title: "Safety Workflow Lesson", date: "June 2026", summary: "A nail injury revealed that emergency contacts, nurse line, incident reports, parent contacts, and media evidence must be visible immediately on mobile devices.", lessonsLearned: ["Incident report must be one tap away.", "Emergency contacts must be pinned.", "Daily information cannot sit near the bottom of the screen.", "Work Today must stay separate from Learn and Explore."] }];
+
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">RESOURCES</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">Tools, references, forms, media, and memory.</h1>
+        <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">Resources replace the word Systems. This is the ecosystem toolbox for crop planning, inventory, almanac, media, forms, and lessons learned.</p>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <h2 className="text-2xl font-black">🌦 Almanac & Live Conditions</h2>
+          <div className="mt-4 grid gap-2 text-sm text-white/84">
+            <div className="rounded-2xl bg-black/28 p-3">Date: {new Date().toLocaleDateString()}</div>
+            <div className="rounded-2xl bg-black/28 p-3">Seasonal focus: hydration, shade, PPE, soil preparation, planting, mulching, and pollinator observation.</div>
+            <div className="rounded-2xl bg-black/28 p-3">Today’s proverb: {todaysMission.proverb}</div>
+            <div className="rounded-2xl bg-black/28 p-3">Safety reminder: check for nails, wire, tools, sharp edges, heat stress, and trip hazards before youth work begins.</div>
+          </div>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">🌱 Crop Planner</h2>
+          <div className="mt-4 grid gap-3">
+            {["Grow Area A — Tomatoes / Peppers", "Grow Area B — Collards / Beans", "Grow Area C — Cucumbers / Squash", "Pollinator Area — Sunflowers / Native Plants"].map((area) => (
+              <div key={area} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black">{area}</div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setScreen("grower")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Grower View</button>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">📦 Inventory</h2>
+          <div className="mt-4 grid gap-2">
+            {inventory.slice(0, 6).map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-2xl bg-black/28 p-3 text-sm">
+                <span className="font-black">{item.name}</span><span className="text-white/70">{item.available}/{item.total} • {item.status}</span>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setScreen("operations")} className="mt-5 rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Inventory</button>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">📚 Resource Library</h2>
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {["Safety Guides", "Incident Procedure", "Supervisor Guide", "Parent Resources", "Youth Career Resources", "Crop Guides", "Marketplace Resources", "Partner Resources"].map((resource) => (
+              <div key={resource} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black">{resource}</div>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">🎥 Media Library</h2>
+          <p className="mt-2 text-sm text-white/78">{media.length} media assets saved locally or through Supabase storage when connected.</p>
+          <button type="button" onClick={() => setScreen("media")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Upload / View Media</button>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">🧠 Ecosystem Memory</h2>
+          <div className="mt-4 grid gap-3">
+            {memories.map((memory) => (
+              <div key={memory.id} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{memory.date}</div>
+                <div className="mt-1 font-black">{memory.title}</div>
+                <p className="mt-2 text-xs leading-5 text-white/72">{memory.summary}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 3);
   const completions = safeRead<CompletionRecord[]>(COMPLETION_KEY, []).slice(0, 2);
@@ -2492,9 +2755,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
   const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("🌲 Take Guided Tour"), subtitle: TT("Experience the ecosystem story one layer at a time."), screen: "demo" },
-    { title: TT("👷 Workforce Program"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Sign in to verify role: youth, parent/guardian, supervisor, or administrator."), screen: workspaceTarget },
-    { title: TT("🛒 Marketplace"), subtitle: TT("Shop, browse products, and connect to farm opportunities."), screen: "marketplace" },
+    { title: TT("🦺 WORK TODAY"), subtitle: TT("Attendance, assignments, emergency contacts, incident reports, media upload, and parent contacts."), screen: "workToday" },
+    { title: TT("📚 LEARN"), subtitle: TT("Today's activity, curriculum, weekly topic selection, skills, portfolio, and almanac."), screen: "learn" },
+    { title: TT("🌍 EXPLORE THE ECOSYSTEM"), subtitle: TT("Farm story, marketplace, growers, partners, guests, volunteers, and community pathways."), screen: "explore" },
+    { title: TT("🧰 RESOURCES"), subtitle: TT("Crop planner, inventory, resource library, media library, and ecosystem memory."), screen: "resources" },
   ];
 
   return (
@@ -2521,7 +2785,7 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
               </p>
             </div>
 
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
               {quickChoices.map((choice) => (
                 <button
                   key={choice.title}
@@ -3172,14 +3436,9 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [guardianName, setGuardianName] = useState("");
   const [guardianPhone, setGuardianPhone] = useState("");
   const [guardianEmail, setGuardianEmail] = useState("");
-  const [guardianPreferredLanguage, setGuardianPreferredLanguage] = useState<LanguageCode>("en");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [programGoal, setProgramGoal] = useState("");
   const [saved, setSaved] = useState("");
-
-  useEffect(() => {
-    setRole("Youth Workforce Participant");
-  }, []);
 
   const save = async () => {
     setSaved("Saving...");
@@ -3245,24 +3504,6 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       };
       const youthResult = await insertRow("youth_participants", YOUTH_KEY, youth);
       if (!youthResult.ok) errors.push(`youth_participants: ${String((youthResult.error as any)?.message || youthResult.error)}`);
-
-      saveYouthFamilyIntake({
-        id: uuid(),
-        youthUserId: profile.id,
-        youthName: fullName,
-        youthFirstName: cleanFirst,
-        youthLastName: cleanLast,
-        youthPhone: phone.trim(),
-        youthEmail: email.trim(),
-        guardianName: guardianName.trim(),
-        guardianRelationship: "Parent / Guardian",
-        guardianEmail: guardianEmail.trim(),
-        guardianPhone: guardianPhone.trim(),
-        guardianPreferredLanguage,
-        portalInviteStatus: "ready_to_invite",
-        created_at: profile.created_at,
-        updated_at: profile.created_at,
-      });
     }
 
     if (errors.length) {
@@ -3277,12 +3518,8 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Registration Center</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Create the profile once. Reuse it everywhere.</h1>
-      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-        <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Workforce Program Role</div>
-        <div className="mt-1 text-2xl font-black">Youth Workforce Participant</div>
-        <p className="mt-2 text-sm leading-6 text-white/72">Youth registration is preselected and locked to prevent choosing the wrong role. Parents are created from the parent/guardian information below.</p>
-      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <SelectField label="Role / Registration Type" value={role} onChange={(v) => setRole(v as Role)} options={roles} />
         <Field label="Preferred Name" value={preferredName} onChange={setPreferredName} />
         <Field label="First Name" value={firstName} onChange={setFirstName} />
         <Field label="Last Name" value={lastName} onChange={setLastName} />
@@ -3298,7 +3535,6 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
             <Field label="Guardian Name" value={guardianName} onChange={setGuardianName} />
             <Field label="Guardian Phone" value={guardianPhone} onChange={setGuardianPhone} />
             <Field label="Guardian Email" value={guardianEmail} onChange={setGuardianEmail} />
-            <SelectField label="Guardian Preferred Language" value={guardianPreferredLanguage} onChange={(v) => setGuardianPreferredLanguage(v as LanguageCode)} options={languageOptions.map((option) => option.code)} />
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <TextArea label="Medical / allergy notes" value={medicalNotes} onChange={setMedicalNotes} />
@@ -3339,7 +3575,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     guardianRelationship: existingFamilyIntake?.guardianRelationship || "Parent / Guardian",
     guardianEmail: existingFamilyIntake?.guardianEmail || "",
     guardianPhone: existingFamilyIntake?.guardianPhone || "",
-    guardianPreferredLanguage: existingFamilyIntake?.guardianPreferredLanguage || language || "en",
   });
   const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone);
   const canChooseWeeklySubject = checkedInToday && familyInfoComplete;
@@ -3373,7 +3608,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       guardianRelationship: familyForm.guardianRelationship.trim() || "Parent / Guardian",
       guardianEmail: familyForm.guardianEmail.trim(),
       guardianPhone: familyForm.guardianPhone.trim(),
-      guardianPreferredLanguage: familyForm.guardianPreferredLanguage as LanguageCode,
       portalInviteStatus: "ready_to_invite",
       created_at: existingFamilyIntake?.created_at || now,
       updated_at: now,
@@ -3437,7 +3671,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 <div className="mt-3 grid gap-2 text-sm font-black text-emerald-50">
                   <div>✅ Parent/guardian contact saved: {existingFamilyIntake?.guardianName}</div>
                   <div>📧 Portal invite ready for: {existingFamilyIntake?.guardianEmail}</div>
-                  <div>🌎 Parent portal language: {languageOptions.find((option) => option.code === existingFamilyIntake?.guardianPreferredLanguage)?.label || "English"}</div>
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -3449,27 +3682,10 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian phone" value={familyForm.guardianPhone} onChange={(e) => setFamilyForm({ ...familyForm, guardianPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth phone optional" value={familyForm.youthPhone} onChange={(e) => setFamilyForm({ ...familyForm, youthPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth email optional" value={familyForm.youthEmail} onChange={(e) => setFamilyForm({ ...familyForm, youthEmail: e.target.value })} />
-                  <label className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white">
-                    <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-white/60">Parent preferred language</span>
-                    <select
-                      value={familyForm.guardianPreferredLanguage}
-                      onChange={(e) => setFamilyForm({ ...familyForm, guardianPreferredLanguage: e.target.value as LanguageCode })}
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm font-black text-white outline-none"
-                    >
-                      {languageOptions.map((option) => (
-                        <option key={option.code} value={option.code} className="bg-black text-white">{option.label}</option>
-                      ))}
-                    </select>
-                  </label>
                   <button type="button" onClick={saveFamilyInformation} className="sm:col-span-2 rounded-[1.1rem] bg-sky-300 px-5 py-4 font-black text-black">Save Parent Portal Contact</button>
                 </div>
               )}
               {familyMessage && <Notice text={familyMessage} />}
-              <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs leading-5 text-white/72">
-                <div className="font-black text-white">Parent invitation preview</div>
-                <div className="mt-1">{getParentInvitationPreview((familyForm.guardianPreferredLanguage || "en") as LanguageCode).subject}</div>
-                <div>{getParentInvitationPreview((familyForm.guardianPreferredLanguage || "en") as LanguageCode).body}</div>
-              </div>
             </div>
 
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -3855,7 +4071,7 @@ function SupervisorDashboard({
           </button>
         ))}
       </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-2">
         {[
           "Start day: attendance, PPE, water, assignment.",
           "During day: wellness review, safety support, incident log.",
@@ -6218,7 +6434,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-2">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments."],
           ["June 8 Featured Project", "Farm Worker Heat Safety & From Soil to Seed: Design, Engineering, Manufacturing, and Contractor teams work in sequence."],
