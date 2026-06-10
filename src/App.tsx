@@ -610,7 +610,8 @@ const todaysMission = {
 
 // =======================================================
 // Weekly Workforce Rotation Model
-// Youth choose ONE subject area per week. Each subject area holds 15 youth.
+// Week 1: youth choose their first subject area. Each subject area holds 15 youth.
+// Week 2 and after: youth do NOT choose; the platform assigns the next available rotation.
 // Youth cannot repeat a subject area they already completed.
 // Supervisors / subject matter experts are assigned by the administrator or lead supervisor.
 // =======================================================
@@ -658,6 +659,9 @@ type YouthFamilyIntake = {
   guardianRelationship: string;
   guardianEmail: string;
   guardianPhone: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  emergencyContactRelationship: string;
   portalInviteStatus: "ready_to_invite" | "sent" | "declined";
   created_at: string;
   updated_at: string;
@@ -784,6 +788,9 @@ function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) 
   const youthUserId = user?.id || "temporary-youth";
   const youthName = user?.name || "Youth Participant";
   const weekNumber = getProgramWeekNumber();
+  if (weekNumber !== 1) {
+    return autoAssignYouthRotation(user);
+  }
   const weekId = getCurrentWeekId();
   const rotations = safeRead<WeeklyRotationAssignment[]>(WEEKLY_ROTATION_KEY, []);
   const existingThisWeek = rotations.find((item) => item.youthUserId === youthUserId && item.weekId === weekId);
@@ -799,6 +806,45 @@ function assignYouthToSubject(user: EcosystemUser | null, subject: SubjectArea) 
     throw new Error("This subject area is full. Choose another available rotation.");
   }
 
+  const supervisor = getSupervisorForSubject(subject.id);
+  const row: WeeklyRotationAssignment = {
+    id: uuid(),
+    youthUserId,
+    youthName,
+    weekId,
+    weekNumber,
+    subjectId: subject.id,
+    subjectTitle: subject.title,
+    supervisorEmail: supervisor?.supervisorEmail,
+    supervisorName: supervisor?.supervisorName,
+    status: "active",
+    created_at: new Date().toISOString(),
+  };
+  safeWrite(WEEKLY_ROTATION_KEY, [row, ...rotations]);
+  return row;
+}
+
+function autoAssignYouthRotation(user: EcosystemUser | null) {
+  const youthUserId = user?.id || "temporary-youth";
+  const youthName = user?.name || "Youth Participant";
+  const weekNumber = getProgramWeekNumber();
+  const weekId = getCurrentWeekId();
+  const rotations = safeRead<WeeklyRotationAssignment[]>(WEEKLY_ROTATION_KEY, []);
+  const existingThisWeek = rotations.find((item) => item.youthUserId === youthUserId && item.weekId === weekId);
+  if (existingThisWeek) return existingThisWeek;
+
+  const completedSubjects = new Set(rotations.filter((item) => item.youthUserId === youthUserId).map((item) => item.subjectId));
+  const openSubjects = workforceSubjectAreas.filter((subject) => {
+    const count = rotations.filter((item) => item.weekId === weekId && item.subjectId === subject.id).length;
+    return !completedSubjects.has(subject.id) && count < subject.capacity;
+  });
+
+  if (!openSubjects.length) {
+    throw new Error("No open rotation areas are available. A supervisor must assign this youth manually.");
+  }
+
+  const startIndex = Math.abs([...youthUserId].reduce((sum, char) => sum + char.charCodeAt(0), 0) + weekNumber) % openSubjects.length;
+  const subject = openSubjects[startIndex];
   const supervisor = getSupervisorForSubject(subject.id);
   const row: WeeklyRotationAssignment = {
     id: uuid(),
@@ -2604,6 +2650,7 @@ function EmergencyContactsScreen({ setScreen, activeUser }: { setScreen: (screen
             <div className="mt-2 flex flex-wrap gap-2">
               <a href={`tel:${currentYouthFamily.guardianPhone}`} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">Call Guardian</a>
               <a href={`mailto:${currentYouthFamily.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black">Email Guardian</a>
+              {currentYouthFamily.emergencyContactPhone && <a href={`tel:${currentYouthFamily.emergencyContactPhone}`} className="rounded-full bg-red-300 px-4 py-2 text-sm font-black text-black">Call Emergency Contact</a>}
             </div>
           </div>
         ) : familyRows.length ? (
@@ -2611,7 +2658,8 @@ function EmergencyContactsScreen({ setScreen, activeUser }: { setScreen: (screen
             {familyRows.slice(0, 12).map((row) => (
               <div key={row.id} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
                 <div className="font-black">{row.youthName}</div>
-                <div className="mt-1 text-sm text-white/75">{row.guardianName}</div>
+                <div className="mt-1 text-sm text-white/75">Guardian: {row.guardianName}</div>
+                {row.emergencyContactName && <div className="mt-1 text-xs text-red-100/80">Emergency: {row.emergencyContactName} • {row.emergencyContactPhone}</div>}
                 <div className="mt-2 flex flex-wrap gap-2">
                   <a href={`tel:${row.guardianPhone}`} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Call</a>
                   <a href={`mailto:${row.guardianEmail}`} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Email</a>
@@ -3741,10 +3789,24 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     guardianRelationship: existingFamilyIntake?.guardianRelationship || "Parent / Guardian",
     guardianEmail: existingFamilyIntake?.guardianEmail || "",
     guardianPhone: existingFamilyIntake?.guardianPhone || "",
+    emergencyContactName: existingFamilyIntake?.emergencyContactName || "",
+    emergencyContactPhone: existingFamilyIntake?.emergencyContactPhone || "",
+    emergencyContactRelationship: existingFamilyIntake?.emergencyContactRelationship || "Emergency Contact",
   });
-  const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone);
-  const canChooseWeeklySubject = checkedInToday && familyInfoComplete;
+  const familyInfoComplete = Boolean(existingFamilyIntake?.guardianName && existingFamilyIntake?.guardianEmail && existingFamilyIntake?.guardianPhone && existingFamilyIntake?.emergencyContactName && existingFamilyIntake?.emergencyContactPhone);
+  const canChooseWeeklySubject = weekNumber === 1 && familyInfoComplete;
   const completionPercent = Math.round((new Set(rotations.filter((item) => item.youthUserId === youthUserId).map((item) => item.subjectId)).size / workforceSubjectAreas.length) * 100);
+
+  useEffect(() => {
+    if (weekNumber > 1 && familyInfoComplete && !currentRotation) {
+      try {
+        const assigned = autoAssignYouthRotation(activeUser);
+        setRotationMessage(`Week ${weekNumber} rotation assigned: ${assigned.subjectTitle}${assigned.supervisorName ? ` with ${assigned.supervisorName}` : ""}.`);
+      } catch (error) {
+        setRotationMessage(error instanceof Error ? error.message : "A supervisor must assign this week's rotation.");
+      }
+    }
+  }, [activeUser?.id, currentRotation?.id, familyInfoComplete, weekNumber]);
 
   const handleSelectSubject = (subject: SubjectArea) => {
     try {
@@ -3757,8 +3819,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   };
 
   const saveFamilyInformation = () => {
-    if (!familyForm.youthFirstName.trim() || !familyForm.youthLastName.trim() || !familyForm.guardianName.trim() || !familyForm.guardianEmail.trim() || !familyForm.guardianPhone.trim()) {
-      setFamilyMessage("Please enter your name and parent/guardian name, email, and phone number.");
+    if (!familyForm.youthFirstName.trim() || !familyForm.youthLastName.trim() || !familyForm.guardianName.trim() || !familyForm.guardianEmail.trim() || !familyForm.guardianPhone.trim() || !familyForm.emergencyContactName.trim() || !familyForm.emergencyContactPhone.trim()) {
+      setFamilyMessage("Please enter youth name, parent/guardian contact, and emergency contact information.");
       return;
     }
     const now = new Date().toISOString();
@@ -3774,6 +3836,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       guardianRelationship: familyForm.guardianRelationship.trim() || "Parent / Guardian",
       guardianEmail: familyForm.guardianEmail.trim(),
       guardianPhone: familyForm.guardianPhone.trim(),
+      emergencyContactName: familyForm.emergencyContactName.trim(),
+      emergencyContactPhone: familyForm.emergencyContactPhone.trim(),
+      emergencyContactRelationship: familyForm.emergencyContactRelationship.trim() || "Emergency Contact",
       portalInviteStatus: "ready_to_invite",
       created_at: existingFamilyIntake?.created_at || now,
       updated_at: now,
@@ -3817,7 +3882,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/82">
               <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Weekly Rule</div>
-              <div className="mt-2 font-bold">Choose one subject area per week. Stay with that subject and supervisor for the week. Next week, choose a different subject.</div>
+              <div className="mt-2 font-bold">Week 1: choose your first topic area. Week 2 and after: the program rotates you automatically. You stay with the assigned topic and supervisor for the week.</div>
             </div>
           </section>
 
@@ -3837,6 +3902,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 <div className="mt-3 grid gap-2 text-sm font-black text-emerald-50">
                   <div>✅ Parent/guardian contact saved: {existingFamilyIntake?.guardianName}</div>
                   <div>📧 Portal invite ready for: {existingFamilyIntake?.guardianEmail}</div>
+                  <div>🚨 Emergency contact saved: {existingFamilyIntake?.emergencyContactName} • {existingFamilyIntake?.emergencyContactPhone}</div>
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -3846,6 +3912,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Relationship" value={familyForm.guardianRelationship} onChange={(e) => setFamilyForm({ ...familyForm, guardianRelationship: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian email" value={familyForm.guardianEmail} onChange={(e) => setFamilyForm({ ...familyForm, guardianEmail: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Parent/guardian phone" value={familyForm.guardianPhone} onChange={(e) => setFamilyForm({ ...familyForm, guardianPhone: e.target.value })} />
+                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency contact name" value={familyForm.emergencyContactName} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactName: e.target.value })} />
+                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency contact phone" value={familyForm.emergencyContactPhone} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactPhone: e.target.value })} />
+                  <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Emergency relationship" value={familyForm.emergencyContactRelationship} onChange={(e) => setFamilyForm({ ...familyForm, emergencyContactRelationship: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth phone optional" value={familyForm.youthPhone} onChange={(e) => setFamilyForm({ ...familyForm, youthPhone: e.target.value })} />
                   <input className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-bold text-white placeholder:text-white/45" placeholder="Youth email optional" value={familyForm.youthEmail} onChange={(e) => setFamilyForm({ ...familyForm, youthEmail: e.target.value })} />
                   <button type="button" onClick={saveFamilyInformation} className="sm:col-span-2 rounded-[1.1rem] bg-sky-300 px-5 py-4 font-black text-black">Save Parent Portal Contact</button>
@@ -3890,7 +3959,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
                 </div>
               ) : (
                 <p className="mt-2 text-sm font-bold leading-6 text-white/82">
-                  After check-in and parent/guardian contact, choose one subject area for this week. Areas close when they reach 15 youth.
+                  Week 1 requires one topic area choice. Week 2 and after are assigned automatically by rotation. Areas close when they reach 15 youth.
                 </p>
               )}
             </div>
@@ -3906,9 +3975,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <section className="mt-4 rounded-[1.75rem] border-2 border-white/12 bg-black/30 p-4 md:p-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Weekly Rotation Choice</div>
-              <h2 className="mt-2 text-3xl font-black">Choose Subject Area</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">One choice per week. Completed subject areas cannot be selected again.</p>
+              <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Weekly Topic Area</div>
+              <h2 className="mt-2 text-3xl font-black">{weekNumber === 1 ? "Choose Week 1 Topic Area" : "Assigned Rotation"}</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Week 1 is the only youth choice. Week 2 and after are assigned automatically. Completed subject areas cannot repeat.</p>
             </div>
             <div className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white/75">Week {weekNumber}</div>
           </div>
@@ -3917,11 +3986,15 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
           {currentRotation ? (
             <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-4 text-sm font-bold leading-6 text-emerald-50">
-              Weekly choice saved. You will remain in <span className="font-black">{currentRotation.subjectTitle}</span> with your assigned supervisor / subject matter expert for this week.
+              This week is locked. You will remain in <span className="font-black">{currentRotation.subjectTitle}</span> with your assigned supervisor / subject matter expert for the week.
+            </div>
+          ) : weekNumber > 1 ? (
+            <div className="mt-4 rounded-2xl border border-sky-200/25 bg-sky-300/12 p-4 text-sm font-bold leading-6 text-sky-50">
+              Week {weekNumber} is assigned by rotation. No youth choice is needed. If your assignment is not showing, ask a supervisor to refresh Mission Control or assign you manually.
             </div>
           ) : !canChooseWeeklySubject ? (
             <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">
-              Complete check-in and save parent/guardian contact information first. Subject area selection unlocks after both are recorded.
+              Save parent/guardian and emergency contact information first. Week 1 topic selection unlocks after profile information is complete. Week 2 and after are assigned automatically.
             </div>
           ) : (
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
