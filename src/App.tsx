@@ -105,6 +105,7 @@ export default function App() {
   const [selectedTopic, setSelectedTopic] = useState("");
   const [savedTopic, setSavedTopic] = useState("");
   const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
+  const [needsSupervisorVerification, setNeedsSupervisorVerification] = useState(false);
   const [message, setMessage] = useState("");
 
   const t = translations[lang];
@@ -138,8 +139,10 @@ export default function App() {
     if (match) {
       setValidatedYouth(match);
       setYouthName(`${match.firstName} ${match.lastName}`);
+      setNeedsSupervisorVerification(false);
     } else {
       setValidatedYouth(null);
+      setNeedsSupervisorVerification(true);
     }
 
     setStep("topic");
@@ -179,6 +182,7 @@ export default function App() {
     setSelectedTopic("");
     setSavedTopic("");
     setValidatedYouth(null);
+    setNeedsSupervisorVerification(false);
   }
 
   const youthHistory = validatedYouth?.completedTopics || [];
@@ -211,7 +215,7 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
-            <p>Youth may enter today with launch access. Records can be verified after work begins.</p>
+            <p>Youth may enter today with PIN-first launch access. Records can be verified after work begins.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
@@ -230,7 +234,7 @@ export default function App() {
           <BackButton onClick={resetHome} />
 
           {step === "checkin" && (
-            <Card title="Youth Launch Access">
+            <Card title="Youth PIN Check-In">
               <p>Enter your PIN if you have it. For launch today, access will not be blocked.</p>
 
               <label>Youth Full Name</label>
@@ -259,6 +263,12 @@ export default function App() {
                 <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
                   Access approved for launch. Continue to topic selection and today’s work.
                 </div>
+
+                {needsSupervisorVerification && (
+                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
+                    Record will be verified later. Youth access is open.
+                  </div>
+                )}
 
                 <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong></p>
               </Card>
@@ -376,7 +386,7 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-5">
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
-            <StatusCard label="Youth Access" value="Open" />
+            <StatusCard label="PIN Access" value="Launch Open" />
             <StatusCard label="Validation" value="After Access" />
             <StatusCard label="Nurse Line" value="Visible" />
             <StatusCard label="Launch Status" value="Ready" />
