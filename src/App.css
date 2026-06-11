@@ -1,0 +1,35 @@
+/* Bronson Family Farm launch support stylesheet.
+   This file exists so src/App.tsx can build successfully. */
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid rgba(24, 57, 43, 0.25);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #fffaf0;
+  color: #18392b;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #18392b;
+  box-shadow: 0 0 0 3px rgba(24, 57, 43, 0.12);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-top: 0.75rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
