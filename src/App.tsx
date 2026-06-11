@@ -76,6 +76,9 @@ type EcosystemUser = {
   accessLevel: AccessLevel;
   status: "online" | "active" | "viewing";
   lastSeen: string;
+  participant_id?: string;
+  profile_id?: string;
+  needs_supervisor_verification?: boolean;
 };
 
 type MasterProfile = {
@@ -121,7 +124,6 @@ type YouthRegistration = {
   medical_notes: string;
   transportation_plan: string;
   program_goal: string;
-  launch_pin?: string;
 };
 
 type AttendanceRecord = {
@@ -299,7 +301,6 @@ const supabase: SupabaseClient | null =
   SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const SESSION_KEY = "bff.launch.activeUser";
-const ACTIVE_PARTICIPANT_KEY = "bff.launch.activeParticipantId";
 const PROFILE_KEY = "bff.launch.profiles";
 const REGISTRATION_KEY = "bff.launch.ecosystem_registrations";
 const YOUTH_KEY = "bff.launch.youth";
@@ -1558,6 +1559,23 @@ function safeWrite<T>(key: string, value: T) {
   } catch {}
 }
 
+function normalizeLaunchText(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function normalizeLaunchPin(value: string) {
+  return value.trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+}
+
+function mergeRowsById<T extends { id?: string; created_at?: string }>(localRows: T[], remoteRows: T[]) {
+  const map = new Map<string, T>();
+  [...localRows, ...remoteRows].forEach((row, index) => {
+    const key = row.id || `row-${index}`;
+    map.set(key, { ...(map.get(key) || {}), ...row });
+  });
+  return Array.from(map.values()).sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+}
+
 
 type JourneyEvent = {
   id: string;
@@ -1719,7 +1737,7 @@ async function insertRow<T extends { id: string }>(table: string, localKey: stri
   return { ok: true, mode: "local-fallback", table: "localStorage", error: lastError };
 }
 
-async function loadSupabaseRows<T extends { id?: string }>(table: string, localKey: string) {
+async function loadSupabaseRows<T extends { id?: string; created_at?: string }>(table: string, localKey: string) {
   const localRows = safeRead<T[]>(localKey, []);
   if (!supabase) return localRows;
 
@@ -1727,16 +1745,11 @@ async function loadSupabaseRows<T extends { id?: string }>(table: string, localK
     try {
       const { data, error } = await supabase.from(candidate).select("*").order("created_at", { ascending: false });
       if (!error && data) {
-        // Launch safety: never let an empty or partial Supabase response erase records
-        // already saved on the device. This was making successful form saves appear lost.
-        const merged = [...(data as T[])];
-        const seen = new Set(merged.map((row: any) => row.id).filter(Boolean));
-        for (const local of localRows) {
-          const id = (local as any).id;
-          if (!id || !seen.has(id)) merged.push(local);
-        }
-        safeWrite(localKey, merged);
-        return merged;
+        // Launch fix: never let an empty or partial Supabase response erase local check-ins.
+        const remoteRows = data as T[];
+        const mergedRows = mergeRowsById(localRows, remoteRows);
+        safeWrite(localKey, mergedRows);
+        return mergedRows;
       }
       if (error) console.warn(`Could not load ${candidate}:`, error);
     } catch (error) {
@@ -1755,116 +1768,6 @@ function saveModeMessage(action: string, result: { mode?: string; table?: string
 function profileName(profile?: MasterProfile) {
   if (!profile) return "Unknown participant";
   return `${profile.preferred_name || profile.first_name} ${profile.last_name}`.trim();
-}
-
-
-function normalizeLaunchText(value: string) {
-  return value.trim().toLowerCase().replace(/[^a-z0-9\s'-]/g, "").replace(/\s+/g, " ");
-}
-
-function normalizeLaunchPin(value: string) {
-  return value.trim().replace(/\D/g, "");
-}
-
-function splitLaunchName(fullName: string) {
-  const parts = fullName.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
-  const firstName = parts[0] || "Youth";
-  const lastName = parts.length > 1 ? parts.slice(1).join(" ") : "Participant";
-  return { firstName, lastName };
-}
-
-const launchYouthRoster = [
-  // Replace or expand this list with the Nesco roster.
-  // The validation repair below does not hard-block launch if a name/PIN is missing here.
-  { firstName: "Jordan", lastName: "Smith", pin: "1234", participantId: "BFF-1234", crew: "Crew A" },
-  { firstName: "Taylor", lastName: "Brown", pin: "5678", participantId: "BFF-5678", crew: "Crew A" },
-];
-
-function findLaunchYouth(nameOrId: string, pin: string) {
-  const entered = normalizeLaunchText(nameOrId);
-  const enteredPin = normalizeLaunchPin(pin);
-  if (!entered && !enteredPin) return null;
-
-  const youthRows = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
-  const profileRows = safeRead<MasterProfile[]>(PROFILE_KEY, []);
-
-  const savedMatch = youthRows.find((row) => {
-    const profile = profileRows.find((p) => p.id === row.profile_id);
-    const savedName = normalizeLaunchText(profile ? `${profile.first_name} ${profile.last_name}` : "");
-    const savedId = normalizeLaunchText(row.participant_id);
-    const savedPin = normalizeLaunchPin(row.launch_pin || "");
-    const pinMatches = enteredPin && savedPin && savedPin === enteredPin;
-    const identityMatches = entered && (savedName === entered || savedId === entered);
-    return (pinMatches && (!entered || identityMatches)) || identityMatches;
-  });
-  if (savedMatch) {
-    const profile = profileRows.find((p) => p.id === savedMatch.profile_id);
-    return {
-      firstName: profile?.first_name || "Youth",
-      lastName: profile?.last_name || "Participant",
-      pin: savedMatch.launch_pin || enteredPin,
-      participantId: savedMatch.participant_id,
-      crew: savedMatch.crew || "Crew A",
-      verified: Boolean(savedMatch.launch_pin && enteredPin && normalizeLaunchPin(savedMatch.launch_pin) === enteredPin),
-    };
-  }
-
-  const rosterMatch = launchYouthRoster.find((row) => {
-    const rosterName = normalizeLaunchText(`${row.firstName} ${row.lastName}`);
-    const rosterId = normalizeLaunchText(row.participantId);
-    const rosterPin = normalizeLaunchPin(row.pin);
-    const pinMatches = enteredPin && rosterPin === enteredPin;
-    const identityMatches = entered && (rosterName === entered || rosterId === entered);
-    return (pinMatches && (!entered || identityMatches)) || identityMatches;
-  });
-  if (rosterMatch) return { ...rosterMatch, verified: true };
-
-  return null;
-}
-
-function ensureYouthLaunchRecord(nameOrId: string, pin: string) {
-  const rosterMatch = findLaunchYouth(nameOrId, pin);
-  const enteredPin = normalizeLaunchPin(pin);
-  const fallbackName = rosterMatch ? `${rosterMatch.firstName} ${rosterMatch.lastName}` : nameOrId.trim();
-  const { firstName, lastName } = splitLaunchName(fallbackName || `Youth ${enteredPin || "Participant"}`);
-  const participantId = rosterMatch?.participantId || (enteredPin ? `BFF-${enteredPin}` : `BFF-${Math.floor(100000 + Math.random() * 899999)}`);
-  const now = new Date().toISOString();
-
-  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
-  const youthRows = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
-  const existingYouth = youthRows.find((row) => row.participant_id === participantId);
-  const existingProfile = existingYouth ? profiles.find((p) => p.id === existingYouth.profile_id) : undefined;
-
-  const profile: MasterProfile = existingProfile || {
-    id: uuid(),
-    profile_type: "youth",
-    first_name: firstName,
-    last_name: lastName,
-    preferred_name: firstName,
-    active: true,
-    created_at: now,
-  };
-
-  const youth: YouthRegistration = existingYouth || {
-    id: uuid(),
-    profile_id: profile.id,
-    participant_id: participantId,
-    age_range: "14-18",
-    crew: rosterMatch?.crew || "Crew A",
-    guardian_name: "Parent / Guardian",
-    guardian_phone: "",
-    guardian_email: "",
-    emergency_contact: "Parent / Guardian",
-    medical_notes: "",
-    transportation_plan: "Parent/guardian pickup",
-    program_goal: "Build skills, responsibility, and confidence.",
-    launch_pin: enteredPin || rosterMatch?.pin || "",
-  };
-
-  safeWrite(PROFILE_KEY, [profile, ...profiles.filter((p) => p.id !== profile.id)]);
-  safeWrite(YOUTH_KEY, [youth, ...youthRows.filter((row) => row.participant_id !== youth.participant_id)]);
-  safeWrite(ACTIVE_PARTICIPANT_KEY, youth.participant_id);
-  return { profile, youth, verified: Boolean(rosterMatch?.verified) };
 }
 
 function roleToProfileType(role: Role): ProfileType {
@@ -1974,14 +1877,17 @@ function App() {
     scrollToTop();
   };
 
-  const signIn = (role: Role, name?: string) => {
+  const signIn = (role: Role, name?: string, options?: Partial<EcosystemUser>) => {
     const user: EcosystemUser = {
-      id: uuid(),
-      name: name?.trim() || `${role} User`,
+      id: options?.id || uuid(),
+      name: name?.trim() || options?.name || `${role} User`,
       role,
       accessLevel: roleAccess[role],
       status: "active",
       lastSeen: nowLabel(),
+      participant_id: options?.participant_id,
+      profile_id: options?.profile_id,
+      needs_supervisor_verification: options?.needs_supervisor_verification,
     };
     safeWrite(SESSION_KEY, user);
     const target = routeForRole(role);
@@ -1993,7 +1899,6 @@ function App() {
 
   const signOut = () => {
     safeWrite<EcosystemUser | null>(SESSION_KEY, null);
-    safeWrite(ACTIVE_PARTICIPANT_KEY, "");
     setActiveUser(null);
     setScreenState("portal");
     scrollToTop();
@@ -2827,12 +2732,13 @@ function MyWorkspace({
   activeUser,
   setScreen,
 }: {
-  signIn: (role: Role, name?: string) => void;
+  signIn: (role: Role, name?: string, options?: Partial<EcosystemUser>) => void;
   activeUser: EcosystemUser | null;
   setScreen: (screen: Screen) => void;
 }) {
   const [name, setName] = useState("");
-  const [pin, setPin] = useState("");
+  const [youthName, setYouthName] = useState("");
+  const [youthPin, setYouthPin] = useState("");
   const [accessMessage, setAccessMessage] = useState("");
   const [showAccessTools, setShowAccessTools] = useState(!activeUser);
 
@@ -2920,16 +2826,42 @@ function MyWorkspace({
   const visibleCards = workspaceCards.filter((card) => card.show);
 
   const verifyYouthAndStart = () => {
-    const enteredName = name.trim();
-    const enteredPin = normalizeLaunchPin(pin);
-    if (!enteredName && !enteredPin) {
-      setAccessMessage("Enter the youth name, Participant ID, or PIN. A supervisor can assist if the record does not match.");
+    const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
+    const youthRows = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+    const enteredName = normalizeLaunchText(youthName || name);
+    const enteredPin = normalizeLaunchPin(youthPin || name);
+
+    const matchedYouth = youthRows.find((youth) => {
+      const profile = profiles.find((item) => item.id === youth.profile_id);
+      const fullName = normalizeLaunchText(`${profile?.first_name || ""} ${profile?.last_name || ""}`);
+      const preferredName = normalizeLaunchText(`${profile?.preferred_name || ""} ${profile?.last_name || ""}`);
+      const participant = normalizeLaunchPin(youth.participant_id);
+      const lastName = normalizeLaunchText(profile?.last_name || "");
+
+      const nameMatches = !enteredName || fullName === enteredName || preferredName === enteredName || (lastName && enteredName.endsWith(lastName));
+      const pinMatches = !enteredPin || participant === enteredPin || participant.endsWith(enteredPin) || enteredPin.endsWith(participant);
+      return nameMatches && pinMatches;
+    });
+
+    if (matchedYouth) {
+      const profile = profiles.find((item) => item.id === matchedYouth.profile_id);
+      const displayName = profileName(profile) === "Unknown participant" ? youthName || matchedYouth.participant_id : profileName(profile);
+      setAccessMessage("Youth access verified. Opening Start My Day.");
+      signIn("Youth Workforce Participant", displayName, {
+        participant_id: matchedYouth.participant_id,
+        profile_id: matchedYouth.profile_id,
+        needs_supervisor_verification: false,
+      });
       return;
     }
 
-    const result = ensureYouthLaunchRecord(enteredName, enteredPin);
-    setAccessMessage(result.verified ? "Youth access verified. Opening the Youth Workspace." : "Supervisor-assisted youth access opened. Opening the Youth Workspace.");
-    signIn("Youth Workforce Participant", profileName(result.profile));
+    // Launch fix: do not block youth because a roster, PIN, spelling, or Supabase record is missing.
+    const fallbackParticipantId = normalizeLaunchPin(youthPin) || `BFF-${Math.floor(100000 + Math.random() * 899999)}`;
+    setAccessMessage("Supervisor-assisted youth access opened. Start My Day will save locally and staff can verify the record.");
+    signIn("Youth Workforce Participant", youthName || name || "Youth Workforce Participant", {
+      participant_id: fallbackParticipantId,
+      needs_supervisor_verification: true,
+    });
   };
 
   return (
@@ -2973,39 +2905,34 @@ function MyWorkspace({
         </button>
         {showAccessTools && (
           <div className="mt-5">
-            <div className="grid max-w-3xl gap-3 md:grid-cols-2">
-              <Field label="Youth Name or Participant ID" value={name} onChange={setName} placeholder="Example: BFF-825435 or first and last name" />
-              <Field label="Assigned PIN / Password" value={pin} onChange={setPin} placeholder="PIN number" />
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button type="button" onClick={verifyYouthAndStart} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">
-                Verify Youth / Start My Day
-              </button>
-              <button type="button" onClick={() => signIn("Supervisor / Staff", name || "Supervisor / Staff")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">
-                Supervisor / Staff Access
-              </button>
-              <button type="button" onClick={() => signIn("Parent / Guardian", name || "Parent / Guardian")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">
-                Parent / Guardian Access
-              </button>
-            </div>
-            {accessMessage && <Notice text={accessMessage} />}
-            <details className="mt-5 rounded-2xl border border-white/10 bg-white/8 p-4">
-              <summary className="cursor-pointer text-sm font-black text-emerald-50">Other role access</summary>
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {roles.filter((role) => !["Youth Workforce Participant", "Supervisor / Staff", "Parent / Guardian"].includes(role)).map((role) => (
-                  <button type="button"
-                    key={role}
-                    onClick={() => signIn(role, name)}
-                    className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
-                  >
-                    <div className="text-lg font-black">{role}</div>
-                    <div className="mt-2 text-sm opacity-85">Workspace: {screenLabel(routeForRole(role))}</div>
-                  </button>
-                ))}
+            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+              <div className="text-sm font-black uppercase tracking-[0.22em] text-emerald-100/75">Youth Launch Access</div>
+              <p className="mt-2 text-sm leading-6 text-white/78">Youth may enter name and assigned PIN. If the roster does not match, supervisor-assisted access opens instead of blocking Start My Day.</p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <Field label="Youth Name" value={youthName} onChange={setYouthName} placeholder="First and last name" />
+                <Field label="Assigned PIN / Participant ID" value={youthPin} onChange={setYouthPin} placeholder="PIN number" />
               </div>
-            </details>
+              <button type="button" onClick={verifyYouthAndStart} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Verify Youth + Start My Day</button>
+              {accessMessage && <Notice text={accessMessage} />}
+            </div>
+
+            <div className="mt-5 max-w-xl">
+              <Field label="Name / Participant ID for this session" value={name} onChange={setName} placeholder="Example: BFF-825435 or Supervisor Aide" />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {roles.map((role) => (
+                <button type="button"
+                  key={role}
+                  onClick={() => signIn(role, name)}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
+                >
+                  <div className="text-lg font-black">{role}</div>
+                  <div className="mt-2 text-sm opacity-85">Workspace: {screenLabel(routeForRole(role))}</div>
+                </button>
+              ))}
+            </div>
             <div className="mt-4 text-xs leading-6 text-white/60">
-              Youth participating through Nesco should already be in the system. They verify information instead of re-registering. Youth do not need a phone: use Participant ID + last name, badge QR, or supervisor lookup.
+              Youth participating through Nesco should already be in the system. They verify information instead of re-registering. Youth do not need a phone: use Participant ID + last name, badge QR, PIN, or supervisor lookup.
             </div>
           </div>
         )}
@@ -3986,7 +3913,7 @@ function SupervisorReports({
 function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
-  const [participantId, setParticipantId] = useState(() => safeRead<string>(ACTIVE_PARTICIPANT_KEY, ""));
+  const [participantId, setParticipantId] = useState(activeUser?.participant_id || "");
   const [mood, setMood] = useState("Okay");
   const [energy, setEnergy] = useState("Medium");
   const [sleep, setSleep] = useState("Okay");
@@ -4015,9 +3942,9 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       const loadedYouth = await loadSupabaseRows<YouthRegistration>("youth_participants", YOUTH_KEY);
       setProfiles(loadedProfiles);
       setYouth(loadedYouth);
-      if (!participantId && loadedYouth[0]?.participant_id) {
-        setParticipantId(loadedYouth[0].participant_id);
-        safeWrite(ACTIVE_PARTICIPANT_KEY, loadedYouth[0].participant_id);
+      if (!participantId) {
+        if (activeUser?.participant_id) setParticipantId(activeUser.participant_id);
+        else if (loadedYouth[0]?.participant_id) setParticipantId(loadedYouth[0].participant_id);
       }
     };
     void load();
@@ -4025,8 +3952,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
   const demoYouth: YouthRegistration = {
     id: "demo-youth-registration",
-    profile_id: activeUser?.id || "demo-profile",
-    participant_id: "BFF-736309",
+    profile_id: activeUser?.profile_id || activeUser?.id || "demo-profile",
+    participant_id: activeUser?.participant_id || "BFF-736309",
     age_range: "14-18",
     crew: "Crew A",
     guardian_name: "Parent / Guardian",
@@ -4038,7 +3965,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     program_goal: "Build skills, responsibility, and confidence.",
   };
 
-  const selectedYouth = youth.find((y) => y.participant_id === participantId) || youth[0] || demoYouth;
+  const selectedYouth = youth.find((y) => y.participant_id === participantId) || (activeUser?.participant_id ? demoYouth : youth[0]) || demoYouth;
   const selectedProfile = profiles.find((p) => p.id === selectedYouth?.profile_id);
   const profileId = selectedYouth?.profile_id || activeUser?.id || "anonymous";
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -4124,6 +4051,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
           <h1 className="mt-2 text-3xl font-black md:text-5xl">Start My Day</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Fast check-in for attendance, PPE, daily goal, and support needs.</p>
+          {activeUser?.needs_supervisor_verification && (
+            <div className="mt-3 rounded-2xl border border-amber-300/40 bg-amber-300/14 p-3 text-sm font-bold text-amber-50">
+              Supervisor-assisted access is active. This check-in will still save, and staff can verify the youth record later.
+            </div>
+          )}
         </div>
         <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 px-4 py-3 text-right">
           <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">Check-In Time</div>
@@ -4136,7 +4068,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Identity</div>
           <div className="mt-2">
-            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={(value) => { setParticipantId(value); safeWrite(ACTIVE_PARTICIPANT_KEY, value); }} options={(youth.length ? youth : [demoYouth]).map((y) => y.participant_id)} />
+            <SelectField label="Youth Participant" value={selectedYouth?.participant_id || participantId} onChange={setParticipantId} options={(youth.length ? youth : [demoYouth]).map((y) => y.participant_id)} />
           </div>
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-sm leading-6">
             <div className="font-black text-white">{profileName(selectedProfile) === "Unknown participant" ? activeUser?.name || "Youth Participant" : profileName(selectedProfile)}</div>
