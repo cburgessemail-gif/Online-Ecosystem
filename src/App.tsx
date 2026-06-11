@@ -121,10 +121,35 @@ export default function App() {
     "Program Logistics": 8,
   }), []);
 
-  function findYouthByPin() {
-    return employerYouthList.find(
-      (youth) => youth.pin.trim() === pin.trim() && youth.worksite === WORKSITE_NAME
-    );
+  function normalizeText(value: string) {
+    return value.trim().toLowerCase().replace(/\s+/g, " ");
+  }
+
+  function normalizePin(value: string) {
+    return value.trim().replace(/\D/g, "");
+  }
+
+  function findYouthForLaunch() {
+    const enteredName = normalizeText(youthName);
+    const enteredPin = normalizePin(pin);
+
+    if (!employerYouthList || employerYouthList.length === 0) return null;
+
+    return employerYouthList.find((youth) => {
+      const officialName = normalizeText(`${youth.firstName} ${youth.lastName}`);
+      const officialPin = normalizePin(youth.pin);
+      const worksiteMatches = youth.worksite === WORKSITE_NAME;
+
+      if (!worksiteMatches) return false;
+
+      // Best match: name and PIN both match.
+      if (enteredName && enteredPin && officialName === enteredName && officialPin === enteredPin) return true;
+
+      // Launch-safe match: PIN alone is enough to identify the youth today.
+      if (enteredPin && officialPin === enteredPin) return true;
+
+      return false;
+    }) || null;
   }
 
   function topicIsFull(topic: string) {
@@ -134,15 +159,18 @@ export default function App() {
   function submitPinAndContinue() {
     setMessage("");
 
-    const match = findYouthByPin();
+    const match = findYouthForLaunch();
 
     if (match) {
       setValidatedYouth(match);
       setYouthName(`${match.firstName} ${match.lastName}`);
       setNeedsSupervisorVerification(false);
+      setMessage("Access verified. Continue to topic selection.");
     } else {
+      // LAUNCH FIX: youth are not blocked by a missing list, typo, missing PIN, or unmatched record.
       setValidatedYouth(null);
       setNeedsSupervisorVerification(true);
+      setMessage("Supervisor-assisted access opened. Continue now and check in with your supervisor.");
     }
 
     setStep("topic");
@@ -181,8 +209,8 @@ export default function App() {
     setMessage("");
     setSelectedTopic("");
     setSavedTopic("");
-    setValidatedYouth(null);
     setNeedsSupervisorVerification(false);
+    setValidatedYouth(null);
   }
 
   const youthHistory = validatedYouth?.completedTopics || [];
@@ -203,7 +231,6 @@ export default function App() {
             <h1 className="text-3xl font-bold">{t.title}</h1>
             <p className="text-lg opacity-90">{t.subtitle}</p>
           </div>
-
           <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="text-[#18392b] rounded-xl px-4 py-2">
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -215,7 +242,7 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
-            <p>Youth may enter today with PIN-first launch access. Records can be verified after work begins.</p>
+            <p>Youth may enter with name and PIN when available. If a record does not match, supervisor-assisted access opens instead of blocking launch.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
@@ -235,7 +262,7 @@ export default function App() {
 
           {step === "checkin" && (
             <Card title="Youth PIN Check-In">
-              <p>Enter your PIN if you have it. For launch today, access will not be blocked.</p>
+              <p>Enter your name and PIN if you have them. For launch today, missing or unmatched records will not block access.</p>
 
               <label>Youth Full Name</label>
               <input value={youthName} onChange={(e) => setYouthName(e.target.value)} placeholder="Optional today" />
@@ -260,17 +287,17 @@ export default function App() {
           {step === "topic" && (
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="Access Status">
-                <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
-                  Access approved for launch. Continue to topic selection and today’s work.
-                </div>
-
-                {needsSupervisorVerification && (
+                {needsSupervisorVerification ? (
                   <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
-                    Record will be verified later. Youth access is open.
+                    Supervisor-assisted access is open. Continue to topic selection and check in with your supervisor.
+                  </div>
+                ) : (
+                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                    PIN verified. Continue to today’s work.
                   </div>
                 )}
 
-                <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong></p>
+                <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Supervisor-assisted cultivator"}</strong></p>
               </Card>
 
               <Card title={t.chooseTopic}>
@@ -284,13 +311,8 @@ export default function App() {
                     const isSelected = selectedTopic === topic;
 
                     return (
-                      <button
-                        key={topic}
-                        type="button"
-                        disabled={full || completed}
-                        onClick={() => setSelectedTopic(topic)}
-                        className={`w-full text-left p-4 rounded-2xl border ${isSelected ? "bg-[#d8a23a] border-[#8a5a00]" : "bg-[#f7f3e8]"} ${full || completed ? "opacity-50 cursor-not-allowed" : ""}`}
-                      >
+                      <button key={topic} type="button" disabled={full || completed} onClick={() => setSelectedTopic(topic)}
+                        className={`w-full text-left p-4 rounded-2xl border ${isSelected ? "bg-[#d8a23a] border-[#8a5a00]" : "bg-[#f7f3e8]"} ${full || completed ? "opacity-50 cursor-not-allowed" : ""}`}>
                         <strong>{topic}</strong><br />
                         <span>{completed ? "Already completed — choose a new area." : full ? t.full : `${TOPIC_CAP - count} ${t.spots}`}</span>
                       </button>
@@ -321,9 +343,15 @@ export default function App() {
               <Card title="Submission Received">
                 <p>Welcome, <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong>.</p>
 
-                <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
-                  Today’s work is now open. Verification can be completed later.
-                </div>
+                {needsSupervisorVerification ? (
+                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
+                    Supervisor-assisted access. Your submission was received and you may begin with supervisor direction.
+                  </div>
+                ) : (
+                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                    PIN access validated. Today’s work is now open.
+                  </div>
+                )}
 
                 <p>This week’s topic area: <strong>{savedTopic}</strong></p>
               </Card>
@@ -371,6 +399,7 @@ export default function App() {
           <Card title={t.supervisorTools}>
             <Checklist items={[
               "Confirm youth attendance.",
+              "Verify youth manually if access is flagged.",
               "Confirm PPE and proper shoes.",
               "Assign youth to topic area supervisor.",
               "Monitor 15 youth per aide.",
@@ -386,8 +415,8 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-5">
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
-            <StatusCard label="PIN Access" value="Launch Open" />
-            <StatusCard label="Validation" value="After Access" />
+            <StatusCard label="PIN Access" value="Enabled" />
+            <StatusCard label="Supervisor Review" value="Enabled" />
             <StatusCard label="Nurse Line" value="Visible" />
             <StatusCard label="Launch Status" value="Ready" />
           </div>
@@ -399,8 +428,9 @@ export default function App() {
           <BackButton onClick={resetHome} />
           <Card title="Guest / Reviewer View">
             <Checklist items={[
-              "Youth enter with launch access first.",
+              "Youth enter with PIN first.",
               "Name mismatch does not block access.",
+              "Supervisor verification handles problem records.",
               "Youth choose a weekly topic area.",
               "Full topic areas cannot be saved.",
               "Youth receive tools and resources for the work they are doing.",
