@@ -517,6 +517,106 @@ const youthCurriculumWeeks = [
   },
 ];
 
+
+const youthWeekOneDailyPlan = [
+  {
+    day: "Monday",
+    date: "June 8, 2026",
+    curriculum: "Workplace Foundations, Safety, PPE, and Cooling Station Challenge launch",
+    focus: "Youth learn the daily rhythm, confirm PPE and water, understand heat safety, and begin the 63 Cooling Fan customer order.",
+    work: ["Check in with supervisor", "Confirm PPE and water", "Watch fan demonstration", "Join Design, Engineering, Manufacturing, Finishing, or Logistics team", "Begin fan production work"],
+    resources: ["Nurse line reminder", "Heat safety checklist", "Fan template / design video", "Team assignment card"],
+    reflection: "What team did you join, and how does your work help create a cooling station?",
+  },
+  {
+    day: "Tuesday",
+    date: "June 9, 2026",
+    curriculum: "Production flow, teamwork, measurement, and quality standards",
+    focus: "Youth continue production while learning how one team depends on another team in a real work system.",
+    work: ["Review yesterday's count", "Continue assembly / finishing", "Check quality standards", "Track completed fans", "Document evidence for portfolio"],
+    resources: ["Quality checklist", "Production count sheet", "Tool safety reminder", "Team communication prompts"],
+    reflection: "Which team depended on your work today?",
+  },
+  {
+    day: "Wednesday",
+    date: "June 10, 2026",
+    curriculum: "Farm infrastructure, cooling station purpose, safety zones, and customer needs",
+    focus: "Youth connect the fan project to farm operations, worker protection, guest safety, and outdoor heat awareness.",
+    work: ["Review cooling station purpose", "Support staging and logistics", "Identify shade / water / safety zones", "Continue production or quality check", "Record lessons learned"],
+    resources: ["Cooling station safety map", "Water and shade checklist", "Infrastructure vocabulary", "Supervisor observation prompts"],
+    reflection: "How does a cooling station help farm workers, volunteers, or visitors?",
+  },
+  {
+    day: "Thursday",
+    date: "June 11, 2026",
+    curriculum: "Career pathways, customer order completion, presentation, and responsibility",
+    focus: "Youth connect their team role to real careers in design, engineering, manufacturing, logistics, construction, agriculture, and operations.",
+    work: ["Finish assigned production tasks", "Prepare customer-ready items", "Identify career skills used", "Update portfolio evidence", "Practice explaining team contribution"],
+    resources: ["Career pathway cards", "Portfolio evidence checklist", "Customer service language", "Presentation prompts"],
+    reflection: "What career pathway did you see in today's work?",
+  },
+  {
+    day: "Friday",
+    date: "June 12, 2026",
+    curriculum: "Reflection, achievement, supervisor feedback, portfolio evidence, and next-week readiness",
+    focus: "Youth close the week by reviewing what they built, what they learned, and what evidence belongs in their workforce portfolio.",
+    work: ["Complete weekly reflection", "Review supervisor feedback", "Record achievement evidence", "Prepare for next week's agriculture rotation", "Celebrate team progress"],
+    resources: ["Weekly reflection guide", "Achievement badge checklist", "Parent-safe summary prompt", "Next week preview"],
+    reflection: "What are you proud of this week, and what do you want to learn next?",
+  },
+];
+
+const youthTopicRotationAreas = [
+  {
+    title: "Regenerative Agriculture",
+    week: "Week 2",
+    description: "Soil health, planting, watering, crop care, companion planting, compost, and observation.",
+    resources: ["Companion planting guide", "Soil health checklist", "Planting and watering basics", "Crop observation prompts"],
+  },
+  {
+    title: "Infrastructure",
+    week: "Week 3",
+    description: "Fencing, water systems, shade, work zones, tools, site setup, and safety planning.",
+    resources: ["Tool safety basics", "Site setup checklist", "Cooling station map", "Infrastructure vocabulary"],
+  },
+  {
+    title: "Apiary & Pollination",
+    week: "Rotation Week",
+    description: "Pollinator awareness, habitat, bee observation safety, flowers, and food-system connections.",
+    resources: ["Pollinator protection basics", "Bee observation safety", "Flower and habitat guide"],
+  },
+  {
+    title: "Culinary & Nutrition",
+    week: "Rotation Week",
+    description: "Harvest handling, food safety awareness, produce-to-plate thinking, and nutrition connections.",
+    resources: ["Harvest handling basics", "Food safety overview", "Produce-to-plate reflection"],
+  },
+  {
+    title: "Guest Services & Tourism",
+    week: "Rotation Week",
+    description: "Welcoming guests, telling the farm story, customer service, tours, and respectful communication.",
+    resources: ["Farm story talking points", "Welcoming guests", "Respectful communication"],
+  },
+  {
+    title: "Media & Storytelling",
+    week: "Rotation Week",
+    description: "Documenting progress, before-and-after photos, consent reminders, and positive storytelling.",
+    resources: ["Photo/video consent reminder", "Storytelling prompts", "Before-and-after documentation"],
+  },
+  {
+    title: "Safety & Emergency Prep",
+    week: "Every Week",
+    description: "PPE, hydration, heat safety, nurse line visibility, site boundaries, and emergency readiness.",
+    resources: ["PPE checklist", "Heat safety", "Nurse line reminder", "Emergency procedure card"],
+  },
+  {
+    title: "Program Logistics",
+    week: "Every Week",
+    description: "Attendance, rotations, daily closeout, supervisor communication, and team accountability.",
+    resources: ["Attendance expectations", "Team rotation overview", "Daily closeout checklist"],
+  },
+];
+
 const youthAchievementBadges = youthCurriculumWeeks.map((week) => ({
   title: week.badge,
   week: `Week ${week.week}`,
@@ -2022,8 +2122,9 @@ function Shell({
       </div>
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
-      <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 md:px-6">
-        <div className="sticky top-2 z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/58 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
+      <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 pb-8 md:px-6">
+        <NurseLineBanner setScreen={setScreen} />
+        <div className="sticky top-[4.75rem] z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/58 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
@@ -2083,6 +2184,24 @@ function Shell({
         </div>
         {children}
         <CompactProprietaryFooter />
+      </div>
+    </div>
+  );
+}
+
+
+function NurseLineBanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  return (
+    <div className="sticky top-0 z-[60] mb-3 rounded-[1.15rem] border border-red-200/35 bg-red-700/92 px-3 py-2 text-white shadow-[0_18px_55px_rgba(0,0,0,.42)] backdrop-blur-xl">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-[11px] font-black uppercase tracking-[0.24em] text-red-50/85">Nurse Line • Visible At All Times</div>
+          <div className="text-sm font-black leading-snug sm:text-base">Health concern, heat concern, injury, medication issue, or urgent support: tell the site lead immediately.</div>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Wellness</button>
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/45 bg-black/20 px-4 py-2 text-xs font-black text-white sm:text-sm">Report</button>
+        </div>
       </div>
     </div>
   );
@@ -3131,6 +3250,63 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <div className="mt-4 flex flex-wrap gap-2">
             {currentWeek.skills.map((skill) => (
               <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
+          <h2 className="mt-3 text-3xl font-black">Week 1 Daily Work Plan</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">Youth work is organized by curriculum and by day so they know what they are doing, why it matters, which resources support the work, and what reflection closes the day.</p>
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {youthWeekOneDailyPlan.map((day) => (
+              <div key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{day.day}</div>
+                    <h3 className="mt-1 text-xl font-black">{day.date}</h3>
+                  </div>
+                  <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">Week 1</span>
+                </div>
+                <div className="mt-4 rounded-2xl border border-emerald-200/15 bg-emerald-300/10 p-3">
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Curriculum</div>
+                  <div className="mt-1 text-sm font-black">{day.curriculum}</div>
+                  <p className="mt-2 text-xs leading-5 text-white/72">{day.focus}</p>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Today’s Work</div>
+                    <ul className="mt-2 space-y-1 text-xs leading-5 text-white/78">
+                      {day.work.map((item) => <li key={item}>• {item}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Tools & Resources</div>
+                    <ul className="mt-2 space-y-1 text-xs leading-5 text-white/78">
+                      {day.resources.map((item) => <li key={item}>• {item}</li>)}
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs leading-5 text-white/76"><strong>Reflection:</strong> {day.reflection}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🧭 Curriculum Topic Rotations</div>
+          <h2 className="mt-3 text-3xl font-black">Topic Areas, Resources, and Supervisor Support</h2>
+          <p className="mt-3 text-sm leading-7 text-white/82">Youth rotate through curriculum areas without losing the daily structure. Each area includes tools and resources so youth understand what they are doing before they commit to the work.</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {youthTopicRotationAreas.map((area) => (
+              <div key={area.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{area.week}</div>
+                <h3 className="mt-2 text-lg font-black">{area.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-white/72">{area.description}</p>
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {area.resources.map((resource) => <span key={resource} className="rounded-full bg-black/25 px-2 py-1 text-[10px] font-bold text-white/74">{resource}</span>)}
+                </div>
+              </div>
             ))}
           </div>
         </Card>
