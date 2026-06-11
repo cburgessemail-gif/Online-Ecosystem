@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 1.3 - ROLE PATHWAY AUDIT FIX + IMAGE PATH RESTORE
+ * LAUNCH CANDIDATE 3.1 - ECOSYSTEM + ENTREPRENEURSHIP RECOVERY LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -17,6 +17,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Reports
  * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
+ * - Restores Youth Command Center: nurse line, field status, Almanac, notifications, ecosystem map, entrepreneurship value stack, daily rhythm, and media evidence upload
  */
 
 type Screen =
@@ -322,6 +323,57 @@ const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
+const FARM_STATUS_KEY = "bff.launch.farmStatus";
+const NOTIFICATION_KEY = "bff.launch.notifications";
+
+type FarmOperationStatus = {
+  level: "Open" | "Modified Operations" | "Closed";
+  color: "green" | "amber" | "red";
+  title: string;
+  summary: string;
+  action: string;
+  updated_at: string;
+};
+
+type EcosystemNotification = {
+  id: string;
+  audience: "Youth" | "Parent" | "Supervisor" | "Mission Control" | "All";
+  priority: "Info" | "Action" | "Safety" | "Urgent";
+  title: string;
+  body: string;
+  created_at: string;
+};
+
+const defaultFarmStatus: FarmOperationStatus = {
+  level: "Modified Operations",
+  color: "amber",
+  title: "Heat Index Warning — Modified Outdoor Operations",
+  summary: "Outdoor field work may be shortened, moved to shade, or suspended when heat conditions create risk for youth, staff, volunteers, or visitors.",
+  action: "Hydrate, use shade, check in with supervisors, and follow the current farm-status decision before beginning outdoor work.",
+  updated_at: new Date().toISOString(),
+};
+
+const launchAlmanacSnapshot = {
+  label: "Live-ready Almanac Snapshot",
+  note: "Connect this card to live weather/heat-index data when the weather API is added. For launch, Mission Control can post the operational decision here.",
+  conditions: [
+    ["Farm Status", "Modified Operations"],
+    ["Heat Risk", "Warning level — supervisor decision required"],
+    ["Water Breaks", "Every 20–30 minutes or more often"],
+    ["Shade / Cooling", "Required during outdoor work"],
+    ["Outdoor Work", "End early or move indoors when directed"],
+    ["Youth Safety", "Nurse Line + site lead visible before work begins"],
+  ],
+  farmWisdom: "The farm teaches planning: weather changes the work, and good workers adjust before people are harmed.",
+};
+
+const defaultNotifications: EcosystemNotification[] = [
+  { id: "heat-alert", audience: "All", priority: "Safety", title: "Heat Index Warning", body: "Farm operations may be modified. Supervisors may end outdoor work early, increase water breaks, and move teams to shade or indoor learning.", created_at: new Date().toISOString() },
+  { id: "today-assignment", audience: "Youth", priority: "Action", title: "Start with Safety, Then Assignment", body: "Check the Nurse Line, field status, Almanac, and today's project before starting work.", created_at: new Date().toISOString() },
+  { id: "media-evidence", audience: "Youth", priority: "Info", title: "Upload Evidence Freely", body: "For launch, youth may upload photos or videos without a permission gate. Permissions and publication controls will be addressed later.", created_at: new Date().toISOString() },
+  { id: "parent-notice", audience: "Parent", priority: "Info", title: "Parent Updates Follow Farm Status", body: "Parents should check program status, early shutdown notes, and supervisor announcements when heat or weather changes the day.", created_at: new Date().toISOString() },
+];
+
 
 const IMG = {
   // Public-folder image paths. Files are in /public, so they are referenced from the site root.
@@ -2278,6 +2330,202 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 }
 
 
+function getFarmStatus() {
+  return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+}
+
+function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
+  const rows = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+  if (!audience) return rows;
+  return rows.filter((item) => item.audience === audience || item.audience === "All");
+}
+
+function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
+  const farmStatus = getFarmStatus();
+  const notifications = getLaunchNotifications().slice(0, compact ? 3 : 4);
+  const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
+
+  return (
+    <Card className={compact ? "p-4" : ""}>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Notifications</div>
+      <h2 className="mt-3 text-3xl font-black">Bronson Daily Operating Status</h2>
+      <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
+            <div className="mt-1 text-2xl font-black">{farmStatus.title}</div>
+            <p className="mt-2 text-sm leading-6 text-white/84">{farmStatus.summary}</p>
+          </div>
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/20 bg-black/28 px-4 py-2 text-sm font-black">Supervisor View</button>
+        </div>
+        <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold leading-6 text-white/86">Action: {farmStatus.action}</div>
+      </div>
+
+      {!compact && (
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {launchAlmanacSnapshot.conditions.map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+              <div className="mt-2 text-sm font-black leading-5">{value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
+        <strong>{launchAlmanacSnapshot.label}:</strong> {launchAlmanacSnapshot.farmWisdom}
+        <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {notifications.map((note) => (
+          <div key={note.id} className="rounded-2xl border border-white/10 bg-black/28 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/72">{note.audience}</span>
+              <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-black text-emerald-50">{note.priority}</span>
+            </div>
+            <div className="mt-2 text-lg font-black">{note.title}</div>
+            <p className="mt-1 text-sm leading-6 text-white/76">{note.body}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function EcosystemImageContextCard() {
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Where Today’s Work Fits</div>
+      <h2 className="mt-3 text-3xl font-black">Connected Food Ecosystem</h2>
+      <p className="mt-3 text-sm leading-7 text-white/82">Youth are not only completing tasks. Youth are contributing to a system where food, safety, customers, growers, partners, marketplace, families, and opportunity connect.</p>
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_.9fr]">
+        <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35">
+          <img src={IMG.ecosystem} alt="Connected Food Ecosystem map" className="h-full max-h-[420px] w-full object-contain p-3" onError={(event) => (event.currentTarget.src = IMG.forest)} />
+        </div>
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-100/75">You Are Here</div>
+          <div className="mt-2 text-2xl font-black">📍 Youth Workforce</div>
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-black">
+            {["Farm Need", "Youth Workforce", "Project", "Customer", "Marketplace", "Community Impact"].map((item, index) => (
+              <React.Fragment key={item}>
+                <span className={item === "Youth Workforce" ? "rounded-full bg-emerald-300 px-3 py-2 text-black" : "rounded-full border border-white/10 bg-white/10 px-3 py-2 text-white"}>{item}</span>
+                {index < 5 && <span className="text-emerald-100/70">→</span>}
+              </React.Fragment>
+            ))}
+          </div>
+          <p className="mt-4 text-sm leading-7 text-white/82">This map keeps the ecosystem and entrepreneurship together: the work solves real farm needs, creates value, builds evidence, and prepares youth for future opportunity.</p>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const stages = [
+    { title: "Beginning of Day", icon: "🌞", body: "Check in, read the Nurse Line, review weather, heat index, farm status, PPE, water, today’s assignment, and daily inspiration.", actions: ["Attendance", "PPE", "Almanac", "Assignment"] },
+    { title: "During Program", icon: "🚜", body: "Do the work, use resources, ask supervisors, upload evidence, connect the task to skills, career pathways, and entrepreneurship.", actions: ["Project", "Resources", "Career", "Evidence"] },
+    { title: "End of Day", icon: "🌙", body: "Reflect, save portfolio evidence, receive supervisor feedback, prepare parent-safe summary, and preview tomorrow’s work.", actions: ["Reflection", "Assessment", "Portfolio", "Tomorrow"] },
+  ];
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Rhythm in Threes</div>
+      <h2 className="mt-3 text-3xl font-black">Beginning • During • End</h2>
+      <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        {stages.map((stage) => (
+          <div key={stage.title} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-3xl">{stage.icon}</div>
+            <h3 className="mt-2 text-xl font-black">{stage.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-white/76">{stage.body}</p>
+            <div className="mt-3 flex flex-wrap gap-1">
+              {stage.actions.map((action) => <span key={action} className="rounded-full bg-black/25 px-2 py-1 text-[10px] font-bold text-white/75">{action}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Current Project</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
+      </div>
+    </Card>
+  );
+}
+
+function EntrepreneurshipValueCard() {
+  const items = [
+    ["Customer", "Bronson Family Farm and the contractor need a safer cooling area for summer outdoor operations."],
+    ["Problem", "Heat stress can harm youth, workers, volunteers, and visitors and can shut down production."],
+    ["Solution", "Youth teams produce, finish, document, and stage cooling-fan work that supports the cooling station."],
+    ["Value", "The project protects people, supports operations, creates portfolio evidence, and teaches how work becomes service and economic opportunity."],
+    ["Opportunity", "Design, engineering, manufacturing, logistics, agriculture, construction, public safety, customer service, and entrepreneurship."],
+  ];
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Entrepreneurship Layer</div>
+      <h2 className="mt-3 text-3xl font-black">Problem → Customer → Solution → Value</h2>
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {items.map(([label, body]) => (
+          <div key={label} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+            <p className="mt-2 text-xs font-bold leading-5 text-white/78">{body}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | null }) {
+  const [assets, setAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
+  const [notice, setNotice] = useState("");
+  const saveLocalFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const row: MediaAsset = {
+        id: uuid(),
+        title: file.name,
+        category: "Youth Portfolio Evidence",
+        file_name: file.name,
+        file_url: String(reader.result || ""),
+        file_type: file.type || "file",
+        file_size: file.size,
+        uploaded_by: activeUser?.name || "Youth Workforce Participant",
+        storage_path: `local/youth-evidence/${file.name}`,
+        created_at: new Date().toISOString(),
+      };
+      const next = [row, ...assets].slice(0, 80);
+      setAssets(next);
+      safeWrite(MEDIA_ASSETS_KEY, next);
+      setNotice("Evidence uploaded and saved immediately. Publication permissions can be addressed later.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media Evidence Upload</div>
+      <h2 className="mt-3 text-3xl font-black">Upload Without Permission Gate</h2>
+      <p className="mt-3 text-sm leading-7 text-white/82">For launch, youth can upload photos or videos immediately. The upload should not block access to the ecosystem, curriculum, project work, reflection, or portfolio.</p>
+      <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-emerald-200/35 bg-emerald-300/10 p-6 text-center hover:bg-emerald-300/18">
+        <span className="text-2xl font-black">📷 Upload Photo / Video Evidence</span>
+        <span className="mt-2 text-sm font-bold text-white/72">Saved locally now; Supabase/media permissions can be hardened later.</span>
+        <input className="hidden" type="file" accept="image/*,video/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) saveLocalFile(file); e.currentTarget.value = ""; }} />
+      </label>
+      {notice && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-bold text-emerald-50">{notice}</div>}
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {assets.slice(0, 4).map((asset) => (
+          <div key={asset.id} className="rounded-2xl border border-white/10 bg-black/28 p-3">
+            <div className="truncate text-sm font-black">{asset.file_name}</div>
+            <div className="mt-1 text-[11px] font-bold text-white/60">{asset.category}</div>
+            <div className="mt-1 text-[11px] font-bold text-white/60">Uploaded by {asset.uploaded_by || "Youth"}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const events = safeRead<JourneyEvent[]>(JOURNEY_KEY, []).slice(0, 3);
   const completions = safeRead<CompletionRecord[]>(COMPLETION_KEY, []).slice(0, 2);
@@ -2386,6 +2634,8 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
 
       <div className="grid gap-4">
         <CultureCard language={language} variant="seed" />
+
+        <DailyOperationsCommandCenter setScreen={setScreen} compact />
 
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
@@ -3204,6 +3454,10 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
         <CultureCard language={language} variant="today" />
 
+        <div className="mt-6">
+          <DailyOperationsCommandCenter setScreen={setScreen} compact />
+        </div>
+
         <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
           <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
@@ -3226,6 +3480,11 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       </Card>
 
       <div className="grid gap-5">
+        <DailyOperationsCommandCenter setScreen={setScreen} />
+        <EcosystemImageContextCard />
+        <ThreePartDailyRhythmCard setScreen={setScreen} />
+        <EntrepreneurshipValueCard />
+        <YouthEvidenceUploadCard activeUser={activeUser} />
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
           <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
@@ -3535,6 +3794,9 @@ function SupervisorDashboard({
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
       <h2 className="mt-3 text-4xl font-black">Launch-day operating picture.</h2>
+      <div className="mt-5">
+        <DailyOperationsCommandCenter setScreen={setScreen} compact />
+      </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <button type="button" key={stat.title} onClick={stat.action} className="rounded-2xl border border-white/10 bg-white/10 p-5 text-left hover:bg-emerald-300 hover:text-black">
