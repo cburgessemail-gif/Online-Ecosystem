@@ -105,6 +105,7 @@ export default function App() {
   const [selectedTopic, setSelectedTopic] = useState("");
   const [savedTopic, setSavedTopic] = useState("");
   const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
+  const [needsSupervisorVerification, setNeedsSupervisorVerification] = useState(false);
   const [message, setMessage] = useState("");
 
   const t = translations[lang];
@@ -138,8 +139,10 @@ export default function App() {
     if (match) {
       setValidatedYouth(match);
       setYouthName(`${match.firstName} ${match.lastName}`);
+      setNeedsSupervisorVerification(false);
     } else {
       setValidatedYouth(null);
+      setNeedsSupervisorVerification(true);
     }
 
     setStep("topic");
@@ -179,6 +182,7 @@ export default function App() {
     setSelectedTopic("");
     setSavedTopic("");
     setValidatedYouth(null);
+    setNeedsSupervisorVerification(false);
   }
 
   const youthHistory = validatedYouth?.completedTopics || [];
@@ -200,11 +204,7 @@ export default function App() {
             <p className="text-lg opacity-90">{t.subtitle}</p>
           </div>
 
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value as Lang)}
-            className="text-[#18392b] rounded-xl px-4 py-2"
-          >
+          <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="text-[#18392b] rounded-xl px-4 py-2">
             <option value="en">English</option>
             <option value="es">Español</option>
           </select>
@@ -251,11 +251,7 @@ export default function App() {
 
               {message && <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">{message}</div>}
 
-              <button
-                type="button"
-                onClick={submitPinAndContinue}
-                className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold"
-              >
+              <button type="button" onClick={submitPinAndContinue} className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold">
                 {t.submitPin}
               </button>
             </Card>
@@ -267,6 +263,12 @@ export default function App() {
                 <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
                   Access approved for launch. Continue to topic selection and today’s work.
                 </div>
+
+                {needsSupervisorVerification && (
+                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
+                    Record will be verified later. Youth access is open.
+                  </div>
+                )}
 
                 <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong></p>
               </Card>
@@ -307,12 +309,7 @@ export default function App() {
 
                 {message && <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">{message}</div>}
 
-                <button
-                  type="button"
-                  disabled={!selectedTopic}
-                  onClick={submitTodayWork}
-                  className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
-                >
+                <button type="button" disabled={!selectedTopic} onClick={submitTodayWork} className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40">
                   {t.submit}
                 </button>
               </Card>
