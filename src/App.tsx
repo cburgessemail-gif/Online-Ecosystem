@@ -105,7 +105,6 @@ export default function App() {
   const [selectedTopic, setSelectedTopic] = useState("");
   const [savedTopic, setSavedTopic] = useState("");
   const [validatedYouth, setValidatedYouth] = useState<YouthRecord | null>(null);
-  const [needsSupervisorVerification, setNeedsSupervisorVerification] = useState(false);
   const [message, setMessage] = useState("");
 
   const t = translations[lang];
@@ -134,21 +133,13 @@ export default function App() {
   function submitPinAndContinue() {
     setMessage("");
 
-    if (!pin.trim()) {
-      setMessage("Please enter your assigned PIN.");
-      return;
-    }
-
     const match = findYouthByPin();
 
     if (match) {
       setValidatedYouth(match);
       setYouthName(`${match.firstName} ${match.lastName}`);
-      setNeedsSupervisorVerification(false);
     } else {
       setValidatedYouth(null);
-      setNeedsSupervisorVerification(true);
-      setMessage("PIN not found. You may continue, but a supervisor must verify you.");
     }
 
     setStep("topic");
@@ -187,7 +178,6 @@ export default function App() {
     setMessage("");
     setSelectedTopic("");
     setSavedTopic("");
-    setNeedsSupervisorVerification(false);
     setValidatedYouth(null);
   }
 
@@ -209,7 +199,12 @@ export default function App() {
             <h1 className="text-3xl font-bold">{t.title}</h1>
             <p className="text-lg opacity-90">{t.subtitle}</p>
           </div>
-          <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="text-[#18392b] rounded-xl px-4 py-2">
+
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
+            className="text-[#18392b] rounded-xl px-4 py-2"
+          >
             <option value="en">English</option>
             <option value="es">Español</option>
           </select>
@@ -220,7 +215,7 @@ export default function App() {
         <section className="max-w-6xl mx-auto px-5 py-8">
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h2 className="text-2xl font-bold mb-2">{t.launchReady}</h2>
-            <p>Youth enter their assigned PIN. If the PIN is not found, they are sent forward with supervisor verification instead of being blocked.</p>
+            <p>Youth may enter today with PIN-first launch access. Records can be verified after work begins.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5">
@@ -240,7 +235,7 @@ export default function App() {
 
           {step === "checkin" && (
             <Card title="Youth PIN Check-In">
-              <p>Enter your assigned PIN. Your name and parent information may be added, but they do not block access today.</p>
+              <p>Enter your PIN if you have it. For launch today, access will not be blocked.</p>
 
               <label>Youth Full Name</label>
               <input value={youthName} onChange={(e) => setYouthName(e.target.value)} placeholder="Optional today" />
@@ -256,7 +251,11 @@ export default function App() {
 
               {message && <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">{message}</div>}
 
-              <button type="button" onClick={submitPinAndContinue} disabled={!pin.trim()} className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40">
+              <button
+                type="button"
+                onClick={submitPinAndContinue}
+                className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold"
+              >
                 {t.submitPin}
               </button>
             </Card>
@@ -265,17 +264,11 @@ export default function App() {
           {step === "topic" && (
             <div className="grid lg:grid-cols-2 gap-6">
               <Card title="Access Status">
-                {needsSupervisorVerification ? (
-                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
-                    Supervisor verification required. Continue to topic selection. Do not leave the line.
-                  </div>
-                ) : (
-                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
-                    PIN verified. Continue to today’s work.
-                  </div>
-                )}
+                <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                  Access approved for launch. Continue to topic selection and today’s work.
+                </div>
 
-                <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Supervisor verification needed"}</strong></p>
+                <p>Youth: <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong></p>
               </Card>
 
               <Card title={t.chooseTopic}>
@@ -289,8 +282,13 @@ export default function App() {
                     const isSelected = selectedTopic === topic;
 
                     return (
-                      <button key={topic} type="button" disabled={full || completed} onClick={() => setSelectedTopic(topic)}
-                        className={`w-full text-left p-4 rounded-2xl border ${isSelected ? "bg-[#d8a23a] border-[#8a5a00]" : "bg-[#f7f3e8]"} ${full || completed ? "opacity-50 cursor-not-allowed" : ""}`}>
+                      <button
+                        key={topic}
+                        type="button"
+                        disabled={full || completed}
+                        onClick={() => setSelectedTopic(topic)}
+                        className={`w-full text-left p-4 rounded-2xl border ${isSelected ? "bg-[#d8a23a] border-[#8a5a00]" : "bg-[#f7f3e8]"} ${full || completed ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
                         <strong>{topic}</strong><br />
                         <span>{completed ? "Already completed — choose a new area." : full ? t.full : `${TOPIC_CAP - count} ${t.spots}`}</span>
                       </button>
@@ -309,7 +307,12 @@ export default function App() {
 
                 {message && <div className="mt-5 bg-red-50 border border-red-400 text-red-800 rounded-2xl p-4">{message}</div>}
 
-                <button type="button" disabled={!selectedTopic} onClick={submitTodayWork} className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40">
+                <button
+                  type="button"
+                  disabled={!selectedTopic}
+                  onClick={submitTodayWork}
+                  className="mt-5 w-full bg-[#18392b] text-white p-4 rounded-2xl font-bold disabled:opacity-40"
+                >
                   {t.submit}
                 </button>
               </Card>
@@ -321,15 +324,9 @@ export default function App() {
               <Card title="Submission Received">
                 <p>Welcome, <strong>{validatedYouth ? `${validatedYouth.firstName} ${validatedYouth.lastName}` : youthName || "Cultivator"}</strong>.</p>
 
-                {needsSupervisorVerification ? (
-                  <div className="bg-yellow-50 border border-yellow-500 text-yellow-900 rounded-2xl p-4">
-                    Supervisor verification required. Your submission was received and you may begin with supervisor direction.
-                  </div>
-                ) : (
-                  <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
-                    PIN access validated. Today’s work is now open.
-                  </div>
-                )}
+                <div className="bg-green-50 border border-green-500 text-green-900 rounded-2xl p-4">
+                  Today’s work is now open. Verification can be completed later.
+                </div>
 
                 <p>This week’s topic area: <strong>{savedTopic}</strong></p>
               </Card>
@@ -377,7 +374,6 @@ export default function App() {
           <Card title={t.supervisorTools}>
             <Checklist items={[
               "Confirm youth attendance.",
-              "Verify youth manually if access is flagged.",
               "Confirm PPE and proper shoes.",
               "Assign youth to topic area supervisor.",
               "Monitor 15 youth per aide.",
@@ -393,8 +389,8 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-5">
             <StatusCard label="Youth Expected" value="70+" />
             <StatusCard label="Topic Capacity" value="15 each" />
-            <StatusCard label="PIN Access" value="Enabled" />
-            <StatusCard label="Supervisor Review" value="Enabled" />
+            <StatusCard label="PIN Access" value="Launch Open" />
+            <StatusCard label="Validation" value="After Access" />
             <StatusCard label="Nurse Line" value="Visible" />
             <StatusCard label="Launch Status" value="Ready" />
           </div>
@@ -406,9 +402,8 @@ export default function App() {
           <BackButton onClick={resetHome} />
           <Card title="Guest / Reviewer View">
             <Checklist items={[
-              "Youth enter with PIN first.",
+              "Youth enter with launch access first.",
               "Name mismatch does not block access.",
-              "Supervisor verification handles problem records.",
               "Youth choose a weekly topic area.",
               "Full topic areas cannot be saved.",
               "Youth receive tools and resources for the work they are doing.",
