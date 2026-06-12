@@ -2157,10 +2157,10 @@ function Shell({
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
               <div className="truncate text-sm font-black leading-tight md:text-base">
-                {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
+                {screen === "portal" ? "🌲 Forest Gate Portal" : activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
               </div>
             </button>
-
+            {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
               <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "Workspace" : "Choose Role"}</button>
@@ -2171,6 +2171,7 @@ function Shell({
               ))}
               {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-4 py-2 text-xs font-black text-amber-50">Mission</button>}
             </div>
+            )}
 
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
@@ -2190,7 +2191,7 @@ function Shell({
 
             {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-black text-white/80">Sign Out</button>}
           </div>
-
+          {screen !== "portal" && (
           <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-white/72">
             <summary className="cursor-pointer font-black text-emerald-50">Tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -2203,6 +2204,7 @@ function Shell({
               {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
           </details>
+          )}
         </div>
         {children}
         <CompactProprietaryFooter />
@@ -2579,46 +2581,56 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
+  const farmStatus = getFarmStatus();
+  const statusIcon = farmStatus.color === "red" ? "🔴" : farmStatus.color === "amber" ? "🟠" : "🟢";
+  const youthTarget: Screen = activeUser?.role === "Youth Workforce Participant" ? "youth" : "roles";
+  const parentTarget: Screen = activeUser?.role === "Parent / Guardian" ? "parent" : "roles";
+  const supervisorTarget: Screen = ["Supervisor / Staff", "Administrator", "Board / Funder"].includes(activeUser?.role || "") ? "supervisor" : "roles";
+  const growerTarget: Screen = activeUser?.role === "Grower" ? "grower" : "roles";
+  const partnerTarget: Screen = activeUser?.role === "Partner" ? "partner" : "roles";
 
-  const pathways: { label: string; body: string; screen: Screen; icon: string }[] = [
-    { label: "Guest", body: "Explore the farm story, events, marketplace, and ways to connect.", screen: "guest", icon: "🌲" },
-    { label: "Youth Workforce", body: "Start My Day, see assignments, upload evidence, and build skills.", screen: "youth", icon: "🌱" },
-    { label: "Parent / Guardian", body: "View youth status, announcements, and parent-safe updates.", screen: "parent", icon: "👨‍👩‍👧" },
-    { label: "Supervisor", body: "Manage attendance, safety, assessments, incidents, and team operations.", screen: "supervisor", icon: "👷" },
-    { label: "Grower", body: "Access growing resources, crop planning, and market opportunities.", screen: "grower", icon: "🚜" },
-    { label: "Marketplace", body: "Shop, sell, and connect food, products, growers, and customers.", screen: "marketplace", icon: "🛒" },
-    { label: "Partner", body: "Collaborate, support projects, and strengthen the regional ecosystem.", screen: "partner", icon: "🤝" },
-    { label: "Mission Control", body: "Monitor operations, reports, alerts, and system readiness.", screen: "reports", icon: "🎛️" },
+  const pathwayCards: { icon: string; title: string; body: string; screen: Screen }[] = [
+    { icon: "🌲", title: "Guest", body: "Explore the farm story, events, marketplace, and ways to connect.", screen: "guest" },
+    { icon: "🌱", title: "Youth Workforce", body: "Start My Day, see assignments, upload evidence, and build skills.", screen: youthTarget },
+    { icon: "👨‍👩‍👧", title: "Parent / Guardian", body: "View youth status, announcements, and parent-safe updates.", screen: parentTarget },
+    { icon: "👷", title: "Supervisor", body: "Manage attendance, safety, assessments, incidents, and team operations.", screen: supervisorTarget },
+    { icon: "🚜", title: "Grower", body: "Access growing resources, crop planning, and market opportunities.", screen: growerTarget },
+    { icon: "🛒", title: "Marketplace", body: "Shop, sell, and connect food, products, growers, and customers.", screen: "marketplace" },
+    { icon: "🤝", title: "Partner", body: "Explore collaboration, support, sponsorship, and impact opportunities.", screen: partnerTarget },
+    { icon: "🎛️", title: "Mission Control", body: "Monitor operations, reports, alerts, safety, and program activity.", screen: "reports" },
   ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+    <div className="grid gap-4 lg:grid-cols-[.95fr_1.05fr]">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[52vh]">
+        <div className="relative min-h-[56vh]">
           <img
             src={IMG.ecosystem}
             alt="Bronson Family Farm connected food ecosystem map"
             className="absolute inset-0 h-full w-full object-cover"
             onError={(event) => (event.currentTarget.src = IMG.forest)}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.86),rgba(0,0,0,.45),rgba(0,0,0,.78))]" />
-          <div className="relative z-10 flex min-h-[52vh] flex-col justify-between p-5 sm:p-8">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.36),rgba(0,0,0,.72))]" />
+          <div className="relative z-10 flex min-h-[56vh] flex-col justify-between p-5 sm:p-8">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
                 {TT("Forest Gate Portal")}
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl">
-                Bronson Family Farm
-              </h1>
-              <p className="mt-4 max-w-2xl text-base font-bold leading-7 text-white/86 sm:text-lg">
+              <h1 className="mt-5 max-w-2xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">Bronson Family Farm</h1>
+              <p className="mt-4 max-w-xl text-base font-black leading-7 text-white/90 sm:text-lg">
                 {TT("A connected food ecosystem. Choose your experience first; details open when needed.")}
               </p>
             </div>
 
-            <div className="mt-6 rounded-[1.35rem] border border-emerald-200/20 bg-black/45 p-4 backdrop-blur-xl">
-              <div className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-100/80">Today</div>
-              <div className="mt-2 text-2xl font-black">Modified Operations</div>
-              <p className="mt-2 text-sm leading-6 text-white/78">Heat Index Warning. Follow supervisor direction before outdoor work.</p>
+            <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-black/62 p-4 backdrop-blur-xl">
+              <div className="text-[11px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Today</div>
+              <div className="mt-2 text-2xl font-black">{statusIcon} {farmStatus.level}</div>
+              <div className="mt-1 text-sm font-bold text-white/80">{farmStatus.title}</div>
+              <details className="mt-3 rounded-2xl border border-white/10 bg-white/8 p-3 text-sm leading-6 text-white/78">
+                <summary className="cursor-pointer font-black text-emerald-50">View Details</summary>
+                <p className="mt-3">{farmStatus.summary}</p>
+                <p className="mt-2 font-bold text-white">Action: {farmStatus.action}</p>
+              </details>
             </div>
           </div>
         </div>
@@ -2626,35 +2638,33 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Choose Your Experience</div>
-        <h2 className="mt-3 text-3xl font-black leading-tight">Who are you today?</h2>
-        <p className="mt-3 text-sm leading-6 text-white/74">The Portal is the front door. Pick a pathway, then the platform reveals only what that role needs next.</p>
-
+        <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Who are you today?</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78">
+          The Portal is the front door. Pick a pathway, then the platform reveals only what that role needs next.
+        </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {pathways.map((pathway) => (
+          {pathwayCards.map((card) => (
             <button
+              key={card.title}
               type="button"
-              key={pathway.label}
-              onClick={() => setScreen(pathway.screen)}
-              className="rounded-[1.2rem] border border-white/12 bg-black/30 p-4 text-left transition hover:border-emerald-200/60 hover:bg-emerald-300/15"
+              onClick={() => setScreen(card.screen)}
+              className="rounded-[1.25rem] border border-white/14 bg-black/28 p-4 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">{pathway.icon}</span>
-                <span className="text-lg font-black leading-tight">{TT(pathway.label)}</span>
+                <span className="text-xl" aria-hidden="true">{card.icon}</span>
+                <span className="text-lg font-black">{card.title}</span>
               </div>
-              <p className="mt-2 text-sm leading-5 text-white/70">{TT(pathway.body)}</p>
+              <div className="mt-2 text-sm leading-6 text-white/72">{card.body}</div>
             </button>
           ))}
         </div>
 
-        {activeUser && (
-          <details className="mt-5 rounded-[1.15rem] border border-white/10 bg-white/8 p-4">
-            <summary className="cursor-pointer font-black text-emerald-50">Signed in as {activeUser.name}</summary>
-            <div className="mt-3 flex flex-wrap gap-3 text-sm text-white/78">
-              <button type="button" onClick={() => setScreen(routeForRole(activeUser.role))} className="rounded-full bg-emerald-300 px-4 py-2 font-black text-black">Open My Workspace</button>
-              <span className="self-center">Role: {activeUser.role}</span>
-            </div>
-          </details>
-        )}
+        <details className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+          <summary className="cursor-pointer font-black text-emerald-50">View Ecosystem Map</summary>
+          <p className="mt-3 text-sm leading-6 text-white/78">
+            The ecosystem connects youth workforce, growers, customers, marketplace, families, partners, and community impact. Each pathway shows only the part that is relevant to that user.
+          </p>
+        </details>
       </Card>
     </div>
   );
