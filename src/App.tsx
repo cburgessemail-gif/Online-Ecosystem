@@ -2579,87 +2579,83 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
-  const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
+
+  const pathways: { label: string; body: string; screen: Screen; icon: string }[] = [
+    { label: "Guest", body: "Explore the farm story, events, marketplace, and ways to connect.", screen: "guest", icon: "🌲" },
+    { label: "Youth Workforce", body: "Start My Day, see assignments, upload evidence, and build skills.", screen: "youth", icon: "🌱" },
+    { label: "Parent / Guardian", body: "View youth status, announcements, and parent-safe updates.", screen: "parent", icon: "👨‍👩‍👧" },
+    { label: "Supervisor", body: "Manage attendance, safety, assessments, incidents, and team operations.", screen: "supervisor", icon: "👷" },
+    { label: "Grower", body: "Access growing resources, crop planning, and market opportunities.", screen: "grower", icon: "🚜" },
+    { label: "Marketplace", body: "Shop, sell, and connect food, products, growers, and customers.", screen: "marketplace", icon: "🛒" },
+    { label: "Partner", body: "Collaborate, support projects, and strengthen the regional ecosystem.", screen: "partner", icon: "🤝" },
+    { label: "Mission Control", body: "Monitor operations, reports, alerts, and system readiness.", screen: "reports", icon: "🎛️" },
+  ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.08fr_.72fr]">
+    <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
+        <div className="relative min-h-[52vh]">
           <img
-            src={IMG.forest}
-            alt="Bronson Family Farm forest gate entry"
+            src={IMG.ecosystem}
+            alt="Bronson Family Farm connected food ecosystem map"
             className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => (event.currentTarget.src = IMG.backup)}
+            onError={(event) => (event.currentTarget.src = IMG.forest)}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.35),rgba(0,0,0,.7))]" />
-          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-8">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.86),rgba(0,0,0,.45),rgba(0,0,0,.78))]" />
+          <div className="relative z-10 flex min-h-[52vh] flex-col justify-between p-5 sm:p-8">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
                 {TT("Forest Gate Portal")}
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
-                {TT("Enter the Living Ecosystem")}
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl">
+                Bronson Family Farm
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
-                {TT("Choose the pathway that fits you. The platform will reveal only what you need next.")}
+              <p className="mt-4 max-w-2xl text-base font-bold leading-7 text-white/86 sm:text-lg">
+                {TT("A connected food ecosystem. Choose your experience first; details open when needed.")}
               </p>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
-                <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
-                <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest story, events, marketplace, volunteer, and partner opportunities.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Marketplace")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Products, events, growers, value-added items, and purchasing.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("demo")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Guided Demo")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("A slower overview for visitors, partners, and reviewers.")}</div>
-              </button>
+            <div className="mt-6 rounded-[1.35rem] border border-emerald-200/20 bg-black/45 p-4 backdrop-blur-xl">
+              <div className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-100/80">Today</div>
+              <div className="mt-2 text-2xl font-black">Modified Operations</div>
+              <p className="mt-2 text-sm leading-6 text-white/78">Heat Index Warning. Follow supervisor direction before outdoor work.</p>
             </div>
           </div>
         </div>
       </Card>
 
-      <div className="grid gap-4">
-        <DailyOperationsCommandCenter setScreen={setScreen} compact />
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Next Action")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Start with the pathway. Details open when needed.")}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/78">
-            {TT("Safety, farm status, and the user's next step stay visible. Curriculum, reports, media, and deep ecosystem information are revealed progressively.")}
-          </p>
-          <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
-            <summary className="cursor-pointer font-black text-emerald-50">{TT("View launch notes")}</summary>
-            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Public visitors explore the portal, story, events, and marketplace without registration.")}</div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Youth go to Start My Day, assignment, project, evidence upload, and reflection.")}</div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Supervisors and Mission Control see the deeper operational tools.")}</div>
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Choose Your Experience</div>
+        <h2 className="mt-3 text-3xl font-black leading-tight">Who are you today?</h2>
+        <p className="mt-3 text-sm leading-6 text-white/74">The Portal is the front door. Pick a pathway, then the platform reveals only what that role needs next.</p>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {pathways.map((pathway) => (
+            <button
+              type="button"
+              key={pathway.label}
+              onClick={() => setScreen(pathway.screen)}
+              className="rounded-[1.2rem] border border-white/12 bg-black/30 p-4 text-left transition hover:border-emerald-200/60 hover:bg-emerald-300/15"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl" aria-hidden="true">{pathway.icon}</span>
+                <span className="text-lg font-black leading-tight">{TT(pathway.label)}</span>
+              </div>
+              <p className="mt-2 text-sm leading-5 text-white/70">{TT(pathway.body)}</p>
+            </button>
+          ))}
+        </div>
+
+        {activeUser && (
+          <details className="mt-5 rounded-[1.15rem] border border-white/10 bg-white/8 p-4">
+            <summary className="cursor-pointer font-black text-emerald-50">Signed in as {activeUser.name}</summary>
+            <div className="mt-3 flex flex-wrap gap-3 text-sm text-white/78">
+              <button type="button" onClick={() => setScreen(routeForRole(activeUser.role))} className="rounded-full bg-emerald-300 px-4 py-2 font-black text-black">Open My Workspace</button>
+              <span className="self-center">Role: {activeUser.role}</span>
             </div>
           </details>
-        </Card>
-        <details className="rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
-          <summary className="cursor-pointer text-lg font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
-          <div className="mt-5 grid gap-4">
-            <CultureCard language={language} variant="seed" />
-            <Card>
-              <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
-              <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
-              <div className="mt-4 grid gap-2 text-sm text-white/82">
-                <div className="rounded-xl bg-black/28 p-3">{TT("Today: team, project, supervisor, location, start time.")}</div>
-                <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
-                <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
-              </div>
-            </Card>
-          </div>
-        </details>
-      </div>
+        )}
+      </Card>
     </div>
   );
 }
