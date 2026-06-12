@@ -5929,6 +5929,336 @@ function SimplePathway({
 }
 
 
+function CoolingCenterProjectModule({
+  setScreen,
+  activeUser,
+  compact = false,
+}: {
+  setScreen: (screen: Screen) => void;
+  activeUser: EcosystemUser | null;
+  compact?: boolean;
+}) {
+  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.coolingCenterProgress", []));
+  const [selectedTeam, setSelectedTeam] = useState<string>("Manufacturing Team");
+  const [contributions, setContributions] = useState<string[]>(() => safeRead<string[]>("bff.launch.myContributions", []));
+  const [learning, setLearning] = useState<string[]>(() => safeRead<string[]>("bff.launch.whatILearned", []));
+  const [visionBefore, setVisionBefore] = useState(() => safeRead<string>("bff.launch.visionBefore", ""));
+  const [visionAfter, setVisionAfter] = useState(() => safeRead<string>("bff.launch.visionAfter", ""));
+  const [oneAcre, setOneAcre] = useState(() => safeRead<string>("bff.launch.oneAcre", ""));
+
+  const selectedTeamInfo = coolingCenterTeams.find((team) => team.name === selectedTeam) || coolingCenterTeams[2];
+
+  const toggleSaved = (item: string) => {
+    const next = savedItems.includes(item) ? savedItems.filter((x) => x !== item) : [item, ...savedItems];
+    setSavedItems(next);
+    safeWrite("bff.launch.coolingCenterProgress", next);
+  };
+
+  const toggleContribution = (item: string) => {
+    const next = contributions.includes(item) ? contributions.filter((x) => x !== item) : [item, ...contributions];
+    setContributions(next);
+    safeWrite("bff.launch.myContributions", next);
+  };
+
+  const toggleLearning = (item: string) => {
+    const next = learning.includes(item) ? learning.filter((x) => x !== item) : [item, ...learning];
+    setLearning(next);
+    safeWrite("bff.launch.whatILearned", next);
+  };
+
+  const saveVision = () => {
+    safeWrite("bff.launch.visionBefore", visionBefore);
+    safeWrite("bff.launch.visionAfter", visionAfter);
+    safeWrite("bff.launch.oneAcre", oneAcre);
+  };
+
+  const contributionItems = [
+    "Creating ideas",
+    "Solving problems",
+    "Building products",
+    "Supporting my team",
+    "Helping a customer",
+    "Creating value",
+    "Learning a new skill",
+    "Improving a process",
+    "Helping someone succeed",
+    "Demonstrating leadership",
+    "Showing creativity",
+    "Practicing responsibility",
+    "Completing assigned tasks",
+    "Maintaining quality standards",
+    "Supporting safety",
+  ];
+
+  const learningItems = [
+    "How businesses work",
+    "How customers and contractors work together",
+    "How products are manufactured",
+    "How quality affects customer satisfaction",
+    "How creativity creates value",
+    "How teamwork improves results",
+    "How communication helps projects succeed",
+    "How planning saves time and money",
+    "How ideas become products",
+    "How products create opportunities",
+    "How entrepreneurs identify opportunities",
+    "How money is earned by solving problems",
+    "How food moves from farms to customers",
+    "How rising costs affect businesses and families",
+    "How workforce skills prepare me for future opportunities",
+    "How Bronson Family Farm creates value for the community",
+    "That I am capable of more than I realized",
+  ];
+
+  const productionItems = [
+    "Youth checked in",
+    "PPE and water confirmed",
+    "Why this project matters lesson completed",
+    "Entrepreneur example discussed",
+    "Vision challenge completed",
+    "My Contribution selected",
+    "Teams assigned",
+    "Customer order explained: 63 fans",
+    "Business cycle explained",
+    "Design standards approved",
+    "Engineering quality checklist completed",
+    "Manufacturing stations active",
+    "Fans assembled",
+    "Fans painted and personalized",
+    "Quality check completed",
+    "Fans counted for delivery",
+    "Fans delivered to Contractor Team",
+    "Reflection completed",
+    "What I Learned completed",
+    "Career interest selected",
+    "Achievement celebrated",
+  ];
+
+  const productionMetrics = [
+    ["Customer Order", "63 fans"],
+    ["Material Cost", "$0.06 each"],
+    ["Markup", "20%"],
+    ["Sale Price", "$0.072 each"],
+    ["Material Cost Total", "$3.78"],
+    ["Contract Value", "$4.54"],
+  ];
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
+      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
+      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
+        Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.
+      </p>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Business Story</div>
+          <p className="mt-3 text-sm leading-7 text-white/84">
+            Bronson Family Farm is the customer. A contractor is hired to build the cooling station. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce.
+          </p>
+          <div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-7 text-white/86">
+            Bronson Family Farm ↓ Contractor ↓ Youth Manufacturing Workforce ↓ Product Delivery ↓ Installation ↓ Customer Satisfaction
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">The Money Side</div>
+          <div className="mt-3 grid gap-2">
+            {productionMetrics.map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
+                <span className="text-white/72">{label}</span>
+                <b>{value}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-white/65">Why It Matters</div>
+          <p className="mt-3 text-sm leading-7 text-white/82">
+            Food prices are rising because every step costs money: growing, harvesting, packaging, transportation, labor, storage, marketing, and selling. This project helps youth understand how solving problems creates value, income, careers, and stronger communities.
+          </p>
+        </div>
+      </div>
+
+      {!compact && (
+        <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.95fr]">
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
+            <h2 className="mt-3 text-2xl font-black">Fan Prototype Demonstration</h2>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
+              Watch how a simple fan idea can become a product. Youth should look for ideas they can improve, paint, personalize, and prepare for the contractor's order.
+            </p>
+            <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/dtYzf3avkT4"
+                title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Entrepreneurship Example</div>
+            <h2 className="mt-3 text-2xl font-black">A 13-Year-Old Saw Opportunity</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">
+              Use the young entrepreneur snack-selling example to start the conversation. The lesson is not snacks. The lesson is that opportunity begins when someone sees a need, creates value, and serves a customer.
+            </p>
+            <a
+              href="https://www.tiktok.com/@kasi_hustlers/video/7610048087100362002"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 block rounded-2xl bg-emerald-300 px-5 py-4 text-center font-black text-black"
+            >
+              Open Inspiration Video
+            </a>
+            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-6 text-white/78">
+              Discussion: What problem was he solving? Who was his customer? What opportunity could you create at Bronson Family Farm?
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Vision Challenge</div>
+        <h2 className="mt-3 text-2xl font-black">What Opportunity Do You See?</h2>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">This morning I see...</span>
+            <textarea value={visionBefore} onChange={(e) => setVisionBefore(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Example: I see a fan, a tomato, a field, or a problem." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">If I had one acre at Bronson Family Farm, I would...</span>
+            <textarea value={oneAcre} onChange={(e) => setOneAcre(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Grow, build, sell, host, teach, create..." />
+          </label>
+          <label className="block rounded-2xl bg-black/25 p-4">
+            <span className="text-sm font-black">Now I see...</span>
+            <textarea value={visionAfter} onChange={(e) => setVisionAfter(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="What opportunity do you see now?" />
+          </label>
+        </div>
+        <button type="button" onClick={saveVision} className="mt-4 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save My Vision</button>
+      </div>
+
+      <div className="mt-7 grid gap-5 lg:grid-cols-[.8fr_1fr]">
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Choose / View My Team</div>
+          <div className="mt-4 grid gap-2">
+            {coolingCenterTeams.map((team) => (
+              <button
+                type="button"
+                key={team.name}
+                onClick={() => setSelectedTeam(team.name)}
+                className={`rounded-2xl border p-4 text-left transition ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}
+              >
+                <div className="text-lg font-black">{team.icon} {team.name}</div>
+                <div className="mt-1 text-sm font-bold opacity-80">{team.identity}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-4xl">{selectedTeamInfo.icon}</div>
+          <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.name}</h2>
+          <p className="mt-2 text-lg font-black text-emerald-100">{selectedTeamInfo.identity}</p>
+          <p className="mt-3 text-sm font-bold text-white/70">Recommended assignment: {selectedTeamInfo.recommendedShare}</p>
+          <p className="mt-4 text-sm leading-7 text-white/82">{selectedTeamInfo.mission}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.skills.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Careers</div>
+              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.careers.map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {!compact && (
+        <>
+          <div className="mt-7 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+              <h2 className="text-2xl font-black">My Contribution</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Choose the ways you will contribute today. This becomes part of your achievement record.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {contributionItems.map((item) => {
+                  const active = contributions.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleContribution(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
+            </div>
+            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
+              <h2 className="text-2xl font-black">What Did I Learn?</h2>
+              <p className="mt-2 text-sm leading-6 text-white/78">Complete this at the end of the project.</p>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                {learningItems.map((item) => {
+                  const active = learning.includes(item);
+                  return <button type="button" key={item} onClick={() => toggleLearning(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-amber-200 bg-amber-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.85fr]">
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+              <h2 className="text-2xl font-black">Production Board</h2>
+              <p className="mt-3 text-sm leading-7 text-white/78">Tap each item as the launch team completes the work. These are saved locally for launch review.</p>
+              <div className="mt-5 grid gap-2 md:grid-cols-2">
+                {productionItems.map((item) => {
+                  const active = savedItems.includes(item);
+                  return (
+                    <button type="button" key={item} onClick={() => toggleSaved(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/30 text-white"}`}>
+                      {active ? "✅" : "☐"} {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+              <h2 className="text-2xl font-black">Supervisor Role Today</h2>
+              <p className="mt-3 text-sm leading-7 text-white/82">Supervisors guide youth success. They do not do the work for the youth.</p>
+              {[
+                "Safety Leader: PPE, hydration, heat awareness, tool safety, emergency response.",
+                "Workforce Coach: encouragement, problem solving, positive behavior, conflict resolution.",
+                "Team Facilitator: keep time, organize teams, support deliverables, keep youth focused.",
+                "Assessor: observe communication, teamwork, responsibility, problem solving, participation.",
+                "Wellness Observer: notice fatigue, frustration, withdrawal, escalation, or need for support.",
+              ].map((item) => <div key={item} className="mt-3 rounded-2xl bg-white/10 p-3 text-sm leading-6 text-white/80">✓ {item}</div>)}
+            </div>
+          </div>
+
+          <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
+            <h2 className="text-2xl font-black">Celebration & Achievement</h2>
+            <p className="mt-4 text-lg leading-8 text-white/88">
+              Today we are not just building fans. We are learning how to see opportunity, imagine solutions, design ideas, build products, deliver value, take ownership, and connect our work to future careers.
+            </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {["Opportunity Seeker", "Problem Solver", "Team Builder", "Creative Thinker", "Quality Champion", "Workforce Ready", "Entrepreneurial Mindset", "Value Creator", "Future Builder"].map((badge) => (
+                <div key={badge} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-black">🏆 {badge}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="mt-7 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Start Youth Check-In</button>
+        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Tracking</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Reflection / Feedback</button>
+      </div>
+    </Card>
+  );
+}
+
 function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [name, setName] = useState(activeUser?.name || "");
   const [interestGrow, setInterestGrow] = useState(false);
