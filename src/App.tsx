@@ -18,7 +18,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
  * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
- * - Keeps returning youth on PIN, supervisors on PIN 0000, adults on temporary password Nesco2026
+ * - Keeps returning youth on PIN, supervisors on PIN 0000, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
  * - Layers youth curriculum by week and day
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  */
@@ -2066,7 +2066,7 @@ function App() {
       {screen === "demo" && <GuidedDemo setScreen={setScreen} />}
       {screen === "guest" && <Guest setScreen={setScreen} />}
       {screen === "registration" && <Registration setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} />}
+      {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} language={language} />}
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "parent" && <ParentScreen setScreen={setScreen} language={language} />}
@@ -2584,12 +2584,20 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
+  const portalText = {
+    en: { eyebrow: "Window Into The Ecosystem", title: "Enter the Ecosystem", subtitle: "Look through the window. Choose how you would like to enter.", guest: "Guest", guestBody: "Explore.", next: "New", nextBody: "Request access.", returning: "Returning", returningBody: "Enter your workspace." },
+    es: { eyebrow: "Ventana al ecosistema", title: "Entrar al Ecosistema", subtitle: "Mire por la ventana. Elija cómo desea entrar.", guest: "Visitante", guestBody: "Explorar.", next: "Nuevo", nextBody: "Solicitar acceso.", returning: "Regresar", returningBody: "Entrar a mi espacio." },
+    tl: { eyebrow: "Bintana sa Ecosystem", title: "Pumasok sa Ecosystem", subtitle: "Tumingin sa bintana. Piliin kung paano papasok.", guest: "Bisita", guestBody: "Mag-explore.", next: "Bago", nextBody: "Humingi ng access.", returning: "Bumabalik", returningBody: "Pumasok sa workspace." },
+    it: { eyebrow: "Finestra sull’ecosistema", title: "Entra nell’Ecosistema", subtitle: "Guarda attraverso la finestra. Scegli come entrare.", guest: "Ospite", guestBody: "Esplora.", next: "Nuovo", nextBody: "Richiedi accesso.", returning: "Di ritorno", returningBody: "Entra nel tuo spazio." },
+    he: { eyebrow: "חלון לאקוסיסטם", title: "כניסה לאקוסיסטם", subtitle: "הביטו דרך החלון. בחרו כיצד להיכנס.", guest: "אורח", guestBody: "חקירה.", next: "חדש", nextBody: "בקשת גישה.", returning: "חוזר", returningBody: "כניסה למרחב שלי." },
+    fr: { eyebrow: "Fenêtre sur l’écosystème", title: "Entrer dans l’Écosystème", subtitle: "Regardez par la fenêtre. Choisissez comment entrer.", guest: "Invité", guestBody: "Explorer.", next: "Nouveau", nextBody: "Demander l’accès.", returning: "Retour", returningBody: "Entrer dans mon espace." },
+  }[language];
   const TT = (phrase: string) => translatePhrase(language, phrase);
 
   const doors: { icon: string; title: string; body: string; screen: Screen }[] = [
-    { icon: "🌲", title: "Guest", body: "Explore the ecosystem without signing in.", screen: "guest" },
-    { icon: "✨", title: "New", body: "Register for access as youth, parent, supervisor, grower, partner, volunteer, or vendor.", screen: "registration" },
-    { icon: "🔑", title: "Returning", body: "Enter your workspace with your assigned PIN or launch password.", screen: "roles" },
+    { icon: "🌲", title: portalText.guest, body: portalText.guestBody, screen: "guest" },
+    { icon: "✨", title: portalText.next, body: portalText.nextBody, screen: "registration" },
+    { icon: "🔑", title: portalText.returning, body: portalText.returningBody, screen: "roles" },
   ];
 
   return (
@@ -2609,10 +2617,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
       </Card>
 
       <Card className="flex flex-col justify-center">
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Window Into The Ecosystem</div>
-        <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Bronson Family Farm</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{portalText.eyebrow}</div>
+        <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">{portalText.title}</h1>
         <p className="mt-4 max-w-xl text-base leading-7 text-white/82">
-          Look into the connected food ecosystem, then choose how you want to enter.
+          {portalText.subtitle}
         </p>
 
         <div className="mt-6 grid gap-3">
@@ -3080,12 +3088,15 @@ function MyWorkspace({
   signIn,
   activeUser,
   setScreen,
+  language,
 }: {
   signIn: (role: Role, name?: string, options?: Partial<EcosystemUser>) => void;
   activeUser: EcosystemUser | null;
   setScreen: (screen: Screen) => void;
+  language: LanguageCode;
 }) {
   type ReturningChoice = "Youth" | "Supervisor" | "Parent" | "Grower" | "Partner" | "Mission Control";
+  const L = (phrase: string) => translatePhrase(language, phrase);
   const [returningChoice, setReturningChoice] = useState<ReturningChoice>("Youth");
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
@@ -3149,17 +3160,26 @@ function MyWorkspace({
       return;
     }
 
+    if (returningChoice === "Parent") {
+      const displayName = name || email || "Parent / Guardian";
+      if (!email.trim() && !name.trim()) {
+        setAccessMessage("Please enter parent email or youth name so we can open the parent view.");
+        return;
+      }
+      signIn("Parent / Guardian", displayName);
+      return;
+    }
+
     if (!password.trim()) {
       setAccessMessage("Please enter your temporary password.");
       return;
     }
     if (password.trim() !== "Nesco2026") {
-      setAccessMessage("Temporary password not recognized. For launch, use Nesco2026 until your password is changed.");
+      setAccessMessage("Temporary password not recognized. For launch, growers, partners, and Mission Control use Nesco2026 until changed.");
       return;
     }
 
     const displayName = name || email || returningChoice;
-    if (returningChoice === "Parent") signIn("Parent / Guardian", displayName);
     if (returningChoice === "Grower") signIn("Grower", displayName);
     if (returningChoice === "Partner") signIn("Partner", displayName);
     if (returningChoice === "Mission Control") signIn("Administrator", displayName);
@@ -3171,10 +3191,10 @@ function MyWorkspace({
   return (
     <div className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🔑 Returning</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Enter Your Workspace</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🔑 {L("Returning")}</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">{L("Enter Your Workspace")}</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">
-          Choose your role first. The screen will show only the access fields you need.
+          {L("Choose your role first. The screen will show only the access fields you need.")}
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -3185,7 +3205,7 @@ function MyWorkspace({
               onClick={() => { setReturningChoice(choice); setAccessMessage(""); }}
               className={`rounded-[1.25rem] border p-4 text-left font-black transition ${returningChoice === choice ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/15"}`}
             >
-              {choice}
+              {L(choice)}
             </button>
           ))}
         </div>
@@ -3193,41 +3213,48 @@ function MyWorkspace({
         <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
           {(returningChoice === "Youth" || returningChoice === "Supervisor") ? (
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label={returningChoice === "Youth" ? "Youth Name" : "Supervisor Name"} value={name} onChange={setName} placeholder="First and last name" />
-              <Field label={returningChoice === "Supervisor" ? "Supervisor PIN" : "Assigned Youth PIN"} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? "0000" : "PIN number"} />
+              <Field label={returningChoice === "Youth" ? L("Youth Name") : L("Supervisor Name")} value={name} onChange={setName} placeholder={L("First and last name")} />
+              <Field label={returningChoice === "Supervisor" ? L("Supervisor PIN") : L("Assigned Youth PIN")} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? "0000" : L("PIN number")} />
+            </div>
+          ) : returningChoice === "Parent" ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label={L("Parent Email")} value={email} onChange={setEmail} placeholder={L("Parent or guardian email")} />
+              <Field label={L("Youth Name")} value={name} onChange={setName} placeholder={L("Youth first and last name")} />
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Username / Email" value={email} onChange={setEmail} placeholder="Email or assigned access ID" />
-              <Field label="Temporary Password" value={password} onChange={setPassword} placeholder="Nesco2026" />
+              <Field label={L("Username / Email")} value={email} onChange={setEmail} placeholder={L("Email or assigned access ID")} />
+              <Field label={L("Temporary Password")} value={password} onChange={setPassword} placeholder="Nesco2026" />
             </div>
           )}
 
-          {returningChoice !== "Youth" && returningChoice !== "Supervisor" && (
-            <p className="mt-3 text-xs leading-5 text-white/62">For launch, use temporary password <strong className="text-white">Nesco2026</strong> until password change is added.</p>
+          {returningChoice === "Parent" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Parents use email and youth name for launch access. No Nesco2026 password is required for parents.")}</p>}
+          {returningChoice !== "Youth" && returningChoice !== "Supervisor" && returningChoice !== "Parent" && (
+            <p className="mt-3 text-xs leading-5 text-white/62">{L("Growers, partners, and Mission Control use temporary password")} <strong className="text-white">Nesco2026</strong> {L("until changed.")}</p>
           )}
-          {returningChoice === "Youth" && <p className="mt-3 text-xs leading-5 text-white/62">Returning youth use their assigned PIN. No temporary password is needed.</p>}
-          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">Supervisor launch PIN: <strong className="text-white">0000</strong>.</p>}
+          {returningChoice === "Youth" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Returning youth use their assigned PIN. No temporary password is needed.")}</p>}
+          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Supervisor launch PIN")}: <strong className="text-white">0000</strong>.</p>}
 
-          <button type="button" onClick={returningLogin} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Enter Workspace</button>
+          <button type="button" onClick={returningLogin} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{L("Enter Workspace")}</button>
           {accessMessage && <Notice text={accessMessage} />}
         </div>
       </Card>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Workspace Rules</div>
-        <h2 className="mt-3 text-3xl font-black">Portal → Pathway → Workspace</h2>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{L("Workspace Rules")}</div>
+        <h2 className="mt-3 text-3xl font-black">{L("Portal → Pathway → Workspace")}</h2>
         <div className="mt-5 grid gap-3">
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Youth:</strong> use name + assigned PIN, then enter My Cultivator Journey.</div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Supervisor:</strong> use name + PIN 0000, then manage attendance, safety, and reports.</div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Adults:</strong> use temporary password Nesco2026 until changed.</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Youth")}:</strong> {L("use name + assigned PIN, then enter My Cultivator Journey.")}</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Supervisor")}:</strong> {L("use name + PIN 0000, then manage attendance, safety, and reports.")}</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Parent / Guardian")}:</strong> {L("use parent email and youth name for launch access.")}</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Grower / Partner / Mission Control")}:</strong> {L("use temporary password Nesco2026 until changed.")}</div>
         </div>
         {activeUser && activeWorkspace && (
           <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
             <div className="text-xs font-black uppercase tracking-[0.24em] text-emerald-100/75">Current Access</div>
             <div className="mt-2 text-2xl font-black">{activeUser.name}</div>
             <div className="mt-1 text-sm text-white/72">{activeUser.role}</div>
-            <button type="button" onClick={() => setScreen(activeWorkspace)} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Workspace</button>
+            <button type="button" onClick={() => setScreen(activeWorkspace)} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{L("Open My Workspace")}</button>
           </div>
         )}
       </Card>
