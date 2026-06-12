@@ -2218,7 +2218,7 @@ function NurseLineBanner({ setScreen }: { setScreen: (screen: Screen) => void })
           <div className="text-[10px] font-black uppercase tracking-[0.24em] text-red-50/85">Nurse Line • Visible At All Times</div>
           <div className="text-sm font-black leading-snug sm:text-base">Health, heat, injury, medication, or urgent support: tell the site lead immediately.</div>
         </div>
-        <button type="button" onClick={() => setScreen("wellness")} className="shrink-0 rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Need Help?</button>
+        <button type="button" onClick={() => setScreen("wellness")} className="shrink-0 rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Nurse Line</button>
       </div>
     </div>
   );
@@ -2307,11 +2307,53 @@ function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
 
 function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
   const farmStatus = getFarmStatus();
-  const notifications = getLaunchNotifications().slice(0, compact ? 3 : 4);
+  const notifications = getLaunchNotifications();
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
+  if (compact) {
+    return (
+      <Card className="p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Farm Status</div>
+            <div className="mt-1 text-xl font-black">{farmStatus.level}</div>
+            <div className="mt-1 text-sm font-bold leading-5 text-white/78">{farmStatus.title}</div>
+          </div>
+          <details className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-black">
+            <summary className="cursor-pointer list-none">Details</summary>
+            <div className="mt-3 w-[min(72vw,28rem)] rounded-2xl border border-white/10 bg-black/85 p-4 text-left text-sm font-semibold leading-6 text-white/82 shadow-2xl">
+              <p>{farmStatus.summary}</p>
+              <p className="mt-2"><strong>Action:</strong> {farmStatus.action}</p>
+              <button type="button" onClick={() => setScreen("supervisor")} className="mt-3 rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Supervisor View</button>
+            </div>
+          </details>
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <details className="rounded-2xl border border-white/10 bg-black/25 p-3">
+            <summary className="cursor-pointer text-sm font-black text-emerald-50">📢 Notifications ({notifications.length})</summary>
+            <div className="mt-3 grid gap-2">
+              {notifications.slice(0, 3).map((note) => (
+                <div key={note.id} className="rounded-xl bg-white/10 p-3 text-sm leading-5 text-white/80">
+                  <strong>{note.title}</strong><br />{note.body}
+                </div>
+              ))}
+            </div>
+          </details>
+          <details className="rounded-2xl border border-white/10 bg-black/25 p-3">
+            <summary className="cursor-pointer text-sm font-black text-emerald-50">🌤 Almanac</summary>
+            <div className="mt-3 grid gap-2 text-sm leading-5 text-white/80">
+              {launchAlmanacSnapshot.conditions.slice(0, 4).map(([label, value]) => (
+                <div key={label} className="rounded-xl bg-white/10 p-3"><strong>{label}:</strong> {value}</div>
+              ))}
+            </div>
+          </details>
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <Card className={compact ? "p-4" : ""}>
+    <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Notifications</div>
       <h2 className="mt-3 text-3xl font-black">Bronson Daily Operating Status</h2>
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
@@ -2319,14 +2361,18 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
           <div>
             <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
             <div className="mt-1 text-2xl font-black">{farmStatus.title}</div>
-            <p className="mt-2 text-sm leading-6 text-white/84">{farmStatus.summary}</p>
           </div>
           <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/20 bg-black/28 px-4 py-2 text-sm font-black">Supervisor View</button>
         </div>
-        <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold leading-6 text-white/86">Action: {farmStatus.action}</div>
+        <details className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold leading-6 text-white/86">
+          <summary className="cursor-pointer font-black text-emerald-50">View operating details</summary>
+          <p className="mt-3">{farmStatus.summary}</p>
+          <p className="mt-2"><strong>Action:</strong> {farmStatus.action}</p>
+        </details>
       </div>
 
-      {!compact && (
+      <details className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
+        <summary className="cursor-pointer font-black text-amber-50">🌤 View Almanac snapshot</summary>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {launchAlmanacSnapshot.conditions.map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
@@ -2335,25 +2381,25 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
             </div>
           ))}
         </div>
-      )}
-
-      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
-        <strong>{launchAlmanacSnapshot.label}:</strong> {launchAlmanacSnapshot.farmWisdom}
+        <div className="mt-4 text-sm leading-6 text-white/78">{launchAlmanacSnapshot.farmWisdom}</div>
         <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
-      </div>
+      </details>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {notifications.map((note) => (
-          <div key={note.id} className="rounded-2xl border border-white/10 bg-black/28 p-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/72">{note.audience}</span>
-              <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-black text-emerald-50">{note.priority}</span>
+      <details className="mt-4 rounded-2xl border border-white/10 bg-black/28 p-4">
+        <summary className="cursor-pointer font-black text-emerald-50">📢 View notifications ({notifications.length})</summary>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {notifications.map((note) => (
+            <div key={note.id} className="rounded-2xl border border-white/10 bg-black/28 p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/72">{note.audience}</span>
+                <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-black text-emerald-50">{note.priority}</span>
+              </div>
+              <div className="mt-2 text-lg font-black">{note.title}</div>
+              <p className="mt-1 text-sm leading-6 text-white/76">{note.body}</p>
             </div>
-            <div className="mt-2 text-lg font-black">{note.title}</div>
-            <p className="mt-1 text-sm leading-6 text-white/76">{note.body}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </details>
     </Card>
   );
 }
@@ -2549,75 +2595,84 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
+  const pathwayCards: { label: string; screen: Screen; icon: string; helper: string }[] = [
+    { label: "Guest", screen: "guest", icon: "🌲", helper: "Explore the farm." },
+    { label: "Youth Workforce", screen: activeUser?.role === "Youth Workforce Participant" ? "youth" : "roles", icon: "🌱", helper: "Start My Day." },
+    { label: "Parent / Guardian", screen: activeUser?.role === "Parent / Guardian" ? "parent" : "roles", icon: "👨‍👩‍👧", helper: "View youth updates." },
+    { label: "Supervisor", screen: activeUser?.accessLevel === "staff" || activeUser?.accessLevel === "admin" || activeUser?.accessLevel === "board" ? "supervisor" : "roles", icon: "👷", helper: "Manage team." },
+    { label: "Grower", screen: "grower", icon: "🚜", helper: "Grow and sell." },
+    { label: "Marketplace", screen: "marketplace", icon: "🛒", helper: "Shop and connect." },
+    { label: "Partner", screen: "partner", icon: "🤝", helper: "Collaborate." },
+    { label: "Mission Control", screen: activeUser?.accessLevel === "admin" || activeUser?.accessLevel === "board" || activeUser?.accessLevel === "staff" ? "reports" : "roles", icon: "🎛", helper: "Monitor operations." },
+  ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.08fr_.72fr]">
+    <div className="grid gap-4">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
-          <img
-            src={IMG.forest}
-            alt="Bronson Family Farm forest gate entry"
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => (event.currentTarget.src = IMG.backup)}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.35),rgba(0,0,0,.7))]" />
-          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-8">
-            <div>
-              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                {TT("Forest Gate Portal")}
+        <div className="grid lg:grid-cols-[1.05fr_.95fr]">
+          <div className="relative min-h-[36rem]">
+            <img src={IMG.forest} alt="Bronson Family Farm forest gate entry" className="absolute inset-0 h-full w-full object-cover" onError={(event) => (event.currentTarget.src = IMG.backup)} />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.86),rgba(0,0,0,.42),rgba(0,0,0,.72))]" />
+            <div className="relative z-10 flex min-h-[36rem] flex-col justify-between p-5 sm:p-8">
+              <div>
+                <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
+                  {TT("Forest Gate Portal")}
+                </div>
+                <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
+                  {TT("Choose Your Experience")}
+                </h1>
+                <p className="mt-5 max-w-2xl text-base leading-7 text-white/84 sm:text-lg">
+                  {TT("The portal is the front door. Choose a pathway first; details open only when needed.")}
+                </p>
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
-                {TT("Enter the Living Ecosystem")}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
-                {TT("Choose the pathway that fits you. The platform will reveal only what you need next.")}
-              </p>
-            </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
-                <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
-                <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest story, events, marketplace, volunteer, and partner opportunities.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Marketplace")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Products, events, growers, value-added items, and purchasing.")}</div>
-              </button>
-              <button type="button" onClick={() => setScreen("demo")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                <div className="text-lg font-black leading-tight">{TT("Guided Demo")}</div>
-                <div className="mt-2 text-sm leading-5 text-white/74">{TT("A slower overview for visitors, partners, and reviewers.")}</div>
-              </button>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
+                  <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
+                  <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
+                </button>
+                <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                  <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
+                  <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest pathway: story, events, marketplace, volunteer, and partner options.")}</div>
+                </button>
+              </div>
             </div>
+          </div>
+
+          <div className="grid gap-4 border-t border-white/10 bg-black/28 p-5 lg:border-l lg:border-t-0">
+            <DailyOperationsCommandCenter setScreen={setScreen} compact />
+            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35">
+              <img src={IMG.ecosystem} alt="Connected Food Ecosystem map" className="max-h-[300px] w-full object-contain p-3" onError={(event) => (event.currentTarget.src = IMG.forest)} />
+            </div>
+            <details className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+              <summary className="cursor-pointer text-sm font-black text-emerald-50">{TT("More Options")}</summary>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <button type="button" onClick={() => setScreen("marketplace")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">🛒 {TT("Marketplace")}</button>
+                <button type="button" onClick={() => setScreen("demo")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">🎬 {TT("Guided Demo")}</button>
+                <button type="button" onClick={() => setScreen("events")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">📅 {TT("Events")}</button>
+                <button type="button" onClick={() => setScreen("feedback")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">💬 {TT("Feedback")}</button>
+              </div>
+            </details>
           </div>
         </div>
       </Card>
 
-      <div className="grid gap-4">
-        <DailyOperationsCommandCenter setScreen={setScreen} compact />
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Next Action")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Start with the pathway. Details open when needed.")}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/78">
-            {TT("Safety, farm status, and the user's next step stay visible. Curriculum, reports, media, and deep ecosystem information are revealed progressively.")}
-          </p>
-          <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
-            <summary className="cursor-pointer font-black text-emerald-50">{TT("View launch notes")}</summary>
-            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Public visitors explore the portal, story, events, and marketplace without registration.")}</div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Youth go to Start My Day, assignment, project, evidence upload, and reflection.")}</div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Supervisors and Mission Control see the deeper operational tools.")}</div>
-            </div>
-          </details>
-        </Card>
-        <details className="rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
-          <summary className="cursor-pointer text-lg font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
-          <div className="mt-5 grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose a pathway")}</div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {pathwayCards.map((card) => (
+            <button key={card.label} type="button" onClick={() => setScreen(card.screen)} className="rounded-[1.25rem] border border-white/10 bg-black/26 p-4 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14">
+              <div className="text-2xl">{card.icon}</div>
+              <div className="mt-2 text-base font-black">{TT(card.label)}</div>
+              <div className="mt-1 text-xs font-semibold leading-5 text-white/62">{TT(card.helper)}</div>
+            </button>
+          ))}
+        </div>
+        <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
+          <summary className="cursor-pointer font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <CultureCard language={language} variant="seed" />
-            <Card>
+            <div className="rounded-[1.35rem] border border-white/10 bg-white/10 p-5">
               <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
               <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
               <div className="mt-4 grid gap-2 text-sm text-white/82">
@@ -2625,10 +2680,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
                 <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
                 <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
               </div>
-            </Card>
+            </div>
           </div>
         </details>
-      </div>
+      </Card>
     </div>
   );
 }
