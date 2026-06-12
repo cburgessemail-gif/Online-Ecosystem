@@ -2102,6 +2102,7 @@ function Shell({
   language: LanguageCode;
   changeLanguage: (language: LanguageCode) => void;
 }) {
+  const [showNurseLine, setShowNurseLine] = useState(false);
   const role = activeUser?.role;
   const workspaceTarget: Screen = role && role !== "Guest" ? routeForRole(role) : "roles";
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
@@ -2148,7 +2149,8 @@ function Shell({
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
       <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 pb-8 md:px-6">
-        <NurseLineBanner setScreen={setScreen} />
+        <NurseLineBanner onOpen={() => setShowNurseLine(true)} />
+        {showNurseLine && <NurseLineModal onClose={() => setShowNurseLine(false)} />}
 
         <div className="sticky top-[4.2rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -2210,15 +2212,44 @@ function Shell({
 }
 
 
-function NurseLineBanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
+function NurseLineBanner({ onOpen }: { onOpen: () => void }) {
   return (
     <div className="sticky top-0 z-[60] mb-3 rounded-[1rem] border border-red-200/35 bg-red-700/92 px-3 py-2 text-white shadow-[0_14px_45px_rgba(0,0,0,.38)] backdrop-blur-xl">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="text-[10px] font-black uppercase tracking-[0.24em] text-red-50/85">Nurse Line • Visible At All Times</div>
-          <div className="text-sm font-black leading-snug sm:text-base">Health, heat, injury, medication, or urgent support: tell the site lead immediately.</div>
+          <div className="text-sm font-black leading-snug sm:text-base">Health, heat, injury, medication, or urgent support: tell your supervisor/site lead immediately.</div>
         </div>
-        <button type="button" onClick={() => setScreen("wellness")} className="shrink-0 rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Nurse Line</button>
+        <button type="button" onClick={onOpen} className="shrink-0 rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Nurse Line</button>
+      </div>
+    </div>
+  );
+}
+
+function NurseLineModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Nurse Line Contact Information">
+      <div className="w-full max-w-md rounded-[2rem] border border-red-200/35 bg-[#1d1513] p-5 text-white shadow-[0_35px_110px_rgba(0,0,0,.7)]">
+        <div className="text-[11px] font-black uppercase tracking-[0.24em] text-red-100/80">Nurse Line</div>
+        <h2 className="mt-2 text-3xl font-black leading-tight">Registered Nurse Triage</h2>
+        <p className="mt-3 text-sm font-bold leading-6 text-white/82">For health, heat-related illness, injury, medication questions, or urgent support.</p>
+
+        <div className="mt-4 rounded-2xl border border-red-200/20 bg-red-700/30 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-red-100/80">Call</div>
+          <a href="tel:18553896699" className="mt-1 block text-3xl font-black tracking-tight text-white">855-389-6699</a>
+          <div className="mt-2 text-sm font-black text-white/82">Available 24/7/365</div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/82">
+          <strong className="text-white">Youth:</strong> tell your supervisor or site lead immediately. The supervisor completes the injury report when documentation is required.
+          <br />
+          <strong className="text-white">Emergency:</strong> call 911 for life-threatening emergencies.
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <a href="tel:18553896699" className="rounded-full bg-white px-5 py-3 text-sm font-black text-red-700">Call Nurse Line</a>
+          <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Close</button>
+        </div>
       </div>
     </div>
   );
@@ -2307,53 +2338,11 @@ function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
 
 function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
   const farmStatus = getFarmStatus();
-  const notifications = getLaunchNotifications();
+  const notifications = getLaunchNotifications().slice(0, compact ? 3 : 4);
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
-  if (compact) {
-    return (
-      <Card className="p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/70">Farm Status</div>
-            <div className="mt-1 text-xl font-black">{farmStatus.level}</div>
-            <div className="mt-1 text-sm font-bold leading-5 text-white/78">{farmStatus.title}</div>
-          </div>
-          <details className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-black">
-            <summary className="cursor-pointer list-none">Details</summary>
-            <div className="mt-3 w-[min(72vw,28rem)] rounded-2xl border border-white/10 bg-black/85 p-4 text-left text-sm font-semibold leading-6 text-white/82 shadow-2xl">
-              <p>{farmStatus.summary}</p>
-              <p className="mt-2"><strong>Action:</strong> {farmStatus.action}</p>
-              <button type="button" onClick={() => setScreen("supervisor")} className="mt-3 rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Supervisor View</button>
-            </div>
-          </details>
-        </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <details className="rounded-2xl border border-white/10 bg-black/25 p-3">
-            <summary className="cursor-pointer text-sm font-black text-emerald-50">📢 Notifications ({notifications.length})</summary>
-            <div className="mt-3 grid gap-2">
-              {notifications.slice(0, 3).map((note) => (
-                <div key={note.id} className="rounded-xl bg-white/10 p-3 text-sm leading-5 text-white/80">
-                  <strong>{note.title}</strong><br />{note.body}
-                </div>
-              ))}
-            </div>
-          </details>
-          <details className="rounded-2xl border border-white/10 bg-black/25 p-3">
-            <summary className="cursor-pointer text-sm font-black text-emerald-50">🌤 Almanac</summary>
-            <div className="mt-3 grid gap-2 text-sm leading-5 text-white/80">
-              {launchAlmanacSnapshot.conditions.slice(0, 4).map(([label, value]) => (
-                <div key={label} className="rounded-xl bg-white/10 p-3"><strong>{label}:</strong> {value}</div>
-              ))}
-            </div>
-          </details>
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
+    <Card className={compact ? "p-4" : ""}>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Notifications</div>
       <h2 className="mt-3 text-3xl font-black">Bronson Daily Operating Status</h2>
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
@@ -2361,18 +2350,14 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
           <div>
             <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
             <div className="mt-1 text-2xl font-black">{farmStatus.title}</div>
+            <p className="mt-2 text-sm leading-6 text-white/84">{farmStatus.summary}</p>
           </div>
           <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/20 bg-black/28 px-4 py-2 text-sm font-black">Supervisor View</button>
         </div>
-        <details className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold leading-6 text-white/86">
-          <summary className="cursor-pointer font-black text-emerald-50">View operating details</summary>
-          <p className="mt-3">{farmStatus.summary}</p>
-          <p className="mt-2"><strong>Action:</strong> {farmStatus.action}</p>
-        </details>
+        <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold leading-6 text-white/86">Action: {farmStatus.action}</div>
       </div>
 
-      <details className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
-        <summary className="cursor-pointer font-black text-amber-50">🌤 View Almanac snapshot</summary>
+      {!compact && (
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {launchAlmanacSnapshot.conditions.map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
@@ -2381,25 +2366,25 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
             </div>
           ))}
         </div>
-        <div className="mt-4 text-sm leading-6 text-white/78">{launchAlmanacSnapshot.farmWisdom}</div>
-        <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
-      </details>
+      )}
 
-      <details className="mt-4 rounded-2xl border border-white/10 bg-black/28 p-4">
-        <summary className="cursor-pointer font-black text-emerald-50">📢 View notifications ({notifications.length})</summary>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {notifications.map((note) => (
-            <div key={note.id} className="rounded-2xl border border-white/10 bg-black/28 p-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/72">{note.audience}</span>
-                <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-black text-emerald-50">{note.priority}</span>
-              </div>
-              <div className="mt-2 text-lg font-black">{note.title}</div>
-              <p className="mt-1 text-sm leading-6 text-white/76">{note.body}</p>
+      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
+        <strong>{launchAlmanacSnapshot.label}:</strong> {launchAlmanacSnapshot.farmWisdom}
+        <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {notifications.map((note) => (
+          <div key={note.id} className="rounded-2xl border border-white/10 bg-black/28 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/72">{note.audience}</span>
+              <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[10px] font-black text-emerald-50">{note.priority}</span>
             </div>
-          ))}
-        </div>
-      </details>
+            <div className="mt-2 text-lg font-black">{note.title}</div>
+            <p className="mt-1 text-sm leading-6 text-white/76">{note.body}</p>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }
@@ -2595,84 +2580,75 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
-  const pathwayCards: { label: string; screen: Screen; icon: string; helper: string }[] = [
-    { label: "Guest", screen: "guest", icon: "🌲", helper: "Explore the farm." },
-    { label: "Youth Workforce", screen: activeUser?.role === "Youth Workforce Participant" ? "youth" : "roles", icon: "🌱", helper: "Start My Day." },
-    { label: "Parent / Guardian", screen: activeUser?.role === "Parent / Guardian" ? "parent" : "roles", icon: "👨‍👩‍👧", helper: "View youth updates." },
-    { label: "Supervisor", screen: activeUser?.accessLevel === "staff" || activeUser?.accessLevel === "admin" || activeUser?.accessLevel === "board" ? "supervisor" : "roles", icon: "👷", helper: "Manage team." },
-    { label: "Grower", screen: "grower", icon: "🚜", helper: "Grow and sell." },
-    { label: "Marketplace", screen: "marketplace", icon: "🛒", helper: "Shop and connect." },
-    { label: "Partner", screen: "partner", icon: "🤝", helper: "Collaborate." },
-    { label: "Mission Control", screen: activeUser?.accessLevel === "admin" || activeUser?.accessLevel === "board" || activeUser?.accessLevel === "staff" ? "reports" : "roles", icon: "🎛", helper: "Monitor operations." },
-  ];
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 lg:grid-cols-[1.08fr_.72fr]">
       <Card className="overflow-hidden p-0">
-        <div className="grid lg:grid-cols-[1.05fr_.95fr]">
-          <div className="relative min-h-[36rem]">
-            <img src={IMG.forest} alt="Bronson Family Farm forest gate entry" className="absolute inset-0 h-full w-full object-cover" onError={(event) => (event.currentTarget.src = IMG.backup)} />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.86),rgba(0,0,0,.42),rgba(0,0,0,.72))]" />
-            <div className="relative z-10 flex min-h-[36rem] flex-col justify-between p-5 sm:p-8">
-              <div>
-                <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                  {TT("Forest Gate Portal")}
-                </div>
-                <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
-                  {TT("Choose Your Experience")}
-                </h1>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-white/84 sm:text-lg">
-                  {TT("The portal is the front door. Choose a pathway first; details open only when needed.")}
-                </p>
+        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
+          <img
+            src={IMG.forest}
+            alt="Bronson Family Farm forest gate entry"
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(event) => (event.currentTarget.src = IMG.backup)}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.35),rgba(0,0,0,.7))]" />
+          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-8">
+            <div>
+              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
+                {TT("Forest Gate Portal")}
               </div>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
-                  <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
-                  <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
-                </button>
-                <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
-                  <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
-                  <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest pathway: story, events, marketplace, volunteer, and partner options.")}</div>
-                </button>
-              </div>
+              <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">
+                {TT("Enter the Living Ecosystem")}
+              </h1>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
+                {TT("Choose the pathway that fits you. The platform will reveal only what you need next.")}
+              </p>
             </div>
-          </div>
 
-          <div className="grid gap-4 border-t border-white/10 bg-black/28 p-5 lg:border-l lg:border-t-0">
-            <DailyOperationsCommandCenter setScreen={setScreen} compact />
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/35">
-              <img src={IMG.ecosystem} alt="Connected Food Ecosystem map" className="max-h-[300px] w-full object-contain p-3" onError={(event) => (event.currentTarget.src = IMG.forest)} />
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
+                <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
+                <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest story, events, marketplace, volunteer, and partner opportunities.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Marketplace")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Products, events, growers, value-added items, and purchasing.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("demo")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Guided Demo")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("A slower overview for visitors, partners, and reviewers.")}</div>
+              </button>
             </div>
-            <details className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-              <summary className="cursor-pointer text-sm font-black text-emerald-50">{TT("More Options")}</summary>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                <button type="button" onClick={() => setScreen("marketplace")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">🛒 {TT("Marketplace")}</button>
-                <button type="button" onClick={() => setScreen("demo")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">🎬 {TT("Guided Demo")}</button>
-                <button type="button" onClick={() => setScreen("events")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">📅 {TT("Events")}</button>
-                <button type="button" onClick={() => setScreen("feedback")} className="rounded-2xl border border-white/10 bg-black/30 p-3 text-left text-sm font-black">💬 {TT("Feedback")}</button>
-              </div>
-            </details>
           </div>
         </div>
       </Card>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{TT("Choose a pathway")}</div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {pathwayCards.map((card) => (
-            <button key={card.label} type="button" onClick={() => setScreen(card.screen)} className="rounded-[1.25rem] border border-white/10 bg-black/26 p-4 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14">
-              <div className="text-2xl">{card.icon}</div>
-              <div className="mt-2 text-base font-black">{TT(card.label)}</div>
-              <div className="mt-1 text-xs font-semibold leading-5 text-white/62">{TT(card.helper)}</div>
-            </button>
-          ))}
-        </div>
-        <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
-          <summary className="cursor-pointer font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4">
+        <DailyOperationsCommandCenter setScreen={setScreen} compact />
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Next Action")}</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Start with the pathway. Details open when needed.")}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/78">
+            {TT("Safety, farm status, and the user's next step stay visible. Curriculum, reports, media, and deep ecosystem information are revealed progressively.")}
+          </p>
+          <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
+            <summary className="cursor-pointer font-black text-emerald-50">{TT("View launch notes")}</summary>
+            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Public visitors explore the portal, story, events, and marketplace without registration.")}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Youth go to Start My Day, assignment, project, evidence upload, and reflection.")}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Supervisors and Mission Control see the deeper operational tools.")}</div>
+            </div>
+          </details>
+        </Card>
+        <details className="rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
+          <summary className="cursor-pointer text-lg font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
+          <div className="mt-5 grid gap-4">
             <CultureCard language={language} variant="seed" />
-            <div className="rounded-[1.35rem] border border-white/10 bg-white/10 p-5">
+            <Card>
               <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
               <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
               <div className="mt-4 grid gap-2 text-sm text-white/82">
@@ -2680,10 +2656,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
                 <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
                 <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
               </div>
-            </div>
+            </Card>
           </div>
         </details>
-      </Card>
+      </div>
     </div>
   );
 }
@@ -3989,8 +3965,11 @@ function IncidentTool({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-red-100/75">Staff-Only Incident / Support Log</div>
-      <h2 className="mt-3 text-4xl font-black">Document safety, behavior, conflict, wellness, or parent contact.</h2>
+      <div className="text-xs uppercase tracking-[0.35em] text-red-100/75">Supervisor-Only Incident / Support Log</div>
+      <h2 className="mt-3 text-4xl font-black">Document safety, behavior, conflict, wellness, injury, or parent contact.</h2>
+      <div className="mt-4 rounded-2xl border border-red-200/20 bg-red-700/20 p-4 text-sm font-bold leading-6 text-white/82">
+        Injury workflow: youth notify the supervisor/site lead first. Registered Nurse Triage is available at <a className="font-black text-white underline" href="tel:18553896699">855-389-6699</a> 24/7/365. Supervisors complete the injury investigation/report when documentation is required.
+      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
         <SelectField label="Incident Type" value={incidentType} onChange={(v) => setIncidentType(v as IncidentRecord["incident_type"])} options={["injury", "behavior", "conflict", "wellness", "safety", "transportation", "parent_contact", "other"]} />
