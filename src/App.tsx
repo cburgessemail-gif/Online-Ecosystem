@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.1 - ECOSYSTEM + ENTREPRENEURSHIP RECOVERY LAUNCH
+ * LAUNCH CANDIDATE 3.2 - FOREST GATE + CULTIVATOR JOURNEY LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -17,7 +17,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Reports
  * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
- * - Restores Youth Command Center: nurse line, field status, Almanac, notifications, ecosystem map, entrepreneurship value stack, daily rhythm, and media evidence upload
+ * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
+ * - Keeps returning youth on PIN, supervisors on PIN 0000, adults on temporary password Nesco2026
+ * - Layers youth curriculum by week and day
+ * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  */
 
 type Screen =
@@ -370,7 +373,7 @@ const launchAlmanacSnapshot = {
 const defaultNotifications: EcosystemNotification[] = [
   { id: "heat-alert", audience: "All", priority: "Safety", title: "Heat Index Warning", body: "Farm operations may be modified. Supervisors may end outdoor work early, increase water breaks, and move teams to shade or indoor learning.", created_at: new Date().toISOString() },
   { id: "today-assignment", audience: "Youth", priority: "Action", title: "Start with Safety, Then Assignment", body: "Check the Nurse Line, field status, Almanac, and today's project before starting work.", created_at: new Date().toISOString() },
-  { id: "media-evidence", audience: "Youth", priority: "Info", title: "Upload Evidence Freely", body: "For launch, youth may upload photos or videos without a permission gate. Permissions and publication controls will be addressed later.", created_at: new Date().toISOString() },
+  { id: "cultivator-story", audience: "Youth", priority: "Info", title: "Tell Your Cultivator Story", body: "Take photos or videos of what you learned, built, helped with, or accomplished today. You are becoming more capable than you were yesterday.", created_at: new Date().toISOString() },
   { id: "parent-notice", audience: "Parent", priority: "Info", title: "Parent Updates Follow Farm Status", body: "Parents should check program status, early shutdown notes, and supervisor announcements when heat or weather changes the day.", created_at: new Date().toISOString() },
 ];
 
@@ -2422,7 +2425,7 @@ function EcosystemImageContextCard() {
 function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const stages = [
     { title: "Beginning of Day", icon: "🌞", body: "Check in, read the Nurse Line, review weather, heat index, farm status, PPE, water, today’s assignment, and daily inspiration.", actions: ["Attendance", "PPE", "Almanac", "Assignment"] },
-    { title: "During Program", icon: "🚜", body: "Do the work, use resources, ask supervisors, upload evidence, connect the task to skills, career pathways, and entrepreneurship.", actions: ["Project", "Resources", "Career", "Evidence"] },
+    { title: "During Program", icon: "🚜", body: "Do the work, use resources, ask supervisors, tell your Cultivator Story, connect the task to skills, career pathways, and entrepreneurship.", actions: ["Project", "Resources", "Career", "Evidence"] },
     { title: "End of Day", icon: "🌙", body: "Reflect, save portfolio evidence, receive supervisor feedback, prepare parent-safe summary, and preview tomorrow’s work.", actions: ["Reflection", "Assessment", "Portfolio", "Tomorrow"] },
   ];
   return (
@@ -2483,31 +2486,32 @@ function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | n
       const row: MediaAsset = {
         id: uuid(),
         title: file.name,
-        category: "Youth Portfolio Evidence",
+        category: "Cultivator Story",
         file_name: file.name,
         file_url: String(reader.result || ""),
         file_type: file.type || "file",
         file_size: file.size,
         uploaded_by: activeUser?.name || "Youth Workforce Participant",
-        storage_path: `local/youth-evidence/${file.name}`,
+        storage_path: `local/cultivator-story/${file.name}`,
         created_at: new Date().toISOString(),
       };
       const next = [row, ...assets].slice(0, 80);
       setAssets(next);
       safeWrite(MEDIA_ASSETS_KEY, next);
-      setNotice("Evidence uploaded and saved immediately. Publication permissions can be addressed later.");
+      setNotice("Your Cultivator Story was saved. Keep showing what you learned, built, helped with, or accomplished.");
     };
     reader.readAsDataURL(file);
   };
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media Evidence Upload</div>
-      <h2 className="mt-3 text-3xl font-black">Upload Without Permission Gate</h2>
-      <p className="mt-3 text-sm leading-7 text-white/82">For launch, youth can upload photos or videos immediately. The upload should not block access to the ecosystem, curriculum, project work, reflection, or portfolio.</p>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Tell Your Cultivator Story</div>
+      <h2 className="mt-3 text-3xl font-black">Show What You Did Today</h2>
+      <p className="mt-3 text-sm leading-7 text-white/82">Every day you are learning something new, building new skills, helping your team, solving problems, and becoming more capable than you were yesterday.</p>
+      <p className="mt-2 text-sm leading-7 text-white/76">Take photos or videos of something you learned, built, discovered, helped with, or accomplished today.</p>
       <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-emerald-200/35 bg-emerald-300/10 p-6 text-center hover:bg-emerald-300/18">
-        <span className="text-2xl font-black">📷 Upload Photo / Video Evidence</span>
-        <span className="mt-2 text-sm font-bold text-white/72">Saved locally now; Supabase/media permissions can be hardened later.</span>
+        <span className="text-2xl font-black">📷 Add Photo or Video</span>
+        <span className="mt-2 text-sm font-bold text-white/72">Saved now as part of your Cultivator Journey.</span>
         <input className="hidden" type="file" accept="image/*,video/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) saveLocalFile(file); e.currentTarget.value = ""; }} />
       </label>
       {notice && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-bold text-emerald-50">{notice}</div>}
@@ -2581,90 +2585,58 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
-  const farmStatus = getFarmStatus();
-  const statusIcon = farmStatus.color === "red" ? "🔴" : farmStatus.color === "amber" ? "🟠" : "🟢";
-  const youthTarget: Screen = activeUser?.role === "Youth Workforce Participant" ? "youth" : "roles";
-  const parentTarget: Screen = activeUser?.role === "Parent / Guardian" ? "parent" : "roles";
-  const supervisorTarget: Screen = ["Supervisor / Staff", "Administrator", "Board / Funder"].includes(activeUser?.role || "") ? "supervisor" : "roles";
-  const growerTarget: Screen = activeUser?.role === "Grower" ? "grower" : "roles";
-  const partnerTarget: Screen = activeUser?.role === "Partner" ? "partner" : "roles";
 
-  const pathwayCards: { icon: string; title: string; body: string; screen: Screen }[] = [
-    { icon: "🌲", title: "Guest", body: "Explore the farm story, events, marketplace, and ways to connect.", screen: "guest" },
-    { icon: "🌱", title: "Youth Workforce", body: "Start My Day, see assignments, upload evidence, and build skills.", screen: youthTarget },
-    { icon: "👨‍👩‍👧", title: "Parent / Guardian", body: "View youth status, announcements, and parent-safe updates.", screen: parentTarget },
-    { icon: "👷", title: "Supervisor", body: "Manage attendance, safety, assessments, incidents, and team operations.", screen: supervisorTarget },
-    { icon: "🚜", title: "Grower", body: "Access growing resources, crop planning, and market opportunities.", screen: growerTarget },
-    { icon: "🛒", title: "Marketplace", body: "Shop, sell, and connect food, products, growers, and customers.", screen: "marketplace" },
-    { icon: "🤝", title: "Partner", body: "Explore collaboration, support, sponsorship, and impact opportunities.", screen: partnerTarget },
-    { icon: "🎛️", title: "Mission Control", body: "Monitor operations, reports, alerts, safety, and program activity.", screen: "reports" },
+  const doors: { icon: string; title: string; body: string; screen: Screen }[] = [
+    { icon: "🌲", title: "Guest", body: "Explore the ecosystem without signing in.", screen: "guest" },
+    { icon: "✨", title: "New", body: "Register for access as youth, parent, supervisor, grower, partner, volunteer, or vendor.", screen: "registration" },
+    { icon: "🔑", title: "Returning", body: "Enter your workspace with your assigned PIN or launch password.", screen: "roles" },
   ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[.95fr_1.05fr]">
+    <div className="grid gap-4 lg:grid-cols-[1.1fr_.9fr] lg:items-stretch">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[56vh]">
+        <div className="relative min-h-[62vh] bg-black/35">
           <img
             src={IMG.ecosystem}
             alt="Bronson Family Farm connected food ecosystem map"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain p-3 sm:p-5"
             onError={(event) => (event.currentTarget.src = IMG.forest)}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.36),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[56vh] flex-col justify-between p-5 sm:p-8">
-            <div>
-              <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
-                {TT("Forest Gate Portal")}
-              </div>
-              <h1 className="mt-5 max-w-2xl text-4xl font-black leading-[0.96] sm:text-6xl md:text-7xl">Bronson Family Farm</h1>
-              <p className="mt-4 max-w-xl text-base font-black leading-7 text-white/90 sm:text-lg">
-                {TT("A connected food ecosystem. Choose your experience first; details open when needed.")}
-              </p>
-            </div>
-
-            <div className="mt-6 rounded-[1.35rem] border border-white/10 bg-black/62 p-4 backdrop-blur-xl">
-              <div className="text-[11px] font-black uppercase tracking-[0.28em] text-emerald-100/80">Today</div>
-              <div className="mt-2 text-2xl font-black">{statusIcon} {farmStatus.level}</div>
-              <div className="mt-1 text-sm font-bold text-white/80">{farmStatus.title}</div>
-              <details className="mt-3 rounded-2xl border border-white/10 bg-white/8 p-3 text-sm leading-6 text-white/78">
-                <summary className="cursor-pointer font-black text-emerald-50">View Details</summary>
-                <p className="mt-3">{farmStatus.summary}</p>
-                <p className="mt-2 font-bold text-white">Action: {farmStatus.action}</p>
-              </details>
-            </div>
+          <div className="absolute left-4 top-4 rounded-full border border-emerald-200/25 bg-black/70 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-emerald-50 backdrop-blur-xl">
+            {TT("Forest Gate Portal")}
           </div>
         </div>
       </Card>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Choose Your Experience</div>
-        <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Who are you today?</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78">
-          The Portal is the front door. Pick a pathway, then the platform reveals only what that role needs next.
+      <Card className="flex flex-col justify-center">
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">Window Into The Ecosystem</div>
+        <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Bronson Family Farm</h1>
+        <p className="mt-4 max-w-xl text-base leading-7 text-white/82">
+          Look into the connected food ecosystem, then choose how you want to enter.
         </p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {pathwayCards.map((card) => (
+
+        <div className="mt-6 grid gap-3">
+          {doors.map((door) => (
             <button
-              key={card.title}
+              key={door.title}
               type="button"
-              onClick={() => setScreen(card.screen)}
-              className="rounded-[1.25rem] border border-white/14 bg-black/28 p-4 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
+              onClick={() => setScreen(door.screen)}
+              className="rounded-[1.5rem] border border-white/14 bg-black/35 p-5 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
             >
               <div className="flex items-center gap-3">
-                <span className="text-xl" aria-hidden="true">{card.icon}</span>
-                <span className="text-lg font-black">{card.title}</span>
+                <span className="text-2xl" aria-hidden="true">{door.icon}</span>
+                <span className="text-2xl font-black">{door.title}</span>
               </div>
-              <div className="mt-2 text-sm leading-6 text-white/72">{card.body}</div>
+              <div className="mt-2 text-sm leading-6 text-white/72">{door.body}</div>
             </button>
           ))}
         </div>
 
-        <details className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
-          <summary className="cursor-pointer font-black text-emerald-50">View Ecosystem Map</summary>
-          <p className="mt-3 text-sm leading-6 text-white/78">
-            The ecosystem connects youth workforce, growers, customers, marketplace, families, partners, and community impact. Each pathway shows only the part that is relevant to that user.
-          </p>
-        </details>
+        {activeUser && (
+          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-white/78">
+            Signed in as <strong className="text-white">{activeUser.name}</strong>. Choose Returning to enter your workspace, or Sign Out to change users.
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -3113,100 +3085,19 @@ function MyWorkspace({
   activeUser: EcosystemUser | null;
   setScreen: (screen: Screen) => void;
 }) {
+  type ReturningChoice = "Youth" | "Supervisor" | "Parent" | "Grower" | "Partner" | "Mission Control";
+  const [returningChoice, setReturningChoice] = useState<ReturningChoice>("Youth");
   const [name, setName] = useState("");
-  const [youthName, setYouthName] = useState("");
-  const [youthPin, setYouthPin] = useState("");
+  const [pin, setPin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [accessMessage, setAccessMessage] = useState("");
-  const [showAccessTools, setShowAccessTools] = useState(!activeUser);
-
-  const isStaff = activeUser ? ["staff", "admin", "board"].includes(activeUser.accessLevel) : false;
-  const isYouth = activeUser?.role === "Youth Workforce Participant";
-  const isParent = activeUser?.role === "Parent / Guardian";
-  const isGrower = activeUser?.role === "Grower";
-  const isMarketplace = activeUser?.role === "Marketplace Customer" || activeUser?.role === "Value-Added Producer";
-
-  const workspaceCards: { title: string; subtitle: string; screen: Screen; show: boolean }[] = [
-    {
-      title: "Youth Daily Check-In",
-      subtitle: "Start My Day: attendance, date/time, PPE, wellness, goal, and support request.",
-      screen: "youth",
-      show: isYouth || isStaff,
-    },
-    {
-      title: "June 8 Cooling Station Challenge",
-      subtitle: "Farm worker heat safety production module: Design, Engineering, Manufacturing, and Contractor teams build a real cooling station.",
-      screen: "launchProject",
-      show: isYouth || isStaff || isParent,
-    },
-    {
-      title: "Supervisor Operations Center",
-      subtitle: "Attendance, PPE, wellness review, assessments, incidents, parent summaries, and reports.",
-      screen: "supervisor",
-      show: isStaff,
-    },
-    {
-      title: "Parent Portal",
-      subtitle: "Parent-safe attendance, progress notes, announcements, and family updates.",
-      screen: "parent",
-      show: isParent || isStaff,
-    },
-    {
-      title: "Grower Operations Center",
-      subtitle: "Weather, crop plans, grower tasks, field notes, inventory, and marketplace demand.",
-      screen: "grower",
-      show: isGrower || isStaff,
-    },
-    {
-      title: "Partner Collaboration",
-      subtitle: "Organizations, schools, businesses, funders, and community groups can explore collaboration opportunities.",
-      screen: "partner",
-      show: activeUser?.role === "Partner" || isStaff || !activeUser,
-    },
-    {
-      title: "Support the Ecosystem",
-      subtitle: "Volunteer, mentor, donate, share resources, sponsor youth, or support infrastructure.",
-      screen: "support",
-      show: activeUser?.role === "Volunteer" || isStaff || !activeUser,
-    },
-    {
-      title: "Value-Added Producer",
-      subtitle: "Develop products, packaging, pricing, and marketplace opportunities from harvests and ideas.",
-      screen: "valueAdded",
-      show: activeUser?.role === "Value-Added Producer" || isGrower || isStaff || !activeUser,
-    },
-    {
-      title: "Marketplace Operations",
-      subtitle: "GrownBy + direct sales, products, inventory, orders, SNAP awareness, and fulfillment.",
-      screen: "marketplace",
-      show: isMarketplace || isGrower || isStaff || !activeUser,
-    },
-    {
-      title: "Executive Reports",
-      subtitle: "Program metrics, workforce status, youth readiness, marketplace activity, and impact reporting.",
-      screen: "reports",
-      show: isStaff,
-    },
-    {
-      title: "Guest Experience",
-      subtitle: "Public story, farm ecosystem, historic place, and community pathway.",
-      screen: "guest",
-      show: !activeUser,
-    },
-    {
-      title: "Registration / Profile",
-      subtitle: "Create one profile once, then reuse it across every workspace.",
-      screen: "registration",
-      show: true,
-    },
-  ];
-
-  const visibleCards = workspaceCards.filter((card) => card.show);
 
   const verifyYouthAndStart = () => {
     const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
     const youthRows = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
-    const enteredName = normalizeLaunchText(youthName || name);
-    const enteredPin = normalizeLaunchPin(youthPin || name);
+    const enteredName = normalizeLaunchText(name);
+    const enteredPin = normalizeLaunchPin(pin);
 
     const matchedYouth = youthRows.find((youth) => {
       const profile = profiles.find((item) => item.id === youth.profile_id);
@@ -3214,16 +3105,14 @@ function MyWorkspace({
       const preferredName = normalizeLaunchText(`${profile?.preferred_name || ""} ${profile?.last_name || ""}`);
       const participant = normalizeLaunchPin(youth.participant_id);
       const lastName = normalizeLaunchText(profile?.last_name || "");
-
       const nameMatches = !enteredName || fullName === enteredName || preferredName === enteredName || (lastName && enteredName.endsWith(lastName));
-      const pinMatches = !enteredPin || participant === enteredPin || participant.endsWith(enteredPin) || enteredPin.endsWith(participant);
+      const pinMatches = !!enteredPin && (participant === enteredPin || participant.endsWith(enteredPin) || enteredPin.endsWith(participant));
       return nameMatches && pinMatches;
     });
 
     if (matchedYouth) {
       const profile = profiles.find((item) => item.id === matchedYouth.profile_id);
-      const displayName = profileName(profile) === "Unknown participant" ? youthName || matchedYouth.participant_id : profileName(profile);
-      setAccessMessage("Youth access verified. Opening Start My Day.");
+      const displayName = profileName(profile) === "Unknown participant" ? name || matchedYouth.participant_id : profileName(profile);
       signIn("Youth Workforce Participant", displayName, {
         participant_id: matchedYouth.participant_id,
         profile_id: matchedYouth.profile_id,
@@ -3232,89 +3121,117 @@ function MyWorkspace({
       return;
     }
 
-    // Launch fix: do not block youth because a roster, PIN, spelling, or Supabase record is missing.
-    const fallbackParticipantId = normalizeLaunchPin(youthPin) || `BFF-${Math.floor(100000 + Math.random() * 899999)}`;
-    setAccessMessage("Supervisor-assisted youth access opened. Start My Day will save locally and staff can verify the record.");
-    signIn("Youth Workforce Participant", youthName || name || "Youth Workforce Participant", {
+    const fallbackParticipantId = enteredPin || `BFF-${Math.floor(100000 + Math.random() * 899999)}`;
+    setAccessMessage("Youth access opened with supervisor-assisted verification. Your work can continue while staff verifies the record.");
+    signIn("Youth Workforce Participant", name || "Youth Workforce Participant", {
       participant_id: fallbackParticipantId,
       needs_supervisor_verification: true,
     });
   };
 
+  const returningLogin = () => {
+    setAccessMessage("");
+    if (returningChoice === "Youth") {
+      if (!pin.trim()) {
+        setAccessMessage("Please enter the youth PIN.");
+        return;
+      }
+      verifyYouthAndStart();
+      return;
+    }
+
+    if (returningChoice === "Supervisor") {
+      if (normalizeLaunchPin(pin) !== "0000") {
+        setAccessMessage("Supervisor PIN not recognized. Use the supervisor launch PIN or check with Mission Control.");
+        return;
+      }
+      signIn("Supervisor / Staff", name || "Supervisor / Staff");
+      return;
+    }
+
+    if (!password.trim()) {
+      setAccessMessage("Please enter your temporary password.");
+      return;
+    }
+    if (password.trim() !== "Nesco2026") {
+      setAccessMessage("Temporary password not recognized. For launch, use Nesco2026 until your password is changed.");
+      return;
+    }
+
+    const displayName = name || email || returningChoice;
+    if (returningChoice === "Parent") signIn("Parent / Guardian", displayName);
+    if (returningChoice === "Grower") signIn("Grower", displayName);
+    if (returningChoice === "Partner") signIn("Partner", displayName);
+    if (returningChoice === "Mission Control") signIn("Administrator", displayName);
+  };
+
+  const activeWorkspace = activeUser ? routeForRole(activeUser.role) : null;
+  const choices: ReturningChoice[] = ["Youth", "Supervisor", "Parent", "Grower", "Partner", "Mission Control"];
+
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Workspace</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">
-        {activeUser ? `Welcome, ${activeUser.name}.` : "Welcome to Bronson Family Farm."}
-      </h1>
-      <p className="mt-4 max-w-4xl text-sm leading-7 text-white/82">
-        This is the role center. Public visitors may explore without registering. Registered users should open only the workspace assigned to their role.
-      </p>
+    <div className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🔑 Returning</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Enter Your Workspace</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">
+          Choose your role first. The screen will show only the access fields you need.
+        </p>
 
-      {activeUser && (
-        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Current Access</div>
-          <div className="mt-2 text-2xl font-black">{activeUser.role}</div>
-          <div className="mt-1 text-sm text-white/72">Access level: {activeUser.accessLevel}</div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {choices.map((choice) => (
+            <button
+              key={choice}
+              type="button"
+              onClick={() => { setReturningChoice(choice); setAccessMessage(""); }}
+              className={`rounded-[1.25rem] border p-4 text-left font-black transition ${returningChoice === choice ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/15"}`}
+            >
+              {choice}
+            </button>
+          ))}
         </div>
-      )}
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {visibleCards.map((card) => (
-          <button type="button"
-            key={card.title}
-            onClick={() => setScreen(card.screen)}
-            className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5 text-left transition hover:bg-emerald-300 hover:text-black"
-          >
-            <div className="text-xl font-black">{card.title}</div>
-            <div className="mt-3 text-sm leading-6 opacity-85">{card.subtitle}</div>
-          </button>
-        ))}
-      </div>
+        <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
+          {(returningChoice === "Youth" || returningChoice === "Supervisor") ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label={returningChoice === "Youth" ? "Youth Name" : "Supervisor Name"} value={name} onChange={setName} placeholder="First and last name" />
+              <Field label={returningChoice === "Supervisor" ? "Supervisor PIN" : "Assigned Youth PIN"} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? "0000" : "PIN number"} />
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Username / Email" value={email} onChange={setEmail} placeholder="Email or assigned access ID" />
+              <Field label="Temporary Password" value={password} onChange={setPassword} placeholder="Nesco2026" />
+            </div>
+          )}
 
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-        <button
-          type="button"
-          onClick={() => setShowAccessTools((value) => !value)}
-          className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black"
-        >
-          {showAccessTools ? "Hide Sign-In / Access Tools" : "Sign In / Verify Role"}
-        </button>
-        {showAccessTools && (
-          <div className="mt-5">
-            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-              <div className="text-sm font-black uppercase tracking-[0.22em] text-emerald-100/75">Youth Launch Access</div>
-              <p className="mt-2 text-sm leading-6 text-white/78">Youth may enter name and assigned PIN. If the roster does not match, supervisor-assisted access opens instead of blocking Start My Day.</p>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <Field label="Youth Name" value={youthName} onChange={setYouthName} placeholder="First and last name" />
-                <Field label="Assigned PIN / Participant ID" value={youthPin} onChange={setYouthPin} placeholder="PIN number" />
-              </div>
-              <button type="button" onClick={verifyYouthAndStart} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Verify Youth + Start My Day</button>
-              {accessMessage && <Notice text={accessMessage} />}
-            </div>
+          {returningChoice !== "Youth" && returningChoice !== "Supervisor" && (
+            <p className="mt-3 text-xs leading-5 text-white/62">For launch, use temporary password <strong className="text-white">Nesco2026</strong> until password change is added.</p>
+          )}
+          {returningChoice === "Youth" && <p className="mt-3 text-xs leading-5 text-white/62">Returning youth use their assigned PIN. No temporary password is needed.</p>}
+          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">Supervisor launch PIN: <strong className="text-white">0000</strong>.</p>}
 
-            <div className="mt-5 max-w-xl">
-              <Field label="Name / Participant ID for this session" value={name} onChange={setName} placeholder="Example: BFF-825435 or Supervisor Aide" />
-            </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {roles.map((role) => (
-                <button type="button"
-                  key={role}
-                  onClick={() => signIn(role, name)}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left transition hover:bg-emerald-300 hover:text-black"
-                >
-                  <div className="text-lg font-black">{role}</div>
-                  <div className="mt-2 text-sm opacity-85">Workspace: {screenLabel(routeForRole(role))}</div>
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 text-xs leading-6 text-white/60">
-              Youth participating through Nesco should already be in the system. They verify information instead of re-registering. Youth do not need a phone: use Participant ID + last name, badge QR, PIN, or supervisor lookup.
-            </div>
+          <button type="button" onClick={returningLogin} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Enter Workspace</button>
+          {accessMessage && <Notice text={accessMessage} />}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Workspace Rules</div>
+        <h2 className="mt-3 text-3xl font-black">Portal → Pathway → Workspace</h2>
+        <div className="mt-5 grid gap-3">
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Youth:</strong> use name + assigned PIN, then enter My Cultivator Journey.</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Supervisor:</strong> use name + PIN 0000, then manage attendance, safety, and reports.</div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Adults:</strong> use temporary password Nesco2026 until changed.</div>
+        </div>
+        {activeUser && activeWorkspace && (
+          <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-4">
+            <div className="text-xs font-black uppercase tracking-[0.24em] text-emerald-100/75">Current Access</div>
+            <div className="mt-2 text-2xl font-black">{activeUser.name}</div>
+            <div className="mt-1 text-sm text-white/72">{activeUser.role}</div>
+            <button type="button" onClick={() => setScreen(activeWorkspace)} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Workspace</button>
           </div>
         )}
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 
@@ -3456,15 +3373,15 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
-            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
-            <p className="mt-4 text-base leading-7 text-white/84">Safety first. Then today's assignment. Then project evidence.</p>
+            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">🌱 My Cultivator Journey</h1>
+            <p className="mt-4 text-base leading-7 text-white/84">Today's assignment, your week, and the story of who you are becoming.</p>
           </div>
           <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/12 p-4 lg:w-[330px]">
             <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Next action</div>
             <h2 className="mt-2 text-2xl font-black">Start My Day</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Start My Day</button>
-              <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Upload Evidence</button>
+              <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Tell Your Story</button>
             </div>
           </div>
         </div>
@@ -3497,8 +3414,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <h2 className="mt-3 text-3xl font-black">Today's rhythm</h2>
           <div className="mt-5 grid gap-3">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Beginning:</strong> Check in, PPE, water, safety, assignment.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>During:</strong> Current project, resources, team progress, upload evidence.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>End:</strong> Reflection, portfolio evidence, supervisor feedback, tomorrow preview.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>During:</strong> Current project, resources, team progress, Tell Your Cultivator Story.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>End:</strong> Reflection, Cultivator Story, supervisor feedback, tomorrow preview.</div>
           </div>
         </Card>
         <YouthEvidenceUploadCard activeUser={activeUser} />
@@ -3518,7 +3435,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       </details>
 
       <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open full curriculum, resources, rotations, and achievements</summary>
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open My Week, daily curriculum, resources, rotations, and achievements</summary>
         <div className="mt-5 grid gap-5">
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
@@ -5309,7 +5226,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
   const [uploadingCategory, setUploadingCategory] = useState<string>("");
   const [mediaNotice, setMediaNotice] = useState<string>("");
-  const [quickCategory, setQuickCategory] = useState<string>("Youth Portfolio Evidence");
+  const [quickCategory, setQuickCategory] = useState<string>("Cultivator Story");
 
   const saveMediaAsset = async (asset: MediaAsset) => {
     const next = [asset, ...mediaAssets];
@@ -5391,7 +5308,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media / Evidence</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Stories</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">Show what was built.</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
           Uploads are open for launch. Evidence saves immediately and can later support portfolios, parent updates, reports, and stories.
@@ -5399,8 +5316,8 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
         {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
         <div className="mt-6 grid gap-3 md:grid-cols-4">
           {[
-            ["Youth Portfolio Evidence", "My work"],
-            ["Team Project Evidence", "My team"],
+            ["Cultivator Story", "My work"],
+            ["Team Story", "My team"],
             ["Training Videos", "Learn"],
             ["Launch Story", "Admin"],
           ].map(([category, label]) => (
@@ -5422,7 +5339,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
       {recentAssets.length > 0 && (
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Evidence</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Cultivator Stories</div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {recentAssets.map((asset) => (
               <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
@@ -5531,7 +5448,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
           <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media / Evidence</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cultivator Stories</button>
         </div>
       </Card>
       <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
