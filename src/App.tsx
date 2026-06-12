@@ -2103,67 +2103,40 @@ function Shell({
   changeLanguage: (language: LanguageCode) => void;
 }) {
   const role = activeUser?.role;
-  const workspaceTarget = role ? routeForRole(role) : "roles";
-  const roleNav: { label: string; screen: Screen; roles?: Role[] }[] = role === "Youth Workforce Participant"
+  const workspaceTarget: Screen = role && role !== "Guest" ? routeForRole(role) : "roles";
+  const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
+
+  const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
         { label: "My Day", screen: "youth" },
-        { label: "Today", screen: "launchProject" },
-        { label: "My Portfolio", screen: "youth" },
-        { label: "Media", screen: "media" },
-        { label: "Reflection", screen: "feedback" },
+        { label: "Project", screen: "launchProject" },
+        { label: "Upload", screen: "media" },
+      ]
+    : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
+    ? [
+        { label: "Supervisor", screen: "supervisor" },
+        { label: "Mission", screen: "reports" },
       ]
     : role === "Parent / Guardian"
     ? [
-        { label: "Youth Progress", screen: "parent" },
-        { label: "Encouragement", screen: "parent" },
-        { label: "Family Feedback", screen: "feedback" },
-      ]
-    : role === "Supervisor / Staff"
-    ? [
-        { label: "Supervisor", screen: "supervisor" },
-        { label: "Reports", screen: "reports" },
-        { label: "June 8", screen: "launchProject" },
-        { label: "Feedback", screen: "feedback" },
-      ]
-    : role === "Case Manager"
-    ? [
-        { label: "Case Manager", screen: "caseManager" },
-        { label: "Support Cases", screen: "caseManager" },
-        { label: "Reports", screen: "reports" },
-        { label: "Feedback", screen: "feedback" },
+        { label: "Parent", screen: "parent" },
+        { label: "Updates", screen: "feedback" },
       ]
     : role === "Grower"
     ? [
         { label: "Grower", screen: "grower" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Resources", screen: "events" },
+        { label: "Market", screen: "marketplace" },
       ]
-    : role === "Partner" || role === "Board / Funder"
+    : role === "Partner"
     ? [
-        { label: "Impact", screen: "partner" },
-        { label: "Reports", screen: "reports" },
+        { label: "Partner", screen: "partner" },
         { label: "Support", screen: "support" },
       ]
-    : role === "Administrator"
-    ? [
-        { label: "Mission Control", screen: "reports" },
-        { label: "Supervisor", screen: "supervisor" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Register", screen: "registration" },
-      ]
-    : role === "Value-Added Producer"
-    ? [
-        { label: "Value-Added", screen: "valueAdded" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Feedback", screen: "feedback" },
-      ]
     : [
-        { label: "Guest", screen: "guest" },
-        { label: "Marketplace", screen: "marketplace" },
-        { label: "Feedback", screen: "feedback" },
+        { label: "Explore", screen: "guest" },
+        { label: "Market", screen: "marketplace" },
       ];
 
-  const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
   const buttonClass = (target: Screen) =>
     `rounded-full border px-4 py-2 text-xs font-black transition ${screen === target ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`;
 
@@ -2176,12 +2149,27 @@ function Shell({
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
       <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 pb-8 md:px-6">
         <NurseLineBanner setScreen={setScreen} />
-        <div className="sticky top-[4.75rem] z-40 mb-3 rounded-[1.25rem] border border-white/10 bg-black/58 p-2 shadow-[0_20px_70px_rgba(0,0,0,.45)] backdrop-blur-2xl">
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setScreen("portal")} className="min-w-0 flex-1 px-2 text-left">
+
+        <div className="sticky top-[4.2rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
-              <div className="truncate text-sm font-black leading-tight md:text-base">{activeUser ? `${activeUser.role}` : "Choose Your Path"}</div>
+              <div className="truncate text-sm font-black leading-tight md:text-base">
+                {activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
+              </div>
             </button>
+
+            <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
+              <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
+              <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "Workspace" : "Choose Role"}</button>
+              {primaryNav.map((item) => (
+                <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
+                  {item.label}
+                </button>
+              ))}
+              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-4 py-2 text-xs font-black text-amber-50">Mission</button>}
+            </div>
+
             <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
               <span className="hidden sm:inline">🌎</span>
               <select
@@ -2197,31 +2185,12 @@ function Shell({
                 ))}
               </select>
             </label>
+
+            {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-black text-white/80">Sign Out</button>}
           </div>
 
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
-            <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>My Workspace</button>
-            {roleNav.map((item) => (
-              <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
-                {item.label}
-              </button>
-            ))}
-            {!activeUser && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>{translatePhrase(language, "Choose Role")}</button>}
-          </div>
-
-          <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold text-white/75">
-            <div className="truncate rounded-full border border-white/10 bg-white/8 px-3 py-1">
-              {activeUser ? `${activeUser.name} • ${activeUser.role}` : t(language, "publicGuest")}
-            </div>
-            <div className="flex shrink-0 gap-2">
-              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-3 py-1 font-black text-amber-50">Mission Control</button>}
-              {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 font-black">{t(language, "signOut")}</button>}
-            </div>
-          </div>
-
-          <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.035] px-3 py-2 text-xs text-white/75">
-            <summary className="cursor-pointer font-black text-emerald-50">More tools</summary>
+          <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-white/72">
+            <summary className="cursor-pointer font-black text-emerald-50">Tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
@@ -2229,7 +2198,6 @@ function Shell({
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
               {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
-              {isStaff && <button type="button" onClick={() => setScreen("caseManager")} className={buttonClass("caseManager")}>Case Manager</button>}
               {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
           </details>
@@ -2244,16 +2212,13 @@ function Shell({
 
 function NurseLineBanner({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <div className="sticky top-0 z-[60] mb-3 rounded-[1.15rem] border border-red-200/35 bg-red-700/92 px-3 py-2 text-white shadow-[0_18px_55px_rgba(0,0,0,.42)] backdrop-blur-xl">
+    <div className="sticky top-0 z-[60] mb-3 rounded-[1rem] border border-red-200/35 bg-red-700/92 px-3 py-2 text-white shadow-[0_14px_45px_rgba(0,0,0,.38)] backdrop-blur-xl">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="text-[11px] font-black uppercase tracking-[0.24em] text-red-50/85">Nurse Line • Visible At All Times</div>
-          <div className="text-sm font-black leading-snug sm:text-base">Health concern, heat concern, injury, medication issue, or urgent support: tell the site lead immediately.</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-red-50/85">Nurse Line • Visible At All Times</div>
+          <div className="text-sm font-black leading-snug sm:text-base">Health, heat, injury, medication, or urgent support: tell the site lead immediately.</div>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Wellness</button>
-          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/45 bg-black/20 px-4 py-2 text-xs font-black text-white sm:text-sm">Report</button>
-        </div>
+        <button type="button" onClick={() => setScreen("wellness")} className="shrink-0 rounded-full bg-white px-4 py-2 text-xs font-black text-red-700 sm:text-sm">Need Help?</button>
       </div>
     </div>
   );
@@ -2584,25 +2549,19 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
   const workspaceTarget = activeUser ? routeForRole(activeUser.role) : "roles";
-  const quickChoices: { title: string; subtitle: string; screen: Screen }[] = [
-    { title: TT("Start Guided Portal"), subtitle: TT("New visitors can enter through the story, ecosystem overview, and guided experience."), screen: "demo" },
-    { title: TT("Enter Ecosystem"), subtitle: TT("Browse public pathways without registering: guest story, events, marketplace, and opportunities."), screen: "guest" },
-    { title: TT("Sign In / Returning Participant"), subtitle: activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Registered youth, parents, supervisors, growers, and partners continue from their assigned workspace."), screen: workspaceTarget },
-    { title: TT("Marketplace"), subtitle: TT("Browse food, products, events, grower opportunities, and GrownBy-connected purchasing."), screen: "marketplace" },
-  ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
+    <div className="grid gap-4 lg:grid-cols-[1.08fr_.72fr]">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[70vh] sm:min-h-[68vh]">
+        <div className="relative min-h-[62vh] sm:min-h-[60vh]">
           <img
             src={IMG.forest}
             alt="Bronson Family Farm forest gate entry"
             className="absolute inset-0 h-full w-full object-cover"
             onError={(event) => (event.currentTarget.src = IMG.backup)}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.32),rgba(0,0,0,.72))]" />
-          <div className="relative z-10 flex min-h-[70vh] flex-col justify-between p-5 sm:min-h-[68vh] sm:p-8">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84),rgba(0,0,0,.35),rgba(0,0,0,.7))]" />
+          <div className="relative z-10 flex min-h-[62vh] flex-col justify-between p-5 sm:min-h-[60vh] sm:p-8">
             <div>
               <div className="inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-50">
                 {TT("Forest Gate Portal")}
@@ -2611,61 +2570,64 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
                 {TT("Enter the Living Ecosystem")}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
-                {TT("Bronson Family Farm connects food, families, youth workforce development, growers, marketplace, and community opportunity.")}
+                {TT("Choose the pathway that fits you. The platform will reveal only what you need next.")}
               </p>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {quickChoices.map((choice) => (
-                <button
-                  key={choice.title}
-                  type="button"
-                  onClick={() => setScreen(choice.screen)}
-                  className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18"
-                >
-                  <div className="text-lg font-black leading-tight">{choice.title}</div>
-                  <div className="mt-2 text-sm leading-5 text-white/74">{choice.subtitle}</div>
-                </button>
-              ))}
+              <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-[1.35rem] border border-emerald-200/40 bg-emerald-300 p-4 text-left text-black shadow-[0_15px_45px_rgba(0,0,0,.35)] transition hover:bg-emerald-200">
+                <div className="text-lg font-black leading-tight">{activeUser ? TT("Go to My Workspace") : TT("Choose My Pathway")}</div>
+                <div className="mt-2 text-sm font-bold leading-5 text-black/74">{activeUser ? `${TT("Continue as")} ${activeUser.name}.` : TT("Youth, parents, supervisors, growers, partners, guests, and customers start here.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("guest")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Explore the Farm")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Guest story, events, marketplace, volunteer, and partner opportunities.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Marketplace")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("Products, events, growers, value-added items, and purchasing.")}</div>
+              </button>
+              <button type="button" onClick={() => setScreen("demo")} className="rounded-[1.35rem] border border-white/12 bg-black/42 p-4 text-left shadow-[0_15px_45px_rgba(0,0,0,.35)] backdrop-blur-xl transition hover:border-emerald-200/70 hover:bg-emerald-300/18">
+                <div className="text-lg font-black leading-tight">{TT("Guided Demo")}</div>
+                <div className="mt-2 text-sm leading-5 text-white/74">{TT("A slower overview for visitors, partners, and reviewers.")}</div>
+              </button>
             </div>
           </div>
         </div>
       </Card>
 
       <div className="grid gap-4">
-        <CultureCard language={language} variant="seed" />
-
         <DailyOperationsCommandCenter setScreen={setScreen} compact />
-
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Launch Candidate 3.0")}</div>
-          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("New visitors enter the story. Returning users go straight to work.")}</h2>
-          <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Public visitors can explore the portal, story, events, and marketplace without registering.")}
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Next Action")}</div>
+          <h2 className="mt-3 text-3xl font-black leading-tight">{TT("Start with the pathway. Details open when needed.")}</h2>
+          <p className="mt-3 text-sm leading-7 text-white/78">
+            {TT("Safety, farm status, and the user's next step stay visible. Curriculum, reports, media, and deep ecosystem information are revealed progressively.")}
+          </p>
+          <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-4">
+            <summary className="cursor-pointer font-black text-emerald-50">{TT("View launch notes")}</summary>
+            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/82">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Public visitors explore the portal, story, events, and marketplace without registration.")}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Youth go to Start My Day, assignment, project, evidence upload, and reflection.")}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4">{TT("Supervisors and Mission Control see the deeper operational tools.")}</div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("Nesco youth participants should already be in the system. They verify information instead of re-registering.")}
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              {TT("No phone required: youth can enter with Participant ID plus last name or supervisor lookup.")}
-            </div>
-          </div>
+          </details>
         </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
-          <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
-          <div className="mt-4 grid gap-2 text-sm text-white/82">
-            <div className="rounded-xl bg-black/28 p-3">{TT("Today: team, project, supervisor, location, start time.")}</div>
-            <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
-            <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
+        <details className="rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
+          <summary className="cursor-pointer text-lg font-black text-emerald-50">{TT("View culture and daily rhythm")}</summary>
+          <div className="mt-5 grid gap-4">
+            <CultureCard language={language} variant="seed" />
+            <Card>
+              <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{TT("Daily Rhythm")}</div>
+              <h3 className="mt-3 text-2xl font-black">{TT("Today → Progress → Tomorrow")}</h3>
+              <div className="mt-4 grid gap-2 text-sm text-white/82">
+                <div className="rounded-xl bg-black/28 p-3">{TT("Today: team, project, supervisor, location, start time.")}</div>
+                <div className="rounded-xl bg-black/28 p-3">{TT("Progress: attendance, safety, achievements, contribution.")}</div>
+                <div className="rounded-xl bg-black/28 p-3">{TT("Tomorrow: assignment, PPE reminder, water bottle, next step.")}</div>
+              </div>
+            </Card>
           </div>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{TT("Choose Role")}</button>
-            <button type="button" onClick={() => setScreen(activeUser ? workspaceTarget : "roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">{TT("Go to Workspace")}</button>
-          </div>
-        </Card>
+        </details>
       </div>
     </div>
   );
@@ -3067,32 +3029,41 @@ function JourneyCompletionCard({
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <>
-      <SimplePathway
-        title="Guest Pathway"
-        image={IMG.ecosystem}
-        text="Guests learn the farm story, the connected food ecosystem, the historic Lansdowne Airport place-based context, regenerative agriculture, and how youth, growers, families, customers, and partners move together."
-        setScreen={setScreen}
-        extra={
-          <>
-            <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Attend an Event</button>
-            <button type="button" onClick={() => setScreen("support")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Volunteer / Support</button>
-            <button type="button" onClick={() => setScreen("partner")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Become a Partner</button>
-          </>
-        }
-      />
-      <LaunchAuditDetailGrid
-        title="Guest journey now has a complete launch story."
-        items={[
-          { heading: "Farm Story", body: "Bronson Family Farm connects food, land, family legacy, agritourism, workforce development, and regional opportunity." },
-          { heading: "Historic Place", body: "The farm experience is rooted at Lansdowne Airport, connecting Youngstown history, land use, aviation context, and community future-building." },
-          { heading: "Regenerative Farming", body: "Guests learn that regenerative agriculture develops the land while improving soil, reducing waste, protecting natural systems, and strengthening future production." },
-          { heading: "Connected Food Ecosystem", body: "The ecosystem connects youth, growers, marketplace customers, parents, partners, volunteers, and value-added producers in one guided experience." },
-          { heading: "Regional Hubs", body: "Youngstown — Bronson Family Farm and Warren — Parker Farms are presented as regional hubs in the Mahoning and Trumbull food ecosystem." },
-          { heading: "Conversion Actions", body: "Guests can attend events, volunteer, shop, become customers, become partners, leave feedback, or continue to the marketplace." },
-        ]}
-      />
-    </>
+    <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guest Pathway</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Explore the farm.</h1>
+        <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
+          Guests see the farm story, events, marketplace, volunteer options, and ways to connect. Youth workforce operations stay in the youth pathway.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-4 text-left font-black text-black">Attend an Event</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Visit Marketplace</button>
+          <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Volunteer / Support</button>
+          <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Become a Partner</button>
+        </div>
+      </Card>
+      <Card className="overflow-hidden p-0">
+        <div className="relative min-h-[340px]">
+          <img src={IMG.forest} alt="Bronson Family Farm guest exploration" className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
+          <div className="relative z-10 flex min-h-[340px] flex-col justify-end p-5">
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
+              <h2 className="text-2xl font-black">What visitors can do</h2>
+              <p className="mt-2 text-sm leading-6 text-white/80">Explore the story, learn about the land, attend events, shop, volunteer, or connect as a partner.</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+      <details className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Learn more about the guest journey</summary>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {["Farm Story", "Historic Lansdowne Airport", "Regenerative Agriculture", "Events", "Marketplace", "Volunteer Path"].map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black">{item}</div>
+          ))}
+        </div>
+      </details>
+    </div>
   );
 }
 
@@ -3439,232 +3410,119 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = youthCurriculumWeeks[0];
+  const todayPlan = youthWeekOneDailyPlan[3] || youthWeekOneDailyPlan[0];
   const completionPercent = 12.5;
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[360px_1fr]">
+    <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
-        <p className="mt-5 text-base leading-8 text-white/86">
-          Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.
-        </p>
-
-        <LargerPictureCard layerKey="Youth Workforce Pathway" />
-
-        <CultureCard language={language} variant="today" />
-
-        <div className="mt-6">
-          <DailyOperationsCommandCenter setScreen={setScreen} compact />
-        </div>
-
-        <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Project</div>
-          <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.objective}</p>
-          <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Date:</strong> {featuredProject.launchDate}</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Start:</strong> {featuredProject.startTime}</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Week:</strong> Week 1</div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><strong>Badge:</strong> {currentWeek.badge}</div>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
+            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">🌞 My Day</h1>
+            <p className="mt-4 text-base leading-7 text-white/84">Safety first. Then today's assignment. Then project evidence.</p>
           </div>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
-          <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">My Achievements</button>
+          <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/12 p-4 lg:w-[330px]">
+            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Next action</div>
+            <h2 className="mt-2 text-2xl font-black">Start My Day</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Start My Day</button>
+              <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Upload Evidence</button>
+            </div>
+          </div>
         </div>
       </Card>
 
-      <div className="grid gap-5">
-        <DailyOperationsCommandCenter setScreen={setScreen} />
-        <EcosystemImageContextCard />
-        <ThreePartDailyRhythmCard setScreen={setScreen} />
-        <EntrepreneurshipValueCard />
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Alerts</div>
+          <h2 className="mt-3 text-2xl font-black">Modified Operations</h2>
+          <p className="mt-3 text-sm leading-6 text-white/82">Heat Index Warning: hydrate, use shade, check in with supervisors, and follow the farm-status decision before beginning outdoor work.</p>
+        </Card>
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today's Assignment</div>
+          <h2 className="mt-3 text-2xl font-black">{todayPlan.day}: {todayPlan.curriculum}</h2>
+          <p className="mt-3 text-sm leading-6 text-white/82">{todayPlan.focus}</p>
+        </Card>
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Why This Matters</div>
+          <h2 className="mt-3 text-2xl font-black">Customer → Problem → Solution</h2>
+          <details className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
+            <summary className="cursor-pointer font-black text-emerald-50">Open entrepreneurship connection</summary>
+            <p className="mt-3">Bronson Family Farm needs heat-safety support. Youth work creates value through production, quality, logistics, customer awareness, and documentation.</p>
+          </details>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Beginning • During • End</div>
+          <h2 className="mt-3 text-3xl font-black">Today's rhythm</h2>
+          <div className="mt-5 grid gap-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Beginning:</strong> Check in, PPE, water, safety, assignment.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>During:</strong> Current project, resources, team progress, upload evidence.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>End:</strong> Reflection, portfolio evidence, supervisor feedback, tomorrow preview.</div>
+          </div>
+        </Card>
         <YouthEvidenceUploadCard activeUser={activeUser} />
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-          <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.project}</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div>
-              <div className="mt-2 text-3xl font-black">{completionPercent}%</div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div>
-              <div className="mt-2 text-sm font-black">{currentWeek.badge}</div>
-            </div>
-          </div>
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-emerald-300" style={{ width: `${completionPercent}%` }} />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {currentWeek.skills.map((skill) => (
-              <span key={skill} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">{skill}</span>
-            ))}
-          </div>
-        </Card>
+      </div>
 
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
-          <h2 className="mt-3 text-3xl font-black">Week 1 Daily Work Plan</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">Youth work is organized by curriculum and by day so they know what they are doing, why it matters, which resources support the work, and what reflection closes the day.</p>
-          <div className="mt-5 grid gap-3 lg:grid-cols-2">
-            {youthWeekOneDailyPlan.map((day) => (
-              <div key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{day.day}</div>
-                    <h3 className="mt-1 text-xl font-black">{day.date}</h3>
-                  </div>
-                  <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-50">Week 1</span>
-                </div>
-                <div className="mt-4 rounded-2xl border border-emerald-200/15 bg-emerald-300/10 p-3">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Curriculum</div>
-                  <div className="mt-1 text-sm font-black">{day.curriculum}</div>
-                  <p className="mt-2 text-xs leading-5 text-white/72">{day.focus}</p>
-                </div>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Today’s Work</div>
-                    <ul className="mt-2 space-y-1 text-xs leading-5 text-white/78">
-                      {day.work.map((item) => <li key={item}>• {item}</li>)}
-                    </ul>
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Tools & Resources</div>
-                    <ul className="mt-2 space-y-1 text-xs leading-5 text-white/78">
-                      {day.resources.map((item) => <li key={item}>• {item}</li>)}
-                    </ul>
-                  </div>
-                </div>
-                <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs leading-5 text-white/76"><strong>Reflection:</strong> {day.reflection}</div>
-              </div>
-            ))}
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">View where my work fits in the ecosystem</summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <div>
+            <h2 className="text-3xl font-black">Youth Workforce in the connected ecosystem</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">Youth work connects safety, farm production, marketplace readiness, customers, partners, and community impact. This is a map for context, not a guest pathway image.</p>
           </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🧭 Curriculum Topic Rotations</div>
-          <h2 className="mt-3 text-3xl font-black">Topic Areas, Resources, and Supervisor Support</h2>
-          <p className="mt-3 text-sm leading-7 text-white/82">Youth rotate through curriculum areas without losing the daily structure. Each area includes tools and resources so youth understand what they are doing before they commit to the work.</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {youthTopicRotationAreas.map((area) => (
-              <div key={area.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{area.week}</div>
-                <h3 className="mt-2 text-lg font-black">{area.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-white/72">{area.description}</p>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {area.resources.map((resource) => <span key={resource} className="rounded-full bg-black/25 px-2 py-1 text-[10px] font-bold text-white/74">{resource}</span>)}
-                </div>
-              </div>
-            ))}
+          <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/30">
+            <img src={IMG.ecosystem} alt="Connected food ecosystem map highlighting youth workforce" className="max-h-[340px] w-full object-cover object-center" onError={(e) => (e.currentTarget.src = IMG.backup)} />
           </div>
-        </Card>
+        </div>
+      </details>
 
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 My 8-Week Journey</div>
-          <h2 className="mt-3 text-3xl font-black">{"Cultivator Workforce Development Roadmap"}</h2>
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {youthCurriculumWeeks.map((week) => (
-              <div key={week.week} className={`rounded-[1.25rem] border p-4 ${week.week === 1 ? "border-emerald-200/35 bg-emerald-300/15" : "border-white/10 bg-white/10"}`}>
-                <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/70">{"Week"} {week.week}</div>
-                <h3 className="mt-2 text-lg font-black">{week.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-white/72">{week.focus}</p>
-                <div className="mt-3 rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black">{week.status}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Wisdom by Team</div>
-          <h2 className="mt-3 text-3xl font-black">Encouragement for Every Rotation</h2>
-          <TeamWisdomGrid language={language} />
-        </Card>
-
-        <div className="grid gap-5 lg:grid-cols-2">
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open full curriculum, resources, rotations, and achievements</summary>
+        <div className="mt-5 grid gap-5">
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">💼 My Portfolio</div>
-            <h2 className="mt-3 text-3xl font-black">Evidence of Work</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">Every project can create evidence: team role, photos, videos, reflections, supervisor assessment, and skills demonstrated. This becomes a youth resume, portfolio, and achievement transcript.</p>
-            <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Builder</div>
-              <h3 className="mt-2 text-xl font-black">Skills Automatically Building</h3>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
-                {["Safety Awareness", "Teamwork", "Communication", "Responsibility", "Initiative", "Problem Solving", "Project Completion", "Career Exploration"].map((skill) => (
-                  <span key={skill} className="rounded-full border border-white/10 bg-black/30 px-3 py-1">{skill}</span>
-                ))}
-              </div>
-              <p className="mt-3 text-xs leading-5 text-white/70">Each check-in, project, reflection, badge, and supervisor assessment adds evidence toward a future resume and portfolio.</p>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
+            <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div><div className="mt-2 text-sm font-black">{currentWeek.project}</div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div><div className="mt-2 text-3xl font-black">{completionPercent}%</div></div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div><div className="mt-2 text-sm font-black">{currentWeek.badge}</div></div>
             </div>
-            <div className="mt-5 grid gap-3">
-              {youthPortfolioEntries.map((entry) => (
-                <div key={entry.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                  <div className="text-lg font-black">{entry.title}</div>
-                  <div className="mt-1 text-xs text-white/65">{entry.date} • {entry.team}</div>
-                  <p className="mt-3 text-sm leading-6 text-white/76">{entry.evidence}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.skills.map((skill) => (
-                      <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-xs font-bold">{skill}</span>
-                    ))}
-                  </div>
-                </div>
+          </Card>
+          <Card>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
+            <h2 className="mt-3 text-3xl font-black">Week 1 Daily Work Plan</h2>
+            <div className="mt-5 grid gap-3 lg:grid-cols-2">
+              {youthWeekOneDailyPlan.map((day) => (
+                <details key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
+                  <summary className="cursor-pointer font-black">{day.day} • {day.curriculum}</summary>
+                  <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
+                  <div className="mt-3 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
+                </details>
               ))}
             </div>
           </Card>
-
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🏆 My Achievements</div>
-            <h2 className="mt-3 text-3xl font-black">Skills, Badges, and Recognition</h2>
-            <div className="mt-5 grid gap-3">
-              {youthAchievementBadges.map((badge) => (
-                <div key={badge.title} className={`rounded-[1.25rem] border p-4 ${badge.earned ? "border-amber-200/35 bg-amber-300/15" : "border-white/10 bg-white/10"}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-lg font-black">{badge.title}</div>
-                      <div className="mt-1 text-xs font-bold text-white/60">{badge.week}</div>
-                    </div>
-                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black">{badge.earned ? "Available Week 1" : "Upcoming"}</span>
+            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Rotation Areas + Resources</div>
+            <h2 className="mt-3 text-3xl font-black">Topic Areas</h2>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {youthTopicRotationAreas.map((topic) => (
+                <details key={topic.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+                  <summary className="cursor-pointer font-black">{topic.title}</summary>
+                  <p className="mt-3 text-sm leading-6 text-white/78">{topic.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {topic.resources.map((resource) => <span key={resource} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[11px] font-black text-white/75">{resource}</span>)}
                   </div>
-                  <p className="mt-3 text-xs leading-5 text-white/70">{badge.description}</p>
-                </div>
+                </details>
               ))}
             </div>
           </Card>
         </div>
-        <JourneyCompletionCard
-          title="Youth Workforce Journey Completion"
-          learned={[
-            "Safety and PPE",
-            "Teamwork and communication",
-            "Cooling Station Challenge",
-            "Portfolio evidence",
-            "Career and income connections",
-          ]}
-          nextSteps={[
-            { label: "Open Today's Project", screen: "supervisor" },
-            { label: "Complete Reflection", screen: "feedback" },
-            { label: "View Achievements", screen: "completion" },
-            { label: "Visit Marketplace", screen: "marketplace" },
-          ]}
-          impact={[
-            "Completed youth pathway",
-            "Built work-readiness skills",
-            "Connected today's work to future income",
-            "Added evidence toward achievement",
-          ]}
-          setScreen={setScreen}
-        />
-      </div>
+      </details>
     </div>
   );
 }
@@ -5411,6 +5269,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
   const [uploadingCategory, setUploadingCategory] = useState<string>("");
   const [mediaNotice, setMediaNotice] = useState<string>("");
+  const [quickCategory, setQuickCategory] = useState<string>("Youth Portfolio Evidence");
 
   const saveMediaAsset = async (asset: MediaAsset) => {
     const next = [asset, ...mediaAssets];
@@ -5487,391 +5346,99 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   };
 
   const assetsFor = (category: string) => mediaAssets.filter((asset) => asset.category === category).slice(0, 3);
+  const recentAssets = mediaAssets.slice(0, 4);
 
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media Center</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Document the launch story.</h1>
-      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
-        The Media Center organizes orientation videos, youth workforce activities, farm progress, interviews, testimonials, drone footage, and partner documentation. It keeps the June 8 project connected to real farm operations and impact reporting.
-      </p>
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Media / Evidence</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Show what was built.</h1>
+        <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
+          Uploads are open for launch. Evidence saves immediately and can later support portfolios, parent updates, reports, and stories.
+        </p>
+        {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
+          {[
+            ["Youth Portfolio Evidence", "My work"],
+            ["Team Project Evidence", "My team"],
+            ["Training Videos", "Learn"],
+            ["Launch Story", "Admin"],
+          ].map(([category, label]) => (
+            <button key={category} type="button" onClick={() => setQuickCategory(category)} className={`rounded-[1.25rem] border p-4 text-left ${quickCategory === category ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+              <div className="text-lg font-black">{label}</div>
+              <div className="mt-1 text-xs font-bold opacity-75">{category}</div>
+            </button>
+          ))}
+        </div>
+        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Selected folder</div>
+          <h2 className="mt-2 text-2xl font-black">{quickCategory}</h2>
+          <label className="mt-4 inline-block cursor-pointer rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black shadow-lg shadow-emerald-950/25">
+            {uploadingCategory === quickCategory ? "Uploading..." : "Upload Photo / Video / File"}
+            <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="hidden" disabled={uploadingCategory === quickCategory} onChange={(event) => handleMediaUpload(quickCategory, event)} />
+          </label>
+        </div>
+      </Card>
 
-      <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-50">
-        <strong>Supabase Storage Upload:</strong> Choose a file under the correct launch folder. Files upload to the <strong>{MEDIA_BUCKET}</strong> bucket when Supabase is connected; otherwise the entry is saved on this device for demo continuity.
-      </div>
-      {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
+      {recentAssets.length > 0 && (
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Evidence</div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {recentAssets.map((asset) => (
+              <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
+                <div className="font-black text-white">{asset.file_name}</div>
+                <div className="mt-1 text-white/55">{asset.category} • {new Date(asset.created_at).toLocaleString()} • {(asset.file_size / 1024 / 1024).toFixed(2)} MB</div>
+              </a>
+            ))}
+          </div>
+        </Card>
+      )}
 
-      <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {folders.map(([title, text]) => {
-          const folderAssets = assetsFor(title);
-          return (
-            <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-              <div className="text-2xl">🎥</div>
-              <h2 className="mt-3 text-xl font-black">{title}</h2>
-              <p className="mt-3 text-sm leading-6 text-white/78">{text}</p>
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open all media folders</summary>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {folders.map(([title, text]) => {
+            const folderAssets = assetsFor(title);
+            return (
+              <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+                <div className="text-2xl">🎥</div>
+                <h2 className="mt-3 text-xl font-black">{title}</h2>
+                <details className="mt-3 text-sm leading-6 text-white/78">
+                  <summary className="cursor-pointer font-black text-emerald-50">Details</summary>
+                  <p className="mt-2">{text}</p>
+                </details>
+                <label className="mt-4 block cursor-pointer rounded-full border border-emerald-200/30 bg-emerald-300 px-4 py-2 text-center text-xs font-black text-black shadow-lg shadow-emerald-950/25">
+                  {uploadingCategory === title ? "Uploading..." : "Choose File / Upload"}
+                  <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="hidden" disabled={uploadingCategory === title} onChange={(event) => handleMediaUpload(title, event)} />
+                </label>
+                {folderAssets.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {folderAssets.map((asset) => (
+                      <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
+                        <div className="font-black text-white">{asset.file_name}</div>
+                        <div className="mt-1 text-white/55">{new Date(asset.created_at).toLocaleString()} • {(asset.file_size / 1024 / 1024).toFixed(2)} MB</div>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </details>
 
-              <label className="mt-4 block cursor-pointer rounded-full border border-emerald-200/30 bg-emerald-300 px-4 py-2 text-center text-xs font-black text-black shadow-lg shadow-emerald-950/25">
-                {uploadingCategory === title ? "Uploading..." : "Choose File / Upload"}
-                <input
-                  type="file"
-                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx"
-                  className="hidden"
-                  disabled={uploadingCategory === title}
-                  onChange={(event) => handleMediaUpload(title, event)}
-                />
-              </label>
-
-              {folderAssets.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  {folderAssets.map((asset) => (
-                    <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
-                      <div className="font-black text-white">{asset.file_name}</div>
-                      <div className="mt-1 text-white/55">{new Date(asset.created_at).toLocaleString()} • {(asset.file_size / 1024 / 1024).toFixed(2)} MB</div>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      <div className="mt-7"><SupportResponseFrameworkCard /></div>
-      <VideoLibrary />
-      <div className="mt-7 flex flex-wrap gap-3">
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open training videos and support framework</summary>
+        <div className="mt-5 grid gap-5">
+          <SupportResponseFrameworkCard />
+          <VideoLibrary />
+        </div>
+      </details>
+      <div className="flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
-        <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Back to My Day</button>
       </div>
-    </Card>
-  );
-}
-
-function CoolingCenterProjectModule({
-  setScreen,
-  activeUser,
-  compact = false,
-}: {
-  setScreen: (screen: Screen) => void;
-  activeUser: EcosystemUser | null;
-  compact?: boolean;
-}) {
-  const [savedItems, setSavedItems] = useState<string[]>(() => safeRead<string[]>("bff.launch.coolingCenterProgress", []));
-  const [selectedTeam, setSelectedTeam] = useState<string>("Manufacturing Team");
-  const [contributions, setContributions] = useState<string[]>(() => safeRead<string[]>("bff.launch.myContributions", []));
-  const [learning, setLearning] = useState<string[]>(() => safeRead<string[]>("bff.launch.whatILearned", []));
-  const [visionBefore, setVisionBefore] = useState(() => safeRead<string>("bff.launch.visionBefore", ""));
-  const [visionAfter, setVisionAfter] = useState(() => safeRead<string>("bff.launch.visionAfter", ""));
-  const [oneAcre, setOneAcre] = useState(() => safeRead<string>("bff.launch.oneAcre", ""));
-
-  const selectedTeamInfo = coolingCenterTeams.find((team) => team.name === selectedTeam) || coolingCenterTeams[2];
-
-  const toggleSaved = (item: string) => {
-    const next = savedItems.includes(item) ? savedItems.filter((x) => x !== item) : [item, ...savedItems];
-    setSavedItems(next);
-    safeWrite("bff.launch.coolingCenterProgress", next);
-  };
-
-  const toggleContribution = (item: string) => {
-    const next = contributions.includes(item) ? contributions.filter((x) => x !== item) : [item, ...contributions];
-    setContributions(next);
-    safeWrite("bff.launch.myContributions", next);
-  };
-
-  const toggleLearning = (item: string) => {
-    const next = learning.includes(item) ? learning.filter((x) => x !== item) : [item, ...learning];
-    setLearning(next);
-    safeWrite("bff.launch.whatILearned", next);
-  };
-
-  const saveVision = () => {
-    safeWrite("bff.launch.visionBefore", visionBefore);
-    safeWrite("bff.launch.visionAfter", visionAfter);
-    safeWrite("bff.launch.oneAcre", oneAcre);
-  };
-
-  const contributionItems = [
-    "Creating ideas",
-    "Solving problems",
-    "Building products",
-    "Supporting my team",
-    "Helping a customer",
-    "Creating value",
-    "Learning a new skill",
-    "Improving a process",
-    "Helping someone succeed",
-    "Demonstrating leadership",
-    "Showing creativity",
-    "Practicing responsibility",
-    "Completing assigned tasks",
-    "Maintaining quality standards",
-    "Supporting safety",
-  ];
-
-  const learningItems = [
-    "How businesses work",
-    "How customers and contractors work together",
-    "How products are manufactured",
-    "How quality affects customer satisfaction",
-    "How creativity creates value",
-    "How teamwork improves results",
-    "How communication helps projects succeed",
-    "How planning saves time and money",
-    "How ideas become products",
-    "How products create opportunities",
-    "How entrepreneurs identify opportunities",
-    "How money is earned by solving problems",
-    "How food moves from farms to customers",
-    "How rising costs affect businesses and families",
-    "How workforce skills prepare me for future opportunities",
-    "How Bronson Family Farm creates value for the community",
-    "That I am capable of more than I realized",
-  ];
-
-  const productionItems = [
-    "Youth checked in",
-    "PPE and water confirmed",
-    "Why this project matters lesson completed",
-    "Entrepreneur example discussed",
-    "Vision challenge completed",
-    "My Contribution selected",
-    "Teams assigned",
-    "Customer order explained: 63 fans",
-    "Business cycle explained",
-    "Design standards approved",
-    "Engineering quality checklist completed",
-    "Manufacturing stations active",
-    "Fans assembled",
-    "Fans painted and personalized",
-    "Quality check completed",
-    "Fans counted for delivery",
-    "Fans delivered to Contractor Team",
-    "Reflection completed",
-    "What I Learned completed",
-    "Career interest selected",
-    "Achievement celebrated",
-  ];
-
-  const productionMetrics = [
-    ["Customer Order", "63 fans"],
-    ["Material Cost", "$0.06 each"],
-    ["Markup", "20%"],
-    ["Sale Price", "$0.072 each"],
-    ["Material Cost Total", "$3.78"],
-    ["Contract Value", "$4.54"],
-  ];
-
-  return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
-      <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
-        Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.
-      </p>
-
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Today's Business Story</div>
-          <p className="mt-3 text-sm leading-7 text-white/84">
-            Bronson Family Farm is the customer. A contractor is hired to build the cooling station. The contractor becomes the customer when ordering 63 fans from the youth manufacturing workforce.
-          </p>
-          <div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-7 text-white/86">
-            Bronson Family Farm ↓ Contractor ↓ Youth Manufacturing Workforce ↓ Product Delivery ↓ Installation ↓ Customer Satisfaction
-          </div>
-        </div>
-        <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/75">The Money Side</div>
-          <div className="mt-3 grid gap-2">
-            {productionMetrics.map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between rounded-2xl bg-black/25 p-3 text-sm">
-                <span className="text-white/72">{label}</span>
-                <b>{value}</b>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-white/65">Why It Matters</div>
-          <p className="mt-3 text-sm leading-7 text-white/82">
-            Food prices are rising because every step costs money: growing, harvesting, packaging, transportation, labor, storage, marketing, and selling. This project helps youth understand how solving problems creates value, income, careers, and stronger communities.
-          </p>
-        </div>
-      </div>
-
-      {!compact && (
-        <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.95fr]">
-          <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Watch Before Work Begins</div>
-            <h2 className="mt-3 text-2xl font-black">Fan Prototype Demonstration</h2>
-            <p className="mt-3 max-w-4xl text-sm leading-7 text-white/80">
-              Watch how a simple fan idea can become a product. Youth should look for ideas they can improve, paint, personalize, and prepare for the contractor's order.
-            </p>
-            <div className="mt-5 aspect-video w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/80">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/dtYzf3avkT4"
-                title="DIY Cardboard Fan | Cardboard Fan no motor no battery"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                className="h-full w-full"
-              />
-            </div>
-          </div>
-          <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Entrepreneurship Example</div>
-            <h2 className="mt-3 text-2xl font-black">A 13-Year-Old Saw Opportunity</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">
-              Use the young entrepreneur snack-selling example to start the conversation. The lesson is not snacks. The lesson is that opportunity begins when someone sees a need, creates value, and serves a customer.
-            </p>
-            <a
-              href="https://www.tiktok.com/@kasi_hustlers/video/7610048087100362002"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-5 block rounded-2xl bg-emerald-300 px-5 py-4 text-center font-black text-black"
-            >
-              Open Inspiration Video
-            </a>
-            <div className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-6 text-white/78">
-              Discussion: What problem was he solving? Who was his customer? What opportunity could you create at Bronson Family Farm?
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Vision Challenge</div>
-        <h2 className="mt-3 text-2xl font-black">What Opportunity Do You See?</h2>
-        <div className="mt-5 grid gap-4 lg:grid-cols-3">
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">This morning I see...</span>
-            <textarea value={visionBefore} onChange={(e) => setVisionBefore(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Example: I see a fan, a tomato, a field, or a problem." />
-          </label>
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">If I had one acre at Bronson Family Farm, I would...</span>
-            <textarea value={oneAcre} onChange={(e) => setOneAcre(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="Grow, build, sell, host, teach, create..." />
-          </label>
-          <label className="block rounded-2xl bg-black/25 p-4">
-            <span className="text-sm font-black">Now I see...</span>
-            <textarea value={visionAfter} onChange={(e) => setVisionAfter(e.target.value)} className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-black/30 p-3 text-white outline-none" placeholder="What opportunity do you see now?" />
-          </label>
-        </div>
-        <button type="button" onClick={saveVision} className="mt-4 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save My Vision</button>
-      </div>
-
-      <div className="mt-7 grid gap-5 lg:grid-cols-[.8fr_1fr]">
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Choose / View My Team</div>
-          <div className="mt-4 grid gap-2">
-            {coolingCenterTeams.map((team) => (
-              <button
-                type="button"
-                key={team.name}
-                onClick={() => setSelectedTeam(team.name)}
-                className={`rounded-2xl border p-4 text-left transition ${selectedTeam === team.name ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}
-              >
-                <div className="text-lg font-black">{team.icon} {team.name}</div>
-                <div className="mt-1 text-sm font-bold opacity-80">{team.identity}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <div className="text-4xl">{selectedTeamInfo.icon}</div>
-          <h2 className="mt-3 text-3xl font-black">{selectedTeamInfo.name}</h2>
-          <p className="mt-2 text-lg font-black text-emerald-100">{selectedTeamInfo.identity}</p>
-          <p className="mt-3 text-sm font-bold text-white/70">Recommended assignment: {selectedTeamInfo.recommendedShare}</p>
-          <p className="mt-4 text-sm leading-7 text-white/82">{selectedTeamInfo.mission}</p>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Deliverables</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Skills</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.skills.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Careers</div>
-              <ul className="mt-2 space-y-1 text-sm text-white/78">{selectedTeamInfo.careers.map((item) => <li key={item}>• {item}</li>)}</ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {!compact && (
-        <>
-          <div className="mt-7 grid gap-5 lg:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-              <h2 className="text-2xl font-black">My Contribution</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">Choose the ways you will contribute today. This becomes part of your achievement record.</p>
-              <div className="mt-4 grid gap-2 md:grid-cols-2">
-                {contributionItems.map((item) => {
-                  const active = contributions.includes(item);
-                  return <button type="button" key={item} onClick={() => toggleContribution(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
-                })}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-              <h2 className="text-2xl font-black">What Did I Learn?</h2>
-              <p className="mt-2 text-sm leading-6 text-white/78">Complete this at the end of the project.</p>
-              <div className="mt-4 grid gap-2 md:grid-cols-2">
-                {learningItems.map((item) => {
-                  const active = learning.includes(item);
-                  return <button type="button" key={item} onClick={() => toggleLearning(item)} className={`rounded-2xl border p-3 text-left text-sm font-black ${active ? "border-amber-200 bg-amber-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>{active ? "✅" : "☐"} {item}</button>;
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_.85fr]">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-              <h2 className="text-2xl font-black">Production Board</h2>
-              <p className="mt-3 text-sm leading-7 text-white/78">Tap each item as the launch team completes the work. These are saved locally for launch review.</p>
-              <div className="mt-5 grid gap-2 md:grid-cols-2">
-                {productionItems.map((item) => {
-                  const active = savedItems.includes(item);
-                  return (
-                    <button type="button" key={item} onClick={() => toggleSaved(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${active ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/30 text-white"}`}>
-                      {active ? "✅" : "☐"} {item}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-              <h2 className="text-2xl font-black">Supervisor Role Today</h2>
-              <p className="mt-3 text-sm leading-7 text-white/82">Supervisors guide youth success. They do not do the work for the youth.</p>
-              {[
-                "Safety Leader: PPE, hydration, heat awareness, tool safety, emergency response.",
-                "Workforce Coach: encouragement, problem solving, positive behavior, conflict resolution.",
-                "Team Facilitator: keep time, organize teams, support deliverables, keep youth focused.",
-                "Assessor: observe communication, teamwork, responsibility, problem solving, participation.",
-                "Wellness Observer: notice fatigue, frustration, withdrawal, escalation, or need for support.",
-              ].map((item) => <div key={item} className="mt-3 rounded-2xl bg-white/10 p-3 text-sm leading-6 text-white/80">✓ {item}</div>)}
-            </div>
-          </div>
-
-          <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-black/35 p-5">
-            <h2 className="text-2xl font-black">Celebration & Achievement</h2>
-            <p className="mt-4 text-lg leading-8 text-white/88">
-              Today we are not just building fans. We are learning how to see opportunity, imagine solutions, design ideas, build products, deliver value, take ownership, and connect our work to future careers.
-            </p>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {["Opportunity Seeker", "Problem Solver", "Team Builder", "Creative Thinker", "Quality Champion", "Workforce Ready", "Entrepreneurial Mindset", "Value Creator", "Future Builder"].map((badge) => (
-                <div key={badge} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/12 p-4 text-sm font-black">🏆 {badge}</div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Start Youth Check-In</button>
-        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Tracking</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Reflection / Feedback</button>
-      </div>
-    </Card>
+    </div>
   );
 }
 
@@ -5901,272 +5468,73 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
     ["Translation Coverage", "Audit In Progress"],
     ["Launch Decision", "Validate Pathways + Launch"],
   ];
+  const keyStats = [
+    ["Youth Registered", youth.length],
+    ["Present Today", present],
+    ["Support Flags", supportFlags],
+    ["Project Items", projectProgress.length],
+  ];
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Mission Control / Reports</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Launch-day readiness status.</h1>
-      <MissionCultureBanner language={language} />
-      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          ["Profiles", profiles.length],
-          ["Youth Registered", youth.length],
-          ["Present Today", present],
-          ["Assessments", assessments.length],
-          ["Support Flags", supportFlags],
-          ["Incident Logs", incidents.length],
-          ["Feedback", feedback.length],
-          ["Project Items Complete", projectProgress.length],
-          ["Portfolio Entries", youthPortfolioEntries.length],
-          ["Resume Ready", Math.min(youth.length, assessments.length)],
-          ["Career Pathways", coolingCenterTeams.length],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-3xl font-black">{value}</div>
-            <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-7 grid gap-3 md:grid-cols-3">
-        {readiness.map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-            <div className="mt-2 text-lg font-black">{value}</div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-7 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5 text-center">
-        <h2 className="text-3xl font-black">🌲 Bronson Family Farm Launch Command Center</h2>
-        <p className="mt-3 text-lg font-bold">Community Beta Launch Phase</p>
-        <p className="mt-3 text-sm text-white/80">Staff Orientation: June 5, 2026 — 9:30 AM</p>
-        <p className="text-sm text-white/80">Youth Workforce Launch: June 8, 2026 — 8:00 AM</p>
-        <p className="mt-4 text-xl font-black">We Grow Green to Harvest Dreams.</p>
-      </div>
-      <div className="mt-7"><SupportResponseFrameworkCard /></div>
-      <VideoLibrary />
-      <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project</button>
-        <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
-        <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Center</button>
-      </div>
-    </Card>
-  );
-}
-
-
-function OperationsInventoryPanel() {
-  const [inventory, setInventory] = useState<OperationsInventoryItem[]>(() => {
-    const stored = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, []);
-    return stored.length ? stored : defaultOperationsInventory;
-  });
-  const [logs, setLogs] = useState<OperationsInventoryLog[]>(() => safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []));
-  const [selectedId, setSelectedId] = useState(inventory[0]?.id || "");
-  const [person, setPerson] = useState("");
-  const [youthLead, setYouthLead] = useState("");
-  const [approver, setApprover] = useState("");
-  const [team, setTeam] = useState("Logistics & Inventory Team");
-  const [quantity, setQuantity] = useState(1);
-  const [notes, setNotes] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newCategory, setNewCategory] = useState<OperationsInventoryItem["category"]>("Supplies");
-  const [newTotal, setNewTotal] = useState(1);
-  const [newLocation, setNewLocation] = useState("Operations bin");
-
-  const saveInventory = (next: OperationsInventoryItem[]) => {
-    setInventory(next);
-    safeWrite(OPERATIONS_INVENTORY_KEY, next);
-  };
-
-  const saveLogs = (next: OperationsInventoryLog[]) => {
-    setLogs(next);
-    safeWrite(OPERATIONS_INVENTORY_LOG_KEY, next.slice(0, 100));
-  };
-
-  const selectedItem = inventory.find((item) => item.id === selectedId) || inventory[0];
-  const lowItems = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing");
-  const checkedOutItems = inventory.filter((item) => item.available < item.total);
-
-  function updateItem(action: OperationsInventoryLog["action"]) {
-    if (!selectedItem) return;
-    const count = Math.max(1, Number(quantity) || 1);
-    const nextInventory = inventory.map((item) => {
-      if (item.id !== selectedItem.id) return item;
-      let available = item.available;
-      if (action === "Checked Out") available = Math.max(0, item.available - count);
-      if (action === "Returned") available = Math.min(item.total, item.available + count);
-      if (action === "Count Adjusted") available = Math.max(0, Math.min(item.total, count));
-      const nextStatus = action === "Needs Replacement" ? "Needs Replacement" : action === "Marked Missing" ? "Missing" : inventoryStatus(item.total, available);
-      return { ...item, available, assigned_to: person || item.assigned_to, status: nextStatus, notes: notes || item.notes, managed_by: "Supervisor / Staff Lead", youth_team_role: "Logistics & Inventory Team", supervisor_approval_required: true, last_updated: new Date().toISOString() };
-    });
-    const log: OperationsInventoryLog = {
-      id: uuid(),
-      item_id: selectedItem.id,
-      item_name: selectedItem.name,
-      action,
-      quantity: count,
-      person,
-      youth_lead: youthLead,
-      approved_by: approver,
-      team,
-      notes,
-      created_at: new Date().toISOString(),
-    };
-    saveInventory(nextInventory);
-    saveLogs([log, ...logs]);
-    setNotes("");
-  }
-
-  function addInventoryItem() {
-    const name = newName.trim();
-    if (!name) return;
-    const total = Math.max(1, Number(newTotal) || 1);
-    const item: OperationsInventoryItem = {
-      id: `ops-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`,
-      name,
-      category: newCategory,
-      total,
-      available: total,
-      location: newLocation || "Operations bin",
-      status: "Ready",
-      notes: "Added during launch operations.",
-      managed_by: "Supervisor / Staff Lead",
-      youth_team_role: "Logistics & Inventory Team",
-      supervisor_approval_required: true,
-      last_updated: new Date().toISOString(),
-    };
-    const next = [...inventory, item];
-    saveInventory(next);
-    setSelectedId(item.id);
-    setNewName("");
-    setNewTotal(1);
-  }
-
-  return (
-    <div className="mt-8 rounded-[2rem] border border-amber-200/20 bg-amber-50/10 p-5 shadow-2xl">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">Operations Inventory</div>
-          <h2 className="mt-2 text-3xl font-black">Inventory & Logistics: tools, supplies, water, and TimeClock Wizard equipment.</h2>
-          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">
-            Supervisor / Staff Lead manages accountability. The Youth Logistics & Inventory Team helps count, prepare, check out, return, and organize items. Administrator controls the master list. Track shovels, rakes, water pitchers, markers, scissors, staplers, garbage bags, and laptops used for TimeClock Wizard sign-in.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-7 text-white/82">
-          <div><strong>{inventory.length}</strong> item groups tracked</div>
-          <div><strong>{checkedOutItems.length}</strong> checked out / not fully available</div>
-          <div><strong>{lowItems.length}</strong> low, missing, or replacement flags</div>
-        </div>
-      </div>
-
-
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
-        {[
-          ["Supervisor / Staff Lead", "Verifies opening inventory, approves check-outs and returns, and confirms damaged, missing, or replacement-needed items."],
-          ["Youth Logistics & Inventory Team", "Counts equipment, prepares bins, tracks responsible teams, supports TimeClock Wizard setup, and conducts end-of-day return checks."],
-          ["Administrator", "Adds new items, edits master quantities, archives equipment, reviews reports, and approves purchase/replacement planning."],
-        ].map(([title, text]) => (
-          <div key={title} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-black uppercase tracking-[0.14em] text-amber-100">{title}</div>
-            <p className="mt-2 text-sm leading-6 text-white/78">{text}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 grid gap-4 xl:grid-cols-[1.3fr_0.9fr]">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20">
-          <div className="grid grid-cols-6 gap-2 border-b border-white/10 bg-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-white/70">
-            <div className="col-span-2">Item</div>
-            <div>Category</div>
-            <div>Ready</div>
-            <div>Managed By</div>
-            <div>Status</div>
-          </div>
-          <div className="max-h-[28rem] overflow-auto">
-            {inventory.map((item) => (
-              <button key={item.id} type="button" onClick={() => setSelectedId(item.id)} className={`grid w-full grid-cols-6 gap-2 px-4 py-3 text-left text-sm transition ${selectedId === item.id ? "bg-emerald-300/20" : "hover:bg-white/10"}`}>
-                <div className="col-span-2 font-black">{item.name}<div className="text-xs font-normal text-white/60">{item.notes}</div></div>
-                <div>{item.category}</div>
-                <div>{item.available} / {item.total}</div>
-                <div className="text-white/75"><div>{item.managed_by || "Supervisor / Staff Lead"}</div><div className="text-xs text-white/50">{item.location}</div></div>
-                <div><span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-black">{item.status}</span></div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
-          <h3 className="text-2xl font-black">Check out / return item</h3>
-          <label className="mt-4 block text-xs font-black uppercase tracking-[0.2em] text-white/60">Inventory Item</label>
-          <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white">
-            {inventory.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <input value={person} onChange={(event) => setPerson(event.target.value)} placeholder="Responsible person / station" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-            <input value={team} onChange={(event) => setTeam(event.target.value)} placeholder="Team using item" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-            <input value={youthLead} onChange={(event) => setYouthLead(event.target.value)} placeholder="Youth logistics lead" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-            <input value={approver} onChange={(event) => setApprover(event.target.value)} placeholder="Supervisor approval" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-            <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white" />
-          </div>
-          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Notes: condition, missing pieces, where it went, who has it..." className="mt-3 min-h-[5.5rem] w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => updateItem("Checked Out")} className="rounded-full bg-amber-200 px-5 py-3 text-sm font-black text-black">Check Out</button>
-            <button type="button" onClick={() => updateItem("Returned")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Return</button>
-            <button type="button" onClick={() => updateItem("Count Adjusted")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Set Available Count</button>
-            <button type="button" onClick={() => updateItem("Needs Replacement")} className="rounded-full border border-red-200/30 bg-red-500/15 px-5 py-3 text-sm font-black">Needs Replacement</button>
-            <button type="button" onClick={() => updateItem("Marked Missing")} className="rounded-full border border-red-200/30 bg-red-500/15 px-5 py-3 text-sm font-black">Missing</button>
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/10 p-4">
-            <h4 className="font-black">Add item</h4>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="Item name" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
-              <select value={newCategory} onChange={(event) => setNewCategory(event.target.value as OperationsInventoryItem["category"])} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white">
-                {(["Tools", "Supplies", "Technology", "Safety", "Water", "Office", "Cleaning"] as OperationsInventoryItem["category"][]).map((category) => <option key={category} value={category}>{category}</option>)}
-              </select>
-              <input type="number" min={1} value={newTotal} onChange={(event) => setNewTotal(Number(event.target.value))} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white" />
-              <input value={newLocation} onChange={(event) => setNewLocation(event.target.value)} placeholder="Location" className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40" />
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Mission Control</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Monitor operations.</h1>
+        <MissionCultureBanner language={language} />
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
+          {keyStats.map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+              <div className="text-3xl font-black">{value}</div>
+              <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
             </div>
-            <button type="button" onClick={addInventoryItem} className="mt-3 rounded-full bg-white px-5 py-3 text-sm font-black text-black">Add to Inventory</button>
-          </div>
+          ))}
         </div>
-      </div>
-
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-          <h3 className="text-xl font-black">Launch-day checklist</h3>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-white/82">
-            <li>• Supervisor opens inventory and assigns the Youth Logistics & Inventory Team.</li>
-            <li>• Youth team counts tools before participants arrive.</li>
-            <li>• Laptops are assigned to the check-in table for TimeClock Wizard.</li>
-            <li>• Water pitchers, PPE, markers, scissors, staplers, and garbage bags are placed in labeled bins.</li>
-            <li>• Supervisor approves missing, damaged, or replacement-needed items.</li>
-            <li>• Youth team completes end-of-day count before youth leave the site.</li>
-          </ul>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
+          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Project</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media / Evidence</button>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-          <h3 className="text-xl font-black">Recent inventory activity</h3>
-          <div className="mt-3 max-h-48 space-y-2 overflow-auto text-sm text-white/78">
-            {logs.length === 0 ? <p>No inventory activity recorded yet.</p> : logs.slice(0, 8).map((log) => (
-              <div key={log.id} className="rounded-xl bg-white/10 p-3">
-                <strong>{log.action}</strong> — {log.quantity} {log.item_name}{log.person ? ` assigned to ${log.person}` : ""}
-                <div className="text-xs text-white/55">{new Date(log.created_at).toLocaleString()}</div>
-                {(log.team || log.youth_lead || log.approved_by) && <div className="mt-1 text-xs text-white/65">{log.team ? `Team: ${log.team}. ` : ""}{log.youth_lead ? `Youth lead: ${log.youth_lead}. ` : ""}{log.approved_by ? `Approved by: ${log.approved_by}.` : ""}</div>}
-                {log.notes && <div className="mt-1 text-xs text-white/70">{log.notes}</div>}
-              </div>
-            ))}
-          </div>
+      </Card>
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open all metrics</summary>
+        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["Profiles", profiles.length],
+            ["Youth Registered", youth.length],
+            ["Present Today", present],
+            ["Assessments", assessments.length],
+            ["Support Flags", supportFlags],
+            ["Incident Logs", incidents.length],
+            ["Feedback", feedback.length],
+            ["Project Items Complete", projectProgress.length],
+            ["Portfolio Entries", youthPortfolioEntries.length],
+            ["Resume Ready", Math.min(youth.length, assessments.length)],
+            ["Career Pathways", coolingCenterTeams.length],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+              <div className="text-3xl font-black">{value}</div>
+              <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
+            </div>
+          ))}
         </div>
-      </div>
-
-      <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100">Youth Workforce Career Connection</div>
-        <h3 className="mt-2 text-2xl font-black">Logistics & Inventory Team</h3>
-        <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">
-          Youth help every team succeed by managing resources responsibly. They learn asset management, supply chain basics, equipment accountability, check-out procedures, return checks, and operations support.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-white/80">
-          {["Inventory Specialist", "Warehouse Associate", "Supply Chain Coordinator", "Operations Manager", "Logistics Technician", "Project Coordinator"].map((career) => <span key={career} className="rounded-full border border-white/10 bg-black/25 px-3 py-2">{career}</span>)}
+      </details>
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open readiness checklist</summary>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {readiness.map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+              <div className="mt-2 text-lg font-black">{value}</div>
+            </div>
+          ))}
         </div>
-      </div>
+      </details>
+      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open videos and support framework</summary>
+        <div className="mt-5 grid gap-5">
+          <SupportResponseFrameworkCard />
+          <VideoLibrary />
+        </div>
+      </details>
     </div>
   );
 }
