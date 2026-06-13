@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import "./style.css";
+import "./App.css";
 
 /**
  * Bronson Family Farm Online Ecosystem
