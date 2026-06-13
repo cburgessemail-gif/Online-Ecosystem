@@ -714,7 +714,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
       <h2 className="mt-3 text-2xl font-black">{farmStatus.title}</h2>
       <p className="mt-3 text-sm leading-6 text-white/82">{farmStatus.summary}</p>
       <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {launchAlmanacSnapshot.conditions.slice(1, compact ? 4 : 6).map(([label, value]) => (
+        {launchAlmanacSnapshot.conditions.slice(0, compact ? 4 : 6).map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
             <div className="mt-1 text-sm font-bold text-white/82">{value}</div>
@@ -2217,13 +2217,12 @@ function Shell({
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
         { label: "My Day", screen: "youth" },
-        { label: "Project", screen: "launchProject" },
-        { label: "Upload", screen: "media" },
+        { label: "Story", screen: "media" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
         { label: "Supervisor", screen: "supervisor" },
-        { label: "Mission", screen: "reports" },
+        { label: "Mission Control", screen: "reports" },
       ]
     : role === "Parent / Guardian"
     ? [
@@ -2276,7 +2275,7 @@ function Shell({
                   {item.label}
                 </button>
               ))}
-              {isStaff && <button type="button" onClick={() => setScreen("reports")} className="rounded-full border border-amber-200/20 bg-amber-300/10 px-4 py-2 text-xs font-black text-amber-50">Mission</button>}
+
             </div>
             )}
 
@@ -2313,6 +2312,7 @@ function Shell({
           </details>
           )}
         </div>
+        {screen !== "portal" && <QuickReturnBar setScreen={setScreen} activeUser={activeUser} />}
         {children}
         <CompactProprietaryFooter />
       </div>
@@ -3512,114 +3512,173 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   );
 }
 
+
+function whyAreWeDoingThis(plan: { curriculum: string; focus: string; work: string[] }) {
+  const text = `${plan.curriculum} ${plan.focus}`.toLowerCase();
+  if (/soil|compost|seedling|plant|crop|water|pollinator|growth/.test(text)) {
+    return [
+      "Healthy soil helps plants grow.",
+      "Healthy plants produce food.",
+      "Food supports families and communities.",
+    ];
+  }
+  if (/water|tote|hydration/.test(text)) {
+    return [
+      "Water keeps people safe and plants alive.",
+      "Good farm operations make the work possible.",
+      "Planning today protects tomorrow’s harvest.",
+    ];
+  }
+  if (/infrastructure|fencing|tool|build|construction|cooling/.test(text)) {
+    return [
+      "Strong infrastructure keeps the farm safe and useful.",
+      "Building and maintaining systems helps everyone work better.",
+      "Solving problems creates value for the farm and community.",
+    ];
+  }
+  return [
+    "Today’s work helps the farm grow.",
+    "The work helps your team learn and contribute.",
+    "Every task is a chance to become more capable.",
+  ];
+}
+
+function connectionPathForPlan(plan: { curriculum: string; focus: string; work: string[] }) {
+  const text = `${plan.curriculum} ${plan.focus}`.toLowerCase();
+  if (/seedling|plant|crop|soil|compost/.test(text)) return ["Seedling", "Healthy Soil", "Food", "Family", "Community"];
+  if (/water|tote|hydration/.test(text)) return ["Water", "Healthy Plants", "Harvest", "Food Access"];
+  if (/infrastructure|fencing|tool|cooling|build/.test(text)) return ["Tools", "Safety", "Problem Solving", "Value Created"];
+  return ["Daily Work", "Learning", "Responsibility", "Growth"];
+}
+
+function CurrentWeekStrip() {
+  const currentWeek = getCurrentYouthWeek();
+  const todayPlan = getCurrentYouthPlan();
+  const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
+  return (
+    <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/75">Current Curriculum</div>
+      <div className="mt-1 text-xl font-black">Week {currentWeek.week}: {currentWeek.title}</div>
+      <div className="mt-1 text-sm font-bold text-white/80">Today: {todayPlan.day} — {todayPlan.curriculum}</div>
+      <details className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm text-white/78">
+        <summary className="cursor-pointer font-black text-emerald-50">View Monday–Friday rhythm</summary>
+        <div className="mt-3 grid gap-2">
+          {currentWeekPlans.map((day) => (
+            <div key={day.day} className={`rounded-xl border p-3 ${day.day === todayPlan.day ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+              <div className="font-black">{day.day}</div>
+              <div className="text-xs font-bold opacity-80">{day.curriculum}</div>
+            </div>
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const home = activeUser?.role ? routeForRole(activeUser.role) : "portal";
+  const label = activeUser?.role === "Youth Workforce Participant" ? "🌱 Return to My Day" : activeUser?.role === "Parent / Guardian" ? "← Back to My Youth" : activeUser?.role === "Supervisor / Staff" ? "← Back to Supervisor" : "← Back to Workspace";
+  return (
+    <div className="mb-3 flex flex-wrap gap-2">
+      <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
+      <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">🏠 Home</button>
+    </div>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
   const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
-  const completionPercent = Math.round((currentWeek.week / youthCurriculumWeeks.length) * 100);
+  const whyLines = whyAreWeDoingThis(todayPlan);
+  const connections = connectionPathForPlan(todayPlan);
 
   return (
-    <div className="grid gap-4">
-      <Card>
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Workforce</div>
-            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">🌱 My Cultivator Journey</h1>
-            <p className="mt-4 text-base leading-7 text-white/84">Today's assignment, your week, and the story of who you are becoming.</p>
-          </div>
-          <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/12 p-4 lg:w-[330px]">
-            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Next action</div>
-            <h2 className="mt-2 text-2xl font-black">Start My Day</h2>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Start My Day</button>
-              <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Tell Your Story</button>
-            </div>
-          </div>
+    <div className="grid gap-3">
+      <Card className="p-4 md:p-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">My Day</div>
+        <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">🌱 Welcome, Cultivator</h1>
+        <p className="mt-2 text-sm leading-6 text-white/82">A Cultivator helps things grow. Today you will help something grow and become more capable than you were yesterday.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Start My Day</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Tell Your Cultivator Story</button>
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-<FarmConditionsCard compact />
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today's Assignment</div>
-          <h2 className="mt-3 text-2xl font-black">{todayPlan.day}: {todayPlan.curriculum}</h2>
+      <div className="grid gap-3 lg:grid-cols-[1fr_.9fr]">
+        <Card className="p-4 md:p-5">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Work</div>
+          <h2 className="mt-2 text-2xl font-black">Week {currentWeek.week} • {todayPlan.day}</h2>
+          <div className="mt-1 text-base font-black text-emerald-50">{todayPlan.curriculum}</div>
           <p className="mt-3 text-sm leading-6 text-white/82">{todayPlan.focus}</p>
+          <div className="mt-4 grid gap-2">
+            {todayPlan.work.slice(0, 4).map((item) => (
+              <div key={item} className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm font-bold">✓ {item}</div>
+            ))}
+          </div>
         </Card>
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Why This Matters</div>
-          <h2 className="mt-3 text-2xl font-black">Customer → Problem → Solution</h2>
-          <details className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
-            <summary className="cursor-pointer font-black text-emerald-50">Open entrepreneurship connection</summary>
-            <p className="mt-3">Bronson Family Farm needs heat-safety support. Youth work creates value through production, quality, logistics, customer awareness, and documentation.</p>
-          </details>
-        </Card>
+
+        <FarmConditionsCard compact />
       </div>
 
-      <CultivatorMomentSkinnyPlantCard />
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Beginning • During • End</div>
-          <h2 className="mt-3 text-3xl font-black">Today's rhythm</h2>
-          <div className="mt-5 grid gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>Beginning:</strong> Check in, PPE, water, safety, assignment.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>During:</strong> Current project, resources, team progress, Tell Your Cultivator Story.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>End:</strong> Reflection, Cultivator Story, supervisor feedback, tomorrow preview.</div>
-          </div>
-        </Card>
-        <YouthEvidenceUploadCard activeUser={activeUser} />
-      </div>
-
-      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">View where my work fits in the ecosystem</summary>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
-          <div>
-            <h2 className="text-3xl font-black">Youth Workforce in the connected ecosystem</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">Youth work connects safety, farm production, marketplace readiness, customers, partners, and community impact. This is a map for context, not a guest pathway image.</p>
-          </div>
-          <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/30">
-            <img src={IMG.ecosystem} alt="Connected food ecosystem map highlighting youth workforce" className="max-h-[340px] w-full object-cover object-center" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-          </div>
+      <Card className="p-4 md:p-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Why Are We Doing This?</div>
+        <div className="mt-3 grid gap-2">
+          {whyLines.map((line) => (
+            <div key={line} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">{line}</div>
+          ))}
         </div>
-      </details>
+      </Card>
 
-      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open My Week, daily curriculum, resources, rotations, and achievements</summary>
-        <div className="mt-5 grid gap-5">
-          <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div><div className="mt-2 text-sm font-black">{currentWeek.project}</div></div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Progress</div><div className="mt-2 text-3xl font-black">{completionPercent}%</div></div>
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Achievement</div><div className="mt-2 text-sm font-black">{currentWeek.badge}</div></div>
-            </div>
-          </Card>
-          <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
-            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} Daily Work Plan</h2>
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {currentWeekPlans.map((day) => (
-                <details key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
-                  <summary className="cursor-pointer font-black">{day.day} • {day.curriculum}</summary>
-                  <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
-                  <div className="mt-3 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
-                </details>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Card className="p-4 md:p-5">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Explore the Connections</div>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-black text-white/86">
+            {connections.map((item, index) => (
+              <React.Fragment key={item}>
+                <span className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-2">{item}</span>
+                {index < connections.length - 1 && <span className="text-emerald-100/65">→</span>}
+              </React.Fragment>
+            ))}
+          </div>
+        </Card>
+        <CultivatorMomentSkinnyPlantCard />
+      </div>
+
+      <Card className="p-4 md:p-5">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">End of Day Reflection</div>
+        <h2 className="mt-2 text-2xl font-black">How did you become more capable today?</h2>
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {["What did I do today?", "What surprised me today?", "What connections did I discover?", "How did I become more capable?"].map((q) => (
+            <div key={q} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{q}</div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Tell Your Cultivator Story</button>
+          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Open Reflection</button>
+        </div>
+      </Card>
+
+      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-base font-black text-emerald-50">📅 My Week + Cultivator Journey</summary>
+        <div className="mt-4 grid gap-3">
+          <CurrentWeekStrip />
+          <Card className="p-4 md:p-5">
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Cultivator Passport</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {["🌱 First Seedling", "🚜 First Equipment Use", "🤝 First Team Project", "📖 First Cultivator Story"].map((stamp) => (
+                <div key={stamp} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{stamp}</div>
               ))}
             </div>
           </Card>
-          <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Rotation Areas + Resources</div>
-            <h2 className="mt-3 text-3xl font-black">Topic Areas</h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {youthTopicRotationAreas.map((topic) => (
-                <details key={topic.title} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-                  <summary className="cursor-pointer font-black">{topic.title}</summary>
-                  <p className="mt-3 text-sm leading-6 text-white/78">{topic.description}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {topic.resources.map((resource) => <span key={resource} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[11px] font-black text-white/75">{resource}</span>)}
-                  </div>
+          <Card className="p-4 md:p-5">
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Monday–Friday Curriculum</div>
+            <div className="mt-3 grid gap-2">
+              {currentWeekPlans.map((day) => (
+                <details key={day.day} className="rounded-xl border border-white/10 bg-white/10 p-3">
+                  <summary className="cursor-pointer text-sm font-black">{day.day} • {day.curriculum}</summary>
+                  <p className="mt-2 text-sm leading-6 text-white/78">{day.focus}</p>
+                  <div className="mt-2 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
                 </details>
               ))}
             </div>
