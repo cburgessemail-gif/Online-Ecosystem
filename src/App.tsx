@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.2 - FOREST GATE + CULTIVATOR JOURNEY LAUNCH
+ * LAUNCH CANDIDATE 3.3 - CORRECTED LAUNCH: GLOBAL TRANSLATION + INVENTORY
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -931,11 +931,17 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
 };
 
 function lt(language: LanguageCode, phrase: string) {
-  return launchPhraseTranslations[language]?.[phrase] || screenTranslations[language]?.[phrase] || phrase;
+  if (!phrase) return "";
+  return translatePhrase(language, phrase);
 }
 
 function t(language: LanguageCode, key: string) {
-  return languageText[language]?.[key] || languageText.en[key] || key;
+  const english = languageText.en[key] || key;
+  return languageText[language]?.[key] || translatePhrase(language, english);
+}
+
+function tla(language: LanguageCode, items: string[]) {
+  return items.map((item) => lt(language, item));
 }
 
 function languageDir(language: LanguageCode) {
@@ -5520,6 +5526,110 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         </div>
       </details>
     </div>
+  );
+}
+
+
+function OperationsInventoryPanel() {
+  const [inventory, setInventory] = useState<OperationsInventoryItem[]>(() => safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory));
+  const [inventoryMessage, setInventoryMessage] = useState("");
+  const [activeNote, setActiveNote] = useState("");
+
+  const updateAvailable = (id: string, nextValue: string) => {
+    const nextAvailable = Math.max(0, Number(nextValue) || 0);
+    const nextInventory = inventory.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            available: Math.min(nextAvailable, item.total),
+            status: inventoryStatus(item.total, Math.min(nextAvailable, item.total)),
+            last_updated: new Date().toISOString(),
+          }
+        : item
+    );
+    setInventory(nextInventory);
+    safeWrite(OPERATIONS_INVENTORY_KEY, nextInventory);
+  };
+
+  const logInventoryAction = (item: OperationsInventoryItem, action: OperationsInventoryLog["action"], quantity: number) => {
+    const logs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
+    const row: OperationsInventoryLog = {
+      id: uuid(),
+      item_id: item.id,
+      item_name: item.name,
+      action,
+      quantity,
+      notes: activeNote || `${action} recorded for ${item.name}`,
+      staff_id: "launch-supervisor",
+      created_at: new Date().toISOString(),
+    };
+    safeWrite(OPERATIONS_INVENTORY_LOG_KEY, [row, ...logs].slice(0, 250));
+    setInventoryMessage(`${action} saved for ${item.name}.`);
+    setActiveNote("");
+  };
+
+  const resetLaunchInventory = () => {
+    setInventory(defaultOperationsInventory);
+    safeWrite(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
+    setInventoryMessage("Launch inventory restored to the default supervisor list.");
+  };
+
+  const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
+  const availableItems = inventory.reduce((sum, item) => sum + item.available, 0);
+  const attentionItems = inventory.filter((item) => item.status !== "Ready");
+
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-amber-200/30 bg-black/35 p-5 text-white/85 backdrop-blur-xl">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">Inventory Management</div>
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-white">Supervisor Tool + Supply Control</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/78">
+            Supervisors can count tools, track PPE and water supplies, record checkout, returns, damaged items, missing items, and supply needs. Youth may help as the Logistics & Inventory Team, but supervisor approval is required.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm">
+          <div className="text-2xl font-black">{availableItems}/{totalItems}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-white/60">Available</div>
+          <div className="mt-2 text-2xl font-black">{attentionItems.length}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-white/60">Need Attention</div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {inventory.map((item) => (
+          <div key={item.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-lg font-black">{item.name}</div>
+                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/55">{item.category} • {item.location}</div>
+              </div>
+              <span className={`rounded-full px-3 py-1 text-xs font-black ${item.status === "Ready" ? "bg-emerald-300 text-black" : item.status === "Low" ? "bg-amber-200 text-black" : "bg-red-300 text-black"}`}>{item.status}</span>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-white/75">{item.notes}</p>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-xl bg-black/30 p-3"><div className="text-xs uppercase tracking-[0.18em] text-white/55">Total</div><div className="text-xl font-black">{item.total}</div></div>
+              <label className="rounded-xl bg-black/30 p-3">
+                <span className="text-xs uppercase tracking-[0.18em] text-white/55">Available</span>
+                <input type="number" min="0" max={item.total} value={item.available} onChange={(e) => updateAvailable(item.id, e.target.value)} className="mt-2" />
+              </label>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" onClick={() => logInventoryAction(item, "Checked Out", 1)} className="rounded-full bg-amber-200 px-3 py-2 text-xs font-black text-black">Checkout</button>
+              <button type="button" onClick={() => logInventoryAction(item, "Returned", 1)} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Returned</button>
+              <button type="button" onClick={() => logInventoryAction(item, "Needs Replacement", 1)} className="rounded-full bg-red-300 px-3 py-2 text-xs font-black text-black">Damaged</button>
+              <button type="button" onClick={() => logInventoryAction(item, "Marked Missing", 1)} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Missing</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+        <textarea value={activeNote} onChange={(e) => setActiveNote(e.target.value)} placeholder="Optional note: rake handle broken, gloves needed, water pitcher missing, laptop needs charging" />
+        <button type="button" onClick={resetLaunchInventory} className="rounded-full border border-white/15 bg-white/10 px-6 py-4 font-black">Reset Launch Inventory</button>
+      </div>
+      {inventoryMessage && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/15 p-4 text-sm font-black text-emerald-50">{inventoryMessage}</div>}
+    </section>
   );
 }
 
