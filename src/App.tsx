@@ -349,31 +349,31 @@ type EcosystemNotification = {
 };
 
 const defaultFarmStatus: FarmOperationStatus = {
-  level: "Modified Operations",
-  color: "amber",
-  title: "Heat Index Warning — Modified Outdoor Operations",
-  summary: "Outdoor field work may be shortened, moved to shade, or suspended when heat conditions create risk for youth, staff, volunteers, or visitors.",
-  action: "Hydrate, use shade, check in with supervisors, and follow the current farm-status decision before beginning outdoor work.",
+  level: "Open",
+  color: "green",
+  title: "Normal Operations — Follow Today’s Farm Conditions",
+  summary: "Begin with today’s assignment, check hydration, review conditions, and follow supervisor direction before outdoor work.",
+  action: "Check the live farm conditions card, bring water, confirm PPE, and listen for any Mission Control updates.",
   updated_at: new Date().toISOString(),
 };
 
 const launchAlmanacSnapshot = {
-  label: "Live-ready Almanac Snapshot",
-  note: "Connect this card to live weather/heat-index data when the weather API is added. For launch, Mission Control can post the operational decision here.",
+  label: "Today’s Farm Conditions",
+  note: "Live-ready farm conditions belong inside the workspace. Mission Control can update operational status when heat, weather, water, or site conditions change.",
   conditions: [
-    ["Farm Status", "Modified Operations"],
-    ["Heat Risk", "Warning level — supervisor decision required"],
-    ["Water Breaks", "Every 20–30 minutes or more often"],
-    ["Shade / Cooling", "Required during outdoor work"],
-    ["Outdoor Work", "End early or move indoors when directed"],
+    ["Farm Status", "Normal Operations unless Mission Control changes status"],
+    ["Wednesday Operations", "Onsite Water cleans and services porta potties — keep access clear"],
+    ["Friday Operations", "Water totes are filled — verify tote locations and access"],
+    ["Hydration", "Bring water and take breaks before heat becomes a problem"],
+    ["Outdoor Work", "Follow current supervisor and farm-status decision"],
     ["Youth Safety", "Nurse Line + site lead visible before work begins"],
   ],
-  farmWisdom: "The farm teaches planning: weather changes the work, and good workers adjust before people are harmed.",
+  farmWisdom: "The farm teaches planning: conditions change the work, and good workers adjust before people are harmed.",
 };
 
 const defaultNotifications: EcosystemNotification[] = [
-  { id: "heat-alert", audience: "All", priority: "Safety", title: "Heat Index Warning", body: "Farm operations may be modified. Supervisors may end outdoor work early, increase water breaks, and move teams to shade or indoor learning.", created_at: new Date().toISOString() },
-  { id: "today-assignment", audience: "Youth", priority: "Action", title: "Start with Safety, Then Assignment", body: "Check the Nurse Line, field status, Almanac, and today's project before starting work.", created_at: new Date().toISOString() },
+  { id: "farm-status", audience: "All", priority: "Info", title: "Check Today’s Farm Conditions", body: "Begin with the live farm conditions card. Mission Control will change status if heat, weather, water, or site conditions affect work.", created_at: new Date().toISOString() },
+  { id: "today-assignment", audience: "Youth", priority: "Action", title: "Start with Safety, Then Today’s Assignment", body: "Check the Nurse Line, farm conditions, and current week activity before starting work.", created_at: new Date().toISOString() },
   { id: "cultivator-story", audience: "Youth", priority: "Info", title: "Tell Your Cultivator Story", body: "Take photos or videos of what you learned, built, helped with, or accomplished today. You are becoming more capable than you were yesterday.", created_at: new Date().toISOString() },
   { id: "parent-notice", audience: "Parent", priority: "Info", title: "Parent Updates Follow Farm Status", body: "Parents should check program status, early shutdown notes, and supervisor announcements when heat or weather changes the day.", created_at: new Date().toISOString() },
 ];
@@ -621,6 +621,109 @@ const youthWeekOneDailyPlan = [
     reflection: "What are you proud of this week, and what do you want to learn next?",
   },
 ];
+
+
+const youthWeekTwoDailyPlan = [
+  {
+    day: "Monday",
+    date: "Week 2 Monday",
+    curriculum: "Soil health, compost, and living systems observation",
+    focus: "Youth observe soil as a living system, compare compost and field soil, and identify what healthy soil needs before planting.",
+    work: ["Observe soil texture and smell", "Compare compost and field soil", "Identify what seedlings need", "Record one thing that surprised you"],
+    resources: ["Soil health checklist", "Compost observation guide", "Seedling care basics"],
+    reflection: "How did today’s soil work help you understand what plants need to grow?",
+  },
+  {
+    day: "Tuesday",
+    date: "Week 2 Tuesday",
+    curriculum: "Seedlings, planting, companion planting, and crop care",
+    focus: "Youth plant or care for seedlings and connect small beginnings to future harvest, food access, and marketplace opportunity.",
+    work: ["Plant or check seedlings", "Water carefully", "Look for plant stress", "Explore companion planting connections"],
+    resources: ["Companion planting guide", "Seedling care card", "Watering basics"],
+    reflection: "What small thing did you do today that could grow into something bigger?",
+  },
+  {
+    day: "Wednesday",
+    date: "Week 2 Wednesday",
+    curriculum: "Farm operations, sanitation, water access, and site readiness",
+    focus: "Youth learn that farm work depends on invisible systems: sanitation, water, access lanes, safety, and coordination.",
+    work: ["Keep porta-potty service access clear", "Check work zones", "Review hydration plan", "Support site readiness tasks"],
+    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide"],
+    reflection: "What farm system did you notice today that helps everyone work safely?",
+  },
+  {
+    day: "Thursday",
+    date: "Week 2 Thursday",
+    curriculum: "Plant growth, pollinators, observation, and ecosystem connections",
+    focus: "Youth observe how plants, flowers, insects, water, soil, and people connect in the farm ecosystem.",
+    work: ["Observe plant growth", "Look for pollinator activity", "Identify one connection", "Document a Cultivator Moment"],
+    resources: ["Pollinator basics", "Plant observation prompts", "Explore the Connections"],
+    reflection: "What connection did you discover between plants, people, and the ecosystem?",
+  },
+  {
+    day: "Friday",
+    date: "Week 2 Friday",
+    curriculum: "Water operations, stewardship, weekly reflection, and Cultivator Story",
+    focus: "Youth connect water tote filling, crop health, planning, and responsibility to the larger farm system.",
+    work: ["Verify water tote access", "Support watering plan", "Review the week", "Tell your Cultivator Story"],
+    resources: ["Friday water operations note", "Weekly reflection guide", "Cultivator Story prompt"],
+    reflection: "How did this week help you become more capable than you were yesterday?",
+  },
+];
+
+const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
+  1: youthWeekOneDailyPlan,
+  2: youthWeekTwoDailyPlan,
+};
+
+const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
+const LAUNCH_MINIMUM_ACTIVE_WEEK = 2;
+
+function getCurrentProgramWeek(date = new Date()) {
+  const start = new Date(PROGRAM_START_DATE);
+  start.setHours(0, 0, 0, 0);
+  const current = new Date(date);
+  current.setHours(0, 0, 0, 0);
+  const diffDays = Math.floor((current.getTime() - start.getTime()) / 86400000);
+  const computed = Math.max(1, Math.floor(diffDays / 7) + 1);
+  return Math.min(8, Math.max(LAUNCH_MINIMUM_ACTIVE_WEEK, computed));
+}
+
+function getProgramDayIndex(date = new Date()) {
+  const day = date.getDay();
+  if (day === 0 || day === 6) return 0; // Weekend preview shows Monday's activity.
+  return Math.max(0, Math.min(4, day - 1));
+}
+
+function getCurrentYouthWeek() {
+  const weekNumber = getCurrentProgramWeek();
+  return youthCurriculumWeeks.find((week) => week.week === weekNumber) || youthCurriculumWeeks[0];
+}
+
+function getCurrentYouthPlan(date = new Date()) {
+  const weekNumber = getCurrentProgramWeek(date);
+  const plans = youthDailyPlansByWeek[weekNumber] || youthWeekOneDailyPlan;
+  return plans[getProgramDayIndex(date)] || plans[0];
+}
+
+function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
+  const farmStatus = getFarmStatus();
+  return (
+    <Card className={compact ? "p-4" : ""}>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Farm Conditions</div>
+      <h2 className="mt-3 text-2xl font-black">{farmStatus.title}</h2>
+      <p className="mt-3 text-sm leading-6 text-white/82">{farmStatus.summary}</p>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {launchAlmanacSnapshot.conditions.slice(1, compact ? 4 : 6).map(([label, value]) => (
+          <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+            <div className="mt-1 text-sm font-bold text-white/82">{value}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 const youthTopicRotationAreas = [
   {
@@ -3410,9 +3513,10 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const currentWeek = youthCurriculumWeeks[0];
-  const todayPlan = youthWeekOneDailyPlan[3] || youthWeekOneDailyPlan[0];
-  const completionPercent = 12.5;
+  const currentWeek = getCurrentYouthWeek();
+  const todayPlan = getCurrentYouthPlan();
+  const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
+  const completionPercent = Math.round((currentWeek.week / youthCurriculumWeeks.length) * 100);
 
   return (
     <div className="grid gap-4">
@@ -3435,11 +3539,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Alerts</div>
-          <h2 className="mt-3 text-2xl font-black">Modified Operations</h2>
-          <p className="mt-3 text-sm leading-6 text-white/82">Heat Index Warning: hydrate, use shade, check in with supervisors, and follow the farm-status decision before beginning outdoor work.</p>
-        </Card>
+<FarmConditionsCard compact />
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today's Assignment</div>
           <h2 className="mt-3 text-2xl font-black">{todayPlan.day}: {todayPlan.curriculum}</h2>
@@ -3488,7 +3588,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-5 grid gap-5">
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-            <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
+            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
             <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div><div className="mt-2 text-sm font-black">{currentWeek.project}</div></div>
@@ -3498,9 +3598,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           </Card>
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
-            <h2 className="mt-3 text-3xl font-black">Week 1 Daily Work Plan</h2>
+            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} Daily Work Plan</h2>
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {youthWeekOneDailyPlan.map((day) => (
+              {currentWeekPlans.map((day) => (
                 <details key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
                   <summary className="cursor-pointer font-black">{day.day} • {day.curriculum}</summary>
                   <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
@@ -3526,6 +3626,44 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           </Card>
         </div>
       </details>
+    </div>
+  );
+}
+
+
+function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const currentWeek = getCurrentYouthWeek();
+  const todayPlan = getCurrentYouthPlan();
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Current Week Activity</div>
+        <h2 className="mt-3 text-4xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
+        <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Today’s Activity</div>
+            <div className="mt-2 text-xl font-black">{todayPlan.day}: {todayPlan.curriculum}</div>
+            <p className="mt-2 text-sm leading-6 text-white/78">{todayPlan.focus}</p>
+          </div>
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Today’s Work</div>
+            <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
+              {todayPlan.work.map((item) => <li key={item}>• {item}</li>)}
+            </ul>
+          </div>
+          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Reflection</div>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/82">{todayPlan.reflection}</p>
+          </div>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Youth Workspace</button>
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Start My Day</button>
+        </div>
+      </Card>
+      <FarmConditionsCard />
+      <CultivatorMomentSkinnyPlantCard />
     </div>
   );
 }
@@ -3567,7 +3705,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
-    { key: "project", label: "6/8 Cooling Station" },
+    { key: "project", label: "Current Week Activity" },
     { key: "roster", label: "Youth Roster" },
     { key: "attendance", label: "Attendance / PPE" },
     { key: "wellness", label: "Wellness Review" },
@@ -3611,7 +3749,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
             setScreen={setScreen}
           />
         )}
-        {tab === "project" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
+        {tab === "project" && <CurrentWeekActivityModule setScreen={setScreen} />}
         {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
@@ -3654,9 +3792,15 @@ function SupervisorDashboard({
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
-      <h2 className="mt-3 text-4xl font-black">Launch-day operating picture.</h2>
+      <h2 className="mt-3 text-4xl font-black">Current operating picture.</h2>
       <div className="mt-5">
         <DailyOperationsCommandCenter setScreen={setScreen} compact />
+      </div>
+      <div className="mt-4 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/75">Current Week Activity</div>
+        <div className="mt-1 text-xl font-black">Week {getCurrentYouthWeek().week}: {getCurrentYouthWeek().title}</div>
+        <div className="mt-1 text-sm font-bold text-white/78">Today: {getCurrentYouthPlan().day} — {getCurrentYouthPlan().curriculum}</div>
+        <button type="button" onClick={() => setTab("project")} className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black">Open Current Week Activity</button>
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
@@ -4322,11 +4466,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
       setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
-      window.setTimeout(() => setScreen("launchProject"), 650);
+      window.setTimeout(() => setScreen("youth"), 650);
     } catch (error) {
       console.error("Start My Day save issue:", error);
       setMessage(`Start My Day saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
-      window.setTimeout(() => setScreen("launchProject"), 650);
+      window.setTimeout(() => setScreen("youth"), 650);
     } finally {
       setSaving(false);
     }
