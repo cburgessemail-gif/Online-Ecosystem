@@ -2,6 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
+ * LAUNCH STABILIZATION NOTE — Inventory must be surfaced, not buried.
+ * Required launch behavior:
+ * - Youth with unmatched Tuesday 4-digit PIN may continue pending verification.
+ * - Send/record unmatched PIN verification for bhchatman@gmail.com.
+ * - Almanac is a daily operating layer, not a hidden resource.
+ * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
+ */
+
+/**
  * Bronson Family Farm Online Ecosystem
  * LAUNCH CANDIDATE 3.2 - FOREST GATE + CULTIVATOR JOURNEY LAUNCH
  *
