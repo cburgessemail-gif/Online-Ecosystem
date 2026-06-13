@@ -358,17 +358,38 @@ const defaultFarmStatus: FarmOperationStatus = {
 };
 
 const launchAlmanacSnapshot = {
-  label: "Today’s Farm Conditions",
-  note: "Live-ready farm conditions belong inside the workspace. Mission Control can update operational status when heat, weather, water, or site conditions change.",
-  conditions: [
-    ["Farm Status", "Normal Operations unless Mission Control changes status"],
-    ["Wednesday Operations", "Onsite Water cleans and services porta potties — keep access clear"],
-    ["Friday Operations", "Water totes are filled — verify tote locations and access"],
-    ["Hydration", "Bring water and take breaks before heat becomes a problem"],
-    ["Outdoor Work", "Follow current supervisor and farm-status decision"],
-    ["Youth Safety", "Nurse Line + site lead visible before work begins"],
+  label: "Today’s Farm Almanac",
+  note: "The Almanac belongs at the top of the day. Youth, parents, supervisors, and Mission Control should see conditions before assignments.",
+  weather: {
+    location: "Youngstown, Ohio / Bronson Family Farm",
+    current: "Local weather snapshot — update in Mission Control when live weather service is connected",
+    temperature: "83°F",
+    heatIndex: "Monitor heat index before outdoor work",
+    rainChance: "Check before planting, watering, or tool setup",
+    wind: "Observe wind before spraying, lifting covers, or using loose materials",
+  },
+  growing: [
+    ["Water Guidance", "Check new plantings and soil moisture before watering"],
+    ["Planting Guidance", "Use today’s assignment and supervisor direction before planting"],
+    ["Pollinator Activity", "Observe bees, butterflies, flowers, and safe distance from hives"],
+    ["Soil Observation", "Look for moisture, structure, roots, worms, mulch, and compaction"],
   ],
-  farmWisdom: "The farm teaches planning: conditions change the work, and good workers adjust before people are harmed.",
+  operationsByDay: {
+    Sunday: "Weekend preview: check Mission Control before arriving onsite.",
+    Monday: "Weekly topic selection, supervisor assignment, PPE, and work-plan confirmation.",
+    Tuesday: "Field production, observation, documentation, and skill practice.",
+    Wednesday: "Onsite Water cleans and services porta potties. Keep service access clear.",
+    Thursday: "Production, maintenance, problem solving, and project completion.",
+    Friday: "Water totes are filled. Verify tote locations, access, and refill needs.",
+    Saturday: "Weekend operations may differ. Check Mission Control before farm activity.",
+  } as Record<string, string>,
+  moonSeason: [
+    ["Season", "Early summer workforce season"],
+    ["Sun Awareness", "Start early, hydrate, and adjust work before heat peaks"],
+    ["Moon Phase", "Add live moon phase when almanac service is connected"],
+    ["Farm Rhythm", "Conditions → Decisions → Work → Learning → Reflection"],
+  ],
+  farmWisdom: "Good farmers observe before they act. Conditions come before decisions.",
 };
 
 const defaultNotifications: EcosystemNotification[] = [
@@ -706,20 +727,58 @@ function getCurrentYouthPlan(date = new Date()) {
   return plans[getProgramDayIndex(date)] || plans[0];
 }
 
+function getAlmanacDayName(date = new Date()) {
+  return date.toLocaleDateString("en-US", { weekday: "long" });
+}
+
+function getTodayOperation(date = new Date()) {
+  const dayName = getAlmanacDayName(date);
+  return launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
+}
+
+function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus()) {
+  return [
+    ["Local Weather", `${launchAlmanacSnapshot.weather.location} · ${launchAlmanacSnapshot.weather.temperature}`],
+    ["Heat / Hydration", launchAlmanacSnapshot.weather.heatIndex],
+    ["Rain / Water", launchAlmanacSnapshot.weather.rainChance],
+    ["Wind", launchAlmanacSnapshot.weather.wind],
+    ["Farm Status", `${farmStatus.level}: ${farmStatus.summary}`],
+    ["Today’s Operations", getTodayOperation(date)],
+    ...launchAlmanacSnapshot.growing,
+    ...launchAlmanacSnapshot.moonSeason,
+  ];
+}
+
 function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
   const farmStatus = getFarmStatus();
+  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
+  const visibleCards = compact ? almanacCards.slice(0, 6) : almanacCards;
+  const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
+
   return (
     <Card className={compact ? "p-4" : ""}>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Farm Conditions</div>
-      <h2 className="mt-3 text-2xl font-black">{farmStatus.title}</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">{farmStatus.summary}</p>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Today’s Farm Almanac</div>
+      <h2 className="mt-3 text-2xl font-black">Conditions → Decisions → Work</h2>
+      <p className="mt-3 text-sm leading-6 text-white/82">Local weather, farm status, water guidance, pollinator activity, and today’s operation note appear before assignments so nobody has to look for them.</p>
+
+      <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
+        <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
+        <div className="mt-1 text-xl font-black">{farmStatus.title}</div>
+        <div className="mt-2 text-sm font-bold leading-6 text-white/84">Action: {farmStatus.action}</div>
+      </div>
+
       <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {launchAlmanacSnapshot.conditions.slice(0, compact ? 4 : 6).map(([label, value]) => (
+        {visibleCards.map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-            <div className="mt-1 text-sm font-bold text-white/82">{value}</div>
+            <div className="mt-1 text-sm font-bold leading-5 text-white/82">{value}</div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
+        💡 {launchAlmanacSnapshot.farmWisdom}
+        <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
       </div>
     </Card>
   );
@@ -2468,7 +2527,7 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
 
       {!compact && (
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {launchAlmanacSnapshot.conditions.map(([label, value]) => (
+          {getTodayAlmanacCards(new Date(), farmStatus).map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
               <div className="mt-2 text-sm font-black leading-5">{value}</div>
@@ -3763,6 +3822,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         </div>
       </Card>
 
+      <FarmConditionsCard />
+
       <div className="grid gap-3 lg:grid-cols-[1fr_.9fr]">
         <Card className="p-4 md:p-5">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Work</div>
@@ -3775,8 +3836,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
             ))}
           </div>
         </Card>
-
-        <FarmConditionsCard compact />
       </div>
 
       <Card className="p-4 md:p-5">
