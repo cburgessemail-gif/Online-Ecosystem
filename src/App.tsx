@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * LAUNCH STABILIZATION NOTE — Inventory must be surfaced, not buried.
+ * MASTER INTEGRATION NOTE — Almanac access + inventory visibility are launch-critical.
  * Required launch behavior:
  * - Youth with unmatched Tuesday 4-digit PIN may continue pending verification.
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
@@ -51,6 +51,7 @@ type Screen =
   | "wellness"
   | "reports"
   | "operations"
+  | "almanac"
   | "events"
   | "media"
   | "launchProject"
@@ -2251,6 +2252,7 @@ function App() {
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
+      {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MediaCenter setScreen={setScreen} />}
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
@@ -2338,6 +2340,7 @@ function Shell({
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
               <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "Workspace" : "Choose Role"}</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🌱 Almanac</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -2371,6 +2374,7 @@ function Shell({
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🌱 Full Almanac</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
@@ -3776,6 +3780,75 @@ function connectionPathForPlan(plan: { curriculum: string; focus: string; work: 
   return ["Daily Work", "Learning", "Responsibility", "Growth"];
 }
 
+
+function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const farmStatus = getFarmStatus();
+  const todayPlan = getCurrentYouthPlan();
+  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
+  const connections = connectionPathForPlan(todayPlan);
+  const askPrompts = [
+    "Why are we doing this today?",
+    "Why does weather change farm work?",
+    "Why do bees and pollinators matter?",
+    "What does healthy soil look like?",
+    "How does today’s work connect to the marketplace?",
+  ];
+
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Full Farm Almanac</div>
+        <h1 className="mt-3 text-4xl font-black leading-tight md:text-5xl">Conditions → Decisions → Work → Learning</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
+          The Almanac is the farm’s daily operating layer. It gives youth, parents, supervisors, growers, and Mission Control direct access to weather, farm status, water guidance, planting guidance, pollinator activity, soil observation, seasonal rhythm, and the reason today’s work matters.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Workspace</button>
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Today’s Work</button>
+          <button type="button" onClick={() => setScreen("operations")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Mission Control Operations</button>
+        </div>
+      </Card>
+
+      <FarmConditionsCard />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Explore the Connections</div>
+          <h2 className="mt-3 text-3xl font-black">Today’s work connects across the ecosystem.</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {connections.map((item, index) => (
+              <span key={`${item}-${index}`} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-50">{item}</span>
+            ))}
+          </div>
+          <p className="mt-4 text-sm leading-7 text-white/78">A single observation can connect soil, water, crops, workers, customers, inventory, pricing, and community food access.</p>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Ask the Almanac</div>
+          <h2 className="mt-3 text-3xl font-black">Questions youth can ask today</h2>
+          <div className="mt-4 grid gap-2">
+            {askPrompts.map((prompt) => (
+              <div key={prompt} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold text-white/84">“{prompt}”</div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">All Almanac Signals</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {almanacCards.map(([label, value]) => (
+            <div key={label} className="rounded-[1.15rem] border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+              <div className="mt-2 text-sm font-bold leading-6 text-white/84">{value}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 function CurrentWeekStrip() {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -3807,6 +3880,7 @@ function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen)
     <div className="mb-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
       <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">🏠 Home</button>
+      <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">🌱 Almanac</button>
     </div>
   );
 }
