@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.3 - CORRECTED LAUNCH: GLOBAL TRANSLATION + INVENTORY
+ * LAUNCH CANDIDATE 3.2 - FOREST GATE + CULTIVATOR JOURNEY LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -21,6 +21,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Keeps returning youth on PIN, supervisors on PIN 0000, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
  * - Layers youth curriculum by week and day
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
+ * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
  */
 
 type Screen =
@@ -621,108 +622,6 @@ const youthWeekOneDailyPlan = [
   },
 ];
 
-const youthWeeklyDailyPlans: Record<number, typeof youthWeekOneDailyPlan> = {
-  1: youthWeekOneDailyPlan,
-  2: [
-    {
-      day: "Monday",
-      date: "Week 2 Monday",
-      curriculum: "Soil health, compost, and living systems observation",
-      focus: "Youth observe soil as a living system, compare compost and field soil, and identify what healthy soil needs before planting.",
-      work: ["Check in with supervisor", "Review PPE, water, and heat safety", "Observe soil texture, moisture, insects, roots, and organic matter", "Spread or level soil where assigned", "Record one soil observation"],
-      resources: ["Soil health checklist", "Compost observation prompts", "Nurse line reminder", "Water and shade checklist"],
-      reflection: "What did you notice in the soil that showed it is part of a living system?",
-    },
-    {
-      day: "Tuesday",
-      date: "Week 2 Tuesday",
-      curriculum: "Planting, spacing, crop care, and responsibility",
-      focus: "Youth learn why spacing, depth, labeling, watering, and careful handling matter when planting crops.",
-      work: ["Review today's crop plan", "Prepare rows or beds", "Plant seeds or transplants at the correct spacing", "Label planting areas", "Water carefully and document the crop planted"],
-      resources: ["Planting and watering basics", "Spacing guide", "Crop observation prompts", "Team communication prompts"],
-      reflection: "What does a plant need from you after it goes into the ground?",
-    },
-    {
-      day: "Wednesday",
-      date: "Week 2 Wednesday",
-      curriculum: "Companion planting, biodiversity, and farm ecosystem connections",
-      focus: "Youth learn how plants, insects, flowers, soil, water, and people work together in a regenerative farm system.",
-      work: ["Review companion planting examples", "Identify beneficial plants or pollinator areas", "Plant or observe companion crops where assigned", "Document one ecosystem connection", "Share one finding with the team"],
-      resources: ["Companion planting guide", "Pollinator protection basics", "Flower and habitat guide", "Before-and-after documentation prompts"],
-      reflection: "What two living things did you see working together in the farm ecosystem today?",
-    },
-    {
-      day: "Thursday",
-      date: "Week 2 Thursday",
-      curriculum: "Mulching, watering, heat protection, and conservation",
-      focus: "Youth connect mulch, watering, shade, and heat safety to protecting crops and protecting people.",
-      work: ["Review heat-safety status", "Apply grass mulch or organic cover where directed", "Water crops carefully", "Check for runoff, dryness, or plant stress", "Record one conservation practice used today"],
-      resources: ["Mulch and moisture guide", "Heat safety checklist", "Water and shade checklist", "Crop stress observation prompts"],
-      reflection: "How did today's work help protect soil, plants, water, or people?",
-    },
-    {
-      day: "Friday",
-      date: "Week 2 Friday",
-      curriculum: "Weekly reflection, portfolio evidence, supervisor feedback, and next-week readiness",
-      focus: "Youth close the regenerative agriculture week by explaining what they planted, observed, protected, or improved.",
-      work: ["Complete weekly reflection", "Upload or describe Cultivator Story evidence", "Review supervisor feedback", "Identify skills used this week", "Preview next week's infrastructure rotation"],
-      resources: ["Weekly reflection guide", "Portfolio evidence checklist", "Achievement badge checklist", "Next week preview"],
-      reflection: "What did you learn this week about caring for land as a living system?",
-    },
-  ],
-  3: [
-    { day: "Monday", date: "Week 3 Monday", curriculum: "Infrastructure safety, tools, and work zones", focus: "Youth learn how safe infrastructure supports farm operations.", work: ["Review PPE and tool safety", "Identify work zones", "Inventory needed tools", "Support assigned setup tasks"], resources: ["Tool safety basics", "Site setup checklist", "Inventory checklist"], reflection: "How does infrastructure make farm work safer or easier?" },
-    { day: "Tuesday", date: "Week 3 Tuesday", curriculum: "Fencing, boundaries, and protection", focus: "Youth connect fencing and boundaries to crop protection, visitor safety, and farm planning.", work: ["Review boundary plan", "Assist fencing or layout tasks", "Document materials used", "Report damaged or missing tools"], resources: ["Fencing basics", "Damage report prompt", "Tool checkout guide"], reflection: "What did the boundary protect today?" },
-    { day: "Wednesday", date: "Week 3 Wednesday", curriculum: "Water, shade, cooling, and field support", focus: "Youth learn how infrastructure protects people and plants during summer operations.", work: ["Map water and shade needs", "Support cooling or hydration setup", "Check supplies", "Record improvement ideas"], resources: ["Water and shade checklist", "Cooling station map", "Heat safety"], reflection: "What infrastructure helped protect people today?" },
-    { day: "Thursday", date: "Week 3 Thursday", curriculum: "Operations logistics and project completion", focus: "Youth practice project flow, teamwork, quality, and cleanup.", work: ["Complete assigned build/support task", "Check quality", "Clean and return tools", "Update inventory notes"], resources: ["Daily closeout checklist", "Quality checklist", "Inventory report"], reflection: "What did your team finish or improve?" },
-    { day: "Friday", date: "Week 3 Friday", curriculum: "Infrastructure reflection and next-week readiness", focus: "Youth connect tools, planning, safety, and construction skills to career pathways.", work: ["Complete reflection", "Identify career skills", "Review supervisor feedback", "Preview production and harvest"], resources: ["Career pathway cards", "Weekly reflection guide"], reflection: "What infrastructure skill could help you in a job?" },
-  ],
-};
-
-const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
-const PROGRAM_WEEKS = 8;
-const PROGRAM_DAYS_PER_WEEK = 5;
-
-function getProgramProgress(today = new Date()) {
-  const startDay = new Date(PROGRAM_START_DATE);
-  startDay.setHours(0, 0, 0, 0);
-  const currentDay = new Date(today);
-  currentDay.setHours(0, 0, 0, 0);
-
-  let completedProgramDays = 0;
-  const cursor = new Date(startDay);
-  while (cursor < currentDay) {
-    const day = cursor.getDay();
-    if (day >= 1 && day <= 5) completedProgramDays += 1;
-    cursor.setDate(cursor.getDate() + 1);
-  }
-
-  const currentJsDay = currentDay.getDay();
-  const todayIsProgramDay = currentJsDay >= 1 && currentJsDay <= 5;
-  const currentWeek = Math.min(PROGRAM_WEEKS, Math.max(1, Math.floor(completedProgramDays / PROGRAM_DAYS_PER_WEEK) + 1));
-  const currentDayIndex = todayIsProgramDay
-    ? Math.min(PROGRAM_DAYS_PER_WEEK - 1, Math.max(0, currentJsDay - 1))
-    : 0;
-
-  return { currentWeek, currentDayIndex, completedProgramDays, todayIsProgramDay };
-}
-
-function getActiveYouthCurriculumWeeks(currentWeek: number) {
-  return youthCurriculumWeeks.map((week) => ({
-    ...week,
-    status: week.week < currentWeek ? "Completed" : week.week === currentWeek ? "Current Week" : "Upcoming",
-  }));
-}
-
-function getDailyPlanForWeek(weekNumber: number) {
-  return youthWeeklyDailyPlans[weekNumber] || youthWeeklyDailyPlans[3] || youthWeekOneDailyPlan;
-}
-
-function getDayStatus(dayIndex: number, currentDayIndex: number) {
-  return dayIndex < currentDayIndex ? "Completed" : dayIndex === currentDayIndex ? "Today" : "Upcoming";
-}
-
-
 const youthTopicRotationAreas = [
   {
     title: "Regenerative Agriculture",
@@ -1033,17 +932,11 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
 };
 
 function lt(language: LanguageCode, phrase: string) {
-  if (!phrase) return "";
-  return translatePhrase(language, phrase);
+  return launchPhraseTranslations[language]?.[phrase] || screenTranslations[language]?.[phrase] || phrase;
 }
 
 function t(language: LanguageCode, key: string) {
-  const english = languageText.en[key] || key;
-  return languageText[language]?.[key] || translatePhrase(language, english);
-}
-
-function tla(language: LanguageCode, items: string[]) {
-  return items.map((item) => lt(language, item));
+  return languageText[language]?.[key] || languageText.en[key] || key;
 }
 
 function languageDir(language: LanguageCode) {
@@ -2585,6 +2478,25 @@ function EntrepreneurshipValueCard() {
   );
 }
 
+
+function CultivatorMomentSkinnyPlantCard() {
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Cultivator Moment</div>
+      <h2 className="mt-3 text-2xl font-black">“All of that food comes from this skinny plant?”</h2>
+      <details className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
+        <summary className="cursor-pointer font-black text-emerald-50">Explore the Connections</summary>
+        <p className="mt-3">Small beginnings can grow into something much bigger.</p>
+        <p className="mt-3">A seedling can become food for families, income for farmers, and seeds for the future.</p>
+        <p className="mt-3">Just like the plant, Cultivators grow with time, care, practice, and support.</p>
+        <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 font-black text-emerald-50">
+          Reflection: What small thing did you do today that could grow into something bigger?
+        </div>
+      </details>
+    </Card>
+  );
+}
+
 function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | null }) {
   const [assets, setAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
   const [notice, setNotice] = useState("");
@@ -3498,12 +3410,9 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const { currentWeek: currentProgramWeek, currentDayIndex } = getProgramProgress();
-  const activeCurriculumWeeks = getActiveYouthCurriculumWeeks(currentProgramWeek);
-  const currentWeek = activeCurriculumWeeks.find((week) => week.week === currentProgramWeek) || activeCurriculumWeeks[0];
-  const activeDailyPlan = getDailyPlanForWeek(currentProgramWeek);
-  const todayPlan = activeDailyPlan[currentDayIndex] || activeDailyPlan[0];
-  const completionPercent = Math.min(100, Math.round((((currentProgramWeek - 1) * PROGRAM_DAYS_PER_WEEK + currentDayIndex + 1) / (PROGRAM_WEEKS * PROGRAM_DAYS_PER_WEEK)) * 100));
+  const currentWeek = youthCurriculumWeeks[0];
+  const todayPlan = youthWeekOneDailyPlan[3] || youthWeekOneDailyPlan[0];
+  const completionPercent = 12.5;
 
   return (
     <div className="grid gap-4">
@@ -3538,13 +3447,15 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         </Card>
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Why This Matters</div>
-          <h2 className="mt-3 text-2xl font-black">{currentProgramWeek === 2 ? "Soil → Life → Stewardship" : "Customer → Problem → Solution"}</h2>
+          <h2 className="mt-3 text-2xl font-black">Customer → Problem → Solution</h2>
           <details className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
             <summary className="cursor-pointer font-black text-emerald-50">Open entrepreneurship connection</summary>
-            <p className="mt-3">{currentProgramWeek === 2 ? "Regenerative agriculture teaches youth how soil, water, plants, insects, people, and business decisions work together. Youth create value by caring for living systems, documenting observations, and preparing crops for future harvest and marketplace readiness." : "Bronson Family Farm needs heat-safety support. Youth work creates value through production, quality, logistics, customer awareness, and documentation."}</p>
+            <p className="mt-3">Bronson Family Farm needs heat-safety support. Youth work creates value through production, quality, logistics, customer awareness, and documentation.</p>
           </details>
         </Card>
       </div>
+
+      <CultivatorMomentSkinnyPlantCard />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
@@ -3577,7 +3488,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-5 grid gap-5">
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 My Week</div>
-            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
+            <h2 className="mt-3 text-3xl font-black">Week 1: {currentWeek.title}</h2>
             <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Current Project</div><div className="mt-2 text-sm font-black">{currentWeek.project}</div></div>
@@ -3587,11 +3498,11 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           </Card>
           <Card>
             <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📆 Curriculum By Day</div>
-            <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} Daily Work Plan</h2>
+            <h2 className="mt-3 text-3xl font-black">Week 1 Daily Work Plan</h2>
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {activeDailyPlan.map((day, dayIndex) => (
+              {youthWeekOneDailyPlan.map((day) => (
                 <details key={day.day} className="rounded-[1.35rem] border border-white/10 bg-white/10 p-4">
-                  <summary className="cursor-pointer font-black">{day.day} • {getDayStatus(dayIndex, currentDayIndex)} • {day.curriculum}</summary>
+                  <summary className="cursor-pointer font-black">{day.day} • {day.curriculum}</summary>
                   <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
                   <div className="mt-3 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
                 </details>
@@ -5631,110 +5542,6 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         </div>
       </details>
     </div>
-  );
-}
-
-
-function OperationsInventoryPanel() {
-  const [inventory, setInventory] = useState<OperationsInventoryItem[]>(() => safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory));
-  const [inventoryMessage, setInventoryMessage] = useState("");
-  const [activeNote, setActiveNote] = useState("");
-
-  const updateAvailable = (id: string, nextValue: string) => {
-    const nextAvailable = Math.max(0, Number(nextValue) || 0);
-    const nextInventory = inventory.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            available: Math.min(nextAvailable, item.total),
-            status: inventoryStatus(item.total, Math.min(nextAvailable, item.total)),
-            last_updated: new Date().toISOString(),
-          }
-        : item
-    );
-    setInventory(nextInventory);
-    safeWrite(OPERATIONS_INVENTORY_KEY, nextInventory);
-  };
-
-  const logInventoryAction = (item: OperationsInventoryItem, action: OperationsInventoryLog["action"], quantity: number) => {
-    const logs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
-    const row: OperationsInventoryLog = {
-      id: uuid(),
-      item_id: item.id,
-      item_name: item.name,
-      action,
-      quantity,
-      notes: activeNote || `${action} recorded for ${item.name}`,
-      staff_id: "launch-supervisor",
-      created_at: new Date().toISOString(),
-    };
-    safeWrite(OPERATIONS_INVENTORY_LOG_KEY, [row, ...logs].slice(0, 250));
-    setInventoryMessage(`${action} saved for ${item.name}.`);
-    setActiveNote("");
-  };
-
-  const resetLaunchInventory = () => {
-    setInventory(defaultOperationsInventory);
-    safeWrite(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
-    setInventoryMessage("Launch inventory restored to the default supervisor list.");
-  };
-
-  const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
-  const availableItems = inventory.reduce((sum, item) => sum + item.available, 0);
-  const attentionItems = inventory.filter((item) => item.status !== "Ready");
-
-  return (
-    <section className="mt-6 rounded-[1.5rem] border border-amber-200/30 bg-black/35 p-5 text-white/85 backdrop-blur-xl">
-      <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">Inventory Management</div>
-      <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-black text-white">Supervisor Tool + Supply Control</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/78">
-            Supervisors can count tools, track PPE and water supplies, record checkout, returns, damaged items, missing items, and supply needs. Youth may help as the Logistics & Inventory Team, but supervisor approval is required.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm">
-          <div className="text-2xl font-black">{availableItems}/{totalItems}</div>
-          <div className="text-xs uppercase tracking-[0.2em] text-white/60">Available</div>
-          <div className="mt-2 text-2xl font-black">{attentionItems.length}</div>
-          <div className="text-xs uppercase tracking-[0.2em] text-white/60">Need Attention</div>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {inventory.map((item) => (
-          <div key={item.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-lg font-black">{item.name}</div>
-                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/55">{item.category} • {item.location}</div>
-              </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-black ${item.status === "Ready" ? "bg-emerald-300 text-black" : item.status === "Low" ? "bg-amber-200 text-black" : "bg-red-300 text-black"}`}>{item.status}</span>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-white/75">{item.notes}</p>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-black/30 p-3"><div className="text-xs uppercase tracking-[0.18em] text-white/55">Total</div><div className="text-xl font-black">{item.total}</div></div>
-              <label className="rounded-xl bg-black/30 p-3">
-                <span className="text-xs uppercase tracking-[0.18em] text-white/55">Available</span>
-                <input type="number" min="0" max={item.total} value={item.available} onChange={(e) => updateAvailable(item.id, e.target.value)} className="mt-2" />
-              </label>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" onClick={() => logInventoryAction(item, "Checked Out", 1)} className="rounded-full bg-amber-200 px-3 py-2 text-xs font-black text-black">Checkout</button>
-              <button type="button" onClick={() => logInventoryAction(item, "Returned", 1)} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Returned</button>
-              <button type="button" onClick={() => logInventoryAction(item, "Needs Replacement", 1)} className="rounded-full bg-red-300 px-3 py-2 text-xs font-black text-black">Damaged</button>
-              <button type="button" onClick={() => logInventoryAction(item, "Marked Missing", 1)} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black">Missing</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
-        <textarea value={activeNote} onChange={(e) => setActiveNote(e.target.value)} placeholder="Optional note: rake handle broken, gloves needed, water pitcher missing, laptop needs charging" />
-        <button type="button" onClick={resetLaunchInventory} className="rounded-full border border-white/15 bg-white/10 px-6 py-4 font-black">Reset Launch Inventory</button>
-      </div>
-      {inventoryMessage && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/15 p-4 text-sm font-black text-emerald-50">{inventoryMessage}</div>}
-    </section>
   );
 }
 
