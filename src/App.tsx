@@ -3513,6 +3513,163 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 }
 
 
+
+
+type ActivityRegistryEntry = {
+  label: string;
+  match: RegExp;
+  knowledge: string[];
+  skills: string[];
+  competencies: string[];
+  careers: string[];
+  entrepreneurship: string[];
+  resources: { title: string; type: "Uploaded" | "Link" | "Visual" | "Internal"; url?: string; note: string }[];
+  evidence: string[];
+  resumeStatement: string;
+  reflectionPrompt: string;
+};
+
+const bronsonActivityRegistry: ActivityRegistryEntry[] = [
+  {
+    label: "Planting Seedlings & Crop Care",
+    match: /seedling|plant|crop|transplant|companion/i,
+    knowledge: ["Plant biology", "Root systems", "Soil health", "Food systems", "Companion planting"],
+    skills: ["Observation", "Attention to detail", "Following procedures", "Responsibility", "Patience"],
+    competencies: ["Technical Agriculture", "Stewardship", "Critical Thinking", "Personal Effectiveness"],
+    careers: ["Farmer", "Horticulturist", "Greenhouse Technician", "Plant Scientist", "Extension Educator"],
+    entrepreneurship: ["Crop production", "Inventory development", "Customer demand", "Marketplace readiness"],
+    resources: [
+      { title: "Crop Planning", type: "Link", url: "https://urbanagriculture.horticulture.wisc.edu/crop-planning/", note: "Use when planning what to plant, when to plant, and how harvest timing connects to customers." },
+      { title: "Companion Planting Guide", type: "Internal", note: "Connect seedlings to pollinators, pest control, bed layout, and crop relationships." },
+      { title: "Seedling Care Basics", type: "Internal", note: "Water gently, observe stress, protect roots, and track growth over time." },
+    ],
+    evidence: ["Photo of planted seedlings", "Growth observation", "Supervisor observation", "End-of-day reflection"],
+    resumeStatement: "Assisted with crop establishment by planting, watering, and monitoring seedlings while following production and safety procedures.",
+    reflectionPrompt: "What small thing did you do today that could grow into something bigger?",
+  },
+  {
+    label: "Soil Health, Compost & Bed Preparation",
+    match: /soil|compost|mulch|bed|row|nutrient|living system/i,
+    knowledge: ["Soil structure", "Compost", "Nutrient cycling", "Water retention", "Regenerative agriculture"],
+    skills: ["Observation", "Physical work", "Planning", "Tool use", "Problem solving"],
+    competencies: ["Technical Agriculture", "Stewardship", "Safety", "Critical Thinking"],
+    careers: ["Soil Scientist", "Agronomist", "Conservation Technician", "Farm Manager"],
+    entrepreneurship: ["Improving yield", "Reducing waste", "Managing inputs", "Protecting future production"],
+    resources: [
+      { title: "Soil Health Checklist", type: "Internal", note: "Look at texture, smell, moisture, organic matter, and living activity." },
+      { title: "Compost Observation Guide", type: "Internal", note: "Compare compost and field soil to understand living systems." },
+      { title: "Cooking Water Fertilizer Visual", type: "Visual", note: "Connect reuse, nutrients, and resource conservation." },
+    ],
+    evidence: ["Before/after bed photo", "Soil observation note", "Team work photo", "Supervisor note"],
+    resumeStatement: "Supported soil preparation and compost application activities to improve growing conditions for vegetable production.",
+    reflectionPrompt: "How did today’s soil work help you understand what plants need to grow?",
+  },
+  {
+    label: "Water Operations & Irrigation",
+    match: /water|tote|irrigation|hydration/i,
+    knowledge: ["Water systems", "Irrigation", "Hydration", "Farm logistics", "Resource management"],
+    skills: ["Planning", "Systems thinking", "Dependability", "Safety awareness", "Recordkeeping"],
+    competencies: ["Farm Operations", "Safety", "Stewardship", "Personal Effectiveness"],
+    careers: ["Farm Manager", "Irrigation Technician", "Water Resource Specialist", "Environmental Technician"],
+    entrepreneurship: ["Operations planning", "Resource cost awareness", "Production reliability"],
+    resources: [
+      { title: "Friday Water Operations Note", type: "Internal", note: "Water totes are filled Fridays; keep access clear and verify locations." },
+      { title: "Hydroponic Crop Production", type: "Uploaded", note: "Use later to connect water quality, EC, pH, and plant production systems." },
+      { title: "Hydration Checklist", type: "Internal", note: "People need water before heat becomes a problem." },
+    ],
+    evidence: ["Water tote access photo", "Operations checklist", "Reflection", "Supervisor observation"],
+    resumeStatement: "Supported farm water operations by helping maintain access to water systems and following safety and hydration procedures.",
+    reflectionPrompt: "What farm system did you notice today that helps people or plants stay healthy?",
+  },
+  {
+    label: "Apiary & Pollinator Observation",
+    match: /bee|apiary|pollinator|hive|flower|insect/i,
+    knowledge: ["Bee biology", "Colony structure", "Pollination", "Biodiversity", "Habitat"],
+    skills: ["Observation", "Data collection", "Risk awareness", "Patience", "Environmental awareness"],
+    competencies: ["Technical Agriculture", "Critical Thinking", "Stewardship", "Safety"],
+    careers: ["Beekeeper", "Apiary Inspector", "Entomologist", "Pollination Specialist", "Extension Educator"],
+    entrepreneurship: ["Pollination services", "Honey products", "Beeswax products", "Value-added products"],
+    resources: [
+      { title: "Beekeeping for Beginners", type: "Uploaded", note: "Honey bee basics, equipment, hive placement, inspections, pests, and seasonal management." },
+      { title: "Pollinator Habitat Guide", type: "Internal", note: "Connect flowers, food production, insects, and biodiversity." },
+      { title: "Ohio Apiary Registration", type: "Internal", note: "Connect apiary work to real-world rules and responsibilities." },
+    ],
+    evidence: ["Pollinator observation", "Photo of flowers or habitat", "Safety reflection", "Supervisor observation"],
+    resumeStatement: "Participated in pollinator observation and apiary support activities while documenting environmental conditions and safety considerations.",
+    reflectionPrompt: "What connection did you discover between pollinators, plants, and food?",
+  },
+  {
+    label: "Hydroponics & Controlled Environment Agriculture",
+    match: /hydroponic|nutrient film|NFT|deep water|ebb|flow|aeroponic|greenhouse|CEA/i,
+    knowledge: ["Hydroponic systems", "Water quality", "Nutrient solution", "EC", "pH", "Greenhouse production"],
+    skills: ["Monitoring", "Troubleshooting", "Recordkeeping", "Measurement", "Systems management"],
+    competencies: ["Technical Agriculture", "Critical Thinking", "STEM", "Operations"],
+    careers: ["Hydroponics Technician", "CEA Specialist", "Greenhouse Manager", "Agricultural Engineer", "Urban Farmer"],
+    entrepreneurship: ["High-value crops", "Year-round production", "Customer-driven production", "Controlled production systems"],
+    resources: [
+      { title: "6 Types of Hydroponic Systems", type: "Uploaded", note: "Wicking, DWC, NFT, Ebb & Flow, Drip Systems, and Aeroponics." },
+      { title: "Basics of Hydroponic Crop Production", type: "Uploaded", note: "Hydroponics, substrates, water tests, EC, pH, nutrient solutions, crops, and greenhouse systems." },
+    ],
+    evidence: ["System observation", "Measurement record", "Photo/video", "Reflection"],
+    resumeStatement: "Monitored hydroponic and controlled-environment growing concepts, including water quality, nutrient management, and plant production systems.",
+    reflectionPrompt: "What did you learn about how water, nutrients, and plants work together?",
+  },
+  {
+    label: "Foraging & Plant Identification",
+    match: /forag|wild edible|plant identification|edible plant|trail/i,
+    knowledge: ["Wild edible plants", "Plant identification", "Habitat", "Responsible harvesting", "Food safety"],
+    skills: ["Research", "Observation", "Identification", "Risk assessment", "Documentation"],
+    competencies: ["Critical Thinking", "Stewardship", "Food Systems", "Safety"],
+    careers: ["Naturalist", "Park Ranger", "Conservation Technician", "Environmental Educator", "Culinary Educator"],
+    entrepreneurship: ["Value-added teas", "Culinary products", "Educational tours", "Specialty products"],
+    resources: [
+      { title: "Forager Chef Wild Plant Species", type: "Link", url: "https://foragerchef.com/category/wild-plant-species/", note: "Use for wild edible plant learning and responsible identification." },
+      { title: "Edible Plants on Trails", type: "Link", url: "https://www.kuhl.com/borninthemountains/edible-plants-on-the-trails-in-usa?srsltid=AfmBOopolLjrk7_jX-_vkOR5Mr2NVDkr4Mq05PBKwaqYE52zb56B4KNM", note: "Connect trails, plant ID, and outdoor learning." },
+    ],
+    evidence: ["Plant photo", "Identification note", "Safety reflection", "Story entry"],
+    resumeStatement: "Assisted with plant identification and research activities while practicing safety, observation, and documentation skills.",
+    reflectionPrompt: "What did you learn about identifying plants safely before using them?",
+  },
+  {
+    label: "Infrastructure, Tools & Equipment",
+    match: /mow|lawn|equipment|tool|fenc|build|construction|cooling|station|repair/i,
+    knowledge: ["Tool safety", "Equipment operation", "Infrastructure", "Maintenance", "Worksite safety"],
+    skills: ["Equipment operation", "Safety awareness", "Time management", "Teamwork", "Problem solving"],
+    competencies: ["Technical Skills", "Safety", "Personal Effectiveness", "Teamwork"],
+    careers: ["Equipment Operator", "Landscape Technician", "Grounds Manager", "Construction Trades", "Farm Operations Manager"],
+    entrepreneurship: ["Property maintenance services", "Customer service", "Cost of materials", "Value creation"],
+    resources: [
+      { title: "Tool Safety Basics", type: "Internal", note: "Use before operating or carrying tools and equipment." },
+      { title: "Cooling Station Project", type: "Internal", note: "Connect problem-solving, design, manufacturing, and customer needs." },
+      { title: "Equipment First-Time Reflection", type: "Internal", note: "Capture confidence gained from first-time equipment operation." },
+    ],
+    evidence: ["Before/after photo", "Supervisor observation", "Safety checklist", "Youth reflection"],
+    resumeStatement: "Safely operated or supported the use of outdoor tools and equipment while maintaining farm work areas and following safety procedures.",
+    reflectionPrompt: "What did you learn by using or working around equipment today?",
+  },
+  {
+    label: "Marketplace, Customer Service & Entrepreneurship",
+    match: /market|customer|price|pricing|sell|sales|inventory|value|entrepreneur|product/i,
+    knowledge: ["Customer needs", "Pricing", "Inventory", "Product presentation", "Business cycle"],
+    skills: ["Communication", "Customer service", "Math", "Organization", "Financial literacy"],
+    competencies: ["Entrepreneurship", "Communication", "Critical Thinking", "Professionalism"],
+    careers: ["Entrepreneur", "Market Manager", "Sales Representative", "Operations Manager", "Small Business Owner"],
+    entrepreneurship: ["Problem → Customer → Solution → Value", "Pricing", "Revenue", "Customer relationships"],
+    resources: [
+      { title: "Marketplace Operations", type: "Internal", note: "Connect products, inventory, customers, and sales." },
+      { title: "Pricing and Value Creation", type: "Internal", note: "Use youth-friendly examples before abstract business language." },
+    ],
+    evidence: ["Product photo", "Customer service note", "Sales or inventory record", "Reflection"],
+    resumeStatement: "Supported marketplace and entrepreneurship activities by assisting with product presentation, customer service, pricing, or inventory tasks.",
+    reflectionPrompt: "What problem did today’s work help solve for a customer or community member?",
+  },
+];
+
+function getActivityKnowledgePack(plan: { curriculum: string; focus: string; work: string[] }) {
+  const combined = `${plan.curriculum} ${plan.focus} ${plan.work.join(" ")}`;
+  return bronsonActivityRegistry.find((entry) => entry.match.test(combined)) || bronsonActivityRegistry[0];
+}
+
 function whyAreWeDoingThis(plan: { curriculum: string; focus: string; work: string[] }) {
   const text = `${plan.curriculum} ${plan.focus}`.toLowerCase();
   if (/soil|compost|seedling|plant|crop|water|pollinator|growth/.test(text)) {
@@ -3592,6 +3749,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
   const whyLines = whyAreWeDoingThis(todayPlan);
   const connections = connectionPathForPlan(todayPlan);
+  const knowledgePack = getActivityKnowledgePack(todayPlan);
 
   return (
     <div className="grid gap-3">
@@ -3622,6 +3780,50 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       </div>
 
       <Card className="p-4 md:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Knowledge + Career Pack</div>
+            <h2 className="mt-2 text-2xl font-black">{knowledgePack.label}</h2>
+            <p className="mt-2 text-sm leading-6 text-white/78">Today's activity connects to knowledge, skills, careers, resume language, and evidence for your Cultivator Journey.</p>
+          </div>
+          <span className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">Resume Builder</span>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-4">
+          <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Knowledge</div>
+            <div className="mt-2 flex flex-wrap gap-1">{knowledgePack.knowledge.slice(0, 4).map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{item}</span>)}</div>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Skills</div>
+            <div className="mt-2 flex flex-wrap gap-1">{knowledgePack.skills.slice(0, 4).map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{item}</span>)}</div>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Careers</div>
+            <div className="mt-2 flex flex-wrap gap-1">{knowledgePack.careers.slice(0, 4).map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{item}</span>)}</div>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Evidence</div>
+            <div className="mt-2 flex flex-wrap gap-1">{knowledgePack.evidence.slice(0, 4).map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{item}</span>)}</div>
+          </div>
+        </div>
+        <details className="mt-4 rounded-xl border border-white/10 bg-black/25 p-3 text-sm leading-6 text-white/82">
+          <summary className="cursor-pointer font-black text-emerald-50">Learn more from today's resources</summary>
+          <div className="mt-3 grid gap-2">
+            {knowledgePack.resources.map((resource) => (
+              <div key={resource.title} className="rounded-xl border border-white/10 bg-white/10 p-3">
+                <div className="font-black">{resource.url ? <a className="underline decoration-emerald-200/60" href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a> : resource.title}</div>
+                <div className="mt-1 text-xs font-bold text-white/70">{resource.type} • {resource.note}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Resume Language</div>
+            <p className="mt-1 font-bold text-emerald-50">{knowledgePack.resumeStatement}</p>
+          </div>
+        </details>
+      </Card>
+
+      <Card className="p-4 md:p-5">
         <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Why Are We Doing This?</div>
         <div className="mt-3 grid gap-2">
           {whyLines.map((line) => (
@@ -3649,7 +3851,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">End of Day Reflection</div>
         <h2 className="mt-2 text-2xl font-black">How did you become more capable today?</h2>
         <div className="mt-4 grid gap-2 md:grid-cols-2">
-          {["What did I do today?", "What surprised me today?", "What connections did I discover?", "How did I become more capable?"].map((q) => (
+          {["What did I do today?", knowledgePack.reflectionPrompt, "What connections did I discover?", "How did I become more capable?"].map((q) => (
             <div key={q} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{q}</div>
           ))}
         </div>
@@ -3693,6 +3895,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
+  const knowledgePack = getActivityKnowledgePack(todayPlan);
   return (
     <div className="grid gap-5">
       <Card>
