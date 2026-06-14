@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.5 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
+ * LAUNCH CANDIDATE 3.6 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -809,17 +809,21 @@ function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus(), w
   ];
 }
 
+const YOUNGSTOWN_ALMANAC_FORECAST_URL = "https://www.almanac.com/weather/forecast/OH/Youngstown";
+const YOUNGSTOWN_ALMANAC_PLANTING_URL = "https://www.almanac.com/gardening/planting-calendar/OH/Youngstown";
+const ALMANAC_GROWING_GUIDES_URL = "https://www.almanac.com/gardening/growing-guides";
+
 function LiveAlmanacResourceLinks() {
   return (
     <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/gardening/growing-guides" target="_blank" rel="noreferrer">
-        Open LIVE Almanac Growing Guides ↗
+      <a className="rounded-2xl border border-emerald-200/35 bg-emerald-300/18 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/25" href={YOUNGSTOWN_ALMANAC_FORECAST_URL} target="_blank" rel="noreferrer">
+        Open LIVE Youngstown Almanac Forecast ↗
       </a>
-      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/gardening/planting-calendar/OH/Youngstown" target="_blank" rel="noreferrer">
+      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href={YOUNGSTOWN_ALMANAC_PLANTING_URL} target="_blank" rel="noreferrer">
         Youngstown Planting Calendar ↗
       </a>
-      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/weather/forecast/OH/Youngstown" target="_blank" rel="noreferrer">
-        Youngstown Almanac Weather ↗
+      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href={ALMANAC_GROWING_GUIDES_URL} target="_blank" rel="noreferrer">
+        Almanac Growing Guides ↗
       </a>
     </div>
   );
@@ -895,7 +899,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 LIVE Farm Almanac</div>
       <h2 className="mt-3 text-2xl font-black">Live Conditions → Decisions → Work</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">This page now pulls live weather for Youngstown/Bronson Family Farm and gives direct access to the live Farmers’ Almanac growing guides and planting calendar.</p>
+      <p className="mt-3 text-sm leading-6 text-white/82">This page pulls live weather for Youngstown/Bronson Family Farm and opens the official live Almanac Youngstown forecast as the primary Almanac source.</p>
 
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
         <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
@@ -917,7 +921,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
 
       <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
         💡 {launchAlmanacSnapshot.farmWisdom}
-        <div className="mt-2 text-xs font-semibold text-white/62">Live weather is pulled automatically. Almanac growing guide links open the live Farmers’ Almanac pages instead of using static text.</div>
+        <div className="mt-2 text-xs font-semibold text-white/62">Live weather is pulled automatically. The official Youngstown Almanac forecast opens from the live Almanac link; it is not replaced with static text.</div>
       </div>
     </Card>
   );
