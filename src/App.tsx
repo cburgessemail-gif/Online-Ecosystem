@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.3 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
+ * LAUNCH CANDIDATE 3.4 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -764,14 +764,37 @@ function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus()) {
 function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
   const farmStatus = getFarmStatus();
   const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
-  const visibleCards = compact ? almanacCards.slice(0, 6) : almanacCards;
+  const visibleCards = compact ? almanacCards.slice(0, 3) : almanacCards;
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
+  if (compact) {
+    return (
+      <div className="rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-3">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌱 Today’s Almanac</div>
+            <div className="mt-1 text-lg font-black">{farmStatus.level} • {launchAlmanacSnapshot.weather.temperature}</div>
+          </div>
+          <span className={`rounded-full border px-3 py-1 text-[11px] font-black ${statusClass}`}>{farmStatus.color === "red" ? "Stop / Review" : farmStatus.color === "amber" ? "Monitor" : "Ready"}</span>
+        </div>
+        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          {visibleCards.map(([label, value]) => (
+            <div key={label} className="rounded-xl border border-white/10 bg-black/25 p-2">
+              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-emerald-100/65">{label}</div>
+              <div className="mt-1 text-xs font-bold leading-4 text-white/82">{value}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-2 text-xs font-bold leading-5 text-white/78">💡 {launchAlmanacSnapshot.farmWisdom}</div>
+      </div>
+    );
+  }
+
   return (
-    <Card className={compact ? "p-4" : ""}>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Today’s Farm Almanac</div>
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Full Farm Almanac</div>
       <h2 className="mt-3 text-2xl font-black">Conditions → Decisions → Work</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">Local weather, farm status, water guidance, pollinator activity, and today’s operation note appear before assignments so nobody has to look for them.</p>
+      <p className="mt-3 text-sm leading-6 text-white/82">This full page is for deeper review. The youth My Day screen now shows the compact daily Almanac automatically.</p>
 
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
         <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
@@ -3902,13 +3925,12 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">My Day</div>
         <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">🌱 Welcome, Cultivator</h1>
         <p className="mt-2 text-sm leading-6 text-white/82">A Cultivator helps things grow. Today you will help something grow and become more capable than you were yesterday.</p>
+        <div className="mt-3"><FarmConditionsCard compact /></div>
         <div className="mt-4 flex flex-wrap gap-2">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Start My Day</button>
           <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Tell Your Cultivator Story</button>
         </div>
       </Card>
-
-      <FarmConditionsCard />
 
       <div className="grid gap-3 lg:grid-cols-[1fr_.9fr]">
         <Card className="p-4 md:p-5">
@@ -4916,6 +4938,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className="text-xs font-bold text-white/75">{checkinDate}</div>
         </div>
       </div>
+
+      <div className="mt-4"><FarmConditionsCard compact /></div>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.15fr_1.2fr]">
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
