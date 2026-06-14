@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.6 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
+ * LAUNCH CANDIDATE 3.7 - CORE LOOP + CULTIVATOR MOMENT LAUNCH
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -33,6 +33,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
  * - Adds Minimum Launch Standard scorecard to Mission Control
  * - Defines OperationsInventoryPanel so inventory is visible and usable instead of referenced only
+ * - Removes static Almanac placeholder guidance from the live Almanac layer
+ * - Promotes live weather, work status, assignment, and Cultivator Moment to the youth launch dashboard
+ * - Adds Cultivator Reflection: Skills Used Today, Who Am I Becoming, and Cultivator Wisdom
  */
 
 type Screen =
@@ -370,8 +373,8 @@ const defaultFarmStatus: FarmOperationStatus = {
 };
 
 const launchAlmanacSnapshot = {
-  label: "Today’s Farm Almanac",
-  note: "The Almanac belongs at the top of the day. Youth, parents, supervisors, and Mission Control should see conditions before assignments.",
+  label: "Today’s Farm Conditions",
+  note: "Live weather appears on the workday screen. The official Almanac is opened through the live Youngstown Almanac links instead of being replaced by static text.",
   weather: {
     location: "Youngstown, Ohio / Bronson Family Farm",
     current: "LIVE weather pulls from Open-Meteo for Youngstown when the browser is online",
@@ -380,12 +383,6 @@ const launchAlmanacSnapshot = {
     rainChance: "Check before planting, watering, or tool setup",
     wind: "Observe wind before spraying, lifting covers, or using loose materials",
   },
-  growing: [
-    ["Water Guidance", "Check new plantings and soil moisture before watering"],
-    ["Planting Guidance", "Use today’s assignment and supervisor direction before planting"],
-    ["Pollinator Activity", "Observe bees, butterflies, flowers, and safe distance from hives"],
-    ["Soil Observation", "Look for moisture, structure, roots, worms, mulch, and compaction"],
-  ],
   operationsByDay: {
     Sunday: "Weekend preview: check Mission Control before arriving onsite.",
     Monday: "Weekly topic selection, supervisor assignment, PPE, and work-plan confirmation.",
@@ -395,13 +392,6 @@ const launchAlmanacSnapshot = {
     Friday: "Water totes are filled. Verify tote locations, access, and refill needs.",
     Saturday: "Weekend operations may differ. Check Mission Control before farm activity.",
   } as Record<string, string>,
-  moonSeason: [
-    ["Season", "Early summer workforce season"],
-    ["Sun Awareness", "Start early, hydrate, and adjust work before heat peaks"],
-    ["Moon Phase", "Daily live weather + direct Almanac growing-guide access"],
-    ["Farm Rhythm", "Conditions → Decisions → Work → Learning → Reflection"],
-  ],
-  farmWisdom: "Good farmers observe before they act. Conditions come before decisions.",
 };
 
 const defaultNotifications: EcosystemNotification[] = [
@@ -798,14 +788,12 @@ function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus(), w
   return [
     ["LIVE Weather", weather?.error ? weather.error : `${launchAlmanacSnapshot.weather.location} · ${formatLiveNumber(temp, "°F")} · feels ${formatLiveNumber(apparent, "°F")}`],
     ["Heat / Hydration", getLiveWeatherGuidance(weather)],
-    ["Rain / Water", weather?.rainChance !== undefined ? `${Math.round(weather.rainChance)}% rain chance · check soil before watering` : "Loading rain chance"],
-    ["Wind", weather?.wind !== undefined ? `${Math.round(weather.wind)} mph · secure loose materials if needed` : "Loading wind"],
+    ["Rain Chance", weather?.rainChance !== undefined ? `${Math.round(weather.rainChance)}%` : "Loading rain chance"],
+    ["Wind", weather?.wind !== undefined ? `${Math.round(weather.wind)} mph` : "Loading wind"],
     ["Sunrise / Sunset", `${formatLiveTime(weather?.sunrise)} / ${formatLiveTime(weather?.sunset)}`],
-    ["UV / Sun", weather?.uv !== undefined ? `UV max ${Math.round(weather.uv)} · plan shade and sunscreen` : "Loading UV"],
-    ["Farm Status", `${farmStatus.level}: ${farmStatus.summary}`],
+    ["UV / Sun", weather?.uv !== undefined ? `UV max ${Math.round(weather.uv)}` : "Loading UV"],
+    ["Work Status", `${farmStatus.level}: ${farmStatus.summary}`],
     ["Today’s Operations", getTodayOperation(date)],
-    ...launchAlmanacSnapshot.growing,
-    ...launchAlmanacSnapshot.moonSeason,
   ];
 }
 
@@ -867,7 +855,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
   }, []);
 
   const almanacCards = getTodayAlmanacCards(new Date(), farmStatus, liveWeather);
-  const visibleCards = compact ? almanacCards.slice(0, 4) : almanacCards;
+  const visibleCards = compact ? almanacCards.slice(0, 6) : almanacCards;
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
   if (compact) {
@@ -875,7 +863,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
       <div className="rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌱 LIVE Today’s Almanac</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌤 LIVE Farm Conditions</div>
             <div className="mt-1 text-lg font-black">{farmStatus.level} • {formatLiveNumber(liveWeather?.temperature, "°F")}</div>
             <div className="mt-1 text-[11px] font-bold text-white/58">Updates every 15 minutes when online.</div>
           </div>
@@ -890,16 +878,15 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
           ))}
         </div>
         <LiveAlmanacResourceLinks />
-        <div className="mt-2 text-xs font-bold leading-5 text-white/78">💡 {launchAlmanacSnapshot.farmWisdom}</div>
       </div>
     );
   }
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 LIVE Farm Almanac</div>
-      <h2 className="mt-3 text-2xl font-black">Live Conditions → Decisions → Work</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">This page pulls live weather for Youngstown/Bronson Family Farm and opens the official live Almanac Youngstown forecast as the primary Almanac source.</p>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Conditions</div>
+      <h2 className="mt-3 text-2xl font-black">Live Weather + Work Status</h2>
+      <p className="mt-3 text-sm leading-6 text-white/82">Live Youngstown weather appears here. The official Almanac opens through the Youngstown Almanac links; this screen does not replace the live Almanac with static guidance.</p>
 
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
         <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
@@ -920,8 +907,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
       <LiveAlmanacResourceLinks />
 
       <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
-        💡 {launchAlmanacSnapshot.farmWisdom}
-        <div className="mt-2 text-xs font-semibold text-white/62">Live weather is pulled automatically. The official Youngstown Almanac forecast opens from the live Almanac link; it is not replaced with static text.</div>
+        Live weather is pulled automatically. The official Youngstown Almanac forecast opens from the live Almanac link; it is not replaced with static text.
       </div>
     </Card>
   );
@@ -1316,7 +1302,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Youth Workforce Pathway": "Ruta de fuerza laboral juvenil",
     "Youth begin with check-in, safety, PPE, daily assignments, wellness awareness, reflection, and skill-building. The supervisor records operational progress.": "Los jóvenes comienzan con check-in, seguridad, PPE, asignaciones diarias, conciencia de bienestar, reflexión y desarrollo de habilidades. El supervisor registra el progreso operativo.",
     "Start My Day": "Comenzar mi día",
-    "End-of-Day Reflection": "Reflexión de fin de día",
+    "Cultivator Reflection": "Reflexión de fin de día",
     "Registration Center": "Centro de registro",
     "Create the profile once. Reuse it everywhere.": "Cree el perfil una vez. Reutilícelo en todo el ecosistema.",
     "Save Registration": "Guardar registro",
@@ -1393,7 +1379,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Connect to Marketplace": "Ikonekta sa Marketplace",
     "Youth Workforce Pathway": "Landas ng Youth Workforce",
     "Start My Day": "Simulan ang Araw Ko",
-    "End-of-Day Reflection": "Reflection sa Pagtatapos ng Araw",
+    "Cultivator Reflection": "Reflection sa Pagtatapos ng Araw",
     "Registration Center": "Registration Center",
     "Create the profile once. Reuse it everywhere.": "Gumawa ng profile nang isang beses. Gamitin ito saanman.",
     "Save Registration": "I-save ang Registration",
@@ -2474,7 +2460,7 @@ function Shell({
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
               <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "Workspace" : "Choose Role"}</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🌱 Almanac</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -2508,7 +2494,7 @@ function Shell({
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🌱 Full Almanac</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
@@ -2684,7 +2670,7 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
       )}
 
       <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
-        <strong>{launchAlmanacSnapshot.label}:</strong> {launchAlmanacSnapshot.farmWisdom}
+        <strong>{launchAlmanacSnapshot.label}:</strong> Live weather + official Almanac access.
         <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
       </div>
 
@@ -2757,7 +2743,7 @@ function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) =
       <div className="mt-5 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Current Project</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">End-of-Day Reflection</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Cultivator Reflection</button>
       </div>
     </Card>
   );
@@ -2802,6 +2788,71 @@ function CultivatorMomentSkinnyPlantCard() {
           Reflection: What small thing did you do today that could grow into something bigger?
         </div>
       </details>
+    </Card>
+  );
+}
+
+
+const cultivatorSkillOptions = ["Teamwork", "Observation", "Communication", "Leadership", "Problem Solving", "Entrepreneurship", "Stewardship", "Safety Awareness"];
+const cultivatorBecomingOptions = ["Grower", "Builder", "Leader", "Entrepreneur", "Steward", "Teacher", "Team Builder", "Problem Solver"];
+
+function CultivatorMomentShadowCard() {
+  const steps = [
+    ["Observation", "The morning shadow shows which areas stay cooler and which areas receive sun later in the day."],
+    ["Decision", "Some crops may prefer cooler, shaded locations while other crops need the strongest sun."],
+    ["Action", "Compare shaded and sunny growing areas before planting or watering today."],
+    ["Reflection", "What is the shadow teaching us about where plants should grow?"],
+  ];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌅 Today’s Cultivator Moment</div>
+      <h2 className="mt-2 text-2xl font-black">The Morning Shadow</h2>
+      <p className="mt-2 text-sm leading-6 text-white/82">The shadow is not an Almanac replacement. It is today’s farm observation: a way to notice light, heat, moisture, plant placement, and presence.</p>
+      <div className="mt-4 grid gap-2 md:grid-cols-4">
+        {steps.map(([label, body]) => (
+          <div key={label} className="rounded-xl border border-white/10 bg-white/10 p-3">
+            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">{label}</div>
+            <div className="mt-1 text-xs font-bold leading-5 text-white/82">{body}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: ReturnType<typeof getActivityKnowledgePack> }) {
+  const questions = [
+    "What did I notice today?",
+    "What did it mean?",
+    "What did I do?",
+    knowledgePack.reflectionPrompt,
+    "What is one thing future cultivators should know?",
+  ];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Cultivator Reflection</div>
+      <h2 className="mt-2 text-2xl font-black">Notice → Decide → Act → Reflect → Become</h2>
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Skills Used Today</div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {cultivatorSkillOptions.map((skill) => <span key={skill} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">☐ {skill}</span>)}
+          </div>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Who Am I Becoming?</div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {cultivatorBecomingOptions.map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">☐ {item}</span>)}
+          </div>
+        </div>
+        <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Cultivator Wisdom</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-emerald-50">What is one thing future cultivators should know?</p>
+        </div>
+      </div>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {questions.map((q) => <div key={q} className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-black">{q}</div>)}
+      </div>
     </Card>
   );
 }
@@ -3931,15 +3982,14 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Full Farm Almanac</div>
-        <h1 className="mt-3 text-4xl font-black leading-tight md:text-5xl">Conditions → Decisions → Work → Learning</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📚 Resources + Live Almanac</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Live Weather, Official Almanac, and Growing Resources</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-          The Almanac is the farm’s daily operating layer. It gives youth, parents, supervisors, growers, and Mission Control direct access to weather, farm status, water guidance, planting guidance, pollinator activity, soil observation, seasonal rhythm, and the reason today’s work matters.
+          This screen shows live Youngstown weather and opens the official Almanac links. Static placeholder growing advice has been removed so the app does not impersonate the live Almanac.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Workspace</button>
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Today’s Work</button>
-          <button type="button" onClick={() => setScreen("operations")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Mission Control Operations</button>
         </div>
       </Card>
 
@@ -3958,8 +4008,8 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Ask the Almanac</div>
-          <h2 className="mt-3 text-3xl font-black">Questions youth can ask today</h2>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Almanac Links</div>
+          <h2 className="mt-3 text-3xl font-black">Open the live source</h2>
           <div className="mt-4 grid gap-2">
             {askPrompts.map((prompt) => (
               <div key={prompt} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold text-white/84">“{prompt}”</div>
@@ -3969,7 +4019,7 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
       </div>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">All Almanac Signals</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Weather Signals</div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {almanacCards.map(([label, value]) => (
             <div key={label} className="rounded-[1.15rem] border border-white/10 bg-white/10 p-4">
@@ -4014,7 +4064,7 @@ function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen)
     <div className="mb-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
       <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">🏠 Home</button>
-      <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">🌱 Almanac</button>
+      <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">📚 Resources</button>
     </div>
   );
 }
@@ -4030,9 +4080,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   return (
     <div className="grid gap-3">
       <Card className="p-4 md:p-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">My Day</div>
-        <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">🌱 Welcome, Cultivator</h1>
-        <p className="mt-2 text-sm leading-6 text-white/82">A Cultivator helps things grow. Today you will help something grow and become more capable than you were yesterday.</p>
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Home Dashboard</div>
+        <h1 className="mt-2 text-2xl font-black leading-tight md:text-3xl">🌱 Welcome, Cultivator</h1>
+        <p className="mt-2 text-sm leading-6 text-white/82">Start with conditions, today’s assignment, and the Cultivator Moment. Then begin your day.</p>
         <div className="mt-3"><FarmConditionsCard compact /></div>
         <div className="mt-4 flex flex-wrap gap-2">
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Start My Day</button>
@@ -4053,6 +4103,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           </div>
         </Card>
       </div>
+
+      <CultivatorMomentShadowCard />
 
       <Card className="p-4 md:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -4122,19 +4174,11 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <CultivatorMomentSkinnyPlantCard />
       </div>
 
-      <Card className="p-4 md:p-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">End of Day Reflection</div>
-        <h2 className="mt-2 text-2xl font-black">How did you become more capable today?</h2>
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
-          {["What did I do today?", knowledgePack.reflectionPrompt, "What connections did I discover?", "How did I become more capable?"].map((q) => (
-            <div key={q} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{q}</div>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Tell Your Cultivator Story</button>
-          <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Open Reflection</button>
-        </div>
-      </Card>
+      <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Tell Your Cultivator Story</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Open Cultivator Reflection</button>
+      </div>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">📅 My Week + Cultivator Journey</summary>
@@ -4190,7 +4234,7 @@ function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) 
             </ul>
           </div>
           <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Reflection</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Cultivator Reflection</div>
             <p className="mt-2 text-sm font-bold leading-6 text-white/82">{todayPlan.reflection}</p>
           </div>
         </div>
@@ -7087,7 +7131,7 @@ function CoolingCenterProjectModule({
         <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Start Youth Check-In</button>
         <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Supervisor Tracking</button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Media Center</button>
-        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Reflection / Feedback</button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cultivator Reflection</button>
       </div>
     </Card>
   );
