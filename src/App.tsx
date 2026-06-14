@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.2 - FOREST GATE + CULTIVATOR JOURNEY LAUNCH
+ * LAUNCH CANDIDATE 3.3 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -31,6 +31,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Layers youth curriculum by week and day
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
+ * - Adds Minimum Launch Standard scorecard to Mission Control
+ * - Defines OperationsInventoryPanel so inventory is visible and usable instead of referenced only
  */
 
 type Screen =
@@ -6009,6 +6011,27 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   const today = todayISO();
   const present = attendance.filter((a) => a.date === today && a.status === "present").length;
   const supportFlags = wellness.filter((w) => w.safety_flag).length;
+  const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
+  const inventoryLogs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
+  const farmStatus = getFarmStatus();
+  const unassignedYouth = youth.filter((item) => !item.crew || /unassigned/i.test(item.crew)).length;
+  const ppeNeedsReview = attendance.filter((a) => a.date === today && a.ppe_status !== "complete").length;
+  const urgentIncidents = incidents.filter((i) => i.urgency === "high" || i.urgency === "emergency").length;
+  const inventoryAlerts = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing" || item.available <= 0).length;
+  const spanishReady = Boolean(languageText.es?.youth && languageText.es?.parent && languageText.es?.supervisor);
+  const launchScorecard = [
+    { area: "Youth Login", status: "🟢 Ready", detail: "PIN access includes supervisor-assisted continuation for unmatched launch PINs.", action: "Test with 2 known PINs and 1 unmatched PIN." },
+    { area: "Start My Day", status: present > 0 ? "🟢 Ready" : "🟡 Monitor", detail: present > 0 ? `${present} youth checked in today.` : "Check-in workflow is present; test when youth arrive.", action: "Confirm attendance saves on phone." },
+    { area: "Supervisor Verification", status: "🟢 Ready", detail: "Unmatched youth may continue pending verification and staff follow-up.", action: "Route unmatched 4-digit PIN issues to bhchatman@gmail.com." },
+    { area: "Assignments", status: unassignedYouth > 0 ? "🔴 Blocker" : "🟢 Ready", detail: unassignedYouth > 0 ? `${unassignedYouth} youth still show unassigned crew.` : "No unassigned youth detected in local roster.", action: "Assign category / supervisor before relying on daily work routing." },
+    { area: "Safety / Nurse Line", status: ppeNeedsReview || urgentIncidents ? "🟡 Monitor" : "🟢 Ready", detail: `${ppeNeedsReview} PPE reviews today; ${urgentIncidents} urgent incidents logged.`, action: "Keep Nurse Line visible and incident form one tap away." },
+    { area: "Inventory", status: inventoryAlerts ? "🟡 Monitor" : "🟢 Ready", detail: `${inventory.length} items loaded; ${inventoryAlerts} alerts; ${inventoryLogs.length} inventory log entries.`, action: "Check out, return, and damage-report one item before youth start." },
+    { area: "Almanac + Weather", status: farmStatus.color === "red" ? "🔴 Blocker" : farmStatus.color === "amber" ? "🟡 Monitor" : "🟢 Ready", detail: `${farmStatus.level}: ${farmStatus.title}`, action: "Set work status before assignments are released." },
+    { area: "Parent Portal", status: "🟡 Monitor", detail: "Parent-safe summaries and attendance visibility are present.", action: "Test with one parent on phone, including Spanish access." },
+    { area: "Translation", status: spanishReady ? "🟢 Ready" : "🟡 Monitor", detail: "English and Spanish are launch-critical; other languages remain available.", action: "Audit buttons, forms, and error messages in Spanish." },
+    { area: "Mission Control", status: "🟢 Ready", detail: "Workforce, safety, project, readiness, inventory, and almanac are centralized.", action: "Use this scorecard only until blockers are green." },
+  ];
+  const statusClass = (status: string) => status.includes("🔴") ? "border-red-300/35 bg-red-700/28" : status.includes("🟡") ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
   const readiness = [
     ["System Status", "ONLINE"],
     ["Launch Phase", "Community Beta"],
@@ -6042,6 +6065,23 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
               <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
             </div>
           ))}
+        </div>
+        <div className="mt-6 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">Minimum Launch Standard</div>
+          <h2 className="mt-2 text-2xl font-black">Launch Readiness Scorecard</h2>
+          <p className="mt-2 text-sm leading-6 text-white/76">No new features until red launch blockers are cleared. Green means launch ready. Yellow means launch with monitoring. Red means fix before relying on that workflow.</p>
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            {launchScorecard.map((item) => (
+              <div key={item.area} className={`rounded-2xl border p-4 ${statusClass(item.status)}`}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="text-lg font-black">{item.area}</div>
+                  <div className="rounded-full bg-black/30 px-3 py-1 text-xs font-black">{item.status}</div>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-white/82">{item.detail}</p>
+                <p className="mt-2 text-xs font-bold leading-5 text-white/64">Next action: {item.action}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
@@ -6122,6 +6162,147 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+
+
+function OperationsInventoryPanel() {
+  const [items, setItems] = useState<OperationsInventoryItem[]>(() => {
+    const saved = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, []);
+    return saved.length ? saved : defaultOperationsInventory;
+  });
+  const [logs, setLogs] = useState<OperationsInventoryLog[]>(() => safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []));
+  const [selectedId, setSelectedId] = useState(items[0]?.id || "");
+  const [quantity, setQuantity] = useState(1);
+  const [person, setPerson] = useState("Supervisor / Logistics Lead");
+  const [notes, setNotes] = useState("");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    safeWrite(OPERATIONS_INVENTORY_KEY, items);
+  }, [items]);
+
+  useEffect(() => {
+    safeWrite(OPERATIONS_INVENTORY_LOG_KEY, logs);
+  }, [logs]);
+
+  const selectedItem = items.find((item) => item.id === selectedId) || items[0];
+  const inventoryAlerts = items.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing" || item.available <= 0);
+  const checkedOut = items.reduce((sum, item) => sum + Math.max(0, item.total - item.available), 0);
+
+  const writeLog = (item: OperationsInventoryItem, action: OperationsInventoryLog["action"], qty: number, extraNotes?: string) => {
+    const row: OperationsInventoryLog = {
+      id: uuid(),
+      item_id: item.id,
+      item_name: item.name,
+      action,
+      quantity: qty,
+      person,
+      notes: extraNotes || notes,
+      approved_by: "Supervisor / Staff Lead",
+      youth_lead: person,
+      team: "Logistics & Inventory Team",
+      created_at: new Date().toISOString(),
+    };
+    setLogs((current) => [row, ...current].slice(0, 150));
+    setMessage(`${item.name}: ${action} recorded.`);
+  };
+
+  const updateItem = (action: OperationsInventoryLog["action"]) => {
+    if (!selectedItem) return;
+    const qty = Math.max(1, Number(quantity) || 1);
+    setItems((current) => current.map((item) => {
+      if (item.id !== selectedItem.id) return item;
+      let nextAvailable = item.available;
+      if (action === "Checked Out") nextAvailable = Math.max(0, item.available - qty);
+      if (action === "Returned") nextAvailable = Math.min(item.total, item.available + qty);
+      const nextStatus = action === "Needs Replacement" || action === "Marked Missing" ? (action === "Marked Missing" ? "Missing" : "Needs Replacement") : inventoryStatus(item.total, nextAvailable);
+      return { ...item, available: nextAvailable, status: nextStatus, notes: notes || item.notes, last_updated: new Date().toISOString() };
+    }));
+    writeLog(selectedItem, action, qty, notes);
+  };
+
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Launch-Critical Inventory</div>
+      <h2 className="mt-2 text-2xl font-black">Inventory Check Out / Return / Damage Report</h2>
+      <p className="mt-2 text-sm leading-6 text-white/76">Inventory is visible in Operations and Mission Control so supervisors can document tools immediately instead of searching for a separate system.</p>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-4">
+        {[
+          ["Items", items.length],
+          ["Checked Out", checkedOut],
+          ["Alerts", inventoryAlerts.length],
+          ["Log Entries", logs.length],
+        ].map(([label, value]) => (
+          <div key={label as string} className="rounded-2xl border border-white/10 bg-black/28 p-4">
+            <div className="text-3xl font-black">{value}</div>
+            <div className="mt-1 text-xs font-black uppercase tracking-[0.2em] text-white/60">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <label className="block">
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-100/75">Item</span>
+              <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-black/45 px-3 py-3 text-white">
+                {items.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-100/75">Quantity</span>
+              <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="mt-2 w-full rounded-xl border border-white/10 bg-black/45 px-3 py-3 text-white" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-100/75">Person / Team</span>
+              <input value={person} onChange={(event) => setPerson(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-black/45 px-3 py-3 text-white" />
+            </label>
+          </div>
+          <label className="mt-3 block">
+            <span className="text-[11px] font-black uppercase tracking-[0.18em] text-emerald-100/75">Notes / Damage Description</span>
+            <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} placeholder="Example: rake handle cracked near the head." className="mt-2 w-full rounded-xl border border-white/10 bg-black/45 px-3 py-3 text-white placeholder:text-white/35" />
+          </label>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={() => updateItem("Checked Out")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Check Out</button>
+            <button type="button" onClick={() => updateItem("Returned")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Return</button>
+            <button type="button" onClick={() => updateItem("Needs Replacement")} className="rounded-full bg-amber-300 px-5 py-3 text-sm font-black text-black">Damage Report</button>
+            <button type="button" onClick={() => updateItem("Marked Missing")} className="rounded-full bg-red-300 px-5 py-3 text-sm font-black text-black">Mark Missing</button>
+          </div>
+          {message && <div className="mt-3 rounded-2xl border border-emerald-200/30 bg-emerald-300/12 p-3 text-sm font-bold text-white/86">{message}</div>}
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Current Inventory</div>
+          <div className="mt-3 grid max-h-[28rem] gap-2 overflow-auto pr-1">
+            {items.map((item) => (
+              <div key={item.id} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-black">{item.name}</div>
+                    <div className="mt-1 text-xs leading-5 text-white/62">{item.location}</div>
+                  </div>
+                  <div className="rounded-full bg-black/35 px-3 py-1 text-xs font-black">{item.available}/{item.total}</div>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/65">
+                  <span>{item.category}</span><span>•</span><span>{item.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {inventoryAlerts.length > 0 && (
+        <div className="mt-4 rounded-2xl border border-amber-200/30 bg-amber-300/12 p-4">
+          <div className="font-black">Inventory alerts needing review</div>
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
+            {inventoryAlerts.map((item) => <div key={item.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{item.name}: {item.status}</div>)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const stops = [
