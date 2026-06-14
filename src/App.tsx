@@ -1990,6 +1990,7 @@ function screenLabel(screen: Screen) {
     wellness: "Youth Morning Check-In",
     reports: "Reports",
     operations: "Operations",
+    almanac: "Today’s Farm Almanac",
     events: "Events & Orientation",
     media: "Media Center",
     launchProject: "June 8 Cooling Station Challenge",
