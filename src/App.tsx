@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.4 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
+ * LAUNCH CANDIDATE 3.5 - MINIMUM LAUNCH STANDARD + INVENTORY COMMAND FIX
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -374,8 +374,8 @@ const launchAlmanacSnapshot = {
   note: "The Almanac belongs at the top of the day. Youth, parents, supervisors, and Mission Control should see conditions before assignments.",
   weather: {
     location: "Youngstown, Ohio / Bronson Family Farm",
-    current: "Local weather snapshot — update in Mission Control when live weather service is connected",
-    temperature: "83°F",
+    current: "LIVE weather pulls from Open-Meteo for Youngstown when the browser is online",
+    temperature: "Loading live weather",
     heatIndex: "Monitor heat index before outdoor work",
     rainChance: "Check before planting, watering, or tool setup",
     wind: "Observe wind before spraying, lifting covers, or using loose materials",
@@ -398,7 +398,7 @@ const launchAlmanacSnapshot = {
   moonSeason: [
     ["Season", "Early summer workforce season"],
     ["Sun Awareness", "Start early, hydrate, and adjust work before heat peaks"],
-    ["Moon Phase", "Add live moon phase when almanac service is connected"],
+    ["Moon Phase", "Daily live weather + direct Almanac growing-guide access"],
     ["Farm Rhythm", "Conditions → Decisions → Work → Learning → Reflection"],
   ],
   farmWisdom: "Good farmers observe before they act. Conditions come before decisions.",
@@ -748,12 +748,60 @@ function getTodayOperation(date = new Date()) {
   return launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
 }
 
-function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus()) {
+type LiveFarmWeather = {
+  temperature?: number;
+  apparent?: number;
+  humidity?: number;
+  wind?: number;
+  precipitation?: number;
+  rainChance?: number;
+  sunrise?: string;
+  sunset?: string;
+  uv?: number;
+  updated?: string;
+  error?: string;
+};
+
+const FARM_LATITUDE = 41.0998;
+const FARM_LONGITUDE = -80.6495;
+const FARM_TIME_ZONE = "America/New_York";
+
+function formatLiveTime(value?: string) {
+  if (!value) return "Loading";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Loading";
+  return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function formatLiveNumber(value?: number, suffix = "") {
+  return typeof value === "number" && Number.isFinite(value) ? `${Math.round(value)}${suffix}` : "Loading";
+}
+
+function getLiveWeatherGuidance(weather: LiveFarmWeather | null) {
+  if (!weather) return "Loading live farm conditions…";
+  if (weather.error) return "Live weather is unavailable right now. Use supervisor observation and Mission Control status.";
+  const apparent = weather.apparent ?? weather.temperature ?? 0;
+  const rainChance = weather.rainChance ?? 0;
+  const wind = weather.wind ?? 0;
+  const guidance: string[] = [];
+  if (apparent >= 90) guidance.push("Heat review required: increase shade, water, and breaks.");
+  else if (apparent >= 82) guidance.push("Hydration watch: check water before outdoor work.");
+  else guidance.push("Normal heat watch: keep water visible.");
+  if (rainChance >= 50) guidance.push("Rain likely: protect tools/materials and review planting plans.");
+  if (wind >= 15) guidance.push("Wind watch: secure loose materials.");
+  return guidance.join(" ");
+}
+
+function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus(), weather: LiveFarmWeather | null = null) {
+  const temp = weather?.temperature;
+  const apparent = weather?.apparent;
   return [
-    ["Local Weather", `${launchAlmanacSnapshot.weather.location} · ${launchAlmanacSnapshot.weather.temperature}`],
-    ["Heat / Hydration", launchAlmanacSnapshot.weather.heatIndex],
-    ["Rain / Water", launchAlmanacSnapshot.weather.rainChance],
-    ["Wind", launchAlmanacSnapshot.weather.wind],
+    ["LIVE Weather", weather?.error ? weather.error : `${launchAlmanacSnapshot.weather.location} · ${formatLiveNumber(temp, "°F")} · feels ${formatLiveNumber(apparent, "°F")}`],
+    ["Heat / Hydration", getLiveWeatherGuidance(weather)],
+    ["Rain / Water", weather?.rainChance !== undefined ? `${Math.round(weather.rainChance)}% rain chance · check soil before watering` : "Loading rain chance"],
+    ["Wind", weather?.wind !== undefined ? `${Math.round(weather.wind)} mph · secure loose materials if needed` : "Loading wind"],
+    ["Sunrise / Sunset", `${formatLiveTime(weather?.sunrise)} / ${formatLiveTime(weather?.sunset)}`],
+    ["UV / Sun", weather?.uv !== undefined ? `UV max ${Math.round(weather.uv)} · plan shade and sunscreen` : "Loading UV"],
     ["Farm Status", `${farmStatus.level}: ${farmStatus.summary}`],
     ["Today’s Operations", getTodayOperation(date)],
     ...launchAlmanacSnapshot.growing,
@@ -761,10 +809,61 @@ function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus()) {
   ];
 }
 
+function LiveAlmanacResourceLinks() {
+  return (
+    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/gardening/growing-guides" target="_blank" rel="noreferrer">
+        Open LIVE Almanac Growing Guides ↗
+      </a>
+      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/gardening/planting-calendar/OH/Youngstown" target="_blank" rel="noreferrer">
+        Youngstown Planting Calendar ↗
+      </a>
+      <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href="https://www.almanac.com/weather/forecast/OH/Youngstown" target="_blank" rel="noreferrer">
+        Youngstown Almanac Weather ↗
+      </a>
+    </div>
+  );
+}
+
 function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
   const farmStatus = getFarmStatus();
-  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
-  const visibleCards = compact ? almanacCards.slice(0, 3) : almanacCards;
+  const [liveWeather, setLiveWeather] = useState<LiveFarmWeather | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadLiveWeather() {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${FARM_LATITUDE}&longitude=${FARM_LONGITUDE}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,wind_speed_10m&daily=sunrise,sunset,uv_index_max,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=${encodeURIComponent(FARM_TIME_ZONE)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
+        const data = await response.json();
+        if (cancelled) return;
+        setLiveWeather({
+          temperature: data.current?.temperature_2m,
+          apparent: data.current?.apparent_temperature,
+          humidity: data.current?.relative_humidity_2m,
+          wind: data.current?.wind_speed_10m,
+          precipitation: data.current?.precipitation ?? data.current?.rain,
+          rainChance: data.daily?.precipitation_probability_max?.[0],
+          sunrise: data.daily?.sunrise?.[0],
+          sunset: data.daily?.sunset?.[0],
+          uv: data.daily?.uv_index_max?.[0],
+          updated: data.current?.time,
+        });
+      } catch (error) {
+        if (!cancelled) setLiveWeather({ error: "Live weather could not load" });
+      }
+    }
+    loadLiveWeather();
+    const timer = window.setInterval(loadLiveWeather, 15 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus, liveWeather);
+  const visibleCards = compact ? almanacCards.slice(0, 4) : almanacCards;
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
   if (compact) {
@@ -772,12 +871,13 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
       <div className="rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌱 Today’s Almanac</div>
-            <div className="mt-1 text-lg font-black">{farmStatus.level} • {launchAlmanacSnapshot.weather.temperature}</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌱 LIVE Today’s Almanac</div>
+            <div className="mt-1 text-lg font-black">{farmStatus.level} • {formatLiveNumber(liveWeather?.temperature, "°F")}</div>
+            <div className="mt-1 text-[11px] font-bold text-white/58">Updates every 15 minutes when online.</div>
           </div>
           <span className={`rounded-full border px-3 py-1 text-[11px] font-black ${statusClass}`}>{farmStatus.color === "red" ? "Stop / Review" : farmStatus.color === "amber" ? "Monitor" : "Ready"}</span>
         </div>
-        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {visibleCards.map(([label, value]) => (
             <div key={label} className="rounded-xl border border-white/10 bg-black/25 p-2">
               <div className="text-[9px] font-black uppercase tracking-[0.16em] text-emerald-100/65">{label}</div>
@@ -785,6 +885,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
             </div>
           ))}
         </div>
+        <LiveAlmanacResourceLinks />
         <div className="mt-2 text-xs font-bold leading-5 text-white/78">💡 {launchAlmanacSnapshot.farmWisdom}</div>
       </div>
     );
@@ -792,14 +893,15 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Full Farm Almanac</div>
-      <h2 className="mt-3 text-2xl font-black">Conditions → Decisions → Work</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">This full page is for deeper review. The youth My Day screen now shows the compact daily Almanac automatically.</p>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 LIVE Farm Almanac</div>
+      <h2 className="mt-3 text-2xl font-black">Live Conditions → Decisions → Work</h2>
+      <p className="mt-3 text-sm leading-6 text-white/82">This page now pulls live weather for Youngstown/Bronson Family Farm and gives direct access to the live Farmers’ Almanac growing guides and planting calendar.</p>
 
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
         <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
         <div className="mt-1 text-xl font-black">{farmStatus.title}</div>
         <div className="mt-2 text-sm font-bold leading-6 text-white/84">Action: {farmStatus.action}</div>
+        <div className="mt-2 text-xs font-bold text-white/56">Live weather refreshes every 15 minutes. Last update: {liveWeather?.updated || "loading"}</div>
       </div>
 
       <div className="mt-4 grid gap-2 md:grid-cols-2">
@@ -811,9 +913,11 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
         ))}
       </div>
 
+      <LiveAlmanacResourceLinks />
+
       <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
         💡 {launchAlmanacSnapshot.farmWisdom}
-        <div className="mt-2 text-xs font-semibold text-white/62">{launchAlmanacSnapshot.note}</div>
+        <div className="mt-2 text-xs font-semibold text-white/62">Live weather is pulled automatically. Almanac growing guide links open the live Farmers’ Almanac pages instead of using static text.</div>
       </div>
     </Card>
   );
