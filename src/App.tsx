@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 3.7 - CORE LOOP + CULTIVATOR MOMENT LAUNCH
+ * LAUNCH CANDIDATE 3.8 - CLICK FIX + LIVE CONDITIONS CLEANUP
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -2458,7 +2458,7 @@ function Shell({
             </button>
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
-              <button type="button" onClick={() => setScreen("portal")} className={buttonClass("portal")}>Home</button>
+              <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "portal")} className={buttonClass(activeUser?.role ? routeForRole(activeUser.role) : "portal")}>Home</button>
               <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "Workspace" : "Choose Role"}</button>
               <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
               {primaryNav.map((item) => (
@@ -4010,7 +4010,9 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
         <Card>
           <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Almanac Links</div>
           <h2 className="mt-3 text-3xl font-black">Open the live source</h2>
-          <div className="mt-4 grid gap-2">
+          <p className="mt-3 text-sm leading-6 text-white/78">These links open the actual Almanac pages in a new tab. The app only summarizes weather and work status.</p>
+          <LiveAlmanacResourceLinks />
+          <div className="mt-5 grid gap-2">
             {askPrompts.map((prompt) => (
               <div key={prompt} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold text-white/84">“{prompt}”</div>
             ))}
@@ -4019,7 +4021,7 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
       </div>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Weather Signals</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Weather Signals Only</div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {almanacCards.map(([label, value]) => (
             <div key={label} className="rounded-[1.15rem] border border-white/10 bg-white/10 p-4">
@@ -6106,10 +6108,13 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Selected folder</div>
           <h2 className="mt-2 text-2xl font-black">{quickCategory}</h2>
-          <label className="mt-4 inline-block cursor-pointer rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black shadow-lg shadow-emerald-950/25">
-            {uploadingCategory === quickCategory ? "Uploading..." : "Upload Photo / Video / File"}
-            <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="hidden" disabled={uploadingCategory === quickCategory} onChange={(event) => handleMediaUpload(quickCategory, event)} />
-          </label>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <label className="inline-flex cursor-pointer items-center rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">
+              {uploadingCategory === quickCategory ? "Uploading..." : "Upload Photo / Video / File"}
+              <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="sr-only" disabled={uploadingCategory === quickCategory} onChange={(event) => handleMediaUpload(quickCategory, event)} />
+            </label>
+            <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Back to My Day</button>
+          </div>
         </div>
       </Card>
 
