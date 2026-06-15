@@ -804,7 +804,7 @@ function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus(), w
 }
 
 const YOUNGSTOWN_ALMANAC_FORECAST_URL = "https://www.almanac.com/weather/forecast/OH/Youngstown";
-const YOUNGSTOWN_ALMANAC_PLANTING_URL = "https://www.almanac.com/gardening/planting-calendar/OH/Youngstown";
+const YOUNGSTOWN_ALMANAC_PLANTING_URL = "https://www.almanac.com/gardening/planting-calendar/zipcode/44505";
 const ALMANAC_GROWING_GUIDES_URL = "https://www.almanac.com/gardening/growing-guides";
 
 function LiveAlmanacResourceLinks() {
@@ -814,7 +814,7 @@ function LiveAlmanacResourceLinks() {
         Open LIVE Youngstown Almanac Forecast ↗
       </a>
       <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href={YOUNGSTOWN_ALMANAC_PLANTING_URL} target="_blank" rel="noreferrer">
-        Youngstown Planting Calendar ↗
+        44505 Planting Calendar ↗
       </a>
       <a className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 px-4 py-3 text-sm font-black text-white hover:bg-emerald-300/20" href={ALMANAC_GROWING_GUIDES_URL} target="_blank" rel="noreferrer">
         Almanac Growing Guides ↗
@@ -3991,91 +3991,64 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
   const farmStatus = getFarmStatus();
   const todayPlan = getCurrentYouthPlan();
   const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
-  const connections = connectionPathForPlan(todayPlan);
-  const askPrompts = [
-    "Why are we doing this today?",
-    "Why does weather change farm work?",
-    "Why do bees and pollinators matter?",
-    "What does healthy soil look like?",
-    "How does today’s work connect to the marketplace?",
-  ];
-
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📚 Resources + Live Almanac</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Live Weather, Official Almanac, and Growing Resources</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌾 Live Almanac + Grower Resources</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Today’s Farm Almanac</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-          This screen shows live Youngstown weather and opens the official Almanac links. Static placeholder growing advice has been removed so the app does not impersonate the live Almanac.
+          This page separates the Almanac from weather. Weather supports the day. The Almanac helps growers decide what to plant, protect, observe, and prepare.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
-          <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Today’s Work</button>
+          <a href={YOUNGSTOWN_ALMANAC_PLANTING_URL} target="_blank" rel="noreferrer" className="rounded-full border border-emerald-200/30 bg-emerald-300/12 px-6 py-3 font-black text-emerald-50">Open 44505 Planting Calendar ↗</a>
         </div>
       </Card>
 
-      <FarmConditionsCard />
-
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Explore the Connections</div>
-          <h2 className="mt-3 text-3xl font-black">Today’s work connects across the ecosystem.</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {connections.map((item, index) => (
-              <span key={`${item}-${index}`} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-50">{item}</span>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 What should growers know today?</div>
+          <h2 className="mt-3 text-2xl font-black">Planting + Protection Guidance</h2>
+          <div className="mt-4 grid gap-2">
+            {[
+              ["Plant", "Seedlings and potatoes are priority planting work today."],
+              ["Prepare", "Complete grow area preparation and secure the second deer-deterrent fence."],
+              ["Protect", "Check all plants for health, stress, insects, moisture, and deer pressure."],
+              ["Build Soil", "Mow grass and create compost to support future soil health."],
+              ["Observe", "Watch sun, shadow, wind, moisture, pollinator activity, and plant response."],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+                <div className="mt-1 text-sm font-bold leading-6 text-white/82">{value}</div>
+              </div>
             ))}
           </div>
-          <p className="mt-4 text-sm leading-7 text-white/78">A single observation can connect soil, water, crops, workers, customers, inventory, pricing, and community food access.</p>
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Almanac Links</div>
-          <h2 className="mt-3 text-3xl font-black">Open the live source</h2>
-          <p className="mt-3 text-sm leading-6 text-white/78">These links open the actual Almanac pages in a new tab. The app only summarizes weather and work status.</p>
-          <LiveAlmanacResourceLinks />
-          <div className="mt-5 grid gap-2">
-            {askPrompts.map((prompt) => (
-              <div key={prompt} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-bold text-white/84">“{prompt}”</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Weather Support</div>
+          <h2 className="mt-3 text-2xl font-black">Conditions still matter</h2>
+          <div className="mt-4 grid gap-2">
+            {almanacCards.slice(0, 8).map(([label, value]) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-black/25 p-3">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
+                <div className="mt-1 text-sm font-bold leading-5 text-white/82">{value}</div>
+              </div>
             ))}
           </div>
         </Card>
       </div>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Weather Signals Only</div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {almanacCards.map(([label, value]) => (
-            <div key={label} className="rounded-[1.15rem] border border-white/10 bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-              <div className="mt-2 text-sm font-bold leading-6 text-white/84">{value}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
+      <TodayFarmOperationsBoard />
 
-function CurrentWeekStrip() {
-  const currentWeek = getCurrentYouthWeek();
-  const todayPlan = getCurrentYouthPlan();
-  const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
-  return (
-    <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/75">Current Curriculum</div>
-      <div className="mt-1 text-xl font-black">Week {currentWeek.week}: {currentWeek.title}</div>
-      <div className="mt-1 text-sm font-bold text-white/80">Today: {todayPlan.day} — {todayPlan.curriculum}</div>
-      <details className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm text-white/78">
-        <summary className="cursor-pointer font-black text-emerald-50">View Monday–Friday rhythm</summary>
-        <div className="mt-3 grid gap-2">
-          {currentWeekPlans.map((day) => (
-            <div key={day.day} className={`rounded-xl border p-3 ${day.day === todayPlan.day ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
-              <div className="font-black">{day.day}</div>
-              <div className="text-xs font-bold opacity-80">{day.curriculum}</div>
-            </div>
-          ))}
-        </div>
-      </details>
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
+        <h2 className="mt-3 text-2xl font-black">Open the actual Almanac</h2>
+        <p className="mt-3 text-sm leading-6 text-white/78">The ecosystem does not replace the Almanac. These links open the live source pages for the farm location and growing guidance.</p>
+        <LiveAlmanacResourceLinks />
+      </Card>
+
+      <CurriculumWeekViewCard />
     </div>
   );
 }
@@ -4148,6 +4121,147 @@ function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen)
 }
 
 
+
+const todayFarmPriorityGroups = [
+  {
+    title: "🌾 Soil & Compost Team",
+    mission: "Build healthy soil.",
+    tasks: ["Mow grass", "Create compost", "Move grass clippings to compost areas"],
+    tools: ["Mower", "Rakes", "Pitchforks", "Wheelbarrows", "Gloves"],
+  },
+  {
+    title: "🌱 Plant Health Team",
+    mission: "Help plants thrive.",
+    tasks: ["Check all plants for health", "Plant seedlings", "Plant potatoes", "Report plant stress"],
+    tools: ["Water pitchers", "Plant markers", "Trowels", "Gloves"],
+  },
+  {
+    title: "🔨 Infrastructure Team",
+    mission: "Protect and secure the grow area.",
+    tasks: ["Complete preparing the grow area", "Make second deer-deterrent fence", "Secure grow area", "Restack wood"],
+    tools: ["Fence supplies", "Stakes", "Ropes/ties", "Work gloves"],
+  },
+  {
+    title: "♻️ Materials Recovery Team",
+    mission: "Prepare materials for the next project.",
+    tasks: ["Begin collecting water bottles", "Sort usable bottles", "Store bottles for next project"],
+    tools: ["Bins", "Bags", "Labels", "Gloves"],
+  },
+  {
+    title: "🫧 Bubble Babies Team",
+    mission: "Continue production and quality check.",
+    tasks: ["Make more Bubble Babies", "Check quality", "Document production"],
+    tools: ["Production materials", "Labels", "Storage containers"],
+  },
+];
+
+function TodayFarmOperationsBoard({ compact = false }: { compact?: boolean }) {
+  const topTasks = todayFarmPriorityGroups.flatMap((group) => group.tasks).slice(0, compact ? 6 : 20);
+  return (
+    <Card className={compact ? "p-4 md:p-5" : undefined}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🚜 Today's Farm Priorities</div>
+          <h2 className="mt-2 text-2xl font-black">Week 2: Regenerative Agriculture in action</h2>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/78">This board turns today's farm needs into clear team assignments for youth and supervisors.</p>
+        </div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Monday Operations</div>
+      </div>
+
+      {compact ? (
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {topTasks.map((task) => (
+            <div key={task} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">• {task}</div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {todayFarmPriorityGroups.map((group) => (
+            <div key={group.title} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-lg font-black">{group.title}</div>
+              <div className="mt-1 text-sm font-black text-emerald-50">Mission: {group.mission}</div>
+              <div className="mt-3 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Tasks</div>
+              <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
+                {group.tasks.map((task) => <li key={task}>• {task}</li>)}
+              </ul>
+              <div className="mt-3 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Tools</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {group.tools.map((tool) => <span key={tool} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-white/78">{tool}</span>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/84">
+        Cultivator question: Where did your presence help something grow, improve, or become safer today?
+      </div>
+    </Card>
+  );
+}
+
+const june2026CalendarDays = Array.from({ length: 30 }, (_, index) => index + 1);
+const june2026CalendarEvents: Record<number, string[]> = {
+  5: ["🧑‍🏫 Supervisor Orientation"],
+  8: ["🚜 Week 1 Launch", "📚 Workplace Foundations"],
+  9: ["🚜 Production Flow"],
+  10: ["🚜 Infrastructure", "🚻 Onsite Water"],
+  11: ["🚜 Career Pathways"],
+  12: ["🚜 Week 1 Closeout", "💧 Water Totes"],
+  15: ["📚 Week 2", "🌱 Regenerative Agriculture", "🚚 Delivery / Services"],
+  16: ["🌱 Seedlings + Companion Planting"],
+  17: ["🚻 Onsite Water", "💧 Site Readiness"],
+  18: ["🐝 Pollinators + Connections"],
+  19: ["💧 Water Totes", "🌾 Week 2 Reflection"],
+  22: ["📚 Week 3", "🔨 Infrastructure"],
+  24: ["🚻 Onsite Water"],
+  26: ["👥 Board Meeting", "💧 Water Totes"],
+  29: ["📚 Week 4", "🥕 Production + Harvest"],
+};
+
+function June2026CalendarGrid() {
+  const leadingBlanks = 1; // June 1, 2026 is Monday.
+  const cells = [...Array.from({ length: leadingBlanks }, () => null), ...june2026CalendarDays];
+  while (cells.length % 7 !== 0) cells.push(null);
+  const today = new Date();
+  const isJune2026 = today.getFullYear() === 2026 && today.getMonth() === 5;
+  return (
+    <Card>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 Real Calendar Grid</div>
+          <h2 className="mt-3 text-3xl font-black">June 2026</h2>
+          <p className="mt-2 text-sm leading-6 text-white/78">Dates show workdays, curriculum milestones, services, deliveries, visitors, and farm operations.</p>
+        </div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Month View</div>
+      </div>
+      <div className="mt-5 grid grid-cols-7 gap-1 text-center text-[11px] font-black uppercase tracking-[0.16em] text-emerald-100/70">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-2">{day}</div>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {cells.map((day, index) => {
+          const events = day ? june2026CalendarEvents[day] || [] : [];
+          const isToday = Boolean(day && isJune2026 && today.getDate() === day);
+          return (
+            <div key={`${day || 'blank'}-${index}`} className={`min-h-[92px] rounded-xl border p-2 text-left ${day ? isToday ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10" : "border-white/5 bg-black/20"}`}>
+              {day && <div className="text-sm font-black">{day}</div>}
+              <div className="mt-1 space-y-1">
+                {events.slice(0, 3).map((event) => <div key={event} className="rounded-lg bg-black/25 px-2 py-1 text-[10px] font-black leading-3 text-white/86">{event}</div>)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2 text-xs font-black text-white/78">
+        <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1">🚜 Workday</span>
+        <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1">📚 Curriculum</span>
+        <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1">🚚 Delivery / Services</span>
+        <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1">👥 Visitors / Meetings</span>
+      </div>
+    </Card>
+  );
+}
+
 function WorkStatusMiniCard() {
   const farmStatus = getFarmStatus();
   const label = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
@@ -4156,7 +4270,7 @@ function WorkStatusMiniCard() {
     <div className={`rounded-[1.15rem] border p-4 ${className}`}>
       <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">🟢 Work Status</div>
       <div className="mt-2 text-2xl font-black">{label}</div>
-      <p className="mt-2 text-xs font-bold leading-5 text-white/72">{farmStatus.action}</p>
+      <p className="mt-2 text-xs font-bold leading-5 text-white/72">Bring water. Confirm PPE. Follow supervisor direction.</p>
     </div>
   );
 }
@@ -4258,13 +4372,14 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today's Work</button>
       </Card>
 
+      <CultivatorMomentShadowCard />
+      <TodayFarmOperationsBoard compact />
       <CurriculumWeekViewCard compact />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Start My Day: Tools, Moment, Why It Matters</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Begin Today's Work: Tools + Why It Matters</summary>
         <div className="mt-4 grid gap-3">
           <ToolStewardshipLaunchCard />
-          <CultivatorMomentShadowCard />
           <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
         </div>
       </details>
@@ -5917,26 +6032,28 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Calendar + Week View</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Program Calendar</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Calendar</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Farm Calendar</h1>
         <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
-          This is the shared operating calendar for curriculum, workdays, visitors, deliveries, service access, weather changes, and weekly progression.
+          This is the real operating calendar: workdays, curriculum, visitors, deliveries, service access, weather changes, and weekly progression.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Day</button>
-          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Weather + Almanac</button>
+          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Almanac</button>
         </div>
       </Card>
 
-      <CurriculumWeekViewCard />
+      <June2026CalendarGrid />
+
+      <TodayFarmOperationsBoard compact />
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operational Calendar</div>
-        <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} farm operations</h2>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Upcoming Operations</div>
+        <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} operations</h2>
         <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Monday", "Weekly topic, supervisor assignment, PPE, work-plan confirmation."],
-            ["Wednesday", "Onsite Water service. Keep access clear."],
+            ["Monday", "Weekly topic, supervisor assignment, PPE, work-plan confirmation, farm priorities."],
+            ["Wednesday", "Onsite Water service. Keep service access clear."],
             ["Friday", "Water totes filled. Verify tote access and refill needs."],
             ["Weather", "Mission Control may change Full Day, Half Day, or Work Cancelled."],
           ].map(([label, note]) => (
@@ -5947,6 +6064,8 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
           ))}
         </div>
       </Card>
+
+      <CurriculumWeekViewCard />
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Events & Visitors</div>
