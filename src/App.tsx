@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 4.0 - MONDAY WEEK 2 LAUNCH FREEZE
+ * LAUNCH CANDIDATE 4.1 - CURRICULUM SOURCE OF TRUTH SYNC
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -29,6 +29,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
  * - Keeps returning youth on PIN, supervisors on PIN 2350, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
  * - Layers youth curriculum by week and day
+ * - Curriculum is the source of truth: actual farm work -> learning -> skills -> reflection -> growth
+ * - Removes visible Crew A/B/C/D routing from launch dashboards and supervisor roster
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
  * - Adds Minimum Launch Standard scorecard to Mission Control
@@ -385,11 +387,11 @@ const launchAlmanacSnapshot = {
   },
   operationsByDay: {
     Sunday: "Weekend preview: check Mission Control before arriving onsite.",
-    Monday: "Weekly topic selection, supervisor assignment, PPE, and work-plan confirmation.",
-    Tuesday: "Field production, observation, documentation, and skill practice.",
-    Wednesday: "Onsite Water cleans and services porta potties. Keep service access clear.",
-    Thursday: "Production, maintenance, problem solving, and project completion.",
-    Friday: "Water totes are filled. Verify tote locations, access, and refill needs.",
+    Monday: "Curriculum begins with the actual farm work: conditions, attendance, PPE, work priorities, learning, and reflection.",
+    Tuesday: "Field production, planting, observation, documentation, and skill practice continue through the current curriculum week.",
+    Wednesday: "Curriculum + farm operations: planting, compost, grow-area readiness, water/sanitation access, and safe work-zone coordination.",
+    Thursday: "Curriculum + ecosystem observation: plant health, pollinators, infrastructure, production quality, and Cultivator Stories.",
+    Friday: "Curriculum closeout: water operations, weekly reflection, skills, portfolio evidence, and next-week readiness.",
     Saturday: "Weekend operations may differ. Check Mission Control before farm activity.",
   } as Record<string, string>,
 };
@@ -650,45 +652,45 @@ const youthWeekTwoDailyPlan = [
   {
     day: "Monday",
     date: "Week 2 Monday",
-    curriculum: "Soil health, compost, and living systems observation",
-    focus: "Youth observe soil as a living system, compare compost and field soil, and identify what healthy soil needs before planting.",
-    work: ["Observe soil texture and smell", "Compare compost and field soil", "Identify what seedlings need", "Record one thing that surprised you"],
-    resources: ["Soil health checklist", "Compost observation guide", "Seedling care basics"],
-    reflection: "How did today’s soil work help you understand what plants need to grow?",
+    curriculum: "Soil health, compost, planting, and living systems observation",
+    focus: "Youth use the actual farm work to understand soil as a living system: compost, seedlings, potatoes, mulch, water, and plant health.",
+    work: ["Create compost", "Observe soil texture and moisture", "Plant or check seedlings", "Plant potatoes where directed", "Record one thing that surprised you"],
+    resources: ["Soil health checklist", "Compost observation guide", "Seedling and potato planting basics"],
+    reflection: "How did today’s soil and planting work help you understand what plants need to grow?",
   },
   {
     day: "Tuesday",
     date: "Week 2 Tuesday",
-    curriculum: "Seedlings, planting, companion planting, and crop care",
-    focus: "Youth plant or care for seedlings and connect small beginnings to future harvest, food access, and marketplace opportunity.",
-    work: ["Plant or check seedlings", "Water carefully", "Look for plant stress", "Explore companion planting connections"],
-    resources: ["Companion planting guide", "Seedling care card", "Watering basics"],
+    curriculum: "Seedlings, potatoes, companion planting, and crop care",
+    focus: "Youth connect planting decisions to future harvest, food access, marketplace opportunity, and the protection needed for crops to survive.",
+    work: ["Plant or check seedlings", "Plant potatoes", "Water carefully", "Look for plant stress", "Explore companion planting connections"],
+    resources: ["Companion planting guide", "Seedling care card", "Potato planting basics", "Watering basics"],
     reflection: "What small thing did you do today that could grow into something bigger?",
   },
   {
     day: "Wednesday",
     date: "Week 2 Wednesday",
-    curriculum: "Farm operations, sanitation, water access, and site readiness",
-    focus: "Youth learn that farm work depends on invisible systems: sanitation, water, access lanes, safety, and coordination.",
-    work: ["Keep porta-potty service access clear", "Check work zones", "Review hydration plan", "Support site readiness tasks"],
-    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide"],
-    reflection: "What farm system did you notice today that helps everyone work safely?",
+    curriculum: "Farm operations, planting, compost, water access, and site readiness",
+    focus: "Youth learn that today’s farm work is the curriculum: planting, compost, grow-area preparation, water/sanitation access, safety zones, and coordination all support a living farm system.",
+    work: ["Plant seedlings", "Plant potatoes", "Create compost", "Continue preparing the grow area", "Build or improve the deer-deterrent fence", "Restack wood", "Collect water bottles for the next project", "Keep porta-potty service access clear", "Review hydration plan"],
+    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide", "Compost and planting guide"],
+    reflection: "What farm system did you improve today, and how did it help everyone work safely or help plants grow?",
   },
   {
     day: "Thursday",
     date: "Week 2 Thursday",
-    curriculum: "Plant growth, pollinators, observation, and ecosystem connections",
-    focus: "Youth observe how plants, flowers, insects, water, soil, and people connect in the farm ecosystem.",
-    work: ["Observe plant growth", "Look for pollinator activity", "Identify one connection", "Document a Cultivator Moment"],
-    resources: ["Pollinator basics", "Plant observation prompts", "Explore the Connections"],
-    reflection: "What connection did you discover between plants, people, and the ecosystem?",
+    curriculum: "Plant growth, protection, pollinators, observation, and ecosystem connections",
+    focus: "Youth observe how plant health, deer protection, soil, water, insects, people, and farm decisions connect in the ecosystem.",
+    work: ["Check all plants for health", "Look for pollinator activity", "Secure the grow area", "Continue deer-deterrent fence work", "Make more Bubble Babies", "Document a Cultivator Moment"],
+    resources: ["Pollinator basics", "Plant observation prompts", "Fence/protection note", "Explore the Connections"],
+    reflection: "What connection did you discover between plants, people, protection, and the ecosystem?",
   },
   {
     day: "Friday",
     date: "Week 2 Friday",
     curriculum: "Water operations, stewardship, weekly reflection, and Cultivator Story",
-    focus: "Youth connect water tote filling, crop health, planning, and responsibility to the larger farm system.",
-    work: ["Verify water tote access", "Support watering plan", "Review the week", "Tell your Cultivator Story"],
+    focus: "Youth connect water access, crop health, compost, planting progress, site protection, and responsibility to the larger farm system.",
+    work: ["Verify water tote access", "Support watering plan", "Finish urgent planting or site-readiness tasks", "Review the week", "Tell your Cultivator Story"],
     resources: ["Friday water operations note", "Weekly reflection guide", "Cultivator Story prompt"],
     reflection: "How did this week help you become more capable than you were yesterday?",
   },
@@ -735,7 +737,37 @@ function getAlmanacDayName(date = new Date()) {
 
 function getTodayOperation(date = new Date()) {
   const dayName = getAlmanacDayName(date);
-  return launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
+  const plan = getCurrentYouthPlan(date);
+  const priorityPreview = todayFarmPriorityGroups
+    .flatMap((group) => group.tasks)
+    .slice(0, 5)
+    .join(" • ");
+  const dayNote = launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
+  return `Week ${getCurrentProgramWeek(date)} curriculum: ${plan.curriculum}. Farm work: ${priorityPreview}. ${dayNote}`;
+}
+
+function getRecordDate(row: any) {
+  return String(row?.date || row?.attendance_date || row?.checkin_date || row?.created_at || "").slice(0, 10);
+}
+
+function getAttendanceStatus(row: any) {
+  return String(row?.status || row?.attendance_status || "not checked in").toLowerCase();
+}
+
+function participantIdForAttendance(row: any) {
+  return String(row?.participant_id || row?.youth_participant_id || row?.youth_id || "");
+}
+
+function isLikelyTestOrAdminYouth(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  const name = `${row.profile?.first_name || ""} ${row.profile?.last_name || ""} ${row.registration.participant_id || ""}`.toLowerCase();
+  const profileType = row.profile?.profile_type;
+  return profileType !== "youth" || /\b(test|demo|sample)\b/.test(name) || name.includes("constance burgess");
+}
+
+function curriculumAssignmentLabel(date = new Date()) {
+  const week = getCurrentYouthWeek();
+  const plan = getCurrentYouthPlan(date);
+  return `Week ${week.week}: ${week.title} • ${plan.day}: ${plan.curriculum}`;
 }
 
 type LiveFarmWeather = {
@@ -2159,7 +2191,9 @@ function supabaseTableCandidates(table: string) {
     attendance: ["attendance_records", "attendance"],
     attendance_records: ["attendance_records", "attendance"],
     feedback: ["feedback", "ecosystem_feedback", "program_feedback"],
-    parent_contact_logs: ["parent_contact_logs", "attendance_communications", "parent_communications"],
+    parent_contact_logs: ["parent_contact_logs", "parent_contacts", "attendance_communications", "parent_communications"],
+    incident_logs: ["incidents", "incident_logs", "incident_reports"],
+    incidents: ["incidents", "incident_logs", "incident_reports"],
     parent_summaries: ["parent_summaries", "parent_summary"],
   };
   return aliases[table] || [table];
@@ -3670,7 +3704,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [preferredName, setPreferredName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [crew, setCrew] = useState("Crew A");
+  const [crew] = useState("Curriculum Week Attendance");
   const [guardianName, setGuardianName] = useState("");
   const [guardianPhone, setGuardianPhone] = useState("");
   const [guardianEmail, setGuardianEmail] = useState("");
@@ -3731,7 +3765,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         profile_id: profile.id,
         participant_id: `BFF-${Math.floor(100000 + Math.random() * 899999)}`,
         age_range: "14-18",
-        crew,
+        crew: curriculumAssignmentLabel(),
         guardian_name: guardianName.trim(),
         guardian_phone: guardianPhone.trim(),
         guardian_email: guardianEmail.trim(),
@@ -3769,7 +3803,10 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <div className="text-lg font-black">Youth Workforce Details</div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <SelectField label="Crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Not assigned"]} />
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm font-bold leading-6 text-white/84">
+              Current curriculum assignment: {curriculumAssignmentLabel()}
+              <div className="mt-1 text-xs text-white/60">Youth are tracked by attendance and curriculum week, not Crew A/B/C/D.</div>
+            </div>
             <Field label="Guardian Name" value={guardianName} onChange={setGuardianName} />
             <Field label="Guardian Phone" value={guardianPhone} onChange={setGuardianPhone} />
             <Field label="Guardian Email" value={guardianEmail} onChange={setGuardianEmail} />
@@ -4165,7 +4202,7 @@ function TodayFarmOperationsBoard({ compact = false }: { compact?: boolean }) {
           <h2 className="mt-2 text-2xl font-black">Week 2: Regenerative Agriculture in action</h2>
           <p className="mt-2 text-sm font-bold leading-6 text-white/78">This board turns today's farm needs into clear team assignments for youth and supervisors.</p>
         </div>
-        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Monday Operations</div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">{getCurrentYouthPlan().day} Operations</div>
       </div>
 
       {compact ? (
@@ -4489,10 +4526,10 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
     refresh();
   }, []);
 
-  const youthRows = youth.map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }));
-  const todayAttendance = attendance.filter((a) => a.date === todayISO());
+  const youthRows = youth.map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) })).filter((row) => !isLikelyTestOrAdminYouth(row));
+  const todayAttendance = attendance.filter((a: any) => getRecordDate(a) === todayISO());
   const supportFlags = wellness.filter((w) => w.safety_flag);
-  const todayIncidents = incidents.filter((i) => i.created_at.slice(0, 10) === todayISO());
+  const todayIncidents = incidents.filter((i: any) => getRecordDate(i) === todayISO());
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
@@ -4573,8 +4610,8 @@ function SupervisorDashboard({
   setScreen: (screen: Screen) => void;
 }) {
   const stats = [
-    { title: "Youth Roster", value: youthCount, action: () => setTab("roster") },
-    { title: "Today Attendance", value: attendanceCount, action: () => setTab("attendance") },
+    { title: "Real Youth Roster", value: youthCount, action: () => setTab("roster") },
+    { title: "Present / Recorded Today", value: attendanceCount, action: () => setTab("attendance") },
     { title: "Support Flags", value: supportFlags, action: () => setTab("wellness") },
     { title: "Today Incidents", value: incidentCount, action: () => setTab("incident") },
     { title: "Parent Summaries", value: parentSummaryCount, action: () => setTab("parent") },
@@ -4642,7 +4679,7 @@ function YouthRosterModule({
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-4xl font-black">Active youth participants.</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, assigned to a crew, checked in today, and ready for assessment or parent-safe updates.</p>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, connected to the current curriculum week, checked in today, and ready for assessment or parent-safe updates.</p>
         </div>
         <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
@@ -4652,12 +4689,12 @@ function YouthRosterModule({
       ) : (
         <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
           <div className="grid grid-cols-[1.3fr_0.9fr_0.8fr_0.8fr_0.8fr_0.9fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
-            <div>Youth</div><div>Participant ID</div><div>Crew</div><div>Age</div><div>Today</div><div>Status</div>
+            <div>Youth</div><div>Participant ID</div><div>Curriculum</div><div>Age</div><div>Today</div><div>Status</div>
           </div>
           <div className="divide-y divide-white/10">
             {youthRows.map((row) => {
               const participantId = row.registration.participant_id;
-              const todayStatus = attendance.find((a) => a.participant_id === participantId && a.date === today)?.status || "not checked in";
+              const todayStatus = attendance.find((a: any) => participantIdForAttendance(a) === participantId && getRecordDate(a) === today)?.status || "not checked in";
               const lastAssessment = assessments.filter((a) => a.participant_id === participantId).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const hasFlag = wellness.some((w) => w.profile_id === row.registration.profile_id && w.safety_flag) || incidents.some((i) => i.participant_id === participantId && i.urgency !== "low");
               return (
@@ -4667,11 +4704,11 @@ function YouthRosterModule({
                     <div className="text-xs text-white/60">Guardian: {row.registration.guardian_name || "not entered"}</div>
                   </div>
                   <div>{participantId}</div>
-                  <div>{row.registration.crew || "Unassigned"}</div>
+                  <div className="text-xs font-bold leading-5 text-white/78">{curriculumAssignmentLabel()}</div>
                   <div>{row.registration.age_range || "—"}</div>
                   <div className="capitalize">{todayStatus.replaceAll("_", " ")}</div>
                   <div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "Clear"}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "OK"}</span>
                     {lastAssessment && <div className="mt-1 text-xs text-white/60">Safety {lastAssessment.safety}/5</div>}
                   </div>
                 </div>
@@ -5192,7 +5229,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     profile_id: activeUser?.profile_id || activeUser?.id || "demo-profile",
     participant_id: activeUser?.participant_id || "BFF-736309",
     age_range: "14-18",
-    crew: "Crew A",
+    crew: curriculumAssignmentLabel(),
     guardian_name: "Parent / Guardian",
     guardian_phone: "(330) 000-0000",
     guardian_email: "",
@@ -5312,7 +5349,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-sm leading-6">
             <div className="font-black text-white">{profileName(selectedProfile) === "Unknown participant" ? activeUser?.name || "Youth Participant" : profileName(selectedProfile)}</div>
             <div className="text-white/70">Participant ID: {selectedYouth?.participant_id}</div>
-            <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
+            <div className="text-white/70">Curriculum: {curriculumAssignmentLabel()}</div>
             <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance saves as PRESENT.</div>
           </div>
         </section>
@@ -6412,13 +6449,12 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
   const projectProgress = safeRead<string[]>("bff.launch.coolingCenterProgress", []);
   const today = todayISO();
-  const present = attendance.filter((a) => a.date === today && a.status === "present").length;
+  const present = attendance.filter((a: any) => getRecordDate(a) === today && getAttendanceStatus(a) === "present").length;
   const supportFlags = wellness.filter((w) => w.safety_flag).length;
   const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
   const inventoryLogs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
   const farmStatus = getFarmStatus();
-  const unassignedYouth = youth.filter((item) => !item.crew || /unassigned/i.test(item.crew)).length;
-  const ppeNeedsReview = attendance.filter((a) => a.date === today && a.ppe_status !== "complete").length;
+  const ppeNeedsReview = attendance.filter((a: any) => getRecordDate(a) === today && a.ppe_status !== "complete").length;
   const urgentIncidents = incidents.filter((i) => i.urgency === "high" || i.urgency === "emergency").length;
   const inventoryAlerts = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing" || item.available <= 0).length;
   const spanishReady = Boolean(languageText.es?.youth && languageText.es?.parent && languageText.es?.supervisor);
@@ -6426,7 +6462,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
     { area: "Youth Login", status: "🟢 Ready", detail: "PIN access includes supervisor-assisted continuation for unmatched launch PINs.", action: "Test with 2 known PINs and 1 unmatched PIN." },
     { area: "Start My Day", status: present > 0 ? "🟢 Ready" : "🟡 Monitor", detail: present > 0 ? `${present} youth checked in today.` : "Check-in workflow is present; test when youth arrive.", action: "Confirm attendance saves on phone." },
     { area: "Supervisor Verification", status: "🟢 Ready", detail: "Unmatched youth may continue pending verification and staff follow-up.", action: "Route unmatched 4-digit PIN issues to bhchatman@gmail.com." },
-    { area: "Assignments", status: unassignedYouth > 0 ? "🔴 Blocker" : "🟢 Ready", detail: unassignedYouth > 0 ? `${unassignedYouth} youth still show unassigned crew.` : "No unassigned youth detected in local roster.", action: "Assign category / supervisor before relying on daily work routing." },
+    { area: "Curriculum Sync", status: "🟢 Ready", detail: `${curriculumAssignmentLabel()} is the active source of truth for youth work.`, action: "Use attendance to prove participation; do not route youth by Crew A/B/C/D." },
     { area: "Safety / Nurse Line", status: ppeNeedsReview || urgentIncidents ? "🟡 Monitor" : "🟢 Ready", detail: `${ppeNeedsReview} PPE reviews today; ${urgentIncidents} urgent incidents logged.`, action: "Keep Nurse Line visible and incident form one tap away." },
     { area: "Inventory", status: inventoryAlerts ? "🟡 Monitor" : "🟢 Ready", detail: `${inventory.length} items loaded; ${inventoryAlerts} alerts; ${inventoryLogs.length} inventory log entries.`, action: "Check out, return, and damage-report one item before youth start." },
     { area: "Almanac + Weather", status: farmStatus.color === "red" ? "🔴 Blocker" : farmStatus.color === "amber" ? "🟡 Monitor" : "🟢 Ready", detail: `${farmStatus.level}: ${farmStatus.title}`, action: "Set work status before assignments are released." },
