@@ -4402,7 +4402,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <summary className="cursor-pointer text-base font-black text-emerald-50">Cultivator Resources + Journey</summary>
         <div className="mt-4 grid gap-3">
           <CultivatorIdentityLaunchCard />
-          <CurrentWeekStrip />
+          <CurriculumWeekViewCard compact />
           <Card className="p-4 md:p-5">
             <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Monday–Friday Curriculum</div>
             <div className="mt-3 grid gap-2">
