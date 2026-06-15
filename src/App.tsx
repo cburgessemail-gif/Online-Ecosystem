@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 4.1 - WEEK 2 LAUNCH FIXES + SHADOW VIDEO
+ * LAUNCH CANDIDATE 4.0 - MONDAY WEEK 2 LAUNCH FREEZE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1031,14 +1031,6 @@ const launchVideos: LaunchVideo[] = [
     tags: ["Youth", "Cooling Station", "Farm Safety"],
   },
   {
-    title: "Following the Sun: Shadow Observation",
-    purpose: "Week 2 Cultivator Moment connecting sun, shadow, presence, observation, and planting decisions.",
-    embedUrl: "https://www.youtube.com/embed/1SN1BOpLZAs",
-    embedTitle: "Following the Sun: Crash Course Kids #8.2",
-    fallback: "Shadow observation video for the Week 2 Cultivator Moment.",
-    tags: ["Shadow", "Sun", "Cultivator Moment", "Week 2"],
-  },
-  {
     title: "Fan Template & Design Demonstration Video",
     purpose: "Watch the cardboard fan demonstration before the June 8 Cooling Station Challenge. Youth use this to understand how the template, assembly, and hand-powered fan concept works before Design, Engineering, Manufacturing, and Contractor teams begin their work.",
     embedUrl: "https://www.youtube.com/embed/dtYzf3avkT4",
@@ -1075,105 +1067,21 @@ const languageOptions: LanguageOption[] = [
 
 const languageText: Record<LanguageCode, Record<string, string>> = {
   en: {
-    "Cultivator Stories": "Cultivator Stories",
-    "My Story": "My Story",
-    "My Growth": "My Growth",
-    "Quick Tools": "Quick Tools",
-    "Resources": "Resources",
-    "Upload Photo / Video": "Upload Photo / Video",
-    "Add Commentary": "Add Commentary",
-    "Back to My Day": "Back to My Day",
-    "Sign Out": "Sign Out",
-    "Today\u2019s Cultivator Moment": "Today’s Cultivator Moment",
-    "The gardener's shadow is the best fertilizer.": "The gardener's shadow is the best fertilizer.",
-    "Things grow when someone is present enough to notice what they need.": "Things grow when someone is present enough to notice what they need.",
-    "Cultivator": "Cultivator",
-    "Week 2 Regenerative Agriculture": "Week 2 Regenerative Agriculture",
     language: "Language", portal: "Portal", demo: "Demo", guest: "Guest", register: "Register", workspace: "My Day", youth: "Youth", supervisor: "Supervisor", parent: "Parent", grower: "Grower", partner: "Partner", support: "Support", valueAdded: "Value-Added", market: "Market", wellness: "Wellness", reports: "Reports", ops: "Ops", feedback: "Feedback", complete: "Complete", publicGuest: "Public / Guest", signOut: "Sign Out", onlineEcosystem: "Online Ecosystem", events: "Events", media: "Media", project: "6/8 Project"
   },
   es: {
-    "Cultivator Stories": "Historias de Cultivadores",
-    "My Story": "Mi Historia",
-    "My Growth": "Mi Crecimiento",
-    "Quick Tools": "Herramientas Rápidas",
-    "Resources": "Recursos",
-    "Upload Photo / Video": "Subir Foto / Video",
-    "Add Commentary": "Agregar Comentario",
-    "Back to My Day": "Volver a Mi Día",
-    "Sign Out": "Salir",
-    "Today\u2019s Cultivator Moment": "Momento Cultivador de Hoy",
-    "The gardener's shadow is the best fertilizer.": "La sombra del jardinero es el mejor fertilizante.",
-    "Things grow when someone is present enough to notice what they need.": "Las cosas crecen cuando alguien está lo suficientemente presente para notar lo que necesitan.",
-    "Cultivator": "Cultivador",
-    "Week 2 Regenerative Agriculture": "Semana 2 Agricultura Regenerativa",
     language: "Idioma", portal: "Portal", demo: "Demo", guest: "Visitante", register: "Registro", workspace: "Mi Día", youth: "Jóvenes", supervisor: "Supervisor", parent: "Padres", grower: "Productor", partner: "Aliado", support: "Apoyar", valueAdded: "Valor agregado", market: "Mercado", wellness: "Bienestar", reports: "Reportes", ops: "Operaciones", feedback: "Comentarios", complete: "Completar", publicGuest: "Público / Visitante", signOut: "Salir", onlineEcosystem: "Ecosistema en línea"
   },
   tl: {
-    "Cultivator Stories": "Mga Kuwento ng Cultivator",
-    "My Story": "Aking Kuwento",
-    "My Growth": "Aking Paglago",
-    "Quick Tools": "Mabilis na Tools",
-    "Resources": "Mga Resource",
-    "Upload Photo / Video": "Mag-upload ng Larawan / Video",
-    "Add Commentary": "Magdagdag ng Komento",
-    "Back to My Day": "Bumalik sa Aking Araw",
-    "Sign Out": "Mag-sign Out",
-    "Today\u2019s Cultivator Moment": "Cultivator Moment Ngayon",
-    "The gardener's shadow is the best fertilizer.": "Ang anino ng hardinero ang pinakamahusay na pataba.",
-    "Things grow when someone is present enough to notice what they need.": "Lumalaki ang mga bagay kapag may taong sapat na naroon upang mapansin ang kanilang kailangan.",
-    "Cultivator": "Cultivator",
-    "Week 2 Regenerative Agriculture": "Linggo 2 Regenerative Agriculture",
     language: "Wika", portal: "Portal", demo: "Demo", guest: "Bisita", register: "Magrehistro", workspace: "Aking Araw", youth: "Kabataan", supervisor: "Supervisor", parent: "Magulang", grower: "Magtatanim", partner: "Katuwang", support: "Suporta", valueAdded: "Value-Added", market: "Merkado", wellness: "Kalusugan", reports: "Ulat", ops: "Operasyon", feedback: "Komento", complete: "Kumpleto", publicGuest: "Publiko / Bisita", signOut: "Mag-sign Out", onlineEcosystem: "Online Ecosystem"
   },
   it: {
-    "Cultivator Stories": "Storie dei Coltivatori",
-    "My Story": "La Mia Storia",
-    "My Growth": "La Mia Crescita",
-    "Quick Tools": "Strumenti Rapidi",
-    "Resources": "Risorse",
-    "Upload Photo / Video": "Carica Foto / Video",
-    "Add Commentary": "Aggiungi Commento",
-    "Back to My Day": "Torna alla Mia Giornata",
-    "Sign Out": "Esci",
-    "Today\u2019s Cultivator Moment": "Momento del Coltivatore di Oggi",
-    "The gardener's shadow is the best fertilizer.": "L'ombra del giardiniere è il miglior fertilizzante.",
-    "Things grow when someone is present enough to notice what they need.": "Le cose crescono quando qualcuno è abbastanza presente da notare ciò di cui hanno bisogno.",
-    "Cultivator": "Coltivatore",
-    "Week 2 Regenerative Agriculture": "Settimana 2 Agricoltura Rigenerativa",
     language: "Lingua", portal: "Portale", demo: "Demo", guest: "Ospite", register: "Registrati", workspace: "La Mia Giornata", youth: "Giovani", supervisor: "Supervisore", parent: "Genitori", grower: "Coltivatore", partner: "Partner", support: "Sostieni", valueAdded: "Valore aggiunto", market: "Mercato", wellness: "Benessere", reports: "Report", ops: "Operazioni", feedback: "Feedback", complete: "Completa", publicGuest: "Pubblico / Ospite", signOut: "Esci", onlineEcosystem: "Ecosistema online"
   },
   he: {
-    "Cultivator Stories": "סיפורי מטפחים",
-    "My Story": "הסיפור שלי",
-    "My Growth": "הצמיחה שלי",
-    "Quick Tools": "כלים מהירים",
-    "Resources": "משאבים",
-    "Upload Photo / Video": "העלאת תמונה / וידאו",
-    "Add Commentary": "הוספת תגובה",
-    "Back to My Day": "חזרה ליום שלי",
-    "Sign Out": "יציאה",
-    "Today\u2019s Cultivator Moment": "רגע המטפח של היום",
-    "The gardener's shadow is the best fertilizer.": "צל הגנן הוא הדשן הטוב ביותר.",
-    "Things grow when someone is present enough to notice what they need.": "דברים גדלים כשמישהו נוכח מספיק כדי לשים לב למה שהם צריכים.",
-    "Cultivator": "מטפח",
-    "Week 2 Regenerative Agriculture": "שבוע 2 חקלאות מתחדשת",
     language: "שפה", portal: "שער", demo: "הדגמה", guest: "אורח", register: "הרשמה", workspace: "היום שלי", youth: "נוער", supervisor: "מדריך", parent: "הורה", grower: "מגדל", partner: "שותף", support: "תמיכה", valueAdded: "מוצרי ערך מוסף", market: "שוק", wellness: "רווחה", reports: "דוחות", ops: "תפעול", feedback: "משוב", complete: "סיום", publicGuest: "ציבור / אורח", signOut: "יציאה", onlineEcosystem: "אקוסיסטם מקוון"
   },
   fr: {
-    "Cultivator Stories": "Histoires de Cultivateurs",
-    "My Story": "Mon Histoire",
-    "My Growth": "Ma Croissance",
-    "Quick Tools": "Outils Rapides",
-    "Resources": "Ressources",
-    "Upload Photo / Video": "Téléverser Photo / Vidéo",
-    "Add Commentary": "Ajouter un Commentaire",
-    "Back to My Day": "Retour à Ma Journée",
-    "Sign Out": "Déconnexion",
-    "Today\u2019s Cultivator Moment": "Moment Cultivateur du Jour",
-    "The gardener's shadow is the best fertilizer.": "L'ombre du jardinier est le meilleur engrais.",
-    "Things grow when someone is present enough to notice what they need.": "Les choses grandissent quand quelqu'un est assez présent pour remarquer ce dont elles ont besoin.",
-    "Cultivator": "Cultivateur",
-    "Week 2 Regenerative Agriculture": "Semaine 2 Agriculture Régénératrice",
     language: "Langue", portal: "Portail", demo: "Démo", guest: "Invité", register: "S'inscrire", workspace: "Ma Journée", youth: "Jeunes", supervisor: "Superviseur", parent: "Parent", grower: "Producteur", partner: "Partenaire", support: "Soutenir", valueAdded: "Valeur ajoutée", market: "Marché", wellness: "Bien-être", reports: "Rapports", ops: "Opérations", feedback: "Commentaires", complete: "Terminer", publicGuest: "Public / Invité", signOut: "Déconnexion", onlineEcosystem: "Écosystème en ligne"
   },
 };
@@ -1594,7 +1502,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Launch Focus": "Pokus sa Launch",
     "🌞 My Day": "🌞 Aking Araw",
     "June 8 Launch Assignment": "Takdang Gawain sa Hunyo 8",
-    "Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
+    "Start here for today’s work: check conditions, confirm PPE and water, see today’s assignment, document your story, and prepare for tomorrow.": "Magsimula dito para sa Youth Workforce launch. Mag-check in, panoorin ang demonstrasyon ng cardboard fan, kilalanin ang iyong team, tapusin ang Hamon sa Heat Safety at Cooling Station, at isumite ang iyong reflection.",
     "Project": "Proyekto",
     "Cooling Station Challenge": "Cooling Station Challenge",
     "Teams": "Mga Team",
@@ -2508,8 +2416,8 @@ function Shell({
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
-        { label: lt(language, "My Story"), screen: "media" },
-        { label: lt(language, "My Growth"), screen: "completion" },
+        { label: "My Story", screen: "media" },
+        { label: "My Growth", screen: "completion" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
@@ -2555,14 +2463,14 @@ function Shell({
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
               <div className="truncate text-sm font-black leading-tight md:text-base">
-                {screen === "portal" ? "🌲 Forest Gate Portal" : activeUser?.role === "Youth Workforce Participant" ? `🌱 ${lt(language, "Cultivator")} | ${lt(language, "Week 2 Regenerative Agriculture")}` : activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
+                {screen === "portal" ? "🌲 Forest Gate Portal" : activeUser?.role === "Youth Workforce Participant" ? "🌱 Cultivator | Week 2" : activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
               </div>
             </button>
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "portal")} className={buttonClass(activeUser?.role ? routeForRole(activeUser.role) : "portal")}>Home</button>
-              <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? lt(language, "My Day") : "Choose Role"}</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>{lt(language, "Resources")}</button>
+              <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "My Day" : "Choose Role"}</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -2588,17 +2496,17 @@ function Shell({
               </select>
             </label>
 
-            {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-black text-white/80">{lt(language, "Sign Out")}</button>}
+            {activeUser && <button type="button" onClick={signOut} className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-black text-white/80">Sign Out</button>}
           </div>
           {screen !== "portal" && (
           <details className="mt-2 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-white/72">
-            <summary className="cursor-pointer font-black text-emerald-50">🧰 {lt(language, "Quick Tools")}</summary>
+            <summary className="cursor-pointer font-black text-emerald-50">🧰 Quick Tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>
-              <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>{lt(language, "Resources")}</button>
+              {role !== "Youth Workforce Participant" && <button type="button" onClick={() => setScreen("roles")} className={buttonClass("roles")}>Switch Role</button>}
+              {role !== "Youth Workforce Participant" && <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>}
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
-              <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
+              {role !== "Youth Workforce Participant" && <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>}
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
               {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
               {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
@@ -2843,7 +2751,7 @@ function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) =
         ))}
       </div>
       <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Begin Today’s Work</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Current Project</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Cultivator Reflection</button>
       </div>
@@ -2898,14 +2806,14 @@ function CultivatorMomentSkinnyPlantCard() {
 const cultivatorSkillOptions = ["Teamwork", "Observation", "Communication", "Leadership", "Problem Solving", "Entrepreneurship", "Stewardship", "Safety Awareness"];
 const cultivatorBecomingOptions = ["Grower", "Builder", "Leader", "Entrepreneur", "Steward", "Teacher", "Team Builder", "Problem Solver"];
 
-function CultivatorMomentShadowCard({ compact = false }: { compact?: boolean }) {
+function CultivatorMomentShadowCard() {
   return (
     <Card className="p-4 md:p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌅 Today’s Cultivator Moment</div>
-      <h2 className="mt-2 text-2xl font-black">Following the Sun</h2>
-      <div className="mt-3 aspect-video overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/40">
+      <h2 className="mt-2 text-2xl font-black">The Gardener’s Shadow</h2>
+      <div className="mt-3 overflow-hidden rounded-[1.15rem] border border-white/10 bg-black/40">
         <iframe
-          className="h-full w-full"
+          className="aspect-video w-full"
           src="https://www.youtube.com/embed/1SN1BOpLZAs"
           title="Following the Sun: Crash Course Kids #8.2"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -2913,20 +2821,10 @@ function CultivatorMomentShadowCard({ compact = false }: { compact?: boolean }) 
           allowFullScreen
         />
       </div>
-      <div className="mt-3 rounded-2xl border border-amber-200/25 bg-amber-300/10 p-3">
-        <div className="text-sm font-black">📜 The gardener's shadow is the best fertilizer.</div>
-        <p className="mt-2 text-sm font-bold leading-6 text-white/82">Things grow when someone is present enough to notice what they need.</p>
+      <div className="mt-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4">
+        <div className="text-sm font-black">📜 The gardener’s shadow is the best fertilizer.</div>
+        <div className="mt-2 text-sm font-bold leading-6 text-white/82">Things grow when someone is present enough to notice what they need.</div>
       </div>
-      {!compact && (
-        <details className="mt-3 rounded-xl border border-white/10 bg-white/10 p-3 text-sm leading-6 text-white/82">
-          <summary className="cursor-pointer font-black text-emerald-50">What should I notice today?</summary>
-          <div className="mt-2 grid gap-2 md:grid-cols-3">
-            {["Where does the morning shadow fall?", "Which soil stays cooler or moist longer?", "What changes because someone is present and paying attention?"].map((item) => (
-              <div key={item} className="rounded-xl border border-white/10 bg-black/25 p-3 text-xs font-bold text-white/82">{item}</div>
-            ))}
-          </div>
-        </details>
-      )}
     </Card>
   );
 }
@@ -3028,7 +2926,7 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">🌞 My Day</div>
       <div className="mt-2 text-2xl font-black">June 8 Launch Assignment</div>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82">
-        Start here for the daily rhythm: check in, confirm PPE and water, see today's team assignment, complete the Cooling Station Challenge work block, reflect, and see what happens tomorrow.
+        Start here for today’s work: check conditions, confirm PPE and water, see today’s assignment, document your story, and prepare for tomorrow.
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -3042,7 +2940,7 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Next Step</div>
-          <div className="mt-1 text-sm font-black">Start My Day</div>
+          <div className="mt-1 text-sm font-black">Begin Today’s Work</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">Goal</div>
@@ -3051,7 +2949,7 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start My Day</button>
+        <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Begin Today’s Work</button>
         <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-6 py-3 font-black text-emerald-50">Open Today's Project</button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Watch Fan Video</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Reflection</button>
@@ -4173,7 +4071,17 @@ function CurrentWeekStrip() {
 
 function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const home = activeUser?.role ? routeForRole(activeUser.role) : "portal";
-  const label = activeUser?.role === "Youth Workforce Participant" ? "🌱 Return to My Day" : activeUser?.role === "Parent / Guardian" ? "← Back to My Youth" : activeUser?.role === "Supervisor / Staff" ? "← Back to Supervisor" : "← Back to My Day";
+  const label = activeUser?.role === "Youth Workforce Participant" ? "🌱 My Day" : activeUser?.role === "Parent / Guardian" ? "← Back to My Youth" : activeUser?.role === "Supervisor / Staff" ? "← Back to Supervisor" : "← Back to My Day";
+  if (activeUser?.role === "Youth Workforce Participant") {
+    return (
+      <div className="mb-3 flex flex-wrap gap-2">
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">🌱 My Day</button>
+        <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">📚 Resources</button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">📸 My Story</button>
+        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">📈 My Growth</button>
+      </div>
+    );
+  }
   return (
     <div className="mb-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
@@ -4253,8 +4161,8 @@ function CultivatorIdentityLaunchCard() {
   return (
     <Card className="p-4 md:p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 What Is A Cultivator?</div>
-      <h2 className="mt-2 text-2xl font-black">A profound symbol of growth, nurturing, and transformation.</h2>
-      <p className="mt-2 text-sm leading-6 text-white/82">A cultivator represents patience and dedication: preparing the soil so seeds can thrive, and preparing the inner landscape so people can flourish. Cultivating also depends on community, collaboration, the right tools, and support. — A. Aslam, BFF Youth Workforce (2025)</p>
+      <h2 className="mt-2 text-2xl font-black">Cultivators grow more than crops.</h2>
+      <p className="mt-2 text-sm leading-6 text-white/82">Cultivators grow opportunities, communities, and futures. A Cultivator learns, observes, contributes, reflects, and leaves things better than they found them.</p>
     </Card>
   );
 }
@@ -4285,25 +4193,23 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <Card className="p-4 md:p-5">
         <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 My Day</div>
         <h1 className="mt-2 text-2xl font-black leading-tight md:text-3xl">Week {currentWeek.week}: {currentWeek.title}</h1>
-        <p className="mt-2 text-sm leading-6 text-white/78">Four things first: status, conditions, assignment, start.</p>
-        <div className="mt-4 grid gap-3 lg:grid-cols-[.85fr_1.15fr_1fr]">
+        <p className="mt-2 text-sm leading-6 text-white/78">Status, conditions, moment, assignment, begin.</p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[.8fr_1.1fr_1fr]">
           <WorkStatusMiniCard />
           <FarmConditionsCard compact />
           <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={currentWeek} />
         </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_.9fr]">
+          <CultivatorMomentShadowCard />
+          <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
+        </div>
+        <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-2xl bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today’s Work</button>
       </Card>
 
-      <CultivatorMomentShadowCard />
-
-      <div className="grid gap-3">
-        <button type="button" onClick={() => setScreen("wellness")} className="w-full rounded-[1.25rem] bg-emerald-300 px-6 py-4 text-xl font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Start My Day</button>
-      </div>
-
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Start My Day: Tools and Why It Matters</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Begin Today’s Work: Tools</summary>
         <div className="mt-4 grid gap-3">
           <ToolStewardshipLaunchCard />
-          <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
         </div>
       </details>
 
@@ -4315,7 +4221,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <ToolStewardshipLaunchCard endOfDay />
           <TomorrowBeginsTodayCard todayPlan={todayPlan} />
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open Cultivator Stories</button>
+            <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open My Story</button>
             <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Save Cultivator Reflection</button>
           </div>
         </div>
@@ -4373,7 +4279,7 @@ function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) 
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Day</button>
-          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Start My Day</button>
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Begin Today’s Work</button>
         </div>
       </Card>
       <FarmConditionsCard />
@@ -5179,11 +5085,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("attendance_records", ATTENDANCE_KEY, attendanceRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
-      setMessage(allRequiredPPE ? `Start My Day saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
+      setMessage(allRequiredPPE ? `Begin Today’s Work saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
       window.setTimeout(() => setScreen("youth"), 650);
     } catch (error) {
-      console.error("Start My Day save issue:", error);
-      setMessage(`Start My Day saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
+      console.error("Begin Today’s Work save issue:", error);
+      setMessage(`Begin Today’s Work saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
       window.setTimeout(() => setScreen("youth"), 650);
     } finally {
       setSaving(false);
@@ -5209,8 +5115,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">Start My Day</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Fast check-in for attendance, PPE, daily goal, and support needs.</p>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Begin Today’s Work</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Fast check-in for attendance, PPE, daily goal, and support needs before work begins.</p>
           {activeUser?.needs_supervisor_verification && (
             <div className="mt-3 rounded-2xl border border-amber-300/40 bg-amber-300/14 p-3 text-sm font-bold text-amber-50">
               Supervisor-assisted access is active. This check-in will still save, and staff can verify the youth record later.
@@ -5243,9 +5149,9 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
           <div className="flex items-center justify-between gap-2">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">PPE</div>
-            <button type="button" onClick={save} disabled={saving} className={`rounded-full px-4 py-2 text-xs font-black disabled:opacity-60 ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
-              {saving ? "Saving..." : readinessStatus}
-            </button>
+            <span className={`rounded-full px-4 py-2 text-xs font-black ${allRequiredPPE ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>
+              {allRequiredPPE ? "Ready" : "Needs Review"}
+            </span>
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <Toggle label="Boots / Shoes" checked={closedToeShoes} setChecked={setClosedToeShoes} />
@@ -5254,7 +5160,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
           <button type="button" onClick={save} disabled={saving} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:opacity-60">
-            {saving ? "Saving..." : "Start My Day"}
+            {saving ? "Saving..." : "▶ Begin Today’s Work"}
           </button>
         </section>
 
@@ -5275,15 +5181,13 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       </div>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What do you want to accomplish today?" />
-        <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. A supervisor can check in privately." />
+        <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What will you help grow today?" />
+        <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. Ask for help early. Cultivators learn by asking questions." />
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <button type="button" onClick={save} disabled={saving} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black disabled:opacity-60">{saving ? "Saving..." : "Start My Day"}</button>
-        <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to Youth Journey</button>
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Choose Another Role</button>
-        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-5 py-3 font-black">Return to Portal</button>
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to My Day</button>
+        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">📈 My Growth</button>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
@@ -6217,31 +6121,30 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Stories</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Cultivator Stories</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Story</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Story</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
-          Tell your Cultivator Story with a photo, video, or short commentary. Keep it simple: what did you notice, learn, or help create?
+          Upload a photo, video, or commentary from today. This is your Cultivator Story.
         </p>
         {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
-        <div className="mt-6 grid gap-3 md:grid-cols-4">
+        <div className="mt-6 grid gap-3 md:grid-cols-1">
           {[
             ["Cultivator Story", "My Story"],
           ].map(([category, label]) => (
             <button key={category} type="button" onClick={() => setQuickCategory(category)} className={`rounded-[1.25rem] border p-4 text-left ${quickCategory === category ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
               <div className="text-lg font-black">{label}</div>
-              <div className="mt-1 text-xs font-bold opacity-75">Photo • Video • Commentary</div>
+              <div className="mt-1 text-xs font-bold opacity-75">{category}</div>
             </button>
           ))}
         </div>
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Selected Story Area</div>
-          <h2 className="mt-2 text-2xl font-black">My Story</h2>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Story Upload</div>
+          <h2 className="mt-2 text-2xl font-black">My Cultivator Story</h2>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <label className="inline-flex cursor-pointer items-center rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">
-              {uploadingCategory === quickCategory ? "Uploading..." : "Upload Photo / Video"}
+              {uploadingCategory === quickCategory ? "Uploading..." : "Upload Photo / Video / Commentary"}
               <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="sr-only" disabled={uploadingCategory === quickCategory} onChange={(event) => handleMediaUpload(quickCategory, event)} />
             </label>
-            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-emerald-200/25 bg-emerald-300/10 px-5 py-3 text-sm font-black text-emerald-50 hover:bg-emerald-300/20">Add Commentary</button>
             <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Back to My Day</button>
           </div>
         </div>
@@ -6249,7 +6152,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
       {recentAssets.length > 0 && (
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Cultivator Stories</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent My Story</div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {recentAssets.map((asset) => (
               <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
@@ -6396,7 +6299,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         <div className="mt-6 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
           <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cultivator Stories</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">My Story</button>
         </div>
       </Card>
       <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
