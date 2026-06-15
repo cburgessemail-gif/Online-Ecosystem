@@ -2416,6 +2416,7 @@ function Shell({
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
+        { label: "Calendar", screen: "events" },
         { label: "My Story", screen: "media" },
         { label: "My Growth", screen: "completion" },
       ]
@@ -2504,7 +2505,7 @@ function Shell({
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
               <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
-              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Events</button>
+              <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>📅 Calendar</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
               {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
@@ -4079,6 +4080,61 @@ function CurrentWeekStrip() {
   );
 }
 
+function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
+  const currentWeek = getCurrentYouthWeek();
+  const todayPlan = getCurrentYouthPlan();
+  const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
+  const nextWeek = youthCurriculumWeeks.find((week) => week.week === currentWeek.week + 1);
+  const todayIndex = currentWeekPlans.findIndex((day) => day.day === todayPlan.day);
+  return (
+    <Card className={compact ? "p-4 md:p-5" : undefined}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">📅 Curriculum Calendar</div>
+          <h2 className="mt-2 text-2xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/78">Today: {todayPlan.day} — {todayPlan.curriculum}</p>
+        </div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Week {currentWeek.week} of 8</div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-5">
+        {currentWeekPlans.map((day, index) => {
+          const isToday = day.day === todayPlan.day;
+          const isPast = index < todayIndex;
+          return (
+            <div key={day.day} className={`rounded-2xl border p-3 ${isToday ? "border-emerald-200 bg-emerald-300 text-black" : isPast ? "border-white/10 bg-white/12 text-white/80" : "border-white/10 bg-black/25 text-white/76"}`}>
+              <div className="text-sm font-black">{isPast ? "✓ " : isToday ? "● " : ""}{day.day}</div>
+              <div className="mt-1 text-xs font-black leading-4 opacity-85">{day.curriculum}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {!compact && (
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {currentWeekPlans.map((day) => (
+            <details key={day.day} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <summary className="cursor-pointer text-sm font-black">{day.day}: {day.curriculum}</summary>
+              <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
+              <div className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Work</div>
+              <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
+                {day.work.map((item) => <li key={item}>• {item}</li>)}
+              </ul>
+              <div className="mt-3 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
+            </details>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-2 md:grid-cols-3">
+        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Week 1: Completed ✅</div>
+        <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-bold">Current: {currentWeek.title}</div>
+        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Next: {nextWeek ? nextWeek.title : "Completion"}</div>
+      </div>
+    </Card>
+  );
+}
+
 function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const home = activeUser?.role ? routeForRole(activeUser.role) : "portal";
   const label = activeUser?.role === "Youth Workforce Participant" ? "🌱 Return to My Day" : activeUser?.role === "Parent / Guardian" ? "← Back to My Youth" : activeUser?.role === "Supervisor / Staff" ? "← Back to Supervisor" : "← Back to My Day";
@@ -4201,6 +4257,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         </div>
         <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today's Work</button>
       </Card>
+
+      <CurriculumWeekViewCard compact />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Start My Day: Tools, Moment, Why It Matters</summary>
@@ -5855,38 +5913,57 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
 
 function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const currentWeek = getCurrentYouthWeek();
   return (
-    <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Events & Orientation</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Launch calendar and orientation center.</h1>
-      <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
-        These launch events prepare staff, supervisors, youth, parents, and partners for safe outdoor workforce programming at Bronson Family Farm.
-      </p>
-      <div className="mt-7 grid gap-4 lg:grid-cols-2">
-        {launchEvents.map((event) => (
-          <div key={event.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{event.date} • {event.time}</div>
-            <h2 className="mt-3 text-2xl font-black">{event.title}</h2>
-            <div className="mt-2 text-sm font-black text-white/70">Audience: {event.audience}</div>
-            <p className="mt-4 text-sm leading-7 text-white/82">{event.purpose}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-7 rounded-[1.5rem] border border-amber-200/20 bg-amber-300/12 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">June 8 Featured Activity</div>
-        <h2 className="mt-2 text-3xl font-black">{featuredProject.title}</h2>
-        <p className="mt-3 text-sm leading-7 text-white/84">{featuredProject.objective}</p>
-        <p className="mt-3 text-sm leading-7 text-white/78">{featuredProject.farmConnection}</p>
-      </div>
-      <div className="mt-7 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open June 8 Project Module</button>
-        <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Media Center</button>
-        <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Choose My Day</button>
-      </div>
-    </Card>
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Calendar + Week View</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Program Calendar</h1>
+        <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
+          This is the shared operating calendar for curriculum, workdays, visitors, deliveries, service access, weather changes, and weekly progression.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Day</button>
+          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Weather + Almanac</button>
+        </div>
+      </Card>
+
+      <CurriculumWeekViewCard />
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operational Calendar</div>
+        <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} farm operations</h2>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["Monday", "Weekly topic, supervisor assignment, PPE, work-plan confirmation."],
+            ["Wednesday", "Onsite Water service. Keep access clear."],
+            ["Friday", "Water totes filled. Verify tote access and refill needs."],
+            ["Weather", "Mission Control may change Full Day, Half Day, or Work Cancelled."],
+          ].map(([label, note]) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-lg font-black">{label}</div>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/76">{note}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Events & Visitors</div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {launchEvents.map((event) => (
+            <div key={event.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+              <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{event.date} • {event.time}</div>
+              <h2 className="mt-3 text-2xl font-black">{event.title}</h2>
+              <div className="mt-2 text-sm font-black text-white/70">Audience: {event.audience}</div>
+              <p className="mt-4 text-sm leading-7 text-white/82">{event.purpose}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 }
-
 
 function VideoLibrary({ compact = false }: { compact?: boolean }) {
   const moduleCard = (video: LaunchVideo) => {
@@ -6120,22 +6197,16 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <div className="grid gap-4">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Stories</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Cultivator Stories</h1>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Story</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
-          Uploads are open for launch. Evidence saves immediately and can later support portfolios, parent updates, reports, and stories.
+          Upload a photo, video, or commentary from your day. This is your Cultivator Story.
         </p>
         {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
-        <div className="mt-6 grid gap-3 md:grid-cols-4">
-          {[
-            ["Cultivator Story", "My Story"],
-            ["Team Story", "Team Story"],
-            ["Cultivator Voices", "Voices"],
-          ].map(([category, label]) => (
-            <button key={category} type="button" onClick={() => setQuickCategory(category)} className={`rounded-[1.25rem] border p-4 text-left ${quickCategory === category ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
-              <div className="text-lg font-black">{label}</div>
-              <div className="mt-1 text-xs font-bold opacity-75">{category}</div>
-            </button>
-          ))}
+        <div className="mt-6 grid gap-3 md:grid-cols-1">
+          <button type="button" onClick={() => setQuickCategory("Cultivator Story")} className="rounded-[1.25rem] border border-emerald-200 bg-emerald-300 p-4 text-left text-black">
+            <div className="text-lg font-black">My Story</div>
+            <div className="mt-1 text-xs font-bold opacity-75">Photo • Video • Commentary</div>
+          </button>
         </div>
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Selected Story Area</div>
