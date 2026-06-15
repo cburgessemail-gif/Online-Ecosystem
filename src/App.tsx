@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 4.1 - CURRICULUM SOURCE OF TRUTH SYNC
+ * LAUNCH CANDIDATE 4.3 - SUPERVISOR DAILY WORK FLOW SYNC
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -29,8 +29,6 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
  * - Keeps returning youth on PIN, supervisors on PIN 2350, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
  * - Layers youth curriculum by week and day
- * - Curriculum is the source of truth: actual farm work -> learning -> skills -> reflection -> growth
- * - Removes visible Crew A/B/C/D routing from launch dashboards and supervisor roster
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
  * - Adds Minimum Launch Standard scorecard to Mission Control
@@ -387,11 +385,11 @@ const launchAlmanacSnapshot = {
   },
   operationsByDay: {
     Sunday: "Weekend preview: check Mission Control before arriving onsite.",
-    Monday: "Curriculum begins with the actual farm work: conditions, attendance, PPE, work priorities, learning, and reflection.",
-    Tuesday: "Field production, planting, observation, documentation, and skill practice continue through the current curriculum week.",
-    Wednesday: "Curriculum + farm operations: planting, compost, grow-area readiness, water/sanitation access, and safe work-zone coordination.",
-    Thursday: "Curriculum + ecosystem observation: plant health, pollinators, infrastructure, production quality, and Cultivator Stories.",
-    Friday: "Curriculum closeout: water operations, weekly reflection, skills, portfolio evidence, and next-week readiness.",
+    Monday: "Weekly topic selection, supervisor assignment, PPE, and work-plan confirmation.",
+    Tuesday: "Field production, observation, documentation, and skill practice.",
+    Wednesday: "Onsite Water cleans and services porta potties. Keep service access clear.",
+    Thursday: "Production, maintenance, problem solving, and project completion.",
+    Friday: "Water totes are filled. Verify tote locations, access, and refill needs.",
     Saturday: "Weekend operations may differ. Check Mission Control before farm activity.",
   } as Record<string, string>,
 };
@@ -652,45 +650,45 @@ const youthWeekTwoDailyPlan = [
   {
     day: "Monday",
     date: "Week 2 Monday",
-    curriculum: "Soil health, compost, planting, and living systems observation",
-    focus: "Youth use the actual farm work to understand soil as a living system: compost, seedlings, potatoes, mulch, water, and plant health.",
-    work: ["Create compost", "Observe soil texture and moisture", "Plant or check seedlings", "Plant potatoes where directed", "Record one thing that surprised you"],
-    resources: ["Soil health checklist", "Compost observation guide", "Seedling and potato planting basics"],
-    reflection: "How did today’s soil and planting work help you understand what plants need to grow?",
+    curriculum: "Soil health, compost, and living systems observation",
+    focus: "Youth observe soil as a living system, compare compost and field soil, and identify what healthy soil needs before planting.",
+    work: ["Observe soil texture and smell", "Compare compost and field soil", "Identify what seedlings need", "Record one thing that surprised you"],
+    resources: ["Soil health checklist", "Compost observation guide", "Seedling care basics"],
+    reflection: "How did today’s soil work help you understand what plants need to grow?",
   },
   {
     day: "Tuesday",
     date: "Week 2 Tuesday",
-    curriculum: "Seedlings, potatoes, companion planting, and crop care",
-    focus: "Youth connect planting decisions to future harvest, food access, marketplace opportunity, and the protection needed for crops to survive.",
-    work: ["Plant or check seedlings", "Plant potatoes", "Water carefully", "Look for plant stress", "Explore companion planting connections"],
-    resources: ["Companion planting guide", "Seedling care card", "Potato planting basics", "Watering basics"],
+    curriculum: "Seedlings, planting, companion planting, and crop care",
+    focus: "Youth plant or care for seedlings and connect small beginnings to future harvest, food access, and marketplace opportunity.",
+    work: ["Plant or check seedlings", "Water carefully", "Look for plant stress", "Explore companion planting connections"],
+    resources: ["Companion planting guide", "Seedling care card", "Watering basics"],
     reflection: "What small thing did you do today that could grow into something bigger?",
   },
   {
     day: "Wednesday",
     date: "Week 2 Wednesday",
-    curriculum: "Farm operations, planting, compost, water access, and site readiness",
-    focus: "Youth learn that today’s farm work is the curriculum: planting, compost, grow-area preparation, water/sanitation access, safety zones, and coordination all support a living farm system.",
-    work: ["Plant seedlings", "Plant potatoes", "Create compost", "Continue preparing the grow area", "Build or improve the deer-deterrent fence", "Restack wood", "Collect water bottles for the next project", "Keep porta-potty service access clear", "Review hydration plan"],
-    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide", "Compost and planting guide"],
-    reflection: "What farm system did you improve today, and how did it help everyone work safely or help plants grow?",
+    curriculum: "Farm operations, sanitation, water access, and site readiness",
+    focus: "Youth learn that farm work depends on invisible systems: sanitation, water, access lanes, safety, and coordination.",
+    work: ["Keep porta-potty service access clear", "Check work zones", "Review hydration plan", "Support site readiness tasks"],
+    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide"],
+    reflection: "What farm system did you notice today that helps everyone work safely?",
   },
   {
     day: "Thursday",
     date: "Week 2 Thursday",
-    curriculum: "Plant growth, protection, pollinators, observation, and ecosystem connections",
-    focus: "Youth observe how plant health, deer protection, soil, water, insects, people, and farm decisions connect in the ecosystem.",
-    work: ["Check all plants for health", "Look for pollinator activity", "Secure the grow area", "Continue deer-deterrent fence work", "Make more Bubble Babies", "Document a Cultivator Moment"],
-    resources: ["Pollinator basics", "Plant observation prompts", "Fence/protection note", "Explore the Connections"],
-    reflection: "What connection did you discover between plants, people, protection, and the ecosystem?",
+    curriculum: "Plant growth, pollinators, observation, and ecosystem connections",
+    focus: "Youth observe how plants, flowers, insects, water, soil, and people connect in the farm ecosystem.",
+    work: ["Observe plant growth", "Look for pollinator activity", "Identify one connection", "Document a Cultivator Moment"],
+    resources: ["Pollinator basics", "Plant observation prompts", "Explore the Connections"],
+    reflection: "What connection did you discover between plants, people, and the ecosystem?",
   },
   {
     day: "Friday",
     date: "Week 2 Friday",
     curriculum: "Water operations, stewardship, weekly reflection, and Cultivator Story",
-    focus: "Youth connect water access, crop health, compost, planting progress, site protection, and responsibility to the larger farm system.",
-    work: ["Verify water tote access", "Support watering plan", "Finish urgent planting or site-readiness tasks", "Review the week", "Tell your Cultivator Story"],
+    focus: "Youth connect water tote filling, crop health, planning, and responsibility to the larger farm system.",
+    work: ["Verify water tote access", "Support watering plan", "Review the week", "Tell your Cultivator Story"],
     resources: ["Friday water operations note", "Weekly reflection guide", "Cultivator Story prompt"],
     reflection: "How did this week help you become more capable than you were yesterday?",
   },
@@ -737,37 +735,7 @@ function getAlmanacDayName(date = new Date()) {
 
 function getTodayOperation(date = new Date()) {
   const dayName = getAlmanacDayName(date);
-  const plan = getCurrentYouthPlan(date);
-  const priorityPreview = todayFarmPriorityGroups
-    .flatMap((group) => group.tasks)
-    .slice(0, 5)
-    .join(" • ");
-  const dayNote = launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
-  return `Week ${getCurrentProgramWeek(date)} curriculum: ${plan.curriculum}. Farm work: ${priorityPreview}. ${dayNote}`;
-}
-
-function getRecordDate(row: any) {
-  return String(row?.date || row?.attendance_date || row?.checkin_date || row?.created_at || "").slice(0, 10);
-}
-
-function getAttendanceStatus(row: any) {
-  return String(row?.status || row?.attendance_status || "not checked in").toLowerCase();
-}
-
-function participantIdForAttendance(row: any) {
-  return String(row?.participant_id || row?.youth_participant_id || row?.youth_id || "");
-}
-
-function isLikelyTestOrAdminYouth(row: { registration: YouthRegistration; profile?: MasterProfile }) {
-  const name = `${row.profile?.first_name || ""} ${row.profile?.last_name || ""} ${row.registration.participant_id || ""}`.toLowerCase();
-  const profileType = row.profile?.profile_type;
-  return profileType !== "youth" || /\b(test|demo|sample)\b/.test(name) || name.includes("constance burgess");
-}
-
-function curriculumAssignmentLabel(date = new Date()) {
-  const week = getCurrentYouthWeek();
-  const plan = getCurrentYouthPlan(date);
-  return `Week ${week.week}: ${week.title} • ${plan.day}: ${plan.curriculum}`;
+  return launchAlmanacSnapshot.operationsByDay[dayName] || "Check Mission Control for today’s operation note.";
 }
 
 type LiveFarmWeather = {
@@ -2191,9 +2159,7 @@ function supabaseTableCandidates(table: string) {
     attendance: ["attendance_records", "attendance"],
     attendance_records: ["attendance_records", "attendance"],
     feedback: ["feedback", "ecosystem_feedback", "program_feedback"],
-    parent_contact_logs: ["parent_contact_logs", "parent_contacts", "attendance_communications", "parent_communications"],
-    incident_logs: ["incidents", "incident_logs", "incident_reports"],
-    incidents: ["incidents", "incident_logs", "incident_reports"],
+    parent_contact_logs: ["parent_contact_logs", "attendance_communications", "parent_communications"],
     parent_summaries: ["parent_summaries", "parent_summary"],
   };
   return aliases[table] || [table];
@@ -2258,8 +2224,24 @@ function saveModeMessage(action: string, result: { mode?: string; table?: string
 }
 
 function profileName(profile?: MasterProfile) {
-  if (!profile) return "Unknown participant";
-  return `${profile.preferred_name || profile.first_name} ${profile.last_name}`.trim();
+  if (!profile) return "Participant Record Pending";
+  const name = `${profile.preferred_name || profile.first_name || ""} ${profile.last_name || ""}`.trim();
+  return name || "Participant Record Pending";
+}
+
+function youthDisplayName(row?: { registration: YouthRegistration; profile?: MasterProfile }) {
+  if (!row) return "Participant Record Pending";
+  const name = profileName(row.profile);
+  return name === "Participant Record Pending" ? `PIN ${row.registration.participant_id || "pending"}` : name;
+}
+
+function youthPinLabel(participantId?: string) {
+  if (!participantId) return "PIN pending";
+  return `PIN ${participantId.replace(/^BFF-/i, "")}`;
+}
+
+function youthSupervisorOption(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  return `${youthDisplayName(row)} — ${youthPinLabel(row.registration.participant_id)}`;
 }
 
 function roleToProfileType(role: Role): ProfileType {
@@ -3546,7 +3528,7 @@ function MyWorkspace({
 
     if (matchedYouth) {
       const profile = profiles.find((item) => item.id === matchedYouth.profile_id);
-      const displayName = profileName(profile) === "Unknown participant" ? name || matchedYouth.participant_id : profileName(profile);
+      const displayName = profileName(profile) === "Participant Record Pending" ? name || matchedYouth.participant_id : profileName(profile);
       signIn("Youth Workforce Participant", displayName, {
         participant_id: matchedYouth.participant_id,
         profile_id: matchedYouth.profile_id,
@@ -3704,7 +3686,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [preferredName, setPreferredName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [crew] = useState("Curriculum Week Attendance");
+  const [crew, setCrew] = useState("Crew A");
   const [guardianName, setGuardianName] = useState("");
   const [guardianPhone, setGuardianPhone] = useState("");
   const [guardianEmail, setGuardianEmail] = useState("");
@@ -3765,7 +3747,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         profile_id: profile.id,
         participant_id: `BFF-${Math.floor(100000 + Math.random() * 899999)}`,
         age_range: "14-18",
-        crew: curriculumAssignmentLabel(),
+        crew,
         guardian_name: guardianName.trim(),
         guardian_phone: guardianPhone.trim(),
         guardian_email: guardianEmail.trim(),
@@ -3803,10 +3785,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
           <div className="text-lg font-black">Youth Workforce Details</div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm font-bold leading-6 text-white/84">
-              Current curriculum assignment: {curriculumAssignmentLabel()}
-              <div className="mt-1 text-xs text-white/60">Youth are tracked by attendance and curriculum week, not Crew A/B/C/D.</div>
-            </div>
+            <SelectField label="Crew" value={crew} onChange={setCrew} options={["Crew A", "Crew B", "Crew C", "Crew D", "Not assigned"]} />
             <Field label="Guardian Name" value={guardianName} onChange={setGuardianName} />
             <Field label="Guardian Phone" value={guardianPhone} onChange={setGuardianPhone} />
             <Field label="Guardian Email" value={guardianEmail} onChange={setGuardianEmail} />
@@ -4202,7 +4181,7 @@ function TodayFarmOperationsBoard({ compact = false }: { compact?: boolean }) {
           <h2 className="mt-2 text-2xl font-black">Week 2: Regenerative Agriculture in action</h2>
           <p className="mt-2 text-sm font-bold leading-6 text-white/78">This board turns today's farm needs into clear team assignments for youth and supervisors.</p>
         </div>
-        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">{getCurrentYouthPlan().day} Operations</div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">{getAlmanacDayName()} Operations</div>
       </div>
 
       {compact ? (
@@ -4526,10 +4505,10 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
     refresh();
   }, []);
 
-  const youthRows = youth.map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) })).filter((row) => !isLikelyTestOrAdminYouth(row));
-  const todayAttendance = attendance.filter((a: any) => getRecordDate(a) === todayISO());
+  const youthRows = youth.map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }));
+  const todayAttendance = attendance.filter((a) => a.date === todayISO());
   const supportFlags = wellness.filter((w) => w.safety_flag);
-  const todayIncidents = incidents.filter((i: any) => getRecordDate(i) === todayISO());
+  const todayIncidents = incidents.filter((i) => i.created_at.slice(0, 10) === todayISO());
 
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
@@ -4610,8 +4589,8 @@ function SupervisorDashboard({
   setScreen: (screen: Screen) => void;
 }) {
   const stats = [
-    { title: "Real Youth Roster", value: youthCount, action: () => setTab("roster") },
-    { title: "Present / Recorded Today", value: attendanceCount, action: () => setTab("attendance") },
+    { title: "Youth Roster", value: youthCount, action: () => setTab("roster") },
+    { title: "Today Attendance", value: attendanceCount, action: () => setTab("attendance") },
     { title: "Support Flags", value: supportFlags, action: () => setTab("wellness") },
     { title: "Today Incidents", value: incidentCount, action: () => setTab("incident") },
     { title: "Parent Summaries", value: parentSummaryCount, action: () => setTab("parent") },
@@ -4629,6 +4608,9 @@ function SupervisorDashboard({
         <div className="mt-1 text-xl font-black">Week {getCurrentYouthWeek().week}: {getCurrentYouthWeek().title}</div>
         <div className="mt-1 text-sm font-bold text-white/78">Today: {getCurrentYouthPlan().day} — {getCurrentYouthPlan().curriculum}</div>
         <button type="button" onClick={() => setTab("project")} className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black">Open Current Week Activity</button>
+      </div>
+      <div className="mt-4">
+        <TodayFarmOperationsBoard compact />
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
@@ -4679,7 +4661,7 @@ function YouthRosterModule({
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-4xl font-black">Active youth participants.</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, connected to the current curriculum week, checked in today, and ready for assessment or parent-safe updates.</p>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This is the supervisor-facing roster. Use it to see who is active, checked in today, connected to the current curriculum week, and ready for assessment or parent-safe updates.</p>
         </div>
         <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
@@ -4688,27 +4670,26 @@ function YouthRosterModule({
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
       ) : (
         <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
-          <div className="grid grid-cols-[1.3fr_0.9fr_0.8fr_0.8fr_0.8fr_0.9fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
-            <div>Youth</div><div>Participant ID</div><div>Curriculum</div><div>Age</div><div>Today</div><div>Status</div>
+          <div className="grid grid-cols-[1.3fr_0.9fr_1.2fr_0.8fr_0.9fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
+            <div>Youth</div><div>PIN</div><div>Current Curriculum</div><div>Today</div><div>Status</div>
           </div>
           <div className="divide-y divide-white/10">
             {youthRows.map((row) => {
               const participantId = row.registration.participant_id;
-              const todayStatus = attendance.find((a: any) => participantIdForAttendance(a) === participantId && getRecordDate(a) === today)?.status || "not checked in";
+              const todayStatus = attendance.find((a) => a.participant_id === participantId && a.date === today)?.status || "not checked in";
               const lastAssessment = assessments.filter((a) => a.participant_id === participantId).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const hasFlag = wellness.some((w) => w.profile_id === row.registration.profile_id && w.safety_flag) || incidents.some((i) => i.participant_id === participantId && i.urgency !== "low");
               return (
-                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.9fr_0.8fr_0.8fr_0.8fr_0.9fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
+                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.9fr_1.2fr_0.8fr_0.9fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
                   <div>
                     <div className="font-black text-white">{nameFor(row)}</div>
                     <div className="text-xs text-white/60">Guardian: {row.registration.guardian_name || "not entered"}</div>
                   </div>
-                  <div>{participantId}</div>
-                  <div className="text-xs font-bold leading-5 text-white/78">{curriculumAssignmentLabel()}</div>
-                  <div>{row.registration.age_range || "—"}</div>
+                  <div>{youthPinLabel(participantId)}</div>
+                  <div>Week {getCurrentYouthWeek().week}: {getCurrentYouthWeek().title}</div>
                   <div className="capitalize">{todayStatus.replaceAll("_", " ")}</div>
                   <div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "OK"}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "Clear"}</span>
                     {lastAssessment && <div className="mt-1 text-xs text-white/60">Safety {lastAssessment.safety}/5</div>}
                   </div>
                 </div>
@@ -4765,7 +4746,14 @@ function AttendanceTool({
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Attendance / PPE</div>
       <h2 className="mt-3 text-4xl font-black">Check youth in and document readiness.</h2>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
+          <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+            {youthRows.map((row) => (
+              <option key={row.registration.participant_id} value={row.registration.participant_id} className="bg-black">{youthSupervisorOption(row)}</option>
+            ))}
+          </select>
+        </label>
         <SelectField label="Attendance Status" value={status} onChange={(v) => setStatus(v as AttendanceRecord["status"])} options={["present", "absent", "late", "excused"]} />
         <SelectField label="PPE / Readiness" value={ppe} onChange={(v) => setPpe(v as AttendanceRecord["ppe_status"])} options={["complete", "missing_gloves", "missing_shoes", "missing_water", "needs_review"]} />
         <TextArea label="Notes" value={notes} onChange={setNotes} />
@@ -4803,6 +4791,71 @@ function WellnessReview({ wellness, profiles }: { wellness: WellnessCheckIn[]; p
   );
 }
 
+type AssessmentCategoryKey = "safety" | "teamwork" | "communication" | "responsibility" | "initiative" | "problemSolving";
+
+const assessmentBehaviorRubric: Record<AssessmentCategoryKey, { label: string; behaviors: string[] }> = {
+  safety: {
+    label: "Safety",
+    behaviors: [
+      "Wore required PPE / readiness items",
+      "Followed site boundaries and supervisor directions",
+      "Used tools and materials safely",
+      "Kept water / hydration visible",
+      "Reminded or helped others stay safe",
+    ],
+  },
+  teamwork: {
+    label: "Teamwork",
+    behaviors: [
+      "Worked respectfully with others",
+      "Stayed with assigned group or work area",
+      "Shared tools, materials, or space appropriately",
+      "Helped another youth or adult",
+      "Encouraged cooperation or helped the group finish",
+    ],
+  },
+  communication: {
+    label: "Communication",
+    behaviors: [
+      "Listened to directions",
+      "Asked a question when unsure",
+      "Explained what they were doing or learning",
+      "Reported a need, concern, or completed task",
+      "Used respectful words with youth, staff, or guests",
+    ],
+  },
+  responsibility: {
+    label: "Responsibility",
+    behaviors: [
+      "Arrived / checked in for the day",
+      "Started assigned work after direction",
+      "Stayed with the task long enough to make progress",
+      "Cleaned up or returned tools/materials",
+      "Completed or helped complete the assigned work",
+    ],
+  },
+  initiative: {
+    label: "Initiative",
+    behaviors: [
+      "Looked for a way to help",
+      "Started a next step without repeated prompting",
+      "Noticed something that needed attention",
+      "Offered an idea or solution",
+      "Took positive ownership of part of the work",
+    ],
+  },
+  problemSolving: {
+    label: "Problem Solving",
+    behaviors: [
+      "Recognized a problem or obstacle",
+      "Tried a safe solution",
+      "Adjusted when something did not work",
+      "Asked for the right support",
+      "Helped the team complete work despite a challenge",
+    ],
+  },
+};
+
 function AssessmentTool({
   youthRows,
   activeUser,
@@ -4813,28 +4866,57 @@ function AssessmentTool({
   onSaved: () => void;
 }) {
   const [participantId, setParticipantId] = useState(youthRows[0]?.registration.participant_id || "");
-  const [safety, setSafety] = useState(3);
-  const [teamwork, setTeamwork] = useState(3);
-  const [communication, setCommunication] = useState(3);
-  const [responsibility, setResponsibility] = useState(3);
-  const [initiative, setInitiative] = useState(3);
-  const [problemSolving, setProblemSolving] = useState(3);
+  const [observedBehaviors, setObservedBehaviors] = useState<Record<AssessmentCategoryKey, string[]>>({
+    safety: [],
+    teamwork: [],
+    communication: [],
+    responsibility: [],
+    initiative: [],
+    problemSolving: [],
+  });
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
 
+  const assessmentKeys: AssessmentCategoryKey[] = ["safety", "teamwork", "communication", "responsibility", "initiative", "problemSolving"];
+
+  const participantOptions = youthRows.map((row) => ({
+    value: row.registration.participant_id,
+    label: youthSupervisorOption(row),
+  }));
+
+  const scoreFor = (key: AssessmentCategoryKey) => Math.max(1, Math.min(5, observedBehaviors[key].length));
+
+  const toggleBehavior = (key: AssessmentCategoryKey, behavior: string) => {
+    setObservedBehaviors((current) => {
+      const selected = current[key] || [];
+      const next = selected.includes(behavior)
+        ? selected.filter((item) => item !== behavior)
+        : [...selected, behavior];
+      return { ...current, [key]: next };
+    });
+  };
+
   const save = async () => {
+    const observedSummary = assessmentKeys
+      .map((key) => {
+        const rubric = assessmentBehaviorRubric[key];
+        const selected = observedBehaviors[key];
+        return `${rubric.label} ${scoreFor(key)}/5: ${selected.length ? selected.join("; ") : "No observed behavior selected"}`;
+      })
+      .join("\n");
+
     const row: AssessmentRecord = {
       id: uuid(),
       participant_id: participantId,
       supervisor_id: activeUser?.id,
       date: todayISO(),
-      safety,
-      teamwork,
-      communication,
-      responsibility,
-      initiative,
-      problem_solving: problemSolving,
-      notes,
+      safety: scoreFor("safety"),
+      teamwork: scoreFor("teamwork"),
+      communication: scoreFor("communication"),
+      responsibility: scoreFor("responsibility"),
+      initiative: scoreFor("initiative"),
+      problem_solving: scoreFor("problemSolving"),
+      notes: [notes.trim(), "Observed behaviors:", observedSummary].filter(Boolean).join("\n"),
       created_at: new Date().toISOString(),
     };
     const result = await insertRow("supervisor_assessments", ASSESSMENT_KEY, row);
@@ -4842,30 +4924,58 @@ function AssessmentTool({
     onSaved();
   };
 
-  const Slider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="block rounded-2xl border border-white/10 bg-white/10 p-4">
-      <div className="flex justify-between text-sm font-black"><span>{label}</span><span>{value}/5</span></div>
-      <input className="mt-3 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
-    </label>
-  );
+  const BehaviorCategory = ({ categoryKey }: { categoryKey: AssessmentCategoryKey }) => {
+    const rubric = assessmentBehaviorRubric[categoryKey];
+    const score = scoreFor(categoryKey);
+    const selected = observedBehaviors[categoryKey];
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="font-black">{rubric.label}</div>
+          <div className="rounded-full border border-emerald-200/30 bg-emerald-300/15 px-3 py-1 text-xs font-black text-emerald-50">{score}/5</div>
+        </div>
+        <div className="mt-1 text-xs font-bold text-white/58">Select all observed today. Higher scores mean stronger observed readiness.</div>
+        <div className="mt-3 grid gap-2">
+          {rubric.behaviors.map((behavior) => (
+            <label key={behavior} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-bold leading-5 text-white/84">
+              <input
+                type="checkbox"
+                checked={selected.includes(behavior)}
+                onChange={() => toggleBehavior(categoryKey, behavior)}
+                className="mt-1 h-4 w-4 accent-emerald-300"
+              />
+              <span>{behavior}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Assessment</div>
-      <h2 className="mt-3 text-4xl font-black">Track skill growth, responsibility, and readiness.</h2>
+      <h2 className="mt-3 text-4xl font-black">Observe today’s work and record growth.</h2>
+      <p className="mt-3 max-w-4xl text-sm leading-6 text-white/80">
+        Supervisors select what they actually observed. The system calculates the score. Higher numbers mean stronger observed readiness.
+      </p>
       <div className="mt-6">
-        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
+          <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+            {participantOptions.map((option) => (
+              <option key={option.value} value={option.value} className="bg-black">
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <Slider label="Safety" value={safety} setValue={setSafety} />
-        <Slider label="Teamwork" value={teamwork} setValue={setTeamwork} />
-        <Slider label="Communication" value={communication} setValue={setCommunication} />
-        <Slider label="Responsibility" value={responsibility} setValue={setResponsibility} />
-        <Slider label="Initiative" value={initiative} setValue={setInitiative} />
-        <Slider label="Problem Solving" value={problemSolving} setValue={setProblemSolving} />
+      <div className="mt-5 grid gap-3 lg:grid-cols-2">
+        {assessmentKeys.map((key) => <BehaviorCategory key={key} categoryKey={key} />)}
       </div>
       <div className="mt-5">
-        <TextArea label="Supervisor Notes" value={notes} onChange={setNotes} />
+        <TextArea label="Supervisor Notes" value={notes} onChange={setNotes} placeholder="Add context only if needed: task completed, support given, concern, or next step." />
       </div>
       <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Assessment</button>
       {message && <Notice text={message} />}
@@ -4915,7 +5025,14 @@ function IncidentTool({
         Injury workflow: youth notify the supervisor/site lead first. Registered Nurse Triage is available at <a className="font-black text-white underline" href="tel:18553896699">855-389-6699</a> 24/7/365. Supervisors complete the injury investigation/report when documentation is required.
       </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-red-100/75">Youth Name / PIN</span>
+          <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-red-200">
+            {youthRows.map((row) => (
+              <option key={row.registration.participant_id} value={row.registration.participant_id} className="bg-black">{youthSupervisorOption(row)}</option>
+            ))}
+          </select>
+        </label>
         <SelectField label="Incident Type" value={incidentType} onChange={(v) => setIncidentType(v as IncidentRecord["incident_type"])} options={["injury", "behavior", "conflict", "wellness", "safety", "transportation", "parent_contact", "other"]} />
         <SelectField label="Urgency" value={urgency} onChange={(v) => setUrgency(v as IncidentRecord["urgency"])} options={["low", "medium", "high", "emergency"]} />
         <label className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 font-black">
@@ -4959,7 +5076,7 @@ function ParentSummaryTool({
   const latestAssessment = participantAssessments[0];
 
   const generated = useMemo(() => {
-    const name = profileName(selectedYouth?.profile);
+    const name = selectedYouth ? youthDisplayName(selectedYouth) : youthPinLabel(participantId);
     const presentDays = participantAttendance.filter((a) => a.status === "present" || a.status === "late").length;
     const safety = latestAssessment?.safety ? `Safety score today: ${latestAssessment.safety}/5.` : "Safety progress is being observed.";
     return `${name} participated in the Bronson Family Farm Youth Workforce Program. Attendance records show ${presentDays} active day(s) recorded. ${safety} Today’s parent-safe update: ${progress || "The participant continued building responsibility, teamwork, and outdoor work readiness."} Strength noticed: ${strengths || "continued participation and willingness to learn."} Next area of support: ${needs || "continued encouragement, punctuality, hydration, PPE readiness, and teamwork."}`;
@@ -4988,7 +5105,14 @@ function ParentSummaryTool({
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent-Safe Summary Generator</div>
       <h2 className="mt-3 text-4xl font-black">Share progress without exposing private youth reflection.</h2>
       <div className="mt-6">
-        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
+          <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+            {youthRows.map((row) => (
+              <option key={row.registration.participant_id} value={row.registration.participant_id} className="bg-black">{youthSupervisorOption(row)}</option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <TextArea label="Strengths to share with parent" value={strengths} onChange={setStrengths} />
@@ -5025,7 +5149,7 @@ function GuardianContactTool({
   const [message, setMessage] = useState("");
 
   const selected = youthRows.find((row) => row.registration.participant_id === participantId);
-  const youthName = selected?.profile ? profileName(selected.profile) : participantId;
+  const youthName = selected ? youthDisplayName(selected) : youthPinLabel(participantId);
   const guardianName = selected?.registration.guardian_name || "No guardian entered";
   const guardianPhone = selected?.registration.guardian_phone || "No phone entered";
   const guardianEmail = selected?.registration.guardian_email || "No email entered";
@@ -5059,7 +5183,14 @@ function GuardianContactTool({
       <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This does not send automatic email or text yet. It gives supervisors one place to see guardian contact information and document phone calls, texts sent, emails sent, pickup conversations, concerns, and daily updates.</p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <SelectField label="Youth Participant" value={participantId} onChange={setParticipantId} options={youthRows.map((row) => row.registration.participant_id)} />
+        <label className="block">
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
+          <select value={participantId} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+            {youthRows.map((row) => (
+              <option key={row.registration.participant_id} value={row.registration.participant_id} className="bg-black">{youthSupervisorOption(row)}</option>
+            ))}
+          </select>
+        </label>
         <SelectField label="Contact Method" value={method} onChange={(v) => setMethod(v as ParentContactLog["contact_method"])} options={["phone", "text", "email", "in_person", "left_message", "other"]} />
         <SelectField label="Reason" value={reason} onChange={(v) => setReason(v as ParentContactLog["contact_reason"])} options={["daily_update", "encouragement", "concern", "incident", "pickup", "attendance", "other"]} />
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/86">
@@ -5229,7 +5360,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     profile_id: activeUser?.profile_id || activeUser?.id || "demo-profile",
     participant_id: activeUser?.participant_id || "BFF-736309",
     age_range: "14-18",
-    crew: curriculumAssignmentLabel(),
+    crew: "Crew A",
     guardian_name: "Parent / Guardian",
     guardian_phone: "(330) 000-0000",
     guardian_email: "",
@@ -5349,7 +5480,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-sm leading-6">
             <div className="font-black text-white">{profileName(selectedProfile) === "Unknown participant" ? activeUser?.name || "Youth Participant" : profileName(selectedProfile)}</div>
             <div className="text-white/70">Participant ID: {selectedYouth?.participant_id}</div>
-            <div className="text-white/70">Curriculum: {curriculumAssignmentLabel()}</div>
+            <div className="text-white/70">Crew: {selectedYouth?.crew || "Unassigned"}</div>
             <div className="mt-2 rounded-full bg-emerald-300 px-3 py-1 text-center text-xs font-black text-black">Attendance saves as PRESENT.</div>
           </div>
         </section>
@@ -6449,12 +6580,13 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
   const projectProgress = safeRead<string[]>("bff.launch.coolingCenterProgress", []);
   const today = todayISO();
-  const present = attendance.filter((a: any) => getRecordDate(a) === today && getAttendanceStatus(a) === "present").length;
+  const present = attendance.filter((a) => a.date === today && a.status === "present").length;
   const supportFlags = wellness.filter((w) => w.safety_flag).length;
   const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
   const inventoryLogs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
   const farmStatus = getFarmStatus();
-  const ppeNeedsReview = attendance.filter((a: any) => getRecordDate(a) === today && a.ppe_status !== "complete").length;
+  const unassignedYouth = youth.filter((item) => !item.crew || /unassigned/i.test(item.crew)).length;
+  const ppeNeedsReview = attendance.filter((a) => a.date === today && a.ppe_status !== "complete").length;
   const urgentIncidents = incidents.filter((i) => i.urgency === "high" || i.urgency === "emergency").length;
   const inventoryAlerts = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing" || item.available <= 0).length;
   const spanishReady = Boolean(languageText.es?.youth && languageText.es?.parent && languageText.es?.supervisor);
@@ -6462,7 +6594,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
     { area: "Youth Login", status: "🟢 Ready", detail: "PIN access includes supervisor-assisted continuation for unmatched launch PINs.", action: "Test with 2 known PINs and 1 unmatched PIN." },
     { area: "Start My Day", status: present > 0 ? "🟢 Ready" : "🟡 Monitor", detail: present > 0 ? `${present} youth checked in today.` : "Check-in workflow is present; test when youth arrive.", action: "Confirm attendance saves on phone." },
     { area: "Supervisor Verification", status: "🟢 Ready", detail: "Unmatched youth may continue pending verification and staff follow-up.", action: "Route unmatched 4-digit PIN issues to bhchatman@gmail.com." },
-    { area: "Curriculum Sync", status: "🟢 Ready", detail: `${curriculumAssignmentLabel()} is the active source of truth for youth work.`, action: "Use attendance to prove participation; do not route youth by Crew A/B/C/D." },
+    { area: "Assignments", status: unassignedYouth > 0 ? "🔴 Blocker" : "🟢 Ready", detail: unassignedYouth > 0 ? `${unassignedYouth} youth still show unassigned crew.` : "No unassigned youth detected in local roster.", action: "Assign category / supervisor before relying on daily work routing." },
     { area: "Safety / Nurse Line", status: ppeNeedsReview || urgentIncidents ? "🟡 Monitor" : "🟢 Ready", detail: `${ppeNeedsReview} PPE reviews today; ${urgentIncidents} urgent incidents logged.`, action: "Keep Nurse Line visible and incident form one tap away." },
     { area: "Inventory", status: inventoryAlerts ? "🟡 Monitor" : "🟢 Ready", detail: `${inventory.length} items loaded; ${inventoryAlerts} alerts; ${inventoryLogs.length} inventory log entries.`, action: "Check out, return, and damage-report one item before youth start." },
     { area: "Almanac + Weather", status: farmStatus.color === "red" ? "🔴 Blocker" : farmStatus.color === "amber" ? "🟡 Monitor" : "🟢 Ready", detail: `${farmStatus.level}: ${farmStatus.title}`, action: "Set work status before assignments are released." },
