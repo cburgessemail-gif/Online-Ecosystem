@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH CANDIDATE 4.3 - SUPERVISOR DAILY WORK FLOW SYNC
+ * LAUNCH 5.0 - OPERATIONS RESTORATION + REAL CALENDAR
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -668,20 +668,20 @@ const youthWeekTwoDailyPlan = [
   {
     day: "Wednesday",
     date: "Week 2 Wednesday",
-    curriculum: "Farm operations, sanitation, water access, and site readiness",
-    focus: "Youth learn that farm work depends on invisible systems: sanitation, water, access lanes, safety, and coordination.",
-    work: ["Keep porta-potty service access clear", "Check work zones", "Review hydration plan", "Support site readiness tasks"],
-    resources: ["Wednesday operations note", "Hydration checklist", "Site access and safety guide"],
-    reflection: "What farm system did you notice today that helps everyone work safely?",
+    curriculum: "Farm operations, planting, compost, water access, and site readiness",
+    focus: "Youth connect actual farm work to soil health, plant establishment, sanitation, water access, safety, and coordination.",
+    work: ["Plant seedlings", "Plant potatoes", "Create compost", "Continue grow area preparation", "Build second deer-deterrent fence", "Restack wood", "Collect water bottles", "Check plant health", "Make Bubble Babies", "Keep porta-potty service access clear"],
+    resources: ["Wednesday operations note", "Hydration checklist", "Planting guide", "Compost observation guide", "Site access and safety guide"],
+    reflection: "What did you observe before acting today, and how did that observation help the farm?",
   },
   {
     day: "Thursday",
     date: "Week 2 Thursday",
-    curriculum: "Plant growth, pollinators, observation, and ecosystem connections",
-    focus: "Youth observe how plants, flowers, insects, water, soil, and people connect in the farm ecosystem.",
-    work: ["Observe plant growth", "Look for pollinator activity", "Identify one connection", "Document a Cultivator Moment"],
-    resources: ["Pollinator basics", "Plant observation prompts", "Explore the Connections"],
-    reflection: "What connection did you discover between plants, people, and the ecosystem?",
+    curriculum: "Plant growth, pollinators, crop protection, and ecosystem connections",
+    focus: "Youth observe how plants, flowers, insects, water, soil, wildlife protection, and people connect in the farm ecosystem.",
+    work: ["Check all plants for health", "Finish planting seedlings", "Continue deer-deterrent fence", "Create compost", "Make more Bubble Babies", "Observe pollinator activity", "Document a Cultivator Moment"],
+    resources: ["Pollinator basics", "Plant observation prompts", "Crop protection and deer fence guide", "Explore the Connections"],
+    reflection: "What connection did you discover today between farm work, food, health, and community?",
   },
   {
     day: "Friday",
@@ -920,6 +920,222 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
         Live weather is pulled automatically. The official Youngstown Almanac forecast opens from the live Almanac link; it is not replaced with static text.
       </div>
     </Card>
+  );
+}
+
+
+
+type TodayFarmPlan = {
+  date: Date;
+  week: ReturnType<typeof getCurrentYouthWeek>;
+  plan: ReturnType<typeof getCurrentYouthPlan>;
+  farmStatus: FarmOperationStatus;
+  work: string[];
+  learning: string[];
+  reflection: string;
+  schedule: { time: string; title: string; kind: "conditions" | "work" | "meal" | "learning" | "reflection" | "operations" | "safety"; detail?: string }[];
+  events: { title: string; kind: "curriculum" | "work" | "delivery" | "visitor" | "safety" | "meeting" | "reflection"; date: string; time?: string }[];
+};
+
+function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
+  const week = getCurrentYouthWeek();
+  const plan = getCurrentYouthPlan(date);
+  const farmStatus = getFarmStatus();
+  const work = plan.work?.length ? plan.work : ["Check Mission Control for today's farm work"];
+  const learning = [...(week.skills || []), "Observation", "Contribution", "Stewardship"];
+  const iso = date.toISOString().slice(0, 10);
+  return {
+    date,
+    week,
+    plan,
+    farmStatus,
+    work,
+    learning,
+    reflection: plan.reflection,
+    schedule: [
+      { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
+      { time: "8:15 AM", title: "Cultivator Almanac + Morning Briefing", kind: "conditions", detail: "Observe weather, work status, calendar, and today's focus." },
+      { time: "8:30 AM", title: work[0] || "Farm Work Block #1", kind: "work", detail: plan.curriculum },
+      { time: "10:00 AM", title: work[1] || "Farm Work Block #2", kind: "work", detail: "Document observations and contribution." },
+      { time: "11:00 AM", title: "Lunch", kind: "meal", detail: "Lunch begins at 11:00 AM." },
+      { time: "11:45 AM", title: work[2] || "Farm Work Block #3", kind: "work", detail: "Return to priority farm work." },
+      { time: "12:45 PM", title: "Uploads / Reflection / Documentation", kind: "reflection", detail: plan.reflection },
+      { time: "1:00 PM", title: "Cleanup & Tool Return", kind: "operations", detail: "Return tools, update inventory, clean work areas." },
+      { time: "1:30 PM", title: "Wrap-Up / Daily Farm Story", kind: "learning", detail: "What happened, what was learned, what remains." },
+      { time: "2:00 PM", title: "Departure", kind: "operations", detail: "Youth depart / parent pickup." },
+    ],
+    events: [
+      { title: `Week ${week.week}: ${week.title}`, kind: "curriculum", date: iso, time: "8:15 AM" },
+      ...work.slice(0, 6).map((title, index) => ({ title, kind: "work" as const, date: iso, time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : "11:45 AM" })),
+      { title: "Lunch", kind: "safety", date: iso, time: "11:00 AM" },
+      { title: "Uploads + Reflection", kind: "reflection", date: iso, time: "12:45 PM" },
+      { title: "Cleanup", kind: "work", date: iso, time: "1:00 PM" },
+    ],
+  };
+}
+
+function statusTone(color: "green" | "amber" | "red" | "blue" | "purple" | "orange" | "slate") {
+  const map = {
+    green: "border-emerald-300 bg-emerald-50 text-emerald-950",
+    amber: "border-amber-300 bg-amber-50 text-amber-950",
+    orange: "border-orange-300 bg-orange-50 text-orange-950",
+    red: "border-red-300 bg-red-50 text-red-950",
+    blue: "border-blue-300 bg-blue-50 text-blue-950",
+    purple: "border-purple-300 bg-purple-50 text-purple-950",
+    slate: "border-slate-300 bg-slate-50 text-slate-950",
+  } as const;
+  return map[color];
+}
+
+function OperationalStatusCard({ icon, label, value, detail, tone = "slate", onClick }: { icon: string; label: string; value: React.ReactNode; detail?: string; tone?: "green" | "amber" | "red" | "blue" | "purple" | "orange" | "slate"; onClick?: () => void }) {
+  const Tag: any = onClick ? "button" : "div";
+  return (
+    <Tag type={onClick ? "button" : undefined} onClick={onClick} className={`rounded-2xl border-2 p-4 text-left shadow-sm ${statusTone(tone)} ${onClick ? "transition hover:scale-[1.01]" : ""}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-2xl">{icon}</div>
+        <div className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{label}</div>
+      </div>
+      <div className="mt-2 text-3xl font-black leading-none">{value}</div>
+      {detail && <div className="mt-2 text-xs font-bold leading-5 opacity-78">{detail}</div>}
+    </Tag>
+  );
+}
+
+function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const status = getFarmStatus();
+  const tone = status.color === "red" ? "red" : status.color === "amber" ? "amber" : "green";
+  return (
+    <div className="grid gap-2 md:grid-cols-4">
+      <OperationalStatusCard icon="🟢" label="Farm Status" value={status.level} detail={status.title} tone={tone} />
+      <OperationalStatusCard icon="🌤" label="Weather" value="Live" detail="Updates every 15 minutes when online" tone="blue" onClick={() => setScreen("almanac")} />
+      <OperationalStatusCard icon="🚑" label="Nurse Line" value="Visible" detail="Tap from any operational screen" tone="red" />
+      <OperationalStatusCard icon="📅" label="Calendar" value="Open" detail="Month / Week / Day views" tone="purple" onClick={() => setScreen("events")} />
+    </div>
+  );
+}
+
+function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => void; setTab?: (tab: any) => void }) {
+  const actions = [
+    ["📅 Calendar", () => setScreen("events")],
+    ["🌤 Weather", () => setScreen("almanac")],
+    ["🚑 Nurse Line", () => undefined],
+    ["📷 Upload", () => setScreen("media")],
+    ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
+    ["👥 Workforce", () => setTab ? setTab("roster") : setScreen("supervisor")],
+    ["📦 Inventory", () => setScreen("operations")],
+  ] as const;
+  return (
+    <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-sm">
+      {actions.map(([label, action]) => (
+        <button key={label} type="button" onClick={action} className="whitespace-nowrap rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black hover:bg-emerald-100">
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TodayFarmPlanCard({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
+  const today = getTodayFarmPlan();
+  return (
+    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Today at Bronson Family Farm</div>
+      <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-3xl font-black">{today.plan.day} • Week {today.week.week}: {today.week.title}</h2>
+          <p className="mt-2 text-sm font-bold text-slate-700">{today.plan.curriculum}</p>
+        </div>
+        <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-slate-900 px-5 py-3 text-sm font-black text-white">Open Calendar</button>
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today's Farm Work</div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {today.work.slice(0, compact ? 6 : 10).map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm">🌱 {item}</div>)}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">Learning + Reflection</div>
+          <div className="mt-3 flex flex-wrap gap-2">{today.learning.slice(0, 8).map((skill) => <span key={skill} className="rounded-full bg-white px-3 py-1 text-xs font-black text-blue-950 shadow-sm">{skill}</span>)}</div>
+          <p className="mt-4 rounded-xl bg-white p-3 text-sm font-bold leading-6 text-slate-800">Reflection: {today.reflection}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CalendarEventPill({ title, kind }: { title: string; kind: string }) {
+  const tone = kind === "safety" ? "bg-red-100 text-red-950 border-red-200" : kind === "work" ? "bg-emerald-100 text-emerald-950 border-emerald-200" : kind === "curriculum" ? "bg-blue-100 text-blue-950 border-blue-200" : kind === "reflection" ? "bg-purple-100 text-purple-950 border-purple-200" : kind === "delivery" ? "bg-orange-100 text-orange-950 border-orange-200" : "bg-slate-100 text-slate-950 border-slate-200";
+  return <div className={`truncate rounded-md border px-1.5 py-1 text-[10px] font-black ${tone}`}>{title}</div>;
+}
+
+function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [view, setView] = useState<"month" | "week" | "day">("week");
+  const base = new Date();
+  const todayPlan = getTodayFarmPlan(base);
+  const monthStart = new Date(base.getFullYear(), base.getMonth(), 1);
+  const gridStart = new Date(monthStart);
+  gridStart.setDate(monthStart.getDate() - monthStart.getDay());
+  const days = Array.from({ length: 42 }, (_, i) => { const d = new Date(gridStart); d.setDate(gridStart.getDate() + i); return d; });
+  const weekStart = new Date(base); weekStart.setDate(base.getDate() - ((base.getDay() + 6) % 7));
+  const weekDays = Array.from({ length: 5 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
+  const eventForDate = (d: Date) => {
+    const day = d.getDay();
+    const week = getCurrentProgramWeek(d);
+    const plan = getCurrentYouthPlan(d);
+    const items = [{ title: `Week ${week}: ${getCurrentYouthWeek().title}`, kind: "curriculum" }, { title: plan.work?.[0] || plan.curriculum, kind: "work" }];
+    if (day === 3) items.push({ title: "Porta-potty service access", kind: "delivery" });
+    if (day === 5) items.push({ title: "Water tote fill check", kind: "delivery" });
+    return items;
+  };
+  return (
+    <div className="rounded-[1.5rem] border-2 border-slate-200 bg-white p-5 text-slate-950 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Actual Calendar</div>
+          <h2 className="mt-1 text-3xl font-black">{base.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</h2>
+        </div>
+        <div className="flex rounded-full border border-slate-200 bg-slate-50 p-1">
+          {(["month", "week", "day"] as const).map((item) => <button key={item} onClick={() => setView(item)} className={`rounded-full px-4 py-2 text-sm font-black capitalize ${view === item ? "bg-slate-900 text-white" : "text-slate-700"}`}>{item}</button>)}
+        </div>
+      </div>
+
+      {view === "month" && <div className="mt-5 grid grid-cols-7 gap-1 text-slate-950">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="p-2 text-center text-xs font-black uppercase tracking-widest text-slate-500">{d}</div>)}
+        {days.map((d) => {
+          const inMonth = d.getMonth() === base.getMonth();
+          const isToday = d.toDateString() === base.toDateString();
+          return <button key={d.toISOString()} type="button" onClick={() => setView("day")} className={`min-h-[110px] rounded-xl border p-2 text-left ${isToday ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white"} ${inMonth ? "opacity-100" : "opacity-45"}`}>
+            <div className="text-sm font-black">{d.getDate()}</div>
+            <div className="mt-2 grid gap-1">{eventForDate(d).slice(0, 3).map((e) => <CalendarEventPill key={`${d.toISOString()}-${e.title}`} title={e.title} kind={e.kind} />)}</div>
+          </button>;
+        })}
+      </div>}
+
+      {view === "week" && <div className="mt-5 overflow-x-auto">
+        <div className="grid min-w-[900px] grid-cols-[110px_repeat(5,1fr)] gap-2">
+          <div />
+          {weekDays.map((d) => <div key={d.toISOString()} className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">{d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}</div>)}
+          {todayPlan.schedule.map((slot) => <React.Fragment key={slot.time}>
+            <div className="rounded-xl bg-slate-100 p-3 text-sm font-black text-slate-700">{slot.time}</div>
+            {weekDays.map((d) => {
+              const p = getTodayFarmPlan(d);
+              const matching = p.schedule.find((s) => s.time === slot.time) || slot;
+              const tone = matching.kind === "meal" ? "border-amber-200 bg-amber-50" : matching.kind === "work" ? "border-emerald-200 bg-emerald-50" : matching.kind === "reflection" ? "border-purple-200 bg-purple-50" : matching.kind === "safety" ? "border-red-200 bg-red-50" : "border-blue-200 bg-blue-50";
+              return <div key={`${d.toISOString()}-${slot.time}`} className={`rounded-xl border p-3 ${tone}`}><div className="text-sm font-black">{matching.title}</div><div className="mt-1 text-xs font-bold text-slate-600">{matching.detail}</div></div>;
+            })}
+          </React.Fragment>)}
+        </div>
+      </div>}
+
+      {view === "day" && <div className="mt-5 grid gap-3">
+        <PersistentSafetyStrip setScreen={setScreen} />
+        {todayPlan.schedule.map((slot) => {
+          const tone = slot.kind === "meal" ? "amber" : slot.kind === "work" ? "green" : slot.kind === "reflection" ? "purple" : slot.kind === "safety" ? "red" : slot.kind === "learning" ? "blue" : "slate";
+          return <div key={slot.time} className={`rounded-2xl border-2 p-4 ${statusTone(tone as any)}`}><div className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{slot.time}</div><div className="mt-1 text-xl font-black">{slot.title}</div>{slot.detail && <div className="mt-1 text-sm font-bold opacity-80">{slot.detail}</div>}</div>;
+        })}
+      </div>}
+    </div>
   );
 }
 
@@ -2273,7 +2489,7 @@ function routeForRole(role: Role): Screen {
     "Marketplace Customer": "marketplace",
     Volunteer: "support",
     Partner: "partner",
-    Administrator: "operations",
+    Administrator: "reports",
     "Value-Added Producer": "valueAdded",
     "Board / Funder": "reports",
   };
@@ -6196,189 +6412,15 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
 
 function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const currentWeek = getCurrentYouthWeek();
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-5">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Calendar</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Farm Calendar</h1>
-        <p className="mt-5 max-w-4xl text-lg leading-8 text-white/84">
-          This is the real operating calendar: workdays, curriculum, visitors, deliveries, service access, weather changes, and weekly progression.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open My Day</button>
-          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Almanac</button>
-        </div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Real calendar of the farm day.</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/78">Month, week, and day views show curriculum, actual farm work, lunch at 11:00 AM, cleanup, visitors, deliveries, weather decisions, uploads, reflections, and the Daily Farm Story.</p>
       </Card>
-
-      <June2026CalendarGrid />
-
-      <TodayFarmOperationsBoard compact />
-
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Upcoming Operations</div>
-        <h2 className="mt-3 text-3xl font-black">Week {currentWeek.week} operations</h2>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Monday", "Weekly topic, supervisor assignment, PPE, work-plan confirmation, farm priorities."],
-            ["Wednesday", "Onsite Water service. Keep service access clear."],
-            ["Friday", "Water totes filled. Verify tote access and refill needs."],
-            ["Weather", "Mission Control may change Full Day, Half Day, or Work Cancelled."],
-          ].map(([label, note]) => (
-            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-              <div className="text-lg font-black">{label}</div>
-              <p className="mt-2 text-sm font-bold leading-6 text-white/76">{note}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <CurriculumWeekViewCard />
-
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Events & Visitors</div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {launchEvents.map((event) => (
-            <div key={event.title} className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
-              <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">{event.date} • {event.time}</div>
-              <h2 className="mt-3 text-2xl font-black">{event.title}</h2>
-              <div className="mt-2 text-sm font-black text-white/70">Audience: {event.audience}</div>
-              <p className="mt-4 text-sm leading-7 text-white/82">{event.purpose}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function VideoLibrary({ compact = false }: { compact?: boolean }) {
-  const moduleCard = (video: LaunchVideo) => {
-    const isSupervisor = video.title.includes("Supervisor") || video.title.includes("June 5");
-    const isCoolingIntro = video.title.includes("Cooling Station Challenge Introduction") || video.title.includes("June 8 Cooling Station");
-    const isManufacturing = video.title.includes("Manufacturing");
-    const isCompletion = video.title.includes("Final Cooling Station");
-
-    const heading = isSupervisor
-      ? "June 5 Staff & Supervisor Orientation"
-      : isCoolingIntro
-        ? "June 8 Cooling Station Challenge Launch Brief"
-        : isManufacturing
-          ? "Manufacturing Team Training Module"
-          : isCompletion
-            ? "Final Cooling Station Completion Module"
-            : video.title;
-
-    const items = isSupervisor
-      ? [
-          "Site safety and youth protection",
-          "Attendance and check-in procedures",
-          "PPE and heat-safety expectations",
-          "Wellness awareness and support",
-          "Incident documentation",
-          "Parent-safe communication",
-          "Platform navigation and reporting",
-        ]
-      : isCoolingIntro
-        ? [
-            "Real-world farm worker heat-safety challenge",
-            "Design Team develops concepts and templates",
-            "Engineering Team optimizes materials and layout",
-            "Manufacturing Team assembles and quality-checks",
-            "Contractor Team builds the final cooling station",
-            "Youth practice teamwork, communication, and problem solving",
-            "Photos, reflections, and assessments become portfolio evidence",
-          ]
-        : isManufacturing
-          ? [
-              "Assembly and safe production flow",
-              "Painting, personalization, and branding",
-              "Quality review before delivery to the Contractor Team",
-              "Teamwork, finishing, and farm operations documentation",
-            ]
-          : isCompletion
-            ? [
-                "Completed fans collected from production teams",
-                "Cooling station setup and presentation area prepared",
-                "Final team presentation and project documentation",
-                "Youth achievement evidence saved for portfolios",
-              ]
-            : [];
-
-    return (
-      <div className="min-h-[260px] border-b border-emerald-200/15 bg-gradient-to-br from-emerald-950/70 via-slate-950/65 to-amber-950/45 p-5">
-        <div className="inline-flex rounded-full bg-emerald-300/18 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-50">
-          Active Training Content
-        </div>
-        <h3 className="mt-4 text-2xl font-black text-white">{heading}</h3>
-        {items.length > 0 ? (
-          <ul className="mt-4 space-y-2 text-sm leading-6 text-white/84">
-            {items.map((item) => (
-              <li key={item} className="flex gap-2">
-                <span className="font-black text-emerald-200">✓</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-sm leading-7 text-white/80">{video.fallback}</p>
-        )}
-        <div className="mt-5 rounded-xl border border-emerald-200/15 bg-emerald-300/12 p-3 text-xs font-bold leading-5 text-emerald-50">
-          {isSupervisor
-            ? "Training content is active. Video recording will be added after the live orientation session."
-            : isCoolingIntro
-              ? "Challenge content is active. Video recording will be added after the live launch session."
-              : "Training module is active. Video documentation can be added after the live session."}
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="mt-7 rounded-[1.5rem] border border-sky-200/20 bg-sky-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.28em] text-sky-100/75">Launch Video Library</div>
-      <h2 className="mt-3 text-2xl font-black">June 5 and June 8 media documentation</h2>
-      <p className="mt-3 max-w-4xl text-sm leading-7 text-white/78">
-        This section organizes the staff orientation, the June 8 Cooling Station Challenge, the fan demonstration, manufacturing/painting documentation, youth interviews, and the final project completion record. Missing live recordings are now shown as active training cards so reviewers do not see empty black video boxes.
-      </p>
-      <div className={`mt-5 grid gap-4 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-3"}`}>
-        {launchVideos.map((video) => (
-          <div key={video.title} className="overflow-hidden rounded-[1.35rem] border border-white/10 bg-black/35">
-            {video.embedUrl ? (
-              <div className="aspect-video w-full overflow-hidden bg-black/80">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src={video.embedUrl}
-                  title={video.embedTitle || video.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  className="h-full w-full"
-                />
-              </div>
-            ) : (
-              moduleCard(video)
-            )}
-            <div className="p-4">
-              <h3 className="text-lg font-black">{video.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/74">{video.purpose}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {video.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-emerald-300/15 px-3 py-1 text-[11px] font-black text-emerald-50">{tag}</span>
-                ))}
-              </div>
-              <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3 text-[11px] leading-5 text-white/62">
-                {video.embedUrl ? (
-                  <>Training Resource: <span className="font-black text-white/80">demonstration ready</span></>
-                ) : (
-                  <>Training Module: <span className="font-black text-white/80">Active and Ready for Launch</span></>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <RealCalendarGrid setScreen={setScreen} />
+      <TodayFarmPlanCard setScreen={setScreen} />
     </div>
   );
 }
@@ -6578,103 +6620,68 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   const wellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []);
   const incidents = safeRead<IncidentRecord[]>(INCIDENT_KEY, []);
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
-  const projectProgress = safeRead<string[]>("bff.launch.coolingCenterProgress", []);
+  const completions = safeRead<any[]>(COMPLETION_KEY, []);
+  const media = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []);
+  const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
   const today = todayISO();
   const present = attendance.filter((a) => a.date === today && a.status === "present").length;
+  const loggedIn = safeRead<EcosystemUser | null>(SESSION_KEY, null) ? 1 : 0;
+  const reflected = safeRead<any[]>(JOURNEY_KEY, []).filter((item: any) => String(item.created_at || item.time || "").slice(0,10) === today).length;
   const supportFlags = wellness.filter((w) => w.safety_flag).length;
-  const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
-  const inventoryLogs = safeRead<OperationsInventoryLog[]>(OPERATIONS_INVENTORY_LOG_KEY, []);
-  const farmStatus = getFarmStatus();
-  const unassignedYouth = youth.filter((item) => !item.crew || /unassigned/i.test(item.crew)).length;
-  const ppeNeedsReview = attendance.filter((a) => a.date === today && a.ppe_status !== "complete").length;
-  const urgentIncidents = incidents.filter((i) => i.urgency === "high" || i.urgency === "emergency").length;
+  const todayIncidents = incidents.filter((i) => i.created_at.slice(0, 10) === today).length;
+  const ppePending = attendance.filter((a) => a.date === today && a.ppe_status !== "complete").length;
   const inventoryAlerts = inventory.filter((item) => item.status === "Low" || item.status === "Needs Replacement" || item.status === "Missing" || item.available <= 0).length;
-  const spanishReady = Boolean(languageText.es?.youth && languageText.es?.parent && languageText.es?.supervisor);
-  const launchScorecard = [
-    { area: "Youth Login", status: "🟢 Ready", detail: "PIN access includes supervisor-assisted continuation for unmatched launch PINs.", action: "Test with 2 known PINs and 1 unmatched PIN." },
-    { area: "Start My Day", status: present > 0 ? "🟢 Ready" : "🟡 Monitor", detail: present > 0 ? `${present} youth checked in today.` : "Check-in workflow is present; test when youth arrive.", action: "Confirm attendance saves on phone." },
-    { area: "Supervisor Verification", status: "🟢 Ready", detail: "Unmatched youth may continue pending verification and staff follow-up.", action: "Route unmatched 4-digit PIN issues to bhchatman@gmail.com." },
-    { area: "Assignments", status: unassignedYouth > 0 ? "🔴 Blocker" : "🟢 Ready", detail: unassignedYouth > 0 ? `${unassignedYouth} youth still show unassigned crew.` : "No unassigned youth detected in local roster.", action: "Assign category / supervisor before relying on daily work routing." },
-    { area: "Safety / Nurse Line", status: ppeNeedsReview || urgentIncidents ? "🟡 Monitor" : "🟢 Ready", detail: `${ppeNeedsReview} PPE reviews today; ${urgentIncidents} urgent incidents logged.`, action: "Keep Nurse Line visible and incident form one tap away." },
-    { area: "Inventory", status: inventoryAlerts ? "🟡 Monitor" : "🟢 Ready", detail: `${inventory.length} items loaded; ${inventoryAlerts} alerts; ${inventoryLogs.length} inventory log entries.`, action: "Check out, return, and damage-report one item before youth start." },
-    { area: "Almanac + Weather", status: farmStatus.color === "red" ? "🔴 Blocker" : farmStatus.color === "amber" ? "🟡 Monitor" : "🟢 Ready", detail: `${farmStatus.level}: ${farmStatus.title}`, action: "Set work status before assignments are released." },
-    { area: "Parent Portal", status: "🟡 Monitor", detail: "Parent-safe summaries and attendance visibility are present.", action: "Test with one parent on phone, including Spanish access." },
-    { area: "Translation", status: spanishReady ? "🟢 Ready" : "🟡 Monitor", detail: "English and Spanish are launch-critical; other languages remain available.", action: "Audit buttons, forms, and error messages in Spanish." },
-    { area: "Mission Control", status: "🟢 Ready", detail: "Workforce, safety, project, readiness, inventory, and almanac are centralized.", action: "Use this scorecard only until blockers are green." },
-  ];
-  const statusClass = (status: string) => status.includes("🔴") ? "border-red-300/35 bg-red-700/28" : status.includes("🟡") ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
-  const readiness = [
-    ["System Status", "ONLINE"],
-    ["Launch Phase", "Community Beta"],
-    ["Staff Orientation", "June 5, 2026 — 9:30 AM"],
-    ["Youth Workforce Launch", "June 8, 2026 — 8:00 AM"],
-    ["Featured Project", featuredProject.shortTitle],
-    ["Project Teams", "Design | Engineering | Manufacturing | Contractor"],
-    ["Photo / Video Documentation", "Media Center Ready"],
-    ["Fan Template / Design Video", "Ready for upload"],
-    ["Manufacturing Fan Painting Video", "Ready for upload"],
-    ["Cooling Station Completion Video", "Ready for upload"],
-    ["Translation Coverage", "Audit In Progress"],
-    ["Launch Decision", "Validate Pathways + Launch"],
-  ];
-  const keyStats = [
-    ["Youth Registered", youth.length],
-    ["Present Today", present],
-    ["Support Flags", supportFlags],
-    ["Project Items", projectProgress.length],
-  ];
+  const plan = getTodayFarmPlan();
+  const missing = Math.max(0, youth.length - present);
   return (
-    <div className="grid gap-4">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Mission Control</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Monitor operations.</h1>
-        <MissionCultureBanner language={language} />
-        <div className="mt-6 grid gap-3 md:grid-cols-4">
-          {keyStats.map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-              <div className="text-3xl font-black">{value}</div>
-              <div className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-white/70">{label}</div>
-            </div>
-          ))}
+    <div className="grid gap-5">
+      <div className="rounded-[1.5rem] border-2 border-slate-200 bg-white p-5 text-slate-950 shadow-sm">
+        <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Mission Control</div>
+        <h1 className="mt-2 text-4xl font-black md:text-6xl">Daily Command Center.</h1>
+        <p className="mt-3 max-w-3xl text-sm font-bold leading-7 text-slate-700">Launch 5.0 restores the operating center: live conditions, actual calendar, workforce truth, safety, today's work, learning, uploads, reflections, and the Daily Farm Story.</p>
+        <div className="mt-5"><PersistentSafetyStrip setScreen={setScreen} /></div>
+        <div className="mt-4"><QuickActionBar setScreen={setScreen} /></div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+        <OperationalStatusCard icon="👥" label="Registered" value={youth.length} detail="Youth roster" tone="blue" onClick={() => setScreen("supervisor")} />
+        <OperationalStatusCard icon="✅" label="Present" value={present} detail="Verified attendance today" tone="green" onClick={() => setScreen("supervisor")} />
+        <OperationalStatusCard icon="⚠️" label="Missing" value={missing} detail="Registered but not present" tone={missing ? "amber" : "green"} />
+        <OperationalStatusCard icon="🔑" label="Logged In" value={loggedIn} detail="Current ecosystem session count" tone="slate" />
+        <OperationalStatusCard icon="📷" label="Uploads" value={media.length} detail="Photos/videos/documentation" tone="purple" onClick={() => setScreen("media")} />
+        <OperationalStatusCard icon="📝" label="Reflections" value={reflected} detail="Journey events today" tone="purple" />
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-4">
+        <OperationalStatusCard icon="🦺" label="PPE Pending" value={ppePending} detail="Needs review" tone={ppePending ? "orange" : "green"} onClick={() => setScreen("supervisor")} />
+        <OperationalStatusCard icon="❤️" label="Wellness Flags" value={supportFlags} detail="Support needed" tone={supportFlags ? "amber" : "green"} onClick={() => setScreen("supervisor")} />
+        <OperationalStatusCard icon="🚨" label="Incidents" value={todayIncidents} detail="Logged today" tone={todayIncidents ? "red" : "green"} onClick={() => setScreen("supervisor")} />
+        <OperationalStatusCard icon="📦" label="Inventory Alerts" value={inventoryAlerts} detail="Low/missing/replacement" tone={inventoryAlerts ? "amber" : "green"} onClick={() => setScreen("operations")} />
+      </div>
+
+      <TodayFarmPlanCard setScreen={setScreen} />
+      <RealCalendarGrid setScreen={setScreen} />
+
+      <div className="rounded-[1.5rem] border-2 border-purple-200 bg-purple-50 p-5 text-purple-950 shadow-sm">
+        <div className="text-xs font-black uppercase tracking-[0.28em] text-purple-700">Daily Farm Story Builder</div>
+        <h2 className="mt-2 text-3xl font-black">What happened today?</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4"><div className="text-sm font-black text-purple-700">Work</div><div className="mt-2 text-sm font-bold leading-6">{plan.work.slice(0, 4).join(" • ")}</div></div>
+          <div className="rounded-2xl bg-white p-4"><div className="text-sm font-black text-purple-700">Learning</div><div className="mt-2 text-sm font-bold leading-6">{plan.learning.slice(0, 5).join(" • ")}</div></div>
+          <div className="rounded-2xl bg-white p-4"><div className="text-sm font-black text-purple-700">Reflection</div><div className="mt-2 text-sm font-bold leading-6">{plan.reflection}</div></div>
         </div>
-        <div className="mt-6 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-100/80">Minimum Launch Standard</div>
-          <h2 className="mt-2 text-2xl font-black">Launch Readiness Scorecard</h2>
-          <p className="mt-2 text-sm leading-6 text-white/76">No new features until red launch blockers are cleared. Green means launch ready. Yellow means launch with monitoring. Red means fix before relying on that workflow.</p>
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            {launchScorecard.map((item) => (
-              <div key={item.area} className={`rounded-2xl border p-4 ${statusClass(item.status)}`}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="text-lg font-black">{item.area}</div>
-                  <div className="rounded-full bg-black/30 px-3 py-1 text-xs font-black">{item.status}</div>
-                </div>
-                <p className="mt-2 text-sm leading-6 text-white/82">{item.detail}</p>
-                <p className="mt-2 text-xs font-bold leading-5 text-white/64">Next action: {item.action}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Supervisor Center</button>
-          <button type="button" onClick={() => setScreen("launchProject")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Open Project</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cultivator Stories</button>
-        </div>
-      </Card>
+      </div>
+
       <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open all metrics</summary>
+        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open legacy metrics and reports</summary>
         <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {[
             ["Profiles", profiles.length],
-            ["Youth Registered", youth.length],
-            ["Present Today", present],
             ["Assessments", assessments.length],
-            ["Support Flags", supportFlags],
-            ["Incident Logs", incidents.length],
             ["Feedback", feedback.length],
-            ["Project Items Complete", projectProgress.length],
-            ["Portfolio Entries", youthPortfolioEntries.length],
-            ["Resume Ready", Math.min(youth.length, assessments.length)],
-            ["Career Pathways", coolingCenterTeams.length],
+            ["Achievements", completions.length],
+            ["Inventory Items", inventory.length],
+            ["Project Skills", coolingCenterTeams.length],
           ].map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
               <div className="text-3xl font-black">{value}</div>
@@ -6683,30 +6690,15 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
           ))}
         </div>
       </details>
-      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open readiness checklist</summary>
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {readiness.map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-              <div className="mt-2 text-lg font-black">{value}</div>
-            </div>
-          ))}
-        </div>
-      </details>
-      <details className="rounded-[1.5rem] border border-white/10 bg-black/35 p-5 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Open videos and support framework</summary>
-        <div className="mt-5 grid gap-5">
-          <SupportResponseFrameworkCard />
-          <VideoLibrary />
-        </div>
-      </details>
     </div>
   );
 }
 
 function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
+    <div className="grid gap-5">
+      <TodayFarmPlanCard setScreen={setScreen} />
+      <OperationsInventoryPanel />
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
@@ -6730,6 +6722,7 @@ function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Events & Orientation</button>
       </div>
     </Card>
+    </div>
   );
 }
 
