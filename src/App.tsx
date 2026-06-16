@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.0 - OPERATIONS RESTORATION + REAL CALENDAR
+ * LAUNCH 5.0 - OPERATIONS RESTORATION + REAL CALENDAR + TRANSLATION HARDENING
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1287,19 +1287,19 @@ const languageText: Record<LanguageCode, Record<string, string>> = {
     language: "Language", portal: "Portal", demo: "Demo", guest: "Guest", register: "Register", workspace: "My Day", youth: "Youth", supervisor: "Supervisor", parent: "Parent", grower: "Grower", partner: "Partner", support: "Support", valueAdded: "Value-Added", market: "Market", wellness: "Wellness", reports: "Reports", ops: "Ops", feedback: "Feedback", complete: "Complete", publicGuest: "Public / Guest", signOut: "Sign Out", onlineEcosystem: "Online Ecosystem", events: "Events", media: "Media", project: "6/8 Project"
   },
   es: {
-    language: "Idioma", portal: "Portal", demo: "Demo", guest: "Visitante", register: "Registro", workspace: "Mi Día", youth: "Jóvenes", supervisor: "Supervisor", parent: "Padres", grower: "Productor", partner: "Aliado", support: "Apoyar", valueAdded: "Valor agregado", market: "Mercado", wellness: "Bienestar", reports: "Reportes", ops: "Operaciones", feedback: "Comentarios", complete: "Completar", publicGuest: "Público / Visitante", signOut: "Salir", onlineEcosystem: "Ecosistema en línea"
+    language: "Idioma", portal: "Portal", demo: "Demo", guest: "Visitante", register: "Registro", workspace: "Mi Día", youth: "Jóvenes", supervisor: "Supervisor", parent: "Padres", grower: "Productor", partner: "Aliado", support: "Apoyar", valueAdded: "Valor agregado", market: "Mercado", wellness: "Bienestar", reports: "Reportes", ops: "Operaciones", feedback: "Comentarios", complete: "Completar", publicGuest: "Público / Visitante", signOut: "Salir", onlineEcosystem: "Ecosistema en línea", events: "Eventos", media: "Medios", project: "Proyecto 6/8"
   },
   tl: {
-    language: "Wika", portal: "Portal", demo: "Demo", guest: "Bisita", register: "Magrehistro", workspace: "Aking Araw", youth: "Kabataan", supervisor: "Supervisor", parent: "Magulang", grower: "Magtatanim", partner: "Katuwang", support: "Suporta", valueAdded: "Value-Added", market: "Merkado", wellness: "Kalusugan", reports: "Ulat", ops: "Operasyon", feedback: "Komento", complete: "Kumpleto", publicGuest: "Publiko / Bisita", signOut: "Mag-sign Out", onlineEcosystem: "Online Ecosystem"
+    language: "Wika", portal: "Portal", demo: "Demo", guest: "Bisita", register: "Magrehistro", workspace: "Aking Araw", youth: "Kabataan", supervisor: "Supervisor", parent: "Magulang", grower: "Magtatanim", partner: "Katuwang", support: "Suporta", valueAdded: "Value-Added", market: "Merkado", wellness: "Kalusugan", reports: "Ulat", ops: "Operasyon", feedback: "Komento", complete: "Kumpleto", publicGuest: "Publiko / Bisita", signOut: "Mag-sign Out", onlineEcosystem: "Online Ecosystem", events: "Mga Kaganapan", media: "Media", project: "Proyekto 6/8"
   },
   it: {
-    language: "Lingua", portal: "Portale", demo: "Demo", guest: "Ospite", register: "Registrati", workspace: "La Mia Giornata", youth: "Giovani", supervisor: "Supervisore", parent: "Genitori", grower: "Coltivatore", partner: "Partner", support: "Sostieni", valueAdded: "Valore aggiunto", market: "Mercato", wellness: "Benessere", reports: "Report", ops: "Operazioni", feedback: "Feedback", complete: "Completa", publicGuest: "Pubblico / Ospite", signOut: "Esci", onlineEcosystem: "Ecosistema online"
+    language: "Lingua", portal: "Portale", demo: "Demo", guest: "Ospite", register: "Registrati", workspace: "La Mia Giornata", youth: "Giovani", supervisor: "Supervisore", parent: "Genitori", grower: "Coltivatore", partner: "Partner", support: "Sostieni", valueAdded: "Valore aggiunto", market: "Mercato", wellness: "Benessere", reports: "Report", ops: "Operazioni", feedback: "Feedback", complete: "Completa", publicGuest: "Pubblico / Ospite", signOut: "Esci", onlineEcosystem: "Ecosistema online", events: "Eventi", media: "Media", project: "Progetto 6/8"
   },
   he: {
-    language: "שפה", portal: "שער", demo: "הדגמה", guest: "אורח", register: "הרשמה", workspace: "היום שלי", youth: "נוער", supervisor: "מדריך", parent: "הורה", grower: "מגדל", partner: "שותף", support: "תמיכה", valueAdded: "מוצרי ערך מוסף", market: "שוק", wellness: "רווחה", reports: "דוחות", ops: "תפעול", feedback: "משוב", complete: "סיום", publicGuest: "ציבור / אורח", signOut: "יציאה", onlineEcosystem: "אקוסיסטם מקוון"
+    language: "שפה", portal: "שער", demo: "הדגמה", guest: "אורח", register: "הרשמה", workspace: "היום שלי", youth: "נוער", supervisor: "מדריך", parent: "הורה", grower: "מגדל", partner: "שותף", support: "תמיכה", valueAdded: "מוצרי ערך מוסף", market: "שוק", wellness: "רווחה", reports: "דוחות", ops: "תפעול", feedback: "משוב", complete: "סיום", publicGuest: "ציבור / אורח", signOut: "יציאה", onlineEcosystem: "אקוסיסטם מקוון", events: "אירועים", media: "מדיה", project: "פרויקט 6/8"
   },
   fr: {
-    language: "Langue", portal: "Portail", demo: "Démo", guest: "Invité", register: "S'inscrire", workspace: "Ma Journée", youth: "Jeunes", supervisor: "Superviseur", parent: "Parent", grower: "Producteur", partner: "Partenaire", support: "Soutenir", valueAdded: "Valeur ajoutée", market: "Marché", wellness: "Bien-être", reports: "Rapports", ops: "Opérations", feedback: "Commentaires", complete: "Terminer", publicGuest: "Public / Invité", signOut: "Déconnexion", onlineEcosystem: "Écosystème en ligne"
+    language: "Langue", portal: "Portail", demo: "Démo", guest: "Invité", register: "S'inscrire", workspace: "Ma Journée", youth: "Jeunes", supervisor: "Superviseur", parent: "Parent", grower: "Producteur", partner: "Partenaire", support: "Soutenir", valueAdded: "Valeur ajoutée", market: "Marché", wellness: "Bien-être", reports: "Rapports", ops: "Opérations", feedback: "Commentaires", complete: "Terminer", publicGuest: "Public / Invité", signOut: "Déconnexion", onlineEcosystem: "Écosystème en ligne", events: "Événements", media: "Médias", project: "Projet 6/8"
   },
 };
 
@@ -1939,10 +1939,31 @@ function applyCommonTranslations(language: LanguageCode, phrase: string) {
   return output;
 }
 
+
+
+const launch50TranslationSupplements: Partial<Record<LanguageCode, Record<string, string>>> = {
+  es: {
+    "Calendar": "Calendario", "Media": "Medios", "My Story": "Mi Historia", "My Growth": "Mi Crecimiento", "Home": "Inicio", "Choose Role": "Elegir Rol", "Resources": "Recursos", "Quick Tools": "Herramientas Rápidas", "Operations": "Operaciones", "Nurse Line": "Línea de Enfermería", "Visible At All Times": "Visible en Todo Momento", "Call Nurse Line": "Llamar a Enfermería", "Close": "Cerrar", "Upload": "Subir", "Add Photo / Video": "Agregar Foto / Video", "Document Today": "Documentar Hoy", "Today's Farm Work": "Trabajo Agrícola de Hoy", "Learning + Reflection": "Aprendizaje + Reflexión", "Today's Activities": "Actividades de Hoy", "Work Status": "Estado de Trabajo", "Live Weather": "Clima en Vivo", "Actual Calendar": "Calendario Real", "Mission Control": "Centro de Misión", "Inventory": "Inventario", "Parent": "Padres", "Youth": "Jóvenes", "Supervisor": "Supervisor"
+  },
+  tl: {
+    "Calendar": "Kalendaryo", "Media": "Media", "My Story": "Aking Kuwento", "My Growth": "Aking Paglago", "Home": "Home", "Choose Role": "Pumili ng Role", "Resources": "Mga Resource", "Quick Tools": "Mabilis na Tools", "Operations": "Operasyon", "Nurse Line": "Nurse Line", "Visible At All Times": "Laging Nakikita", "Call Nurse Line": "Tumawag sa Nurse Line", "Close": "Isara", "Upload": "Mag-upload", "Add Photo / Video": "Magdagdag ng Larawan / Video", "Document Today": "Idokumento Ngayon", "Today's Farm Work": "Gawain sa Bukid Ngayon", "Learning + Reflection": "Pag-aaral + Pagninilay", "Today's Activities": "Mga Gawain Ngayon", "Work Status": "Katayuan ng Trabaho", "Live Weather": "Live Weather", "Actual Calendar": "Tunay na Kalendaryo", "Mission Control": "Mission Control", "Inventory": "Imbentaryo", "Parent": "Magulang", "Youth": "Kabataan", "Supervisor": "Supervisor"
+  },
+  it: {
+    "Calendar": "Calendario", "Media": "Media", "My Story": "La Mia Storia", "My Growth": "La Mia Crescita", "Home": "Home", "Choose Role": "Scegli Ruolo", "Resources": "Risorse", "Quick Tools": "Strumenti Rapidi", "Operations": "Operazioni", "Nurse Line": "Linea Infermieristica", "Visible At All Times": "Sempre Visibile", "Call Nurse Line": "Chiama la Linea Infermieristica", "Close": "Chiudi", "Upload": "Carica", "Add Photo / Video": "Aggiungi Foto / Video", "Document Today": "Documenta Oggi", "Today's Farm Work": "Lavoro Agricolo di Oggi", "Learning + Reflection": "Apprendimento + Riflessione", "Today's Activities": "Attività di Oggi", "Work Status": "Stato del Lavoro", "Live Weather": "Meteo in Diretta", "Actual Calendar": "Calendario Reale", "Mission Control": "Centro Missione", "Inventory": "Inventario", "Parent": "Genitore", "Youth": "Giovani", "Supervisor": "Supervisore"
+  },
+  he: {
+    "Calendar": "לוח שנה", "Media": "מדיה", "My Story": "הסיפור שלי", "My Growth": "הצמיחה שלי", "Home": "בית", "Choose Role": "בחר תפקיד", "Resources": "משאבים", "Quick Tools": "כלים מהירים", "Operations": "תפעול", "Nurse Line": "קו אחות", "Visible At All Times": "גלוי תמיד", "Call Nurse Line": "התקשר לקו האחות", "Close": "סגור", "Upload": "העלאה", "Add Photo / Video": "הוסף תמונה / וידאו", "Document Today": "תעד את היום", "Today's Farm Work": "עבודת החווה היום", "Learning + Reflection": "למידה + רפלקציה", "Today's Activities": "פעילויות היום", "Work Status": "מצב עבודה", "Live Weather": "מזג אוויר חי", "Actual Calendar": "לוח שנה אמיתי", "Mission Control": "מרכז משימה", "Inventory": "מלאי", "Parent": "הורה", "Youth": "נוער", "Supervisor": "מדריך"
+  },
+  fr: {
+    "Calendar": "Calendrier", "Media": "Médias", "My Story": "Mon Histoire", "My Growth": "Ma Croissance", "Home": "Accueil", "Choose Role": "Choisir un rôle", "Resources": "Ressources", "Quick Tools": "Outils rapides", "Operations": "Opérations", "Nurse Line": "Ligne infirmière", "Visible At All Times": "Toujours visible", "Call Nurse Line": "Appeler la ligne infirmière", "Close": "Fermer", "Upload": "Téléverser", "Add Photo / Video": "Ajouter Photo / Vidéo", "Document Today": "Documenter Aujourd’hui", "Today's Farm Work": "Travail agricole d’aujourd’hui", "Learning + Reflection": "Apprentissage + Réflexion", "Today's Activities": "Activités d’aujourd’hui", "Work Status": "Statut du travail", "Live Weather": "Météo en direct", "Actual Calendar": "Vrai calendrier", "Mission Control": "Centre de mission", "Inventory": "Inventaire", "Parent": "Parent", "Youth": "Jeunes", "Supervisor": "Superviseur"
+  },
+};
+
 function translatePhrase(language: LanguageCode, raw: string) {
   if (language === "en") return raw;
   const key = raw.trim();
   const exact =
+    launch50TranslationSupplements[language]?.[key] ||
     launchIntegrationTranslations[language]?.[key] ||
     launchCriticalTranslations[language]?.[key] ||
     launchPhraseTranslations[language]?.[key] ||
@@ -2577,12 +2598,12 @@ function App() {
     setLanguage(next);
     safeWrite(LANGUAGE_KEY, next);
     document.documentElement.lang = next;
-    document.documentElement.dir = "ltr";
+    document.documentElement.dir = languageDir(next);
   };
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.documentElement.dir = "ltr";
+    document.documentElement.dir = languageDir(language);
     if (language === "en") {
       activeTranslationRun++;
       return () => undefined;
@@ -2716,7 +2737,7 @@ function Shell({
     `rounded-full border px-4 py-2 text-xs font-black transition ${screen === target ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`;
 
   return (
-    <div data-bff-app-root data-current-language={language} key={language} className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir="ltr">
+    <div data-bff-app-root data-current-language={language} key={language} className="relative min-h-screen overflow-x-hidden bg-black text-white" lang={language} dir={languageDir(language)}>
       <div className="fixed inset-0">
         <img src={IMG.forest} alt="Bronson Family Farm forest entrance" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
       </div>
@@ -2782,6 +2803,7 @@ function Shell({
           )}
         </div>
         {children}
+        <FloatingUploadDock screen={screen} setScreen={setScreen} />
         <CompactProprietaryFooter />
       </div>
     </div>
@@ -2828,6 +2850,31 @@ function NurseLineModal({ onClose }: { onClose: () => void }) {
           <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Close</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+function FloatingUploadDock({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
+  if (screen === "portal") return null;
+  return (
+    <div className="fixed bottom-4 right-4 z-[70] flex flex-col items-end gap-2">
+      <button
+        type="button"
+        onClick={() => setScreen("media")}
+        className="rounded-full border-2 border-white/40 bg-emerald-400 px-5 py-3 text-sm font-black text-slate-950 shadow-[0_18px_55px_rgba(0,0,0,.45)] transition hover:scale-[1.03]"
+        title="Add Photo / Video"
+      >
+        📷 Add Photo / Video
+      </button>
+      <button
+        type="button"
+        onClick={() => setScreen("feedback")}
+        className="rounded-full border border-white/20 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-[0_12px_35px_rgba(0,0,0,.35)] backdrop-blur-xl"
+        title="Add Observation"
+      >
+        📝 Add Observation
+      </button>
     </div>
   );
 }
