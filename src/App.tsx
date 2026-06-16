@@ -324,6 +324,7 @@ const SESSION_KEY = "bff.launch.activeUser";
 const PROFILE_KEY = "bff.launch.profiles";
 const REGISTRATION_KEY = "bff.launch.ecosystem_registrations";
 const YOUTH_KEY = "bff.launch.youth";
+const DELETED_YOUTH_KEY = "bff.launch.deletedYouthIds";
 const ATTENDANCE_KEY = "bff.launch.attendance";
 const ASSESSMENT_KEY = "bff.launch.assessments";
 const WELLNESS_KEY = "bff.launch.wellness";
@@ -2431,6 +2432,40 @@ async function loadSupabaseRows<T extends { id?: string; created_at?: string }>(
     }
   }
   return localRows;
+}
+
+async function deleteSupabaseRow(table: string, id: string) {
+  if (!supabase) return { ok: true, mode: "local", table: "localStorage", error: null };
+  let lastError: unknown = null;
+  for (const candidate of supabaseTableCandidates(table)) {
+    try {
+      const { error } = await supabase.from(candidate).delete().eq("id", id);
+      if (!error) return { ok: true, mode: "supabase", table: candidate, error: null };
+      lastError = error;
+      console.warn(`Supabase delete rejected ${candidate}:`, error);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Supabase delete failed for ${candidate}:`, error);
+    }
+  }
+  return { ok: false, mode: "local-fallback", table: "localStorage", error: lastError };
+}
+
+async function archiveSupabaseProfile(profileId: string) {
+  if (!supabase) return { ok: true, mode: "local", table: "localStorage", error: null };
+  let lastError: unknown = null;
+  for (const candidate of ["profiles", "ecosystem_registrations"]) {
+    try {
+      const { error } = await supabase.from(candidate).update({ active: false }).eq("id", profileId);
+      if (!error) return { ok: true, mode: "supabase", table: candidate, error: null };
+      lastError = error;
+      console.warn(`Supabase archive rejected ${candidate}:`, error);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Supabase archive failed for ${candidate}:`, error);
+    }
+  }
+  return { ok: false, mode: "local-fallback", table: "localStorage", error: lastError };
 }
 
 function saveModeMessage(action: string, result: { mode?: string; table?: string }) {
@@ -4721,7 +4756,11 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
     refresh();
   }, []);
 
-  const youthRows = youth.map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }));
+  const deletedYouthIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
+  const youthRows = youth
+    .filter((y) => !deletedYouthIds.includes(y.id) && !deletedYouthIds.includes(y.profile_id) && !deletedYouthIds.includes(y.participant_id))
+    .map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }))
+    .filter((row) => row.profile?.active !== false);
   const todayAttendance = attendance.filter((a) => a.date === todayISO());
   const supportFlags = wellness.filter((w) => w.safety_flag);
   const todayIncidents = incidents.filter((i) => i.created_at.slice(0, 10) === todayISO());
@@ -4773,7 +4812,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
           />
         )}
         {tab === "project" && <CurrentWeekActivityModule setScreen={setScreen} />}
-        {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} />}
+        {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} onChanged={refresh} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
         {tab === "assessment" && <AssessmentTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
@@ -4858,6 +4897,7 @@ function YouthRosterModule({
   incidents,
   setScreen,
   setTab,
+  onChanged,
 }: {
   youthRows: { registration: YouthRegistration; profile?: MasterProfile }[];
   attendance: AttendanceRecord[];
@@ -4866,10 +4906,43 @@ function YouthRosterModule({
   incidents: IncidentRecord[];
   setScreen: (screen: Screen) => void;
   setTab: (tab: "dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
+  onChanged: () => void | Promise<void>;
 }) {
   const today = todayISO();
   const nameFor = (row: { registration: YouthRegistration; profile?: MasterProfile }) =>
     row.profile ? `${row.profile.first_name} ${row.profile.last_name}`.trim() : row.registration.participant_id;
+  const [rosterMessage, setRosterMessage] = useState("");
+
+  const removeYouthFromRoster = async (row: { registration: YouthRegistration; profile?: MasterProfile }, mode: "archive" | "delete") => {
+    const youthName = nameFor(row);
+    const label = `${youthName} (${youthPinLabel(row.registration.participant_id)})`;
+    const confirmText = mode === "delete"
+      ? `Delete ${label} from the active youth roster? Attendance, incidents, and parent records are preserved for safety/history, but this youth will no longer appear in the roster.`
+      : `Archive ${label} from the active youth roster? This keeps history but removes the youth from daily operations.`;
+    if (!window.confirm(confirmText)) return;
+
+    setRosterMessage(`${mode === "delete" ? "Deleting" : "Archiving"} ${label}...`);
+
+    const nextYouth = safeRead<YouthRegistration[]>(YOUTH_KEY, []).filter((item) => item.id !== row.registration.id);
+    safeWrite(YOUTH_KEY, nextYouth);
+    const deletedIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
+    safeWrite(DELETED_YOUTH_KEY, Array.from(new Set([...deletedIds, row.registration.id, row.registration.profile_id, row.registration.participant_id])));
+
+    const nextProfiles = safeRead<MasterProfile[]>(PROFILE_KEY, []).map((profile) =>
+      profile.id === row.registration.profile_id ? { ...profile, active: false } : profile
+    );
+    safeWrite(PROFILE_KEY, nextProfiles);
+
+    const nextRegistrations = safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).map((registration) =>
+      registration.id === row.registration.profile_id ? { ...registration, active: false } : registration
+    );
+    safeWrite(REGISTRATION_KEY, nextRegistrations);
+
+    await deleteSupabaseRow("youth_participants", row.registration.id);
+    await archiveSupabaseProfile(row.registration.profile_id);
+    await onChanged();
+    setRosterMessage(`${label} removed from the active youth roster.`);
+  };
 
   return (
     <Card>
@@ -4881,13 +4954,14 @@ function YouthRosterModule({
         </div>
         <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
+      {rosterMessage && <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black text-amber-50">{rosterMessage}</div>}
 
       {youthRows.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
       ) : (
         <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
-          <div className="grid grid-cols-[1.3fr_0.9fr_1.2fr_0.8fr_0.9fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
-            <div>Youth</div><div>PIN</div><div>Current Curriculum</div><div>Today</div><div>Status</div>
+          <div className="grid grid-cols-[1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
+            <div>Youth</div><div>PIN</div><div>Current Curriculum</div><div>Today</div><div>Status</div><div>Actions</div>
           </div>
           <div className="divide-y divide-white/10">
             {youthRows.map((row) => {
@@ -4896,7 +4970,7 @@ function YouthRosterModule({
               const lastAssessment = assessments.filter((a) => a.participant_id === participantId).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const hasFlag = wellness.some((w) => w.profile_id === row.registration.profile_id && w.safety_flag) || incidents.some((i) => i.participant_id === participantId && i.urgency !== "low");
               return (
-                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.9fr_1.2fr_0.8fr_0.9fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
+                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
                   <div>
                     <div className="font-black text-white">{nameFor(row)}</div>
                     <div className="text-xs text-white/60">Guardian: {row.registration.guardian_name || "not entered"}</div>
@@ -4907,6 +4981,10 @@ function YouthRosterModule({
                   <div>
                     <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "Clear"}</span>
                     {lastAssessment && <div className="mt-1 text-xs text-white/60">Safety {lastAssessment.safety}/5</div>}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => removeYouthFromRoster(row, "archive")} className="rounded-full border border-amber-200/25 bg-amber-300/15 px-3 py-2 text-xs font-black text-amber-50 hover:bg-amber-300 hover:text-black">Archive</button>
+                    <button type="button" onClick={() => removeYouthFromRoster(row, "delete")} className="rounded-full border border-red-200/30 bg-red-700/25 px-3 py-2 text-xs font-black text-red-50 hover:bg-red-400 hover:text-black">Delete</button>
                   </div>
                 </div>
               );
