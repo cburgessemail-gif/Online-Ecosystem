@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.1.2 - NESCo 4-DIGIT PIN + ROSTER INTEGRITY RESTORATION
+ * LAUNCH 5.1.3 - GROWING CENTER + CONTEXTUAL RESOURCES + STORY RESTORATION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -943,7 +943,7 @@ function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
   const plan = getCurrentYouthPlan(date);
   const farmStatus = getFarmStatus();
   const work = plan.work?.length ? plan.work : ["Check Mission Control for today's farm work"];
-  const learning = [...(week.skills || []), "Observation", "Contribution", "Stewardship"];
+  const learning = normalizeLearningTags([...(week.skills || []), "Observation", "Contribution", "Stewardship"]);
   const iso = date.toISOString().slice(0, 10);
   return {
     date,
@@ -1008,7 +1008,7 @@ function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => v
   return (
     <div className="grid gap-2 md:grid-cols-4">
       <OperationalStatusCard icon="🟢" label="Farm Status" value={status.level} detail={status.title} tone={tone} />
-      <OperationalStatusCard icon="🌤" label="Weather" value="Live" detail="Updates every 15 minutes when online" tone="blue" onClick={() => setScreen("almanac")} />
+      <OperationalStatusCard icon="🌤" label="Weather" value="Live" detail="Visible in My Day" tone="blue" />
       <OperationalStatusCard icon="🚑" label="Nurse Line" value="Visible" detail="Tap from any operational screen" tone="red" />
       <OperationalStatusCard icon="📅" label="Calendar" value="Open" detail="Month / Week / Day views" tone="purple" onClick={() => setScreen("events")} />
     </div>
@@ -1018,9 +1018,9 @@ function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => v
 function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => void; setTab?: (tab: any) => void }) {
   const actions = [
     ["📅 Calendar", () => setScreen("events")],
-    ["🌤 Weather", () => setScreen("almanac")],
+    ["📚 Resources", () => setScreen("almanac")],
     ["🚑 Nurse Line", () => undefined],
-    ["📷 Upload", () => setScreen("media")],
+    ["📷 My Story", () => setScreen("media")],
     ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
     ["👥 Workforce", () => setTab ? setTab("roster") : setScreen("supervisor")],
     ["📦 Inventory", () => setScreen("operations")],
@@ -1060,6 +1060,9 @@ function TodayFarmPlanCard({ setScreen, compact = false }: { setScreen: (screen:
           <div className="mt-3 flex flex-wrap gap-2">{today.learning.slice(0, 8).map((skill) => <span key={skill} className="rounded-full bg-white px-3 py-1 text-xs font-black text-blue-950 shadow-sm">{skill}</span>)}</div>
           <p className="mt-4 rounded-xl bg-white p-3 text-sm font-bold leading-6 text-slate-800">Reflection: {today.reflection}</p>
         </div>
+      </div>
+      <div className="mt-4">
+        <GrowingCenterPanel setScreen={setScreen} compact />
       </div>
     </div>
   );
@@ -2714,7 +2717,7 @@ function App() {
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
-      {screen === "media" && <MediaCenter setScreen={setScreen} />}
+      {screen === "media" && <MyStoryScreen setScreen={setScreen} />}
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
@@ -4366,78 +4369,161 @@ function connectionPathForPlan(plan: { curriculum: string; focus: string; work: 
   return ["Daily Work", "Learning", "Responsibility", "Growth"];
 }
 
+function normalizeLearningTags(tags: string[]) {
+  const normalized: string[] = [];
+  for (const raw of tags) {
+    const tag = raw === "Environmental Stewardship" ? "Stewardship" : raw;
+    if (!normalized.some((existing) => existing.toLowerCase() === tag.toLowerCase())) normalized.push(tag);
+  }
+  return normalized.slice(0, 6);
+}
+
+type CropPlanEntry = {
+  crop: string;
+  varieties: string[];
+  location: string;
+  plantWindow: string;
+  harvestWindow: string;
+  companions: string[];
+  avoid: string[];
+  nutrition: string;
+  preservation: string[];
+  marketplace: string[];
+  youthLearning: string[];
+  entrepreneurship: string;
+};
+
+const bronsonCropPlan: CropPlanEntry[] = [
+  { crop: "Potatoes", varieties: ["Field potatoes"], location: "Grow area rows", plantWindow: "Mid-June launch planting", harvestWindow: "Late summer to early fall", companions: ["Beans", "Cabbage", "Corn", "Marigolds"], avoid: ["Tomatoes", "Cucumbers", "Squash"], nutrition: "Energy crop; connects to food access, storage, and simple meals.", preservation: ["Curing", "Cool dry storage", "Soups", "Value-added meals"], marketplace: ["Fresh potatoes", "CSA / market bags", "Recipe bundles"], youthLearning: ["Soil depth", "Spacing", "Observation", "Harvest forecasting"], entrepreneurship: "A row can become a yield estimate, a market product, a meal, and a lesson in storage." },
+  { crop: "Tomatoes", varieties: ["Slicing", "Roma", "Cherry"], location: "Warm full-sun growing areas", plantWindow: "After frost / transplants", harvestWindow: "Mid-summer through frost", companions: ["Basil", "Marigold", "Onion", "Peppers"], avoid: ["Potatoes", "Corn"], nutrition: "Vitamin-rich crop for fresh eating, sauces, and community meals.", preservation: ["Canning", "Sauce", "Salsa", "Freezing"], marketplace: ["Fresh market", "Sauce kits", "Salsa kits"], youthLearning: ["Trellising", "Plant health", "Pest observation", "Customer quality"], entrepreneurship: "One crop can become fresh sales, value-added products, recipes, and customer education." },
+  { crop: "Cabbage / Collards / Brassicas", varieties: ["Cabbage", "Collards", "Broccoli", "Cauliflower"], location: "Cooler areas and managed rows", plantWindow: "Spring and succession planting", harvestWindow: "Summer into fall", companions: ["Onions", "Herbs", "Potatoes"], avoid: ["Strawberries", "Pole beans"], nutrition: "Leafy and storage crops for family nutrition and cooking education.", preservation: ["Fermentation", "Freezing", "Canning-ready recipes"], marketplace: ["Fresh heads/bunches", "Cooking bundles", "Nutrition education"], youthLearning: ["Pest scouting", "Leaf health", "Cool-season planning"], entrepreneurship: "Crop care quality affects harvest, customer trust, and food preparation options." },
+  { crop: "Beans / Corn / Squash", varieties: ["Beans", "Corn", "Squash"], location: "Production rows and learning demonstrations", plantWindow: "Warm-season planting", harvestWindow: "Summer", companions: ["Three Sisters combinations", "Marigolds", "Nasturtiums"], avoid: ["Crowding without support"], nutrition: "Connects protein, starch, vegetables, and cultural food traditions.", preservation: ["Drying", "Freezing", "Canning", "Seed saving"], marketplace: ["Fresh bundles", "Educational demonstrations", "Family meal kits"], youthLearning: ["Interdependence", "Spacing", "Support", "Pollination"], entrepreneurship: "Companion planting demonstrates how production design affects yield and storytelling." },
+];
+
+function cropPlanForActivity(activity: string) {
+  const text = activity.toLowerCase();
+  if (/potato/.test(text)) return bronsonCropPlan.find((crop) => crop.crop === "Potatoes");
+  if (/tomato/.test(text)) return bronsonCropPlan.find((crop) => crop.crop === "Tomatoes");
+  if (/cabbage|collard|broccoli|cauliflower|brassica/.test(text)) return bronsonCropPlan.find((crop) => crop.crop === "Cabbage / Collards / Brassicas");
+  if (/bean|corn|squash/.test(text)) return bronsonCropPlan.find((crop) => crop.crop === "Beans / Corn / Squash");
+  if (/seedling|plant|crop|companion/.test(text)) return bronsonCropPlan[0];
+  return undefined;
+}
+
+function contextualResourcesForPlan(plan: { curriculum: string; focus: string; work: string[]; resources?: string[] }) {
+  const pack = getActivityKnowledgePack(plan);
+  const resources = [...pack.resources];
+  for (const item of plan.resources || []) {
+    if (!resources.some((resource) => resource.title.toLowerCase() === item.toLowerCase())) {
+      resources.push({ title: item, type: "Internal", note: "Pulled directly from today’s curriculum plan." });
+    }
+  }
+  return resources.slice(0, 8);
+}
+
+function GrowingCenterPanel({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
+  const plan = getCurrentYouthPlan();
+  const pack = getActivityKnowledgePack(plan);
+  const resources = contextualResourcesForPlan(plan);
+  const crops = plan.work.map(cropPlanForActivity).filter(Boolean) as CropPlanEntry[];
+  const uniqueCrops = crops.filter((crop, index, list) => list.findIndex((item) => item.crop === crop.crop) === index);
+
+  return (
+    <div className={`rounded-[1.5rem] border-2 border-emerald-200 bg-white p-${compact ? "4" : "5"} text-slate-950 shadow-sm`}>
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">🌱 Growing Center</div>
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-black">Resources tied to today’s curriculum</h2>
+          <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Resources appear beside the work. This is not a separate weather or almanac screen.</p>
+        </div>
+        <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-slate-900 px-5 py-3 text-sm font-black text-white">Open Calendar</button>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today’s Resource Pack</div>
+          <div className="mt-3 grid gap-2">
+            {resources.map((resource) => (
+              <div key={resource.title} className="rounded-xl bg-white p-3 shadow-sm">
+                <div className="text-sm font-black text-slate-900">{resource.title} <span className="text-[10px] uppercase text-slate-500">{resource.type}</span></div>
+                <div className="mt-1 text-xs font-bold leading-5 text-slate-600">{resource.note}</div>
+                {resource.url && <a href={resource.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-black text-emerald-700">Open resource ↗</a>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">Crop Plan Connection</div>
+          {uniqueCrops.length ? (
+            <div className="mt-3 grid gap-2">
+              {uniqueCrops.map((crop) => (
+                <details key={crop.crop} className="rounded-xl bg-white p-3 shadow-sm">
+                  <summary className="cursor-pointer text-sm font-black text-slate-900">{crop.crop} • harvest {crop.harvestWindow}</summary>
+                  <div className="mt-2 grid gap-2 text-xs font-bold leading-5 text-slate-700">
+                    <div><span className="font-black text-slate-950">Companions:</span> {crop.companions.join(", ")}</div>
+                    <div><span className="font-black text-slate-950">Avoid:</span> {crop.avoid.join(", ")}</div>
+                    <div><span className="font-black text-slate-950">Nutrition:</span> {crop.nutrition}</div>
+                    <div><span className="font-black text-slate-950">Preservation:</span> {crop.preservation.join(", ")}</div>
+                    <div><span className="font-black text-slate-950">Marketplace:</span> {crop.marketplace.join(", ")}</div>
+                    <div><span className="font-black text-slate-950">Youth learning:</span> {crop.youthLearning.join(", ")}</div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold leading-6 text-slate-700">Today’s crop-specific planning will appear when the activity names a crop. General resource pack is still tied to the curriculum.</div>
+          )}
+        </div>
+      </div>
+
+      {!compact && (
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-600">Bronson distinction</div>
+          <div className="mt-1 text-sm font-bold leading-6 text-slate-800">The crop plan connects production, youth learning, workforce skills, entrepreneurship, nutrition, preservation, marketplace, and community impact. It is inspired by planning tools, but it is not a Seedtime clone.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "roles";
   const todayPlan = getCurrentYouthPlan();
   const todayFarmPlan = getTodayFarmPlan();
-  const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "roles";
-  const guidance = [
-    ["Plant", todayPlan.work?.some((item) => item.toLowerCase().includes("plant")) ? "Planting appears in today’s work plan. Check soil moisture, spacing, and shade before planting." : "Use today’s curriculum and field observations before adding new planting work."],
-    ["Prepare", "Prepare tools, water, shade, PPE, and access routes before outdoor work begins."],
-    ["Protect", "Protect youth, plants, materials, and site access when heat, rain, wind, or deer pressure changes the day."],
-    ["Build Soil", todayPlan.work?.some((item) => item.toLowerCase().includes("compost") || item.toLowerCase().includes("soil")) ? "Compost or soil work is part of today’s plan. Document what changes in texture, smell, moisture, or structure." : "Use crop observations and the grow area condition to decide whether soil work is needed today."],
-    ["Observe", todayPlan.reflection || "Observe before acting. Record one condition that changed your decision today."],
-  ];
-
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Launch 5.1 Weather Command</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">LIVE Farm Weather + Almanac</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-          Weather is the operational screen. The Almanac is the grower guidance layer that uses weather, calendar, curriculum, and farm observations to decide what to plant, protect, observe, and prepare.
-        </p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📚 Contextual Resources</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Growing Center</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">Resources are delivered in context from the curriculum and today’s farm work. Weather, Almanac, and Work Status remain small operational cards inside My Day; they do not take over this screen.</p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
-          <a href={YOUNGSTOWN_ALMANAC_PLANTING_URL} target="_blank" rel="noreferrer" className="rounded-full border border-emerald-200/30 bg-emerald-300/12 px-6 py-3 font-black text-emerald-50">Open 44505 Planting Calendar ↗</a>
-          <a href={YOUNGSTOWN_ALMANAC_FORECAST_URL} target="_blank" rel="noreferrer" className="rounded-full border border-sky-200/30 bg-sky-300/12 px-6 py-3 font-black text-sky-50">Open Youngstown Forecast ↗</a>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open My Story</button>
+          <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
         </div>
       </Card>
 
-      <FarmConditionsCard />
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Almanac Guidance from Today’s Plan</div>
-          <h2 className="mt-3 text-2xl font-black">Planting + Protection Guidance</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-white/78">This guidance is tied to today’s curriculum and work plan instead of a static launch snapshot.</p>
-          <div className="mt-4 grid gap-2">
-            {guidance.map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-                <div className="mt-1 text-sm font-bold leading-6 text-white/82">{value}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🧭 Today’s Operating Decision</div>
-          <h2 className="mt-3 text-2xl font-black">What weather changes first</h2>
-          <div className="mt-4 grid gap-2">
-            {[
-              ["Heat", "Move hard outdoor work earlier, increase shade, water, and breaks."],
-              ["Rain", "Protect tools, seedlings, electronics, paper forms, and loose materials."],
-              ["Wind", "Secure row covers, signs, buckets, light supplies, and shade materials."],
-              ["Sun / Shadow", "Use shade observations for cool plants and full-sun placement for crops needing more light."],
-              ["Work Status", todayFarmPlan.farmStatus.level === "Open" ? "Full operations unless Mission Control changes the day." : todayFarmPlan.farmStatus.action],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-black/25 p-3">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-                <div className="mt-1 text-sm font-bold leading-5 text-white/82">{value}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
+      <div className="grid gap-3 lg:grid-cols-3">
+        <WorkStatusMiniCard />
+        <FarmConditionsCard compact />
+        <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={getCurrentYouthWeek()} />
       </div>
 
-      <TodayFarmOperationsBoard />
+      <GrowingCenterPanel setScreen={setScreen} />
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
-        <h2 className="mt-3 text-2xl font-black">Open the actual Almanac</h2>
-        <p className="mt-3 text-sm leading-6 text-white/78">The ecosystem keeps the official Almanac links available while the weather command screen shows the immediate farm conditions.</p>
+        <h2 className="mt-3 text-2xl font-black">Almanac and planting links</h2>
+        <p className="mt-3 text-sm leading-6 text-white/78">These links support today’s resource pack. They do not replace the curriculum-driven Growing Center.</p>
         <LiveAlmanacResourceLinks />
+      </Card>
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today’s operating note</div>
+        <h2 className="mt-3 text-2xl font-black">{todayFarmPlan.farmStatus.level}</h2>
+        <p className="mt-3 text-sm font-bold leading-6 text-white/82">{todayFarmPlan.farmStatus.action}</p>
       </Card>
 
       <CurriculumWeekViewCard />
@@ -4766,6 +4852,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
       <CultivatorMomentShadowCard />
       <TodayFarmOperationsBoard compact />
+      <GrowingCenterPanel setScreen={setScreen} compact />
       <CurriculumWeekViewCard compact />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
@@ -4845,7 +4932,7 @@ function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) 
           <button type="button" onClick={() => setScreen("wellness")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Start My Day</button>
         </div>
       </Card>
-      <FarmConditionsCard />
+      <GrowingCenterPanel setScreen={setScreen} />
       <CultivatorMomentSkinnyPlantCard />
     </div>
   );
@@ -6627,6 +6714,93 @@ function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </Card>
       <RealCalendarGrid setScreen={setScreen} />
       <TodayFarmPlanCard setScreen={setScreen} />
+    </div>
+  );
+}
+
+function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
+  const [notice, setNotice] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const recentAssets = mediaAssets.slice(0, 6);
+
+  const handleStoryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setNotice(`Saving ${file.name}...`);
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `media-${Date.now()}`;
+    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const storagePath = `cultivator-story/${todayISO()}-${id}-${cleanName}`;
+    try {
+      let fileUrl = URL.createObjectURL(file);
+      if (supabase) {
+        const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(storagePath, file, { cacheControl: "3600", upsert: false });
+        if (error) throw error;
+        const { data } = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(storagePath);
+        fileUrl = data.publicUrl;
+      }
+      const asset: MediaAsset = { id, title: "Cultivator Story", category: "Cultivator Story", file_name: file.name, file_url: fileUrl, file_type: file.type || "unknown", file_size: file.size || 0, uploaded_by: "Cultivator", storage_path: storagePath, created_at: new Date().toISOString() };
+      const next = [asset, ...mediaAssets];
+      setMediaAssets(next);
+      safeWrite(MEDIA_ASSETS_KEY, next);
+      setNotice(supabase ? `Uploaded: ${file.name}` : `Saved on this device: ${file.name}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Upload failed.";
+      setNotice(`Upload issue: ${message}`);
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
+
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Portfolio</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Story</h1>
+        <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">This is where youth document photos, videos, field notes, reflections, first-time experiences, and Cultivator Moments.</p>
+        {notice && <Notice text={notice} />}
+        <div className="mt-6 flex flex-wrap gap-3">
+          <label className="inline-flex cursor-pointer items-center rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">
+            {uploading ? "Uploading..." : "Upload Photo / Video"}
+            <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="sr-only" disabled={uploading} onChange={handleStoryUpload} />
+          </label>
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Back to My Day</button>
+          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Today’s Resources</button>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Story Builder</div>
+        <h2 className="mt-3 text-2xl font-black">What belongs in My Story?</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {[
+            ["📷 Photos", "Plants, projects, tools, before/after work, and first-time experiences."],
+            ["🎥 Videos", "Short clips of learning, demonstrations, teamwork, and farm progress."],
+            ["📝 Field Notes", "What you noticed, what surprised you, and what you learned."],
+          ].map(([title, body]) => (
+            <div key={title} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-lg font-black">{title}</div>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/78">{body}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {recentAssets.length > 0 && (
+        <Card>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Cultivator Stories</div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {recentAssets.map((asset) => (
+              <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
+                <div className="font-black text-white">{asset.file_name || asset.title}</div>
+                <div className="mt-1 text-white/55">{asset.category || "Cultivator Story"} • {asset.created_at ? new Date(asset.created_at).toLocaleString() : "Today"}</div>
+              </a>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
