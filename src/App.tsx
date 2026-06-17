@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.0 - OPERATIONS RESTORATION + REAL CALENDAR + TRANSLATION HARDENING
+ * LAUNCH 5.1.2 - NESCo 4-DIGIT PIN + ROSTER INTEGRITY RESTORATION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -2262,6 +2262,45 @@ function normalizeLaunchPin(value: string) {
   return value.trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 }
 
+function normalizeNescoPin(value: string) {
+  return value.trim().replace(/\D/g, "");
+}
+
+function isValidNescoPin(value: string) {
+  return /^\d{4}$/.test(normalizeNescoPin(value));
+}
+
+function isLegacyGeneratedPin(value?: string) {
+  const digits = normalizeNescoPin(value || "");
+  return /^\d{6}$/.test(digits) || /^BFF-\d{6}$/i.test(value || "");
+}
+
+function youthRosterKey(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  const name = normalizeLaunchText(`${row.profile?.first_name || ""} ${row.profile?.last_name || ""}`);
+  const guardian = normalizeLaunchText(row.registration.guardian_name || "");
+  return name ? `${name}|${guardian}` : normalizeLaunchPin(row.registration.participant_id || row.registration.id);
+}
+
+function preferYouthRosterRow(current: { registration: YouthRegistration; profile?: MasterProfile }, incoming: { registration: YouthRegistration; profile?: MasterProfile }) {
+  const currentPin = normalizeNescoPin(current.registration.participant_id);
+  const incomingPin = normalizeNescoPin(incoming.registration.participant_id);
+  const currentHasNesco = /^\d{4}$/.test(currentPin);
+  const incomingHasNesco = /^\d{4}$/.test(incomingPin);
+  if (incomingHasNesco && !currentHasNesco) return incoming;
+  if (currentHasNesco && !incomingHasNesco) return current;
+  return String(incoming.registration.id || "") > String(current.registration.id || "") ? incoming : current;
+}
+
+function dedupeYouthRosterRows(rows: { registration: YouthRegistration; profile?: MasterProfile }[]) {
+  const map = new Map<string, { registration: YouthRegistration; profile?: MasterProfile }>();
+  rows.forEach((row) => {
+    const key = youthRosterKey(row);
+    const existing = map.get(key);
+    map.set(key, existing ? preferYouthRosterRow(existing, row) : row);
+  });
+  return Array.from(map.values());
+}
+
 function mergeRowsById<T extends { id?: string; created_at?: string }>(localRows: T[], remoteRows: T[]) {
   const map = new Map<string, T>();
   [...localRows, ...remoteRows].forEach((row, index) => {
@@ -2509,7 +2548,10 @@ function youthDisplayName(row?: { registration: YouthRegistration; profile?: Mas
 
 function youthPinLabel(participantId?: string) {
   if (!participantId) return "PIN pending";
-  return `PIN ${participantId.replace(/^BFF-/i, "")}`;
+  const digits = normalizeNescoPin(participantId);
+  if (/^\d{4}$/.test(digits)) return `PIN ${digits}`;
+  if (isLegacyGeneratedPin(participantId)) return "PIN needs Nesco 4-digit update";
+  return "PIN needs review";
 }
 
 function youthSupervisorOption(row: { registration: YouthRegistration; profile?: MasterProfile }) {
@@ -3817,10 +3859,10 @@ function MyWorkspace({
       const profile = profiles.find((item) => item.id === youth.profile_id);
       const fullName = normalizeLaunchText(`${profile?.first_name || ""} ${profile?.last_name || ""}`);
       const preferredName = normalizeLaunchText(`${profile?.preferred_name || ""} ${profile?.last_name || ""}`);
-      const participant = normalizeLaunchPin(youth.participant_id);
+      const participant = normalizeNescoPin(youth.participant_id);
       const lastName = normalizeLaunchText(profile?.last_name || "");
       const nameMatches = !enteredName || fullName === enteredName || preferredName === enteredName || (lastName && enteredName.endsWith(lastName));
-      const pinMatches = !!enteredPin && (participant === enteredPin || participant.endsWith(enteredPin) || enteredPin.endsWith(participant));
+      const pinMatches = isValidNescoPin(enteredPin) && participant === normalizeNescoPin(enteredPin);
       return nameMatches && pinMatches;
     });
 
@@ -3835,10 +3877,14 @@ function MyWorkspace({
       return;
     }
 
-    const fallbackParticipantId = enteredPin || `BFF-${Math.floor(100000 + Math.random() * 899999)}`;
-    setAccessMessage("Youth access opened with supervisor-assisted verification. Your work can continue while staff verifies the record.");
+    if (!isValidNescoPin(enteredPin)) {
+      setAccessMessage("Please enter the youth's Nesco-assigned 4-digit PIN.");
+      return;
+    }
+
+    setAccessMessage("Youth access opened with supervisor-assisted verification. This 4-digit PIN must be matched to the Nesco roster; no duplicate roster record was created.");
     signIn("Youth Workforce Participant", name || "Youth Workforce Participant", {
-      participant_id: fallbackParticipantId,
+      participant_id: normalizeNescoPin(enteredPin),
       needs_supervisor_verification: true,
     });
   };
@@ -3855,7 +3901,7 @@ function MyWorkspace({
     }
 
     if (returningChoice === "Supervisor") {
-      const enteredSupervisorPin = normalizeLaunchPin(pin);
+      const enteredSupervisorPin = normalizeNescoPin(pin);
       if (!name.trim()) {
         setAccessMessage("Please enter the supervisor name exactly as it appears on the Nesco list.");
         return;
@@ -4002,6 +4048,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
   const [guardianEmail, setGuardianEmail] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [programGoal, setProgramGoal] = useState("");
+  const [assignedPin, setAssignedPin] = useState("");
   const [saved, setSaved] = useState("");
 
   const save = async () => {
@@ -4015,6 +4062,12 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 
     if (!cleanFirst || !cleanLast) {
       setSaved("Please enter first and last name before saving.");
+      return;
+    }
+
+    const cleanAssignedPin = normalizeNescoPin(assignedPin);
+    if (profileType === "youth" && !isValidNescoPin(cleanAssignedPin)) {
+      setSaved("Youth records require the Nesco-assigned 4-digit PIN. Do not save generated 6-digit PINs.");
       return;
     }
 
@@ -4055,7 +4108,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       const youth: YouthRegistration = {
         id: uuid(),
         profile_id: profile.id,
-        participant_id: `BFF-${Math.floor(100000 + Math.random() * 899999)}`,
+        participant_id: cleanAssignedPin,
         age_range: "14-18",
         crew,
         guardian_name: guardianName.trim(),
@@ -4084,6 +4137,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Create the profile once. Reuse it everywhere.</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Role / Registration Type" value={role} onChange={(v) => setRole(v as Role)} options={roles} />
+        {role === "Youth Workforce Participant" && <Field label="Nesco 4-digit PIN" value={assignedPin} onChange={setAssignedPin} placeholder="0000" />}
         <Field label="Preferred Name" value={preferredName} onChange={setPreferredName} />
         <Field label="First Name" value={firstName} onChange={setFirstName} />
         <Field label="Last Name" value={lastName} onChange={setLastName} />
@@ -4828,10 +4882,12 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
   }, []);
 
   const deletedYouthIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
-  const youthRows = youth
-    .filter((y) => !deletedYouthIds.includes(y.id) && !deletedYouthIds.includes(y.profile_id) && !deletedYouthIds.includes(y.participant_id))
-    .map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }))
-    .filter((row) => row.profile?.active !== false);
+  const youthRows = dedupeYouthRosterRows(
+    youth
+      .filter((y) => !deletedYouthIds.includes(y.id) && !deletedYouthIds.includes(y.profile_id) && !deletedYouthIds.includes(y.participant_id))
+      .map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }))
+      .filter((row) => row.profile?.active !== false)
+  );
   const todayAttendance = attendance.filter((a) => a.date === todayISO());
   const supportFlags = wellness.filter((w) => w.safety_flag);
   const todayIncidents = incidents.filter((i) => i.created_at.slice(0, 10) === todayISO());
@@ -4873,7 +4929,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
       <div>
         {tab === "dashboard" && (
           <SupervisorDashboard
-            youthCount={youth.length}
+            youthCount={youthRows.length}
             attendanceCount={todayAttendance.length}
             supportFlags={supportFlags.length}
             incidentCount={todayIncidents.length}
@@ -5026,6 +5082,7 @@ function YouthRosterModule({
         <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
       {rosterMessage && <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black text-amber-50">{rosterMessage}</div>}
+      <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">Launch 5.1 roster rule: youth and supervisors use Nesco-assigned 4-digit PINs only. Old 6-digit generated values are hidden as “PIN needs Nesco 4-digit update” until corrected.</div>
 
       {youthRows.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
@@ -5723,7 +5780,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const demoYouth: YouthRegistration = {
     id: "demo-youth-registration",
     profile_id: activeUser?.profile_id || activeUser?.id || "demo-profile",
-    participant_id: activeUser?.participant_id || "BFF-736309",
+    participant_id: activeUser?.participant_id || "PIN-PENDING",
     age_range: "14-18",
     crew: "Crew A",
     guardian_name: "Parent / Guardian",
