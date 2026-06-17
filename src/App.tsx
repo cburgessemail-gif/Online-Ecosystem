@@ -3835,15 +3835,26 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </Card>
       <details open className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
         <summary className="cursor-pointer text-lg font-black text-emerald-50">Learn more about the guest journey</summary>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {Object.keys(guestTopics).map((item) => (
-            <button key={item} type="button" onClick={() => setGuestTopic(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${guestTopic === item ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}>{item}</button>
-          ))}
-        </div>
         <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <h2 className="text-2xl font-black text-white">{selected.title}</h2>
+          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-100/70">Selected guest topic</div>
+          <h2 className="mt-2 text-2xl font-black text-white">{selected.title}</h2>
           <p className="mt-2 text-sm font-bold leading-6 text-white/80">{selected.body}</p>
           <button type="button" onClick={() => setScreen(selected.action)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black hover:bg-emerald-200">{selected.actionLabel}</button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {Object.entries(guestTopics).map(([item, topic]) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setGuestTopic(item)}
+              className={`rounded-2xl border p-4 text-left text-sm font-black transition ${guestTopic === item ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
+              aria-pressed={guestTopic === item}
+            >
+              <span className="block text-base">{item}</span>
+              <span className={`mt-2 block text-xs leading-5 ${guestTopic === item ? "text-black/70" : "text-white/65"}`}>{topic.body}</span>
+              <span className={`mt-3 block rounded-full px-3 py-2 text-center text-xs ${guestTopic === item ? "bg-black text-white" : "bg-white/10 text-white"}`}>Select topic</span>
+            </button>
+          ))}
         </div>
       </details>
     </div>
