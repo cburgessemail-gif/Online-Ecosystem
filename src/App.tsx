@@ -3797,15 +3797,110 @@ function JourneyCompletionCard({
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [guestTopic, setGuestTopic] = useState("Farm Story");
-  const guestTopics: Record<string, { title: string; body: string; actionLabel: string; action: Screen }> = {
-    "Farm Story": { title: "Farm Story", body: "Bronson Family Farm is a regenerative farm, youth workforce classroom, marketplace, and community growing place at historic Lansdowne Airport.", actionLabel: "Open Home", action: "guest" },
-    "Historic Lansdowne Airport": { title: "Historic Lansdowne Airport", body: "The farm sits within a larger place-based story where land, aviation history, agriculture, and community redevelopment meet.", actionLabel: "Become a Partner", action: "partner" },
-    "Regenerative Agriculture": { title: "Regenerative Agriculture", body: "Guests can learn how soil, compost, crops, pollinators, water, and stewardship connect to food access and community health.", actionLabel: "Open Growing Center", action: "resources" },
-    "Events": { title: "Events", body: "Events connect visitors to growers, youth learning, marketplace activity, community partners, and seasonal farm experiences.", actionLabel: "Open Calendar", action: "events" },
-    "Marketplace": { title: "Marketplace", body: "The marketplace connects produce, growers, SNAP access, value-added products, and entrepreneurship.", actionLabel: "Visit Marketplace", action: "marketplace" },
-    "Volunteer Path": { title: "Volunteer Path", body: "Volunteers support farm operations, youth learning, events, infrastructure, and community food-system work.", actionLabel: "Volunteer / Support", action: "support" },
+  type GuestTopic = {
+    title: string;
+    body: string;
+    actionLabel: string;
+    action: Screen;
+    whyItMatters: string;
+    whatVisitorsLearn: string[];
+    ecosystemConnections: string[];
+    nextSteps: string[];
+  };
+  const guestTopics: Record<string, GuestTopic> = {
+    "Farm Story": {
+      title: "Farm Story",
+      body: "Bronson Family Farm is a regenerative farm, youth workforce classroom, marketplace, and community growing place at historic Lansdowne Airport.",
+      actionLabel: "Stay on Guest Path",
+      action: "guest",
+      whyItMatters: "Visitors should understand that this is not only a farm. It is a place where land, learning, workforce development, entrepreneurship, food access, and community connection are being cultivated together.",
+      whatVisitorsLearn: [
+        "How Bronson Family Farm uses the land as a living classroom.",
+        "How Farm & Family Alliance connects education, family, growers, and community benefit.",
+        "Why youth workforce development is connected to real farm work, not simulated assignments.",
+        "How the farm story includes food production, stewardship, market participation, and place-based redevelopment.",
+      ],
+      ecosystemConnections: ["Youth Workforce", "Farm & Family Alliance", "Marketplace", "Community Food System", "Agritourism"],
+      nextSteps: ["Attend a farm event", "Visit the marketplace", "Volunteer or support a project", "Ask how your organization can partner"],
+    },
+    "Historic Lansdowne Airport": {
+      title: "Historic Lansdowne Airport",
+      body: "The farm sits within a larger place-based story where land, aviation history, agriculture, and community redevelopment meet.",
+      actionLabel: "Become a Partner",
+      action: "partner",
+      whyItMatters: "The airport context helps visitors understand that Bronson Family Farm is growing inside a unique community asset. The site connects history, land use, economic development, education, and future agritourism possibilities.",
+      whatVisitorsLearn: [
+        "Why the Lansdowne Airport location matters.",
+        "How the farm fits between the hangars and the larger airport property.",
+        "How neglected or underused land can become productive, educational, and community-serving.",
+        "How aviation, agriculture, tourism, and youth opportunity can exist in one place-based story.",
+      ],
+      ecosystemConnections: ["Place-Based Learning", "Agritourism", "Partnerships", "Infrastructure", "Community Redevelopment"],
+      nextSteps: ["Explore the farm story", "Schedule a site conversation", "Discuss partnership opportunities", "Support infrastructure development"],
+    },
+    "Regenerative Agriculture": {
+      title: "Regenerative Agriculture",
+      body: "Guests can learn how soil, compost, crops, pollinators, water, and stewardship connect to food access and community health.",
+      actionLabel: "Open Growing Center",
+      action: "resources",
+      whyItMatters: "Regenerative agriculture is not treated as a slogan. It is the daily practice of improving soil, protecting crops, observing living systems, using available resources wisely, and helping youth understand how food is actually grown.",
+      whatVisitorsLearn: [
+        "How compost, mulch, soil health, and planting decisions support future harvests.",
+        "Why observation is a farm skill, a science skill, and a workforce skill.",
+        "How companion planting, pollinators, crop protection, and water access affect production.",
+        "How the crop plan connects farming to curriculum, nutrition, preservation, marketplace, and entrepreneurship.",
+      ],
+      ecosystemConnections: ["Growing Center", "Crop Plan", "Soil Health", "Companion Planting", "Youth Curriculum"],
+      nextSteps: ["Open the Growing Center", "Review today's crop plan", "Explore companion planting", "Connect farm work to food and marketplace outcomes"],
+    },
+    "Events": {
+      title: "Events",
+      body: "Events connect visitors to growers, youth learning, marketplace activity, community partners, and seasonal farm experiences.",
+      actionLabel: "Open Calendar",
+      action: "events",
+      whyItMatters: "Events are how the public experiences the ecosystem. They are not separate from the farm. They connect learning, growers, vendors, partners, visitors, youth accomplishments, and community food access.",
+      whatVisitorsLearn: [
+        "What is happening at the farm this season.",
+        "How events connect visitors to growers, youth, vendors, and community partners.",
+        "How the calendar also supports deliveries, visitors, curriculum, and farm operations.",
+        "How farm events become agritourism and community engagement opportunities.",
+      ],
+      ecosystemConnections: ["Calendar", "Visitors", "Marketplace", "Growers", "Community Partners"],
+      nextSteps: ["Open the calendar", "Attend an upcoming event", "Invite a partner organization", "Connect an event to marketplace or youth learning"],
+    },
+    "Marketplace": {
+      title: "Marketplace",
+      body: "The marketplace connects produce, growers, SNAP access, value-added products, and entrepreneurship.",
+      actionLabel: "Visit Marketplace",
+      action: "marketplace",
+      whyItMatters: "The marketplace shows youth and visitors that food production becomes customer service, pricing, sales, value-added products, nutrition, and economic opportunity.",
+      whatVisitorsLearn: [
+        "How produce and value-added products move from farm work to customers.",
+        "How SNAP access and local growers connect to food access.",
+        "How youth learn entrepreneurship through real marketplace thinking.",
+        "How crop planning affects inventory, harvest timing, sales, and community benefit.",
+      ],
+      ecosystemConnections: ["SNAP", "Growers", "Value-Added Producers", "Entrepreneurship", "Crop Plan"],
+      nextSteps: ["Visit the marketplace", "Learn about grower participation", "Explore value-added opportunities", "Connect production to sales and community access"],
+    },
+    "Volunteer Path": {
+      title: "Volunteer Path",
+      body: "Volunteers support farm operations, youth learning, events, infrastructure, and community food-system work.",
+      actionLabel: "Volunteer / Support",
+      action: "support",
+      whyItMatters: "Volunteers help protect the youth program, strengthen the farm, support events, and make the ecosystem possible when resources are limited.",
+      whatVisitorsLearn: [
+        "What kinds of help are needed on the farm.",
+        "How volunteers can support youth without disrupting the learning environment.",
+        "How infrastructure, planting, events, food access, and storytelling all need support.",
+        "How community members can contribute time, skills, materials, or connections.",
+      ],
+      ecosystemConnections: ["Support", "Infrastructure", "Youth Learning", "Events", "Community Food System"],
+      nextSteps: ["Volunteer for a project", "Donate materials", "Support a youth learning activity", "Connect the farm to a useful partner"],
+    },
   };
   const selected = guestTopics[guestTopic] || guestTopics["Farm Story"];
+  const topicKeys = Object.keys(guestTopics);
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
       <Card>
@@ -3833,30 +3928,70 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         </div>
       </Card>
-      <details open className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
-        <summary className="cursor-pointer text-lg font-black text-emerald-50">Learn more about the guest journey</summary>
-        <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-5">
-          <div className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-100/70">Selected guest topic</div>
-          <h2 className="mt-2 text-2xl font-black text-white">{selected.title}</h2>
-          <p className="mt-2 text-sm font-bold leading-6 text-white/80">{selected.body}</p>
-          <button type="button" onClick={() => setScreen(selected.action)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black hover:bg-emerald-200">{selected.actionLabel}</button>
+
+      <section className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xl font-black text-emerald-50">Learn more about the guest journey</h2>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-white/55">Select a topic below</div>
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {Object.entries(guestTopics).map(([item, topic]) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setGuestTopic(item)}
-              className={`rounded-2xl border p-4 text-left text-sm font-black transition ${guestTopic === item ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
-              aria-pressed={guestTopic === item}
-            >
-              <span className="block text-base">{item}</span>
-              <span className={`mt-2 block text-xs leading-5 ${guestTopic === item ? "text-black/70" : "text-white/65"}`}>{topic.body}</span>
-              <span className={`mt-3 block rounded-full px-3 py-2 text-center text-xs ${guestTopic === item ? "bg-black text-white" : "bg-white/10 text-white"}`}>Select topic</span>
-            </button>
-          ))}
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {topicKeys.map((item) => {
+            const topic = guestTopics[item];
+            const active = guestTopic === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setGuestTopic(item)}
+                className={`rounded-2xl border p-4 text-left transition ${active ? "border-emerald-200 bg-emerald-300 text-black shadow-lg shadow-emerald-950/20" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
+                aria-pressed={active}
+              >
+                <span className="block text-base font-black">{item}</span>
+                <span className={`mt-2 block text-xs font-bold leading-5 ${active ? "text-black/70" : "text-white/65"}`}>{topic.body}</span>
+                <span className={`mt-3 inline-flex rounded-full px-3 py-2 text-center text-xs font-black ${active ? "bg-black text-white" : "bg-white/10 text-white"}`}>{active ? "Selected" : "Select and read below"}</span>
+              </button>
+            );
+          })}
         </div>
-      </details>
+
+        <div className="mt-5 rounded-[1.35rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm">
+          <div className="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Selected Topic Detail</div>
+          <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-3xl font-black">{selected.title}</h2>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-slate-700">{selected.body}</p>
+            </div>
+            <button type="button" onClick={() => setScreen(selected.action)} className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700">{selected.actionLabel}</button>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Why this matters</div>
+              <p className="mt-3 text-sm font-bold leading-6 text-slate-800">{selected.whyItMatters}</p>
+            </div>
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">What visitors learn</div>
+              <div className="mt-3 grid gap-2">
+                {selected.whatVisitorsLearn.map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm">• {item}</div>)}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-purple-200 bg-purple-50 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-purple-800">Next steps</div>
+              <div className="mt-3 grid gap-2">
+                {selected.nextSteps.map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm">→ {item}</div>)}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Ecosystem connections</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selected.ecosystemConnections.map((item) => <span key={item} className="rounded-full bg-white px-3 py-2 text-xs font-black text-slate-800 shadow-sm">{item}</span>)}
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
