@@ -57,6 +57,7 @@ type Screen =
   | "reports"
   | "operations"
   | "almanac"
+  | "resources"
   | "events"
   | "media"
   | "launchProject"
@@ -1018,7 +1019,7 @@ function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => v
 function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => void; setTab?: (tab: any) => void }) {
   const actions = [
     ["📅 Calendar", () => setScreen("events")],
-    ["📚 Resources", () => setScreen("almanac")],
+    ["📚 Resources", () => setScreen("resources")],
     ["🚑 Nurse Line", () => undefined],
     ["📷 My Story", () => setScreen("media")],
     ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
@@ -2399,7 +2400,8 @@ function screenLabel(screen: Screen) {
     wellness: "Youth Morning Check-In",
     reports: "Reports",
     operations: "Operations",
-    almanac: "Today’s Farm Almanac",
+    almanac: "Weather / Almanac Utilities",
+    resources: "Growing Center / Contextual Resources",
     events: "Events & Orientation",
     media: "Media Center",
     launchProject: "June 8 Cooling Station Challenge",
@@ -2716,6 +2718,7 @@ function App() {
       {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
       {screen === "operations" && <Operations setScreen={setScreen} />}
       {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "resources" && <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MyStoryScreen setScreen={setScreen} />}
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
@@ -2804,7 +2807,7 @@ function Shell({
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "portal")} className={buttonClass(activeUser?.role ? routeForRole(activeUser.role) : "portal")}>Home</button>
               <button type="button" onClick={() => setScreen(workspaceTarget)} className={buttonClass(workspaceTarget)}>{role && role !== "Guest" ? "My Day" : "Choose Role"}</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
+              <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>📚 Resources</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -2837,7 +2840,7 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">🧰 Quick Tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
-              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>📚 Resources</button>
+              <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>📚 Resources</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>📅 Calendar</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Media</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
@@ -3793,6 +3796,16 @@ function JourneyCompletionCard({
 
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [guestTopic, setGuestTopic] = useState("Farm Story");
+  const guestTopics: Record<string, { title: string; body: string; actionLabel: string; action: Screen }> = {
+    "Farm Story": { title: "Farm Story", body: "Bronson Family Farm is a regenerative farm, youth workforce classroom, marketplace, and community growing place at historic Lansdowne Airport.", actionLabel: "Open Home", action: "guest" },
+    "Historic Lansdowne Airport": { title: "Historic Lansdowne Airport", body: "The farm sits within a larger place-based story where land, aviation history, agriculture, and community redevelopment meet.", actionLabel: "Become a Partner", action: "partner" },
+    "Regenerative Agriculture": { title: "Regenerative Agriculture", body: "Guests can learn how soil, compost, crops, pollinators, water, and stewardship connect to food access and community health.", actionLabel: "Open Growing Center", action: "resources" },
+    "Events": { title: "Events", body: "Events connect visitors to growers, youth learning, marketplace activity, community partners, and seasonal farm experiences.", actionLabel: "Open Calendar", action: "events" },
+    "Marketplace": { title: "Marketplace", body: "The marketplace connects produce, growers, SNAP access, value-added products, and entrepreneurship.", actionLabel: "Visit Marketplace", action: "marketplace" },
+    "Volunteer Path": { title: "Volunteer Path", body: "Volunteers support farm operations, youth learning, events, infrastructure, and community food-system work.", actionLabel: "Volunteer / Support", action: "support" },
+  };
+  const selected = guestTopics[guestTopic] || guestTopics["Farm Story"];
   return (
     <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
       <Card>
@@ -3802,10 +3815,10 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           Guests see the farm story, events, marketplace, volunteer options, and ways to connect. Youth workforce operations stay in the youth pathway.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-4 text-left font-black text-black">Attend an Event</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Visit Marketplace</button>
-          <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Volunteer / Support</button>
-          <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black">Become a Partner</button>
+          <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-4 text-left font-black text-black hover:bg-emerald-200">Attend an Event</button>
+          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Visit Marketplace</button>
+          <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Volunteer / Support</button>
+          <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Become a Partner</button>
         </div>
       </Card>
       <Card className="overflow-hidden p-0">
@@ -3820,12 +3833,17 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         </div>
       </Card>
-      <details className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
+      <details open className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
         <summary className="cursor-pointer text-lg font-black text-emerald-50">Learn more about the guest journey</summary>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {["Farm Story", "Historic Lansdowne Airport", "Regenerative Agriculture", "Events", "Marketplace", "Volunteer Path"].map((item) => (
-            <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black">{item}</div>
+          {Object.keys(guestTopics).map((item) => (
+            <button key={item} type="button" onClick={() => setGuestTopic(item)} className={`rounded-2xl border p-4 text-left text-sm font-black transition ${guestTopic === item ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}>{item}</button>
           ))}
+        </div>
+        <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-5">
+          <h2 className="text-2xl font-black text-white">{selected.title}</h2>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/80">{selected.body}</p>
+          <button type="button" onClick={() => setScreen(selected.action)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black hover:bg-emerald-200">{selected.actionLabel}</button>
         </div>
       </details>
     </div>
@@ -4488,6 +4506,26 @@ function GrowingCenterPanel({ setScreen, compact = false }: { setScreen: (screen
 }
 
 
+function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "guest";
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📚 Curriculum-Driven Resources</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Growing Center</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">Resources are delivered in context from today’s curriculum and farm work. Weather, Almanac, and Work Status are small operational utilities, not this page.</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return</button>
+          <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open My Story</button>
+        </div>
+      </Card>
+      <GrowingCenterPanel setScreen={setScreen} />
+      <CurriculumWeekViewCard />
+    </div>
+  );
+}
+
 function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "roles";
   const todayPlan = getCurrentYouthPlan();
@@ -4495,12 +4533,12 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📚 Contextual Resources</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Growing Center</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">Resources are delivered in context from the curriculum and today’s farm work. Weather, Almanac, and Work Status remain small operational cards inside My Day; they do not take over this screen.</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Weather + Almanac Utilities</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Farm Conditions</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">This is the compact utility view for weather, official Almanac links, and work status. The full resource experience is in the Growing Center.</p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open My Story</button>
+          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Growing Center</button>
           <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
         </div>
       </Card>
@@ -4510,8 +4548,6 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
         <FarmConditionsCard compact />
         <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={getCurrentYouthWeek()} />
       </div>
-
-      <GrowingCenterPanel setScreen={setScreen} />
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
@@ -4593,7 +4629,7 @@ function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen)
     <div className="mb-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
       <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">🏠 Home</button>
-      <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">📚 Resources</button>
+      <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">📚 Resources</button>
     </div>
   );
 }
@@ -6767,7 +6803,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="sr-only" disabled={uploading} onChange={handleStoryUpload} />
           </label>
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Back to My Day</button>
-          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Today’s Resources</button>
+          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Today’s Resources</button>
         </div>
       </Card>
 
