@@ -27,7 +27,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
  * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
- * - Keeps returning youth on PIN, supervisors on PIN 2350, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
+ * - Keeps returning youth and supervisors on their Nesco-assigned 4-digit PINs, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
  * - Layers youth curriculum by week and day
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
@@ -3855,11 +3855,23 @@ function MyWorkspace({
     }
 
     if (returningChoice === "Supervisor") {
-      if (normalizeLaunchPin(pin) !== "2350") {
-        setAccessMessage("Supervisor PIN not recognized. Use the supervisor launch PIN or check with Mission Control.");
+      const enteredSupervisorPin = normalizeLaunchPin(pin);
+      if (!name.trim()) {
+        setAccessMessage("Please enter the supervisor name exactly as it appears on the Nesco list.");
         return;
       }
-      signIn("Supervisor / Staff", name || "Supervisor / Staff");
+      if (!/^\d{4}$/.test(enteredSupervisorPin)) {
+        setAccessMessage("Please enter the supervisor\’s Nesco-assigned 4-digit PIN.");
+        return;
+      }
+      // Launch 5.1 correction: supervisors do NOT use a shared launch PIN.
+      // Nesco issues 4-digit PINs. Until the supervisor roster is imported,
+      // open Supervisor access with the entered 4-digit PIN and flag it for verification.
+      signIn("Supervisor / Staff", name || "Supervisor / Staff", {
+        participant_id: enteredSupervisorPin,
+        needs_supervisor_verification: true,
+      });
+      setAccessMessage("Supervisor access opened with Nesco 4-digit PIN pending roster verification. Shared PIN 2350 is no longer used.");
       return;
     }
 
@@ -3928,7 +3940,7 @@ function MyWorkspace({
           {(returningChoice === "Youth" || returningChoice === "Supervisor") ? (
             <div className="grid gap-4 md:grid-cols-2">
               <Field label={returningChoice === "Youth" ? L("Youth Name") : L("Supervisor Name")} value={name} onChange={setName} placeholder={L("First and last name")} />
-              <Field label={returningChoice === "Supervisor" ? L("Supervisor PIN") : L("Assigned Youth PIN")} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? "2350" : L("PIN number")} />
+              <Field label={returningChoice === "Supervisor" ? L("Supervisor PIN") : L("Assigned Youth PIN")} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? L("Nesco 4-digit PIN") : L("PIN number")} />
             </div>
           ) : returningChoice === "Parent" ? (
             <div className="grid gap-4 md:grid-cols-2">
@@ -3947,7 +3959,7 @@ function MyWorkspace({
             <p className="mt-3 text-xs leading-5 text-white/62">{L("Growers, partners, and Mission Control use temporary password")} <strong className="text-white">Nesco2026</strong> {L("until changed.")}</p>
           )}
           {returningChoice === "Youth" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Returning youth use their assigned PIN. No temporary password is needed.")}</p>}
-          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Supervisor launch PIN")}: <strong className="text-white">2350</strong>.</p>}
+          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Supervisors use their Nesco-assigned 4-digit PIN. Shared PIN 2350 is no longer used.")}</p>}
 
           <button type="button" onClick={returningLogin} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{L("Enter My Day")}</button>
           {accessMessage && <Notice text={accessMessage} />}
@@ -3959,7 +3971,7 @@ function MyWorkspace({
         <h2 className="mt-3 text-3xl font-black">{returningChoice === "Supervisor" ? L("Supervisor Access") : L("Open the correct daily space")}</h2>
         {returningChoice === "Supervisor" ? (
           <div className="mt-5 grid gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Supervisor")}:</strong> {L("use name + PIN 2350, then manage attendance, safety, and reports.")}</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Supervisor")}:</strong> {L("use name + Nesco-assigned 4-digit PIN, then manage attendance, safety, and reports.")}</div>
           </div>
         ) : (
           <p className="mt-5 text-sm font-bold leading-6 text-white/76">{L("Only the selected role's access information appears here. Youth, parents, guests, growers, and supervisors should not see each other's instructions.")}</p>
