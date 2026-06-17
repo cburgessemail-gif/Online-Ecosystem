@@ -4302,35 +4302,41 @@ function connectionPathForPlan(plan: { curriculum: string; focus: string; work: 
 
 
 function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const farmStatus = getFarmStatus();
   const todayPlan = getCurrentYouthPlan();
-  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus);
+  const todayFarmPlan = getTodayFarmPlan();
+  const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "roles";
+  const guidance = [
+    ["Plant", todayPlan.work?.some((item) => item.toLowerCase().includes("plant")) ? "Planting appears in today’s work plan. Check soil moisture, spacing, and shade before planting." : "Use today’s curriculum and field observations before adding new planting work."],
+    ["Prepare", "Prepare tools, water, shade, PPE, and access routes before outdoor work begins."],
+    ["Protect", "Protect youth, plants, materials, and site access when heat, rain, wind, or deer pressure changes the day."],
+    ["Build Soil", todayPlan.work?.some((item) => item.toLowerCase().includes("compost") || item.toLowerCase().includes("soil")) ? "Compost or soil work is part of today’s plan. Document what changes in texture, smell, moisture, or structure." : "Use crop observations and the grow area condition to decide whether soil work is needed today."],
+    ["Observe", todayPlan.reflection || "Observe before acting. Record one condition that changed your decision today."],
+  ];
+
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌾 Live Almanac + Grower Resources</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">Today’s Farm Almanac</h1>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Launch 5.1 Weather Command</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">LIVE Farm Weather + Almanac</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">
-          This page separates the Almanac from weather. Weather supports the day. The Almanac helps growers decide what to plant, protect, observe, and prepare.
+          Weather is the operational screen. The Almanac is the grower guidance layer that uses weather, calendar, curriculum, and farm observations to decide what to plant, protect, observe, and prepare.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
+          <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
           <a href={YOUNGSTOWN_ALMANAC_PLANTING_URL} target="_blank" rel="noreferrer" className="rounded-full border border-emerald-200/30 bg-emerald-300/12 px-6 py-3 font-black text-emerald-50">Open 44505 Planting Calendar ↗</a>
+          <a href={YOUNGSTOWN_ALMANAC_FORECAST_URL} target="_blank" rel="noreferrer" className="rounded-full border border-sky-200/30 bg-sky-300/12 px-6 py-3 font-black text-sky-50">Open Youngstown Forecast ↗</a>
         </div>
       </Card>
 
+      <FarmConditionsCard />
+
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 What should growers know today?</div>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Almanac Guidance from Today’s Plan</div>
           <h2 className="mt-3 text-2xl font-black">Planting + Protection Guidance</h2>
+          <p className="mt-3 text-sm font-bold leading-6 text-white/78">This guidance is tied to today’s curriculum and work plan instead of a static launch snapshot.</p>
           <div className="mt-4 grid gap-2">
-            {[
-              ["Plant", "Seedlings and potatoes are priority planting work today."],
-              ["Prepare", "Complete grow area preparation and secure the second deer-deterrent fence."],
-              ["Protect", "Check all plants for health, stress, insects, moisture, and deer pressure."],
-              ["Build Soil", "Mow grass and create compost to support future soil health."],
-              ["Observe", "Watch sun, shadow, wind, moisture, pollinator activity, and plant response."],
-            ].map(([label, value]) => (
+            {guidance.map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
                 <div className="mt-1 text-sm font-bold leading-6 text-white/82">{value}</div>
@@ -4340,10 +4346,16 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Weather Support</div>
-          <h2 className="mt-3 text-2xl font-black">Conditions still matter</h2>
+          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🧭 Today’s Operating Decision</div>
+          <h2 className="mt-3 text-2xl font-black">What weather changes first</h2>
           <div className="mt-4 grid gap-2">
-            {almanacCards.slice(0, 8).map(([label, value]) => (
+            {[
+              ["Heat", "Move hard outdoor work earlier, increase shade, water, and breaks."],
+              ["Rain", "Protect tools, seedlings, electronics, paper forms, and loose materials."],
+              ["Wind", "Secure row covers, signs, buckets, light supplies, and shade materials."],
+              ["Sun / Shadow", "Use shade observations for cool plants and full-sun placement for crops needing more light."],
+              ["Work Status", todayFarmPlan.farmStatus.level === "Open" ? "Full operations unless Mission Control changes the day." : todayFarmPlan.farmStatus.action],
+            ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-black/25 p-3">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
                 <div className="mt-1 text-sm font-bold leading-5 text-white/82">{value}</div>
@@ -4358,7 +4370,7 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
         <h2 className="mt-3 text-2xl font-black">Open the actual Almanac</h2>
-        <p className="mt-3 text-sm leading-6 text-white/78">The ecosystem does not replace the Almanac. These links open the live source pages for the farm location and growing guidance.</p>
+        <p className="mt-3 text-sm leading-6 text-white/78">The ecosystem keeps the official Almanac links available while the weather command screen shows the immediate farm conditions.</p>
         <LiveAlmanacResourceLinks />
       </Card>
 
