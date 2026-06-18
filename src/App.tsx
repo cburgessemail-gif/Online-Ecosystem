@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.1.4 - MORNING LAUNCH MODE + RESOURCE VISIBILITY + FOREST CONNECTIONS
+ * LAUNCH 5.1.6 - INTERACTIVE QUESTIONS + DISCOVERY WALL + WORK COMPLETION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -346,6 +346,8 @@ const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
 const MEDIA_BUCKET = "bff-media";
 const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
+const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
+const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
 
 type FarmOperationStatus = {
   level: "Open" | "Modified Operations" | "Closed";
@@ -362,6 +364,28 @@ type EcosystemNotification = {
   priority: "Info" | "Action" | "Safety" | "Urgent";
   title: string;
   body: string;
+  created_at: string;
+};
+
+type CultivatorDiscovery = {
+  id: string;
+  participant_id: string;
+  user_name: string;
+  date: string;
+  category: string;
+  question: string;
+  response: string;
+  source: "My Day" | "Resources" | "Reflection" | "Mission Control";
+  created_at: string;
+};
+
+type WorkCompletionRecord = {
+  id: string;
+  participant_id: string;
+  user_name: string;
+  date: string;
+  item: string;
+  completed: boolean;
   created_at: string;
 };
 
@@ -2443,6 +2467,8 @@ function supabaseTableCandidates(table: string) {
     feedback: ["feedback", "ecosystem_feedback", "program_feedback"],
     parent_contact_logs: ["parent_contact_logs", "attendance_communications", "parent_communications"],
     parent_summaries: ["parent_summaries", "parent_summary"],
+    cultivator_discoveries: ["cultivator_discoveries", "reflections", "community_stories"],
+    work_completions: ["work_completions", "daily_task_completions", "reflections"],
   };
   return aliases[table] || [table];
 }
@@ -5056,7 +5082,267 @@ function TomorrowBeginsTodayCard({ todayPlan }: { todayPlan: typeof youthWeekOne
 }
 
 
-function LaunchMorningMyDayPanel({ setScreen }: { setScreen: (screen: Screen) => void }) {
+
+function launchParticipantId(activeUser?: EcosystemUser | null) {
+  return activeUser?.participant_id || activeUser?.profile_id || activeUser?.id || "guest";
+}
+
+function launchParticipantName(activeUser?: EcosystemUser | null) {
+  return activeUser?.name || "Cultivator";
+}
+
+function todayDiscoveries(activeUser?: EcosystemUser | null) {
+  const participantId = launchParticipantId(activeUser);
+  return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, [])
+    .filter((row) => row.date === todayISO() && (row.participant_id === participantId || participantId === "guest"))
+    .slice(0, 50);
+}
+
+function todaysWorkCompletionRows(activeUser?: EcosystemUser | null) {
+  const participantId = launchParticipantId(activeUser);
+  return safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, [])
+    .filter((row) => row.date === todayISO() && row.participant_id === participantId);
+}
+
+function InteractiveLearningCard({
+  topic,
+  activeUser,
+  existingResponses,
+  onSaved,
+}: {
+  topic: { title: string; body: string; question: string; icon: string };
+  activeUser?: EcosystemUser | null;
+  existingResponses: CultivatorDiscovery[];
+  onSaved: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [response, setResponse] = useState("");
+  const [status, setStatus] = useState("");
+  const matchingResponses = existingResponses.filter((row) => row.category === topic.title).slice(0, 3);
+
+  async function saveDiscovery() {
+    const cleanResponse = response.trim();
+    if (!cleanResponse) {
+      setStatus("Type your answer first.");
+      return;
+    }
+    const row: CultivatorDiscovery = {
+      id: uuid(),
+      participant_id: launchParticipantId(activeUser),
+      user_name: launchParticipantName(activeUser),
+      date: todayISO(),
+      category: topic.title,
+      question: topic.question,
+      response: cleanResponse,
+      source: "My Day",
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
+    setResponse("");
+    setStatus(saveModeMessage("Response", result));
+    onSaved();
+  }
+
+  return (
+    <div className="rounded-xl bg-white p-3 shadow-sm">
+      <button type="button" onClick={() => setOpen((value) => !value)} className="w-full text-left">
+        <div className="flex items-start gap-2">
+          <div className="text-xl">{topic.icon}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-black text-slate-950">{topic.title}</div>
+            <div className="mt-1 text-xs font-bold leading-5 text-slate-600">{topic.body}</div>
+            <div className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-black leading-5 text-blue-950">Question: {topic.question}</div>
+          </div>
+          <div className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">{open ? "Close" : "Answer"}</div>
+        </div>
+      </button>
+
+      {open && (
+        <div className="mt-3 grid gap-2">
+          <textarea
+            value={response}
+            onChange={(e) => setResponse(e.target.value)}
+            rows={3}
+            placeholder="Type your answer here..."
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-950 outline-none focus:border-emerald-500"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={saveDiscovery} className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-700">
+              Save Response
+            </button>
+            {status && <span className="text-xs font-black text-slate-600">{status}</span>}
+          </div>
+          {matchingResponses.length > 0 && (
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3">
+              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-800">Saved answers</div>
+              <div className="mt-2 grid gap-2">
+                {matchingResponses.map((row) => (
+                  <div key={row.id} className="rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-700">
+                    “{row.response}”
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WorkCompletionChecklist({ items, activeUser }: { items: string[]; activeUser?: EcosystemUser | null }) {
+  const [rows, setRows] = useState<WorkCompletionRecord[]>(() => todaysWorkCompletionRows(activeUser));
+  const participantId = launchParticipantId(activeUser);
+  const completedItems = new Set(rows.filter((row) => row.completed).map((row) => row.item));
+  const total = Math.max(items.length, 1);
+  const completed = items.filter((item) => completedItems.has(item)).length;
+  const percent = Math.round((completed / total) * 100);
+
+  function toggleItem(item: string) {
+    const currentRows = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []);
+    const existing = currentRows.find((row) => row.date === todayISO() && row.participant_id === participantId && row.item === item);
+    let nextRows: WorkCompletionRecord[];
+    if (existing) {
+      nextRows = currentRows.map((row) => row.id === existing.id ? { ...row, completed: !row.completed, created_at: new Date().toISOString() } : row);
+    } else {
+      const row: WorkCompletionRecord = {
+        id: uuid(),
+        participant_id: participantId,
+        user_name: launchParticipantName(activeUser),
+        date: todayISO(),
+        item,
+        completed: true,
+        created_at: new Date().toISOString(),
+      };
+      nextRows = [row, ...currentRows];
+    }
+    safeWrite(WORK_COMPLETION_KEY, nextRows.slice(0, 500));
+    setRows(nextRows.filter((row) => row.date === todayISO() && row.participant_id === participantId));
+  }
+
+  return (
+    <div className="grid gap-3">
+      <div className="rounded-xl bg-white p-3 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today's Progress</div>
+            <div className="mt-1 text-lg font-black text-slate-950">{completed} of {items.length} completed</div>
+          </div>
+          <div className="text-2xl font-black text-emerald-700">{percent}%</div>
+        </div>
+        <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${percent}%` }} />
+        </div>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {items.map((item) => {
+          const done = completedItems.has(item);
+          return (
+            <button key={item} type="button" onClick={() => toggleItem(item)} className={`rounded-xl border px-3 py-3 text-left text-sm font-black shadow-sm ${done ? "border-emerald-300 bg-emerald-100 text-emerald-950" : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50"}`}>
+              {done ? "☑" : "☐"} {item}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser?: EcosystemUser | null }) {
+  const todayPlan = getCurrentYouthPlan();
+  const [discoveries, setDiscoveries] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
+  const refreshDiscoveries = () => setDiscoveries(todayDiscoveries(activeUser));
+  const todayResources = [
+    { title: "What Changed?", body: "Notice something today that is different than yesterday.", question: "What changed that most people would miss?", icon: "👀" },
+    { title: "Forest → Farm Connection", body: "Yesterday's forest walk should help us understand today's farm work.", question: "What can the farm learn from the forest?", icon: "🌲" },
+    { title: "Plant of the Day", body: "Choose one plant and observe it carefully.", question: "What story is this plant telling?", icon: "🌿" },
+    { title: "Insect of the Day", body: "Bugs have jobs. Some pollinate, some decompose, some protect, and some damage crops.", question: "What was the insect doing?", icon: "🐞" },
+    { title: "Soil + Compost", body: "Healthy soil grows healthy food.", question: "What did you find living in the soil or compost?", icon: "🌱" },
+    { title: "Water", body: "Water is something we manage, not just use.", question: "Where did water matter today?", icon: "💧" },
+    { title: "Sun + Shadow", body: "The gardener’s shadow means presence and attention.", question: "What did the shadow teach you today?", icon: "☀️" },
+    { title: "Plant Health", body: "Plants communicate through color, growth, insects, and stress.", question: "What is the plant telling you?", icon: "🍃" },
+    { title: "Companion Planting", body: "Some plants help each other grow; some should not be together.", question: "Which plants should grow together, and why?", icon: "🌿" },
+    { title: "Food Safety", body: "Whole foods, processed foods, labels, additives, and allowable contaminants.", question: "What should families know before eating or buying food?", icon: "🥫" },
+  ];
+
+  return (
+    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Launch Mode • Start Here</div>
+      <h2 className="mt-2 text-3xl font-black">My Day</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Youth can work, learn, answer questions, take photos, reflect, and get help without hunting.</p>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left shadow-sm hover:bg-emerald-100">
+          <div className="text-2xl">🚜</div><div className="mt-2 text-sm font-black">Today’s Work</div><div className="mt-1 text-xs font-bold text-slate-600">Check off completed work.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("resources")} className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-left shadow-sm hover:bg-blue-100">
+          <div className="text-2xl">📚</div><div className="mt-2 text-sm font-black">Learn</div><div className="mt-1 text-xs font-bold text-slate-600">Answer today’s questions.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-2xl border border-purple-200 bg-purple-50 p-4 text-left shadow-sm hover:bg-purple-100">
+          <div className="text-2xl">📸</div><div className="mt-2 text-sm font-black">Take a Photo</div><div className="mt-1 text-xs font-bold text-slate-600">Tell My Story.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left shadow-sm hover:bg-amber-100">
+          <div className="text-2xl">✍️</div><div className="mt-2 text-sm font-black">Reflection</div><div className="mt-1 text-xs font-bold text-slate-600">Observe. Learn. Wonder.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("support")} className="rounded-2xl border border-red-200 bg-red-50 p-4 text-left shadow-sm hover:bg-red-100">
+          <div className="text-2xl">🆘</div><div className="mt-2 text-sm font-black">Help</div><div className="mt-1 text-xs font-bold text-slate-600">Safety and support.</div>
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_.9fr]">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today’s Work</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Tap each item when it is completed.</p>
+          <div className="mt-3">
+            <WorkCompletionChecklist items={todayPlan.work.slice(0, 8)} activeUser={activeUser} />
+          </div>
+          <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold text-slate-700">Start at the Morning Huddle. Bring water, closed-toe shoes, and gloves if needed.</div>
+        </div>
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">Today’s Learning Questions</div>
+          <div className="mt-2 text-lg font-black">Click a question. Type your answer. Save it.</div>
+          <div className="mt-2 text-sm font-bold leading-6 text-slate-700">Answers stay visible and become Cultivator Discoveries.</div>
+          <div className="mt-3 grid gap-2">
+            {todayResources.map((resource) => (
+              <InteractiveLearningCard key={resource.title} topic={resource} activeUser={activeUser} existingResponses={discoveries} onSaved={refreshDiscoveries} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-600">Discovery Wall</div>
+            <div className="mt-1 text-lg font-black text-slate-950">Today's saved answers</div>
+          </div>
+          <button type="button" onClick={refreshDiscoveries} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-black text-slate-800">Refresh</button>
+        </div>
+        {discoveries.length ? (
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {discoveries.slice(0, 8).map((row) => (
+              <div key={row.id} className="rounded-xl bg-white p-3 shadow-sm">
+                <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700">{row.category}</div>
+                <div className="mt-1 text-xs font-bold leading-5 text-slate-500">{row.question}</div>
+                <div className="mt-2 text-sm font-black leading-5 text-slate-900">“{row.response}”</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold leading-6 text-slate-700">No responses saved yet. Click any learning question above to record a Cultivator Discovery.</div>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">End-of-day reflection</div>
+        <div className="mt-2 grid gap-2 md:grid-cols-3">
+          {["What did I observe?", "What did I learn?", "What do I wonder?"].map((question) => <div key={question} className="rounded-xl bg-white p-3 text-sm font-black shadow-sm">{question}</div>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+: { setScreen: (screen: Screen) => void }) {
   const todayPlan = getCurrentYouthPlan();
   const todayResources = [
     { title: "Forest → Farm Connection", body: "What can the farm learn from the forest?", icon: "🌲" },
@@ -5143,7 +5429,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today's Work</button>
       </Card>
 
-      <LaunchMorningMyDayPanel setScreen={setScreen} />
+      <LaunchMorningMyDayPanel setScreen={setScreen} activeUser={activeUser} />
       <CultivatorMomentShadowCard />
       <TodayFarmOperationsBoard compact />
       <GrowingCenterPanel setScreen={setScreen} compact />
