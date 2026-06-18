@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.1.3 - GROWING CENTER + CONTEXTUAL RESOURCES + STORY RESTORATION
+ * LAUNCH 5.1.4 - MORNING LAUNCH MODE + RESOURCE VISIBILITY + FOREST CONNECTIONS
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1020,7 +1020,7 @@ function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => 
   const actions = [
     ["📅 Calendar", () => setScreen("events")],
     ["📚 Resources", () => setScreen("resources")],
-    ["🚑 Nurse Line", () => undefined],
+    ["🚑 Nurse Line", () => setScreen("support")],
     ["📷 My Story", () => setScreen("media")],
     ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
     ["👥 Workforce", () => setTab ? setTab("roster") : setScreen("supervisor")],
@@ -5055,6 +5055,72 @@ function TomorrowBeginsTodayCard({ todayPlan }: { todayPlan: typeof youthWeekOne
   );
 }
 
+
+function LaunchMorningMyDayPanel({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const todayPlan = getCurrentYouthPlan();
+  const todayResources = [
+    { title: "Forest → Farm Connection", body: "What can the farm learn from the forest?", icon: "🌲" },
+    { title: "Observation", body: "What changed? What did you notice?", icon: "👀" },
+    { title: "Soil + Compost", body: "Healthy soil grows healthy food.", icon: "🌱" },
+    { title: "Water", body: "Water is something we manage, not just use.", icon: "💧" },
+    { title: "Sun + Shadow", body: "The gardener’s shadow means presence and attention.", icon: "☀️" },
+    { title: "Plant Health", body: "Plants communicate through color, growth, insects, and stress.", icon: "🍃" },
+    { title: "Companion Planting", body: "Some plants help each other grow; some should not be together.", icon: "🌿" },
+    { title: "Food Safety", body: "Whole foods, processed foods, labels, additives, and allowable contaminants.", icon: "🥫" },
+  ];
+
+  return (
+    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Launch Mode • Start Here</div>
+      <h2 className="mt-2 text-3xl font-black">Today’s 5 Buttons</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Keep it simple this morning. Youth should not hunt for work, learning, photos, reflection, or help.</p>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left shadow-sm hover:bg-emerald-100">
+          <div className="text-2xl">🚜</div><div className="mt-2 text-sm font-black">Today’s Work</div><div className="mt-1 text-xs font-bold text-slate-600">What am I doing?</div>
+        </button>
+        <button type="button" onClick={() => setScreen("resources")} className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-left shadow-sm hover:bg-blue-100">
+          <div className="text-2xl">📚</div><div className="mt-2 text-sm font-black">Learn</div><div className="mt-1 text-xs font-bold text-slate-600">What do I need to know?</div>
+        </button>
+        <button type="button" onClick={() => setScreen("media")} className="rounded-2xl border border-purple-200 bg-purple-50 p-4 text-left shadow-sm hover:bg-purple-100">
+          <div className="text-2xl">📸</div><div className="mt-2 text-sm font-black">Take a Photo</div><div className="mt-1 text-xs font-bold text-slate-600">Tell My Story.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("feedback")} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left shadow-sm hover:bg-amber-100">
+          <div className="text-2xl">✍️</div><div className="mt-2 text-sm font-black">Reflection</div><div className="mt-1 text-xs font-bold text-slate-600">Observe. Learn. Wonder.</div>
+        </button>
+        <button type="button" onClick={() => setScreen("support")} className="rounded-2xl border border-red-200 bg-red-50 p-4 text-left shadow-sm hover:bg-red-100">
+          <div className="text-2xl">🆘</div><div className="mt-2 text-sm font-black">Help</div><div className="mt-1 text-xs font-bold text-slate-600">Safety and support.</div>
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_.9fr]">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today’s Work</div>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {todayPlan.work.slice(0, 8).map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-black shadow-sm">• {item}</div>)}
+          </div>
+          <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold text-slate-700">Start at the Morning Huddle. Bring water, closed-toe shoes, and gloves if needed.</div>
+        </div>
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">Today’s Learning</div>
+          <div className="mt-2 text-lg font-black">What changed?</div>
+          <div className="mt-2 text-sm font-bold leading-6 text-slate-700">Forest → Farm → Food → Health → Careers. Cultivators learn by observing, asking questions, documenting, and reflecting.</div>
+          <div className="mt-3 grid gap-2">
+            {todayResources.map((resource) => <div key={resource.title} className="rounded-xl bg-white p-2 text-xs font-bold shadow-sm"><span className="mr-1">{resource.icon}</span><span className="font-black">{resource.title}:</span> {resource.body}</div>)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-600">Reflection</div>
+        <div className="mt-2 grid gap-2 md:grid-cols-3">
+          {['What did I observe?', 'What did I learn?', 'What do I wonder?'].map((question) => <div key={question} className="rounded-xl bg-white p-3 text-sm font-black shadow-sm">{question}</div>)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -5077,6 +5143,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today's Work</button>
       </Card>
 
+      <LaunchMorningMyDayPanel setScreen={setScreen} />
       <CultivatorMomentShadowCard />
       <TodayFarmOperationsBoard compact />
       <GrowingCenterPanel setScreen={setScreen} compact />
