@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 5.1.6 - INTERACTIVE QUESTIONS + DISCOVERY WALL + WORK COMPLETION
+ * LAUNCH 6.0 - DAILY RHYTHM + LIVE VISUAL WEATHER + LAYERED CULTIVATOR FLOW
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -27,15 +27,15 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Real Marketplace Operations: catalog, cart, checkout, orders, marketplace reports
  * - Supabase writes with localStorage fallback
  * - Restores Forest Gate Portal: window into ecosystem with Guest / New / Returning doors
- * - Keeps returning youth and supervisors on their Nesco-assigned 4-digit PINs, parents on email/youth access, and growers/partners/Mission Control on temporary password Nesco2026
+ * - Keeps returning youth on assigned PINs; supervisors create their own 4-digit PIN at first access; parents receive/confirm youth-linked access; growers/partners/Mission Control use temporary password Nesco2026
  * - Layers youth curriculum by week and day
  * - Reframes uploads as Tell Your Cultivator Story instead of evidence
  * - Adds simple Cultivator Moment: “All of that food comes from this skinny plant?” with Explore the Connections
  * - Adds Minimum Launch Standard scorecard to Mission Control
  * - Defines OperationsInventoryPanel so inventory is visible and usable instead of referenced only
  * - Removes static Almanac placeholder guidance from the live Almanac layer
- * - Promotes live weather, work status, assignment, and Cultivator Moment to the youth launch dashboard
- * - Adds Cultivator Reflection: Skills Used Today, Who Am I Becoming, and Cultivator Wisdom
+ * - Promotes LIVE visual weather, work status, today's goal, my contribution, and one-button work entry to the youth launch dashboard
+ * - Adds Launch 6.0 layered flow: My Day → Activity Card → Info to Share → Contribution → Meaning → Tomorrow
  */
 
 type Screen =
@@ -348,6 +348,7 @@ const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
 const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
 const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
+const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
 
 type FarmOperationStatus = {
   level: "Open" | "Modified Operations" | "Closed";
@@ -778,6 +779,10 @@ type LiveFarmWeather = {
   tomorrowLow?: number;
   weekHighs?: number[];
   weekLows?: number[];
+  hourlyTimes?: string[];
+  hourlyTemps?: number[];
+  hourlyApparent?: number[];
+  hourlyRainChance?: number[];
   updated?: string;
   error?: string;
 };
@@ -795,6 +800,51 @@ function formatLiveTime(value?: string) {
 
 function formatLiveNumber(value?: number, suffix = "") {
   return typeof value === "number" && Number.isFinite(value) ? `${Math.round(value)}${suffix}` : "Loading";
+}
+
+
+function weatherIconFor(weather: LiveFarmWeather | null) {
+  if (!weather || weather.error) return "🌤";
+  const rainChance = weather.rainChance ?? 0;
+  const apparent = weather.apparent ?? weather.temperature ?? 0;
+  if (rainChance >= 60) return "🌧";
+  if (apparent >= 90) return "🔥";
+  if (rainChance >= 30) return "🌦";
+  return "☀️";
+}
+
+function heatLabelFor(weather: LiveFarmWeather | null) {
+  const apparent = weather?.apparent ?? weather?.temperature;
+  if (typeof apparent !== "number") return "Checking";
+  if (apparent >= 95) return "High Heat";
+  if (apparent >= 85) return "Heat Watch";
+  return "Normal";
+}
+
+function workImpactFor(weather: LiveFarmWeather | null, status: FarmOperationStatus) {
+  if (status.level === "Closed") return "Work cancelled. Follow Mission Control instructions.";
+  if (status.level === "Modified Operations") return "Half-day or modified work. Check with supervisor before outdoor tasks.";
+  if (!weather || weather.error) return "Use supervisor observation until live weather returns.";
+  const apparent = weather.apparent ?? weather.temperature ?? 0;
+  const rainChance = weather.rainChance ?? 0;
+  const wind = weather.wind ?? 0;
+  if (apparent >= 95) return "Heat safety mode: water, shade, and shorter outdoor work blocks.";
+  if (apparent >= 85) return "Outdoor work allowed with water breaks and heat watch.";
+  if (rainChance >= 60) return "Rain likely. Protect tools and expect work plan changes.";
+  if (wind >= 18) return "Secure loose materials before field work.";
+  return "Good for outdoor work. Keep water visible.";
+}
+
+function nextHourlyWeather(weather: LiveFarmWeather | null, count = 4) {
+  if (!weather?.hourlyTimes?.length || !weather.hourlyTemps?.length) return [];
+  const now = new Date();
+  const start = Math.max(0, weather.hourlyTimes.findIndex((time) => new Date(time).getTime() >= now.getTime()));
+  return weather.hourlyTimes.slice(start, start + count).map((time, index) => ({
+    time,
+    temp: weather.hourlyTemps?.[start + index],
+    apparent: weather.hourlyApparent?.[start + index],
+    rain: weather.hourlyRainChance?.[start + index],
+  }));
 }
 
 function getLiveWeatherGuidance(weather: LiveFarmWeather | null) {
@@ -857,7 +907,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
     let cancelled = false;
     async function loadLiveWeather() {
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${FARM_LATITUDE}&longitude=${FARM_LONGITUDE}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,wind_speed_10m&daily=sunrise,sunset,uv_index_max,precipitation_probability_max,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=${encodeURIComponent(FARM_TIME_ZONE)}`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${FARM_LATITUDE}&longitude=${FARM_LONGITUDE}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,wind_speed_10m&hourly=temperature_2m,apparent_temperature,precipitation_probability&daily=sunrise,sunset,uv_index_max,precipitation_probability_max,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=${encodeURIComponent(FARM_TIME_ZONE)}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
         const data = await response.json();
@@ -876,6 +926,10 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
           tomorrowLow: data.daily?.temperature_2m_min?.[1],
           weekHighs: data.daily?.temperature_2m_max,
           weekLows: data.daily?.temperature_2m_min,
+          hourlyTimes: data.hourly?.time,
+          hourlyTemps: data.hourly?.temperature_2m,
+          hourlyApparent: data.hourly?.apparent_temperature,
+          hourlyRainChance: data.hourly?.precipitation_probability,
           updated: data.current?.time,
         });
       } catch (error) {
@@ -890,65 +944,90 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
     };
   }, []);
 
-  const almanacCards = getTodayAlmanacCards(new Date(), farmStatus, liveWeather);
-  const visibleCards = compact ? almanacCards.slice(0, 6) : almanacCards;
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
+  const icon = weatherIconFor(liveWeather);
+  const impact = workImpactFor(liveWeather, farmStatus);
+  const hourly = nextHourlyWeather(liveWeather, compact ? 4 : 8);
+  const temp = formatLiveNumber(liveWeather?.temperature, "°F");
+  const feels = formatLiveNumber(liveWeather?.apparent, "°F");
+  const rain = liveWeather?.rainChance !== undefined ? `${Math.round(liveWeather.rainChance)}%` : "—";
+  const wind = liveWeather?.wind !== undefined ? `${Math.round(liveWeather.wind)} mph` : "—";
+  const heat = heatLabelFor(liveWeather);
 
   if (compact) {
     return (
-      <div className="rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-3">
-        <div className="flex flex-wrap items-start justify-between gap-2">
+      <div className={`rounded-[1.25rem] border p-4 ${statusClass}`}>
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">🌤 LIVE Farm Conditions</div>
-            <div className="mt-1 text-lg font-black">{farmStatus.level} • {formatLiveNumber(liveWeather?.temperature, "°F")}</div>
-            <div className="mt-1 text-[11px] font-bold text-white/58">Updates every 15 minutes when online.</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">LIVE FARM WEATHER</div>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="text-5xl leading-none">{icon}</div>
+              <div>
+                <div className="text-4xl font-black leading-none">{temp}</div>
+                <div className="mt-1 text-xs font-black text-white/70">Feels like {feels}</div>
+              </div>
+            </div>
           </div>
-          <span className={`rounded-full border px-3 py-1 text-[11px] font-black ${statusClass}`}>{farmStatus.color === "red" ? "Stop / Review" : farmStatus.color === "amber" ? "Monitor" : "Full Day"}</span>
+          <span className="rounded-full border border-white/20 bg-black/25 px-3 py-1 text-[11px] font-black">{farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Cancelled"}</span>
         </div>
-        <div className="mt-2 grid gap-2 sm:grid-cols-2">
-          {visibleCards.map(([label, value]) => (
-            <div key={label} className="rounded-xl border border-white/10 bg-black/25 p-2">
-              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-emerald-100/65">{label}</div>
-              <div className="mt-1 text-xs font-bold leading-4 text-white/82">{value}</div>
+        <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black leading-5 text-white/88">{impact}</div>
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Rain</div><div className="font-black">{rain}</div></div>
+          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Wind</div><div className="font-black">{wind}</div></div>
+          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Heat</div><div className="font-black">{heat}</div></div>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {(hourly.length ? hourly : [0, 1, 2, 3].map((i) => ({ time: "", temp: undefined, apparent: undefined, rain: undefined }))).map((slot, index) => (
+            <div key={`${slot.time || "loading"}-${index}`} className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
+              <div className="text-[10px] font-black text-white/60">{slot.time ? new Date(slot.time).toLocaleTimeString("en-US", { hour: "numeric" }) : "—"}</div>
+              <div className="mt-1 text-lg font-black">{typeof slot.temp === "number" ? `${Math.round(slot.temp)}°` : "--"}</div>
             </div>
           ))}
         </div>
-        <LiveAlmanacResourceLinks />
+        <div className="mt-3 text-[10px] font-bold text-white/55">Updated {formatLiveTime(liveWeather?.updated)} • visual live card, not a word list</div>
       </div>
     );
   }
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Conditions</div>
-      <h2 className="mt-3 text-2xl font-black">Live Weather + Work Status</h2>
-      <p className="mt-3 text-sm leading-6 text-white/82">Live Youngstown weather appears here. The official Almanac opens through the Youngstown Almanac links; this screen does not replace the live Almanac with static guidance.</p>
-
-      <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
-        <div className="text-[11px] font-black uppercase tracking-[0.24em] text-white/72">{farmStatus.level}</div>
-        <div className="mt-1 text-xl font-black">{farmStatus.title}</div>
-        <div className="mt-2 text-sm font-bold leading-6 text-white/84">Action: {farmStatus.action}</div>
-        <div className="mt-2 text-xs font-bold text-white/56">Live weather refreshes every 15 minutes. Last update: {liveWeather?.updated || "loading"}</div>
-      </div>
-
-      <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {visibleCards.map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{label}</div>
-            <div className="mt-1 text-sm font-bold leading-5 text-white/82">{value}</div>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Weather</div>
+      <div className={`mt-4 rounded-[1.75rem] border p-5 ${statusClass}`}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="text-7xl leading-none">{icon}</div>
+            <div>
+              <div className="text-6xl font-black leading-none">{temp}</div>
+              <div className="mt-2 text-lg font-black text-white/76">Feels like {feels}</div>
+              <div className="mt-1 text-xs font-bold text-white/55">Youngstown / Bronson Family Farm • Updated {formatLiveTime(liveWeather?.updated)}</div>
+            </div>
           </div>
-        ))}
+          <div className="rounded-2xl border border-white/15 bg-black/25 px-5 py-4 text-center">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/58">Work Decision</div>
+            <div className="mt-1 text-2xl font-black">{farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Cancelled"}</div>
+          </div>
+        </div>
+        <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4 text-lg font-black leading-7 text-white/90">{impact}</div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl bg-black/20 p-3 text-center"><div className="text-[10px] font-black uppercase text-white/55">Rain</div><div className="text-2xl font-black">{rain}</div></div>
+          <div className="rounded-2xl bg-black/20 p-3 text-center"><div className="text-[10px] font-black uppercase text-white/55">Wind</div><div className="text-2xl font-black">{wind}</div></div>
+          <div className="rounded-2xl bg-black/20 p-3 text-center"><div className="text-[10px] font-black uppercase text-white/55">Heat</div><div className="text-2xl font-black">{heat}</div></div>
+          <div className="rounded-2xl bg-black/20 p-3 text-center"><div className="text-[10px] font-black uppercase text-white/55">Sun</div><div className="text-sm font-black">{formatLiveTime(liveWeather?.sunrise)} / {formatLiveTime(liveWeather?.sunset)}</div></div>
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-4 lg:grid-cols-8">
+          {(hourly.length ? hourly : Array.from({ length: 8 }, (_, i) => ({ time: "", temp: undefined, apparent: undefined, rain: undefined }))).map((slot, index) => (
+            <div key={`${slot.time || "loading"}-${index}`} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-center">
+              <div className="text-xs font-black text-white/60">{slot.time ? new Date(slot.time).toLocaleTimeString("en-US", { hour: "numeric" }) : "—"}</div>
+              <div className="mt-1 text-2xl font-black">{typeof slot.temp === "number" ? `${Math.round(slot.temp)}°` : "--"}</div>
+              <div className="text-[10px] font-bold text-white/55">{typeof slot.rain === "number" ? `${Math.round(slot.rain)}% rain` : ""}</div>
+            </div>
+          ))}
+        </div>
       </div>
-
       <LiveAlmanacResourceLinks />
-
-      <div className="mt-4 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4 text-sm font-bold leading-6 text-white/86">
-        Live weather is pulled automatically. The official Youngstown Almanac forecast opens from the live Almanac link; it is not replaced with static text.
-      </div>
     </Card>
   );
 }
-
 
 
 type TodayFarmPlan = {
@@ -1045,7 +1124,7 @@ function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => 
     ["📅 Calendar", () => setScreen("events")],
     ["📚 Resources", () => setScreen("resources")],
     ["🚑 Nurse Line", () => setScreen("support")],
-    ["📷 My Story", () => setScreen("media")],
+    ["🌱 Info to Share", () => setScreen("media")],
     ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
     ["👥 Workforce", () => setTab ? setTab("roster") : setScreen("supervisor")],
     ["📦 Inventory", () => setScreen("operations")],
@@ -1971,19 +2050,19 @@ function applyCommonTranslations(language: LanguageCode, phrase: string) {
 
 const launch50TranslationSupplements: Partial<Record<LanguageCode, Record<string, string>>> = {
   es: {
-    "Calendar": "Calendario", "Media": "Medios", "My Story": "Mi Historia", "My Growth": "Mi Crecimiento", "Home": "Inicio", "Choose Role": "Elegir Rol", "Resources": "Recursos", "Quick Tools": "Herramientas Rápidas", "Operations": "Operaciones", "Nurse Line": "Línea de Enfermería", "Visible At All Times": "Visible en Todo Momento", "Call Nurse Line": "Llamar a Enfermería", "Close": "Cerrar", "Upload": "Subir", "Add Photo / Video": "Agregar Foto / Video", "Document Today": "Documentar Hoy", "Today's Farm Work": "Trabajo Agrícola de Hoy", "Learning + Reflection": "Aprendizaje + Reflexión", "Today's Activities": "Actividades de Hoy", "Work Status": "Estado de Trabajo", "Live Weather": "Clima en Vivo", "Actual Calendar": "Calendario Real", "Mission Control": "Centro de Misión", "Inventory": "Inventario", "Parent": "Padres", "Youth": "Jóvenes", "Supervisor": "Supervisor"
+    "Calendar": "Calendario", "Media": "Medios", "Info to Share": "Información para compartir", "My Cultivator Journey": "Mi Crecimiento", "Home": "Inicio", "Choose Role": "Elegir Rol", "Resources": "Recursos", "Quick Tools": "Herramientas Rápidas", "Operations": "Operaciones", "Nurse Line": "Línea de Enfermería", "Visible At All Times": "Visible en Todo Momento", "Call Nurse Line": "Llamar a Enfermería", "Close": "Cerrar", "Upload": "Subir", "Add Photo / Video": "Agregar Foto / Video", "Document Today": "Documentar Hoy", "Today's Farm Work": "Trabajo Agrícola de Hoy", "Learning + Reflection": "Aprendizaje + Reflexión", "Today's Activities": "Actividades de Hoy", "Work Status": "Estado de Trabajo", "Live Weather": "Clima en Vivo", "Actual Calendar": "Calendario Real", "Mission Control": "Centro de Misión", "Inventory": "Inventario", "Parent": "Padres", "Youth": "Jóvenes", "Supervisor": "Supervisor"
   },
   tl: {
-    "Calendar": "Kalendaryo", "Media": "Media", "My Story": "Aking Kuwento", "My Growth": "Aking Paglago", "Home": "Home", "Choose Role": "Pumili ng Role", "Resources": "Mga Resource", "Quick Tools": "Mabilis na Tools", "Operations": "Operasyon", "Nurse Line": "Nurse Line", "Visible At All Times": "Laging Nakikita", "Call Nurse Line": "Tumawag sa Nurse Line", "Close": "Isara", "Upload": "Mag-upload", "Add Photo / Video": "Magdagdag ng Larawan / Video", "Document Today": "Idokumento Ngayon", "Today's Farm Work": "Gawain sa Bukid Ngayon", "Learning + Reflection": "Pag-aaral + Pagninilay", "Today's Activities": "Mga Gawain Ngayon", "Work Status": "Katayuan ng Trabaho", "Live Weather": "Live Weather", "Actual Calendar": "Tunay na Kalendaryo", "Mission Control": "Mission Control", "Inventory": "Imbentaryo", "Parent": "Magulang", "Youth": "Kabataan", "Supervisor": "Supervisor"
+    "Calendar": "Kalendaryo", "Media": "Media", "Info to Share": "Impormasyong Ibahagi", "My Cultivator Journey": "Aking Paglago", "Home": "Home", "Choose Role": "Pumili ng Role", "Resources": "Mga Resource", "Quick Tools": "Mabilis na Tools", "Operations": "Operasyon", "Nurse Line": "Nurse Line", "Visible At All Times": "Laging Nakikita", "Call Nurse Line": "Tumawag sa Nurse Line", "Close": "Isara", "Upload": "Mag-upload", "Add Photo / Video": "Magdagdag ng Larawan / Video", "Document Today": "Idokumento Ngayon", "Today's Farm Work": "Gawain sa Bukid Ngayon", "Learning + Reflection": "Pag-aaral + Pagninilay", "Today's Activities": "Mga Gawain Ngayon", "Work Status": "Katayuan ng Trabaho", "Live Weather": "Live Weather", "Actual Calendar": "Tunay na Kalendaryo", "Mission Control": "Mission Control", "Inventory": "Imbentaryo", "Parent": "Magulang", "Youth": "Kabataan", "Supervisor": "Supervisor"
   },
   it: {
-    "Calendar": "Calendario", "Media": "Media", "My Story": "La Mia Storia", "My Growth": "La Mia Crescita", "Home": "Home", "Choose Role": "Scegli Ruolo", "Resources": "Risorse", "Quick Tools": "Strumenti Rapidi", "Operations": "Operazioni", "Nurse Line": "Linea Infermieristica", "Visible At All Times": "Sempre Visibile", "Call Nurse Line": "Chiama la Linea Infermieristica", "Close": "Chiudi", "Upload": "Carica", "Add Photo / Video": "Aggiungi Foto / Video", "Document Today": "Documenta Oggi", "Today's Farm Work": "Lavoro Agricolo di Oggi", "Learning + Reflection": "Apprendimento + Riflessione", "Today's Activities": "Attività di Oggi", "Work Status": "Stato del Lavoro", "Live Weather": "Meteo in Diretta", "Actual Calendar": "Calendario Reale", "Mission Control": "Centro Missione", "Inventory": "Inventario", "Parent": "Genitore", "Youth": "Giovani", "Supervisor": "Supervisore"
+    "Calendar": "Calendario", "Media": "Media", "Info to Share": "Info da condividere", "My Cultivator Journey": "La Mia Crescita", "Home": "Home", "Choose Role": "Scegli Ruolo", "Resources": "Risorse", "Quick Tools": "Strumenti Rapidi", "Operations": "Operazioni", "Nurse Line": "Linea Infermieristica", "Visible At All Times": "Sempre Visibile", "Call Nurse Line": "Chiama la Linea Infermieristica", "Close": "Chiudi", "Upload": "Carica", "Add Photo / Video": "Aggiungi Foto / Video", "Document Today": "Documenta Oggi", "Today's Farm Work": "Lavoro Agricolo di Oggi", "Learning + Reflection": "Apprendimento + Riflessione", "Today's Activities": "Attività di Oggi", "Work Status": "Stato del Lavoro", "Live Weather": "Meteo in Diretta", "Actual Calendar": "Calendario Reale", "Mission Control": "Centro Missione", "Inventory": "Inventario", "Parent": "Genitore", "Youth": "Giovani", "Supervisor": "Supervisore"
   },
   he: {
-    "Calendar": "לוח שנה", "Media": "מדיה", "My Story": "הסיפור שלי", "My Growth": "הצמיחה שלי", "Home": "בית", "Choose Role": "בחר תפקיד", "Resources": "משאבים", "Quick Tools": "כלים מהירים", "Operations": "תפעול", "Nurse Line": "קו אחות", "Visible At All Times": "גלוי תמיד", "Call Nurse Line": "התקשר לקו האחות", "Close": "סגור", "Upload": "העלאה", "Add Photo / Video": "הוסף תמונה / וידאו", "Document Today": "תעד את היום", "Today's Farm Work": "עבודת החווה היום", "Learning + Reflection": "למידה + רפלקציה", "Today's Activities": "פעילויות היום", "Work Status": "מצב עבודה", "Live Weather": "מזג אוויר חי", "Actual Calendar": "לוח שנה אמיתי", "Mission Control": "מרכז משימה", "Inventory": "מלאי", "Parent": "הורה", "Youth": "נוער", "Supervisor": "מדריך"
+    "Calendar": "לוח שנה", "Media": "מדיה", "Info to Share": "מידע לשיתוף", "My Cultivator Journey": "הצמיחה שלי", "Home": "בית", "Choose Role": "בחר תפקיד", "Resources": "משאבים", "Quick Tools": "כלים מהירים", "Operations": "תפעול", "Nurse Line": "קו אחות", "Visible At All Times": "גלוי תמיד", "Call Nurse Line": "התקשר לקו האחות", "Close": "סגור", "Upload": "העלאה", "Add Photo / Video": "הוסף תמונה / וידאו", "Document Today": "תעד את היום", "Today's Farm Work": "עבודת החווה היום", "Learning + Reflection": "למידה + רפלקציה", "Today's Activities": "פעילויות היום", "Work Status": "מצב עבודה", "Live Weather": "מזג אוויר חי", "Actual Calendar": "לוח שנה אמיתי", "Mission Control": "מרכז משימה", "Inventory": "מלאי", "Parent": "הורה", "Youth": "נוער", "Supervisor": "מדריך"
   },
   fr: {
-    "Calendar": "Calendrier", "Media": "Médias", "My Story": "Mon Histoire", "My Growth": "Ma Croissance", "Home": "Accueil", "Choose Role": "Choisir un rôle", "Resources": "Ressources", "Quick Tools": "Outils rapides", "Operations": "Opérations", "Nurse Line": "Ligne infirmière", "Visible At All Times": "Toujours visible", "Call Nurse Line": "Appeler la ligne infirmière", "Close": "Fermer", "Upload": "Téléverser", "Add Photo / Video": "Ajouter Photo / Vidéo", "Document Today": "Documenter Aujourd’hui", "Today's Farm Work": "Travail agricole d’aujourd’hui", "Learning + Reflection": "Apprentissage + Réflexion", "Today's Activities": "Activités d’aujourd’hui", "Work Status": "Statut du travail", "Live Weather": "Météo en direct", "Actual Calendar": "Vrai calendrier", "Mission Control": "Centre de mission", "Inventory": "Inventaire", "Parent": "Parent", "Youth": "Jeunes", "Supervisor": "Superviseur"
+    "Calendar": "Calendrier", "Media": "Médias", "Info to Share": "Infos à partager", "My Cultivator Journey": "Ma Croissance", "Home": "Accueil", "Choose Role": "Choisir un rôle", "Resources": "Ressources", "Quick Tools": "Outils rapides", "Operations": "Opérations", "Nurse Line": "Ligne infirmière", "Visible At All Times": "Toujours visible", "Call Nurse Line": "Appeler la ligne infirmière", "Close": "Fermer", "Upload": "Téléverser", "Add Photo / Video": "Ajouter Photo / Vidéo", "Document Today": "Documenter Aujourd’hui", "Today's Farm Work": "Travail agricole d’aujourd’hui", "Learning + Reflection": "Apprentissage + Réflexion", "Today's Activities": "Activités d’aujourd’hui", "Work Status": "Statut du travail", "Live Weather": "Météo en direct", "Actual Calendar": "Vrai calendrier", "Mission Control": "Centre de mission", "Inventory": "Inventaire", "Parent": "Parent", "Youth": "Jeunes", "Supervisor": "Superviseur"
   },
 };
 
@@ -2779,8 +2858,8 @@ function Shell({
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
         { label: "Calendar", screen: "events" },
-        { label: "My Story", screen: "media" },
-        { label: "My Growth", screen: "completion" },
+        { label: "Info to Share", screen: "media" },
+        { label: "My Cultivator Journey", screen: "completion" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
@@ -4141,21 +4220,29 @@ function MyWorkspace({
     if (returningChoice === "Supervisor") {
       const enteredSupervisorPin = normalizeNescoPin(pin);
       if (!name.trim()) {
-        setAccessMessage("Please enter the supervisor name exactly as it appears on the Nesco list.");
+        setAccessMessage("Please enter the supervisor name.");
         return;
       }
       if (!/^\d{4}$/.test(enteredSupervisorPin)) {
-        setAccessMessage("Please enter the supervisor\’s Nesco-assigned 4-digit PIN.");
+        setAccessMessage("Please enter a 4-digit supervisor PIN. First-time supervisors create their own PIN here.");
         return;
       }
-      // Launch 5.1 correction: supervisors do NOT use a shared launch PIN.
-      // Nesco issues 4-digit PINs. Until the supervisor roster is imported,
-      // open Supervisor access with the entered 4-digit PIN and flag it for verification.
+      // Launch 6.0 correction: supervisors do not have Nesco PINs.
+      // First-time supervisors create their own 4-digit PIN. Returning supervisors use the same PIN.
+      const supervisorKey = normalizeLaunchText(name);
+      const supervisorPins = safeRead<Record<string, string>>(SUPERVISOR_ACCESS_KEY, {});
+      if (supervisorPins[supervisorKey] && supervisorPins[supervisorKey] !== enteredSupervisorPin) {
+        setAccessMessage("Supervisor PIN does not match the PIN created for this name.");
+        return;
+      }
+      if (!supervisorPins[supervisorKey]) {
+        safeWrite(SUPERVISOR_ACCESS_KEY, { ...supervisorPins, [supervisorKey]: enteredSupervisorPin });
+        setAccessMessage("Supervisor PIN created. Supervisor Operations is opening now.");
+      }
       signIn("Supervisor / Staff", name || "Supervisor / Staff", {
         participant_id: enteredSupervisorPin,
-        needs_supervisor_verification: true,
+        needs_supervisor_verification: false,
       });
-      setAccessMessage("Supervisor access opened with Nesco 4-digit PIN pending roster verification. Shared PIN 2350 is no longer used.");
       return;
     }
 
@@ -4224,7 +4311,7 @@ function MyWorkspace({
           {(returningChoice === "Youth" || returningChoice === "Supervisor") ? (
             <div className="grid gap-4 md:grid-cols-2">
               <Field label={returningChoice === "Youth" ? L("Youth Name") : L("Supervisor Name")} value={name} onChange={setName} placeholder={L("First and last name")} />
-              <Field label={returningChoice === "Supervisor" ? L("Supervisor PIN") : L("Assigned Youth PIN")} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? L("Nesco 4-digit PIN") : L("PIN number")} />
+              <Field label={returningChoice === "Supervisor" ? L("Supervisor PIN") : L("Assigned Youth PIN")} value={pin} onChange={setPin} placeholder={returningChoice === "Supervisor" ? L("Create or enter 4-digit PIN") : L("PIN number")} />
             </div>
           ) : returningChoice === "Parent" ? (
             <div className="grid gap-4 md:grid-cols-2">
@@ -4243,7 +4330,7 @@ function MyWorkspace({
             <p className="mt-3 text-xs leading-5 text-white/62">{L("Growers, partners, and Mission Control use temporary password")} <strong className="text-white">Nesco2026</strong> {L("until changed.")}</p>
           )}
           {returningChoice === "Youth" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Returning youth use their assigned PIN. No temporary password is needed.")}</p>}
-          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Supervisors use their Nesco-assigned 4-digit PIN. Shared PIN 2350 is no longer used.")}</p>}
+          {returningChoice === "Supervisor" && <p className="mt-3 text-xs leading-5 text-white/62">{L("Supervisors create their own 4-digit PIN at first access. Returning supervisors use the same PIN.")}</p>}
 
           <button type="button" onClick={returningLogin} className="mt-5 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">{L("Enter My Day")}</button>
           {accessMessage && <Notice text={accessMessage} />}
@@ -4255,7 +4342,7 @@ function MyWorkspace({
         <h2 className="mt-3 text-3xl font-black">{returningChoice === "Supervisor" ? L("Supervisor Access") : L("Open the correct daily space")}</h2>
         {returningChoice === "Supervisor" ? (
           <div className="mt-5 grid gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Supervisor")}:</strong> {L("use name + Nesco-assigned 4-digit PIN, then manage attendance, safety, and reports.")}</div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4"><strong>{L("Supervisor")}:</strong> {L("create or enter your supervisor PIN, then manage attendance, safety, and reports.")}</div>
           </div>
         ) : (
           <p className="mt-5 text-sm font-bold leading-6 text-white/76">{L("Only the selected role's access information appears here. Youth, parents, guests, growers, and supervisors should not see each other's instructions.")}</p>
@@ -4734,7 +4821,7 @@ function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return</button>
           <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open My Story</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Info to Share</button>
         </div>
       </Card>
       <GrowingCenterPanel setScreen={setScreen} />
@@ -5279,7 +5366,7 @@ function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen
           <div className="text-2xl">📚</div><div className="mt-2 text-sm font-black">Learn</div><div className="mt-1 text-xs font-bold text-slate-600">Answer today’s questions.</div>
         </button>
         <button type="button" onClick={() => setScreen("media")} className="rounded-2xl border border-purple-200 bg-purple-50 p-4 text-left shadow-sm hover:bg-purple-100">
-          <div className="text-2xl">📸</div><div className="mt-2 text-sm font-black">Take a Photo</div><div className="mt-1 text-xs font-bold text-slate-600">Tell My Story.</div>
+          <div className="text-2xl">📸</div><div className="mt-2 text-sm font-black">Take a Photo</div><div className="mt-1 text-xs font-bold text-slate-600">Tell Info to Share.</div>
         </button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left shadow-sm hover:bg-amber-100">
           <div className="text-2xl">✍️</div><div className="mt-2 text-sm font-black">Reflection</div><div className="mt-1 text-xs font-bold text-slate-600">Observe. Learn. Wonder.</div>
@@ -5343,6 +5430,82 @@ function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen
   );
 }
 
+
+function Launch60ActivityGoalCard({ todayPlan }: { todayPlan: typeof youthWeekOneDailyPlan[number] }) {
+  const goal = todayPlan.work?.[0] || todayPlan.curriculum;
+  const contribution = todayPlan.work?.[1] || "Support today's farm goal";
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Launch 6.0 Activity Card</div>
+      <h2 className="mt-2 text-2xl font-black">{goal}</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Today's Goal</div>
+          <div className="mt-2 text-sm font-black leading-6">Complete the work goal assigned by the supervisor.</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">My Contribution</div>
+          <div className="mt-2 text-sm font-black leading-6">{contribution}</div>
+        </div>
+        <div className="rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-100/80">Why It Matters</div>
+          <div className="mt-2 text-sm font-black leading-6">Today's work helps the farm grow food, protect resources, build skills, and serve families.</div>
+        </div>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/60">Today's Resource</div><div className="mt-2 text-sm font-black">Use the resource connected to this activity only. No large resource library on the work screen.</div></div>
+        <div className="rounded-2xl border border-red-200/25 bg-red-300/10 p-4"><div className="text-[10px] font-black uppercase tracking-[0.18em] text-red-100/75">Safety Reminder</div><div className="mt-2 text-sm font-black">Water visible. Gloves when needed. Watch footing. Ask a supervisor before using unfamiliar tools.</div></div>
+      </div>
+    </Card>
+  );
+}
+
+function InfoToShareLaunch60Card() {
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Info to Share</div>
+      <h2 className="mt-2 text-2xl font-black">Save something worth sharing.</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/82">Info to Share means information, observations, discoveries, ideas, photos, videos, or accomplishments that may help you, your family, your team, future Cultivators, or the farm.</p>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {["Did anything surprise or interest you today?", "Tell us about it in your own words.", "Would you like to save it in Info to Share?", "Could this help someone else?"].map((item) => (
+          <div key={item} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{item}</div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function Launch60EndMyDayCard() {
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">End My Day</div>
+      <h2 className="mt-2 text-2xl font-black">One question at a time.</h2>
+      <div className="mt-4 grid gap-2">
+        {["Did anything surprise or interest you today?", "How did you contribute today?", "Why did today's work matter?", "Tomorrow I want to..."].map((item, index) => (
+          <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black"><span className="mr-2 rounded-full bg-emerald-300 px-2 py-1 text-xs text-black">{index + 1}</span>{item}</div>
+        ))}
+      </div>
+      <p className="mt-4 text-xs font-bold leading-5 text-white/62">Youth should never see all program intelligence at once. The system captures work, discovery, contribution, meaning, and tomorrow behind the scenes.</p>
+    </Card>
+  );
+}
+
+function Launch60DailyRhythmCard({ todayPlan, currentWeek, setScreen }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void }) {
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Launch 6.0 Daily Rhythm</div>
+      <h1 className="mt-2 text-3xl font-black leading-tight md:text-5xl">Today first. One layer at a time.</h1>
+      <p className="mt-3 max-w-3xl text-sm font-bold leading-6 text-white/78">Youth land here: work status, live visual weather, today's goal, my contribution, why it matters, safety, and begin work. Resources appear only when useful.</p>
+      <div className="mt-5 grid gap-3 lg:grid-cols-[.8fr_1.2fr_1fr]">
+        <WorkStatusMiniCard />
+        <FarmConditionsCard compact />
+        <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={currentWeek} />
+      </div>
+      <button type="button" onClick={() => setScreen("wellness")} className="mt-5 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Start My Day</button>
+    </Card>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -5353,50 +5516,37 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
 
   return (
     <div className="grid gap-3">
-      <Card className="p-4 md:p-5">
-        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 My Day</div>
-        <h1 className="mt-2 text-2xl font-black leading-tight md:text-3xl">Week {currentWeek.week}: {currentWeek.title}</h1>
-        <p className="mt-2 text-sm leading-6 text-white/78">Four things first: status, conditions, assignment, start.</p>
-        <div className="mt-4 grid gap-3 lg:grid-cols-[.8fr_1.1fr_1fr]">
-          <WorkStatusMiniCard />
-          <FarmConditionsCard compact />
-          <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={currentWeek} />
-        </div>
-        <button type="button" onClick={() => setScreen("wellness")} className="mt-4 w-full rounded-full bg-emerald-300 px-6 py-4 text-lg font-black text-black shadow-lg shadow-emerald-950/25 hover:bg-emerald-200">▶ Begin Today's Work</button>
-      </Card>
-
-      <LaunchMorningMyDayPanel setScreen={setScreen} activeUser={activeUser} />
-      <CultivatorMomentShadowCard />
-      <TodayFarmOperationsBoard compact />
-      <GrowingCenterPanel setScreen={setScreen} compact />
-      <CurriculumWeekViewCard compact />
+      <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
+      <Launch60ActivityGoalCard todayPlan={todayPlan} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open after Begin Today's Work: Tools + Why It Matters</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Today's Resources + Why It Matters</summary>
         <div className="mt-4 grid gap-3">
-          <ToolStewardshipLaunchCard />
+          <GrowingCenterPanel setScreen={setScreen} compact />
           <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
+          <ToolStewardshipLaunchCard />
         </div>
       </details>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">End My Day: Story, Reflection, Stewardship, Tomorrow</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">End My Day: layered reflection</summary>
         <div className="mt-4 grid gap-3">
+          <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
-          <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
-          <ToolStewardshipLaunchCard endOfDay />
+          <Launch60EndMyDayCard />
           <TomorrowBeginsTodayCard todayPlan={todayPlan} />
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open Cultivator Stories</button>
-            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Save Cultivator Reflection</button>
+            <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open Info to Share</button>
+            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Complete My Day</button>
           </div>
         </div>
       </details>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Cultivator Resources + Journey</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">My Cultivator Journey + Weekly View</summary>
         <div className="mt-4 grid gap-3">
           <CultivatorIdentityLaunchCard />
+          <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
           <CurriculumWeekViewCard compact />
           <Card className="p-4 md:p-5">
             <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Monday–Friday Curriculum</div>
@@ -5415,7 +5565,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     </div>
   );
 }
-
 function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -5685,7 +5834,7 @@ function YouthRosterModule({
         <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Add New Youth</button>
       </div>
       {rosterMessage && <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black text-amber-50">{rosterMessage}</div>}
-      <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">Launch 5.1 roster rule: youth and supervisors use Nesco-assigned 4-digit PINs only. Old 6-digit generated values are hidden as “PIN needs Nesco 4-digit update” until corrected.</div>
+      <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">Launch 6.0 roster rule: youth use assigned PINs. Supervisors create their own 4-digit PIN at first access. Old generated values are hidden until corrected.</div>
 
       {youthRows.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
@@ -6551,7 +6700,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to My Day</button>
-        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">My Growth</button>
+        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">My Cultivator Journey</button>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
@@ -7274,7 +7423,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <div className="grid gap-4">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Portfolio</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Story</h1>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Info to Share</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">This is where youth document photos, videos, field notes, reflections, first-time experiences, and Cultivator Moments.</p>
         {notice && <Notice text={notice} />}
         <div className="mt-6 flex flex-wrap gap-3">
@@ -7289,7 +7438,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Story Builder</div>
-        <h2 className="mt-3 text-2xl font-black">What belongs in My Story?</h2>
+        <h2 className="mt-3 text-2xl font-black">What belongs in Info to Share?</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {[
             ["📷 Photos", "Plants, projects, tools, before/after work, and first-time experiences."],
@@ -7422,14 +7571,14 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
     <div className="grid gap-4">
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Stories</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Story</h1>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">Info to Share</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
           Upload a photo, video, or commentary from your day. This is your Cultivator Story.
         </p>
         {mediaNotice && <div className="mt-4 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-bold text-white/80">{mediaNotice}</div>}
         <div className="mt-6 grid gap-3 md:grid-cols-1">
           <button type="button" onClick={() => setQuickCategory("Cultivator Story")} className="rounded-[1.25rem] border border-emerald-200 bg-emerald-300 p-4 text-left text-black">
-            <div className="text-lg font-black">My Story</div>
+            <div className="text-lg font-black">Info to Share</div>
             <div className="mt-1 text-xs font-bold opacity-75">Photo • Video • Commentary</div>
           </button>
         </div>
