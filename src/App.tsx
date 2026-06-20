@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 6.0 - DAILY RHYTHM + LIVE VISUAL WEATHER + LAYERED CULTIVATOR FLOW
+ * LAUNCH 6.0.1 - WEEK 3 ACTIVE + REST-OF-WEEK CURRICULUM
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -36,6 +36,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Removes static Almanac placeholder guidance from the live Almanac layer
  * - Promotes LIVE visual weather, work status, today's goal, my contribution, and one-button work entry to the youth launch dashboard
  * - Adds Launch 6.0 layered flow: My Day → Activity Card → Info to Share → Contribution → Meaning → Tomorrow
+ * - Advances active curriculum to Week 3 after Week 2 completion and shows the remaining week at a glance
  */
 
 type Screen =
@@ -598,7 +599,7 @@ const youthCurriculumWeeks = [
     project: "Farm Worker Heat Safety & Cooling Station Challenge",
     skills: ["Safety", "Teamwork", "Communication", "Problem Solving", "Following Instructions"],
     badge: "🏅 Workplace Foundations",
-    status: "Current Week",
+    status: "Completed",
   },
   {
     week: 2,
@@ -607,7 +608,7 @@ const youthCurriculumWeeks = [
     project: "Regenerative growing and soil stewardship activities",
     skills: ["Observation", "Soil Health", "Plant Care", "Environmental Stewardship"],
     badge: "🌱 Regenerative Agriculture",
-    status: "Upcoming",
+    status: "Completed",
   },
   {
     week: 3,
@@ -616,7 +617,7 @@ const youthCurriculumWeeks = [
     project: "Farm infrastructure and site-readiness project",
     skills: ["Construction", "Tool Safety", "Planning", "Logistics"],
     badge: "🏗 Infrastructure Builder",
-    status: "Upcoming",
+    status: "Current Week",
   },
   {
     week: 4,
@@ -763,13 +764,62 @@ const youthWeekTwoDailyPlan = [
   },
 ];
 
+const youthWeekThreeDailyPlan = [
+  {
+    day: "Monday",
+    date: "Week 3 Monday",
+    curriculum: "Farm infrastructure, site safety, and goal setting",
+    focus: "Youth begin Week 3 by understanding how farm infrastructure protects people, crops, tools, water access, and daily operations.",
+    work: ["Review farm infrastructure zones", "Walk the grow area with a supervisor", "Identify fence, water, shade, tool, and path needs", "Set today's team goal", "Choose my contribution"],
+    resources: ["Tool safety basics", "Site map", "Fence and pathway checklist", "Work status and weather card"],
+    reflection: "What part of the farm infrastructure did you understand better today?",
+  },
+  {
+    day: "Tuesday",
+    date: "Week 3 Tuesday",
+    curriculum: "Tools, measurement, teamwork, and safe building habits",
+    focus: "Youth practice safe tool handling, measuring, carrying, organizing, and working in teams before larger infrastructure tasks.",
+    work: ["Review tool safety", "Measure or mark an area", "Organize supplies", "Support fence or grow-area preparation", "Return tools to inventory"],
+    resources: ["Tool checkout reminder", "Measurement basics", "Team communication prompts", "Inventory return checklist"],
+    reflection: "What tool, measurement, or teamwork skill did you practice today?",
+  },
+  {
+    day: "Wednesday",
+    date: "Week 3 Wednesday",
+    curriculum: "Fence, water, shade, and work-zone infrastructure",
+    focus: "Youth connect infrastructure work to crop protection, heat safety, efficient movement, and keeping the farm ready for visitors and production.",
+    work: ["Continue deer-deterrent fence", "Check water access", "Prepare or improve shade/work zones", "Clear paths and secure loose materials", "Document before-and-after progress"],
+    resources: ["Fence guide", "Hydration and shade checklist", "Work-zone safety guide", "Photo documentation prompt"],
+    reflection: "How did today's infrastructure work protect people, plants, or the farm?",
+  },
+  {
+    day: "Thursday",
+    date: "Week 3 Thursday",
+    curriculum: "Problem solving, repairs, and operational readiness",
+    focus: "Youth identify what is not working yet, propose improvements, and help move the farm closer to daily operational readiness.",
+    work: ["Inspect work zones", "Identify one problem to solve", "Help repair, organize, or improve a farm area", "Update inventory or tool needs", "Share one improvement idea"],
+    resources: ["Problem-solving prompt", "Operations checklist", "Inventory needs form", "Info to Share"],
+    reflection: "Did you notice an opportunity to improve the farm today?",
+  },
+  {
+    day: "Friday",
+    date: "Week 3 Friday",
+    curriculum: "Infrastructure closeout, stewardship, and weekly progress",
+    focus: "Youth close Week 3 by reviewing goals achieved, what remains, what should be checked next week, and how infrastructure supports food production.",
+    work: ["Review Week 3 infrastructure goals", "Confirm what was completed", "Identify what still needs attention", "Return tools and update inventory", "Complete weekly reflection"],
+    resources: ["Weekly goal progress", "Tool return checklist", "Supervisor observation prompt", "Next week preview"],
+    reflection: "What infrastructure contribution are you proud of this week, and why did it matter?",
+  },
+];
+
 const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
   1: youthWeekOneDailyPlan,
   2: youthWeekTwoDailyPlan,
+  3: youthWeekThreeDailyPlan,
 };
 
 const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
-const LAUNCH_MINIMUM_ACTIVE_WEEK = 2;
+const LAUNCH_MINIMUM_ACTIVE_WEEK = 3;
 
 function getCurrentProgramWeek(date = new Date()) {
   const start = new Date(PROGRAM_START_DATE);
@@ -4972,9 +5022,9 @@ function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
       )}
 
       <div className="mt-4 grid gap-2 md:grid-cols-3">
-        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Week 1: Completed ✅</div>
-        <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-bold">Current: {currentWeek.title}</div>
-        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Next: {nextWeek ? nextWeek.title : "Completion"}</div>
+        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Weeks 1–2: Completed ✅</div>
+        <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-bold">Current: Week {currentWeek.week} — {currentWeek.title}</div>
+        <div className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-bold">Rest of Week {currentWeek.week}: shown above</div>
       </div>
     </Card>
   );
