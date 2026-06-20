@@ -349,6 +349,10 @@ const NOTIFICATION_KEY = "bff.launch.notifications";
 const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
 const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
 const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
+const PARENT_NOTIFICATION_KEY = "bff.launch.parentNotifications";
+const BROADCAST_MESSAGE_KEY = "bff.launch.broadcastMessages";
+const CROP_PLAN_KEY = "bff.launch.cropPlanner";
+const ECOSYSTEM_BASE_URL = "https://ecosystem.farmandfamilyalliance.org";
 
 type FarmOperationStatus = {
   level: "Open" | "Modified Operations" | "Closed";
@@ -387,6 +391,44 @@ type WorkCompletionRecord = {
   date: string;
   item: string;
   completed: boolean;
+  created_at: string;
+};
+
+type ParentNotificationRecord = {
+  id: string;
+  youth_profile_id: string;
+  youth_name: string;
+  guardian_name?: string;
+  guardian_email: string;
+  guardian_phone?: string;
+  parent_pathway_link: string;
+  subject: string;
+  body: string;
+  status: "Queued" | "Sent" | "Opened" | "Failed";
+  created_at: string;
+  sent_at?: string;
+};
+
+type BroadcastMessageRecord = {
+  id: string;
+  audience: "Youth" | "Parents" | "Supervisors" | "Growers" | "Everyone";
+  priority: "Info" | "Action" | "Safety" | "Urgent";
+  title: string;
+  body: string;
+  created_by: string;
+  status: "Draft" | "Queued" | "Sent";
+  created_at: string;
+};
+
+type CropPlanRecord = {
+  id: string;
+  crop: string;
+  bed_or_area: string;
+  goal: string;
+  planting_date: string;
+  target_harvest: string;
+  companion_notes: string;
+  status: "Planned" | "Planted" | "Growing" | "Needs Attention" | "Harvest Ready" | "Completed";
   created_at: string;
 };
 
@@ -4446,6 +4488,18 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       };
       const youthResult = await insertRow("youth_participants", YOUTH_KEY, youth);
       if (!youthResult.ok) errors.push(`youth_participants: ${String((youthResult.error as any)?.message || youthResult.error)}`);
+      const parentNotice = queueParentNotification(profile, youth);
+      if (parentNotice) {
+        const notices = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+        safeWrite(NOTIFICATION_KEY, [{
+          id: parentNotice.id,
+          audience: "Parent",
+          priority: "Action",
+          title: "Parent Pathway Access Created",
+          body: `${parentNotice.guardian_email} is queued to receive Parent Pathway access for ${parentNotice.youth_name}.`,
+          created_at: parentNotice.created_at,
+        }, ...notices].slice(0, 250));
+      }
     }
 
     if (errors.length) {
@@ -4453,7 +4507,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       return;
     }
 
-    setSaved("Saved to Supabase. This profile is now available for supervisor autofill.");
+    setSaved(profileType === "youth" ? "Saved. If a guardian email was provided, the Parent Pathway notice has been queued with the access link." : "Saved to Supabase. This profile is now available for supervisor autofill.");
   };
 
   return (
@@ -7667,6 +7721,9 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   const feedback = safeRead<FeedbackRecord[]>(FEEDBACK_KEY, []);
   const completions = safeRead<any[]>(COMPLETION_KEY, []);
   const media = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []);
+  const parentNotices = safeRead<ParentNotificationRecord[]>(PARENT_NOTIFICATION_KEY, []);
+  const broadcastMessages = safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []);
+  const cropPlans = safeRead<CropPlanRecord[]>(CROP_PLAN_KEY, []);
   const inventory = safeRead<OperationsInventoryItem[]>(OPERATIONS_INVENTORY_KEY, defaultOperationsInventory);
   const today = todayISO();
   const present = attendance.filter((a) => a.date === today && a.status === "present").length;
@@ -7683,7 +7740,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
       <div className="rounded-[1.5rem] border-2 border-slate-200 bg-white p-5 text-slate-950 shadow-sm">
         <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Mission Control</div>
         <h1 className="mt-2 text-4xl font-black md:text-6xl">Daily Command Center.</h1>
-        <p className="mt-3 max-w-3xl text-sm font-bold leading-7 text-slate-700">Launch 5.0 restores the operating center: live conditions, actual calendar, workforce truth, safety, today's work, learning, uploads, reflections, and the Daily Farm Story.</p>
+        <p className="mt-3 max-w-3xl text-sm font-bold leading-7 text-slate-700">Launch 6.0 restores the operating center: live conditions, actual calendar, workforce truth, safety, today's work, learning, uploads, reflections, and the Daily Farm Story.</p>
         <div className="mt-5"><PersistentSafetyStrip setScreen={setScreen} /></div>
         <div className="mt-4"><QuickActionBar setScreen={setScreen} /></div>
       </div>
@@ -7702,6 +7759,12 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         <OperationalStatusCard icon="❤️" label="Wellness Flags" value={supportFlags} detail="Support needed" tone={supportFlags ? "amber" : "green"} onClick={() => setScreen("supervisor")} />
         <OperationalStatusCard icon="🚨" label="Incidents" value={todayIncidents} detail="Logged today" tone={todayIncidents ? "red" : "green"} onClick={() => setScreen("supervisor")} />
         <OperationalStatusCard icon="📦" label="Inventory Alerts" value={inventoryAlerts} detail="Low/missing/replacement" tone={inventoryAlerts ? "amber" : "green"} onClick={() => setScreen("operations")} />
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-3">
+        <OperationalStatusCard icon="📧" label="Parent Notices" value={parentNotices.filter((notice) => notice.status === "Queued").length} detail="Queued for parent email" tone={parentNotices.some((notice) => notice.status === "Queued") ? "amber" : "green"} onClick={() => setScreen("operations")} />
+        <OperationalStatusCard icon="📣" label="Messages" value={broadcastMessages.length} detail="Broadcasts saved" tone="blue" onClick={() => setScreen("operations")} />
+        <OperationalStatusCard icon="🌱" label="Crop Plans" value={cropPlans.length} detail="Operational crop planner" tone="green" onClick={() => setScreen("operations")} />
       </div>
 
       <TodayFarmPlanCard setScreen={setScreen} />
@@ -7739,10 +7802,137 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
   );
 }
 
+
+function ParentNotificationCenter() {
+  const [notices, setNotices] = useState<ParentNotificationRecord[]>(() => safeRead<ParentNotificationRecord[]>(PARENT_NOTIFICATION_KEY, []));
+  const markSent = (id: string) => {
+    const next = notices.map((notice) => notice.id === id ? { ...notice, status: "Sent" as const, sent_at: new Date().toISOString() } : notice);
+    setNotices(next);
+    safeWrite(PARENT_NOTIFICATION_KEY, next);
+  };
+  const queued = notices.filter((notice) => notice.status === "Queued").length;
+  const sent = notices.filter((notice) => notice.status === "Sent" || notice.status === "Opened").length;
+  return (
+    <div className="rounded-[1.5rem] border-2 border-blue-200 bg-blue-50 p-5 text-blue-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-blue-700">Parent Notification Center</div>
+      <h2 className="mt-2 text-3xl font-black">Parent Pathway notices</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-blue-900/80">When a youth has a registered guardian email, the system queues a parent notice with a Parent Pathway access link. A production deployment should connect this queue to the email service.</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <OperationalStatusCard icon="📧" label="Queued" value={queued} detail="Ready for email send" tone={queued ? "amber" : "green"} />
+        <OperationalStatusCard icon="✅" label="Sent" value={sent} detail="Marked sent/opened" tone="green" />
+        <OperationalStatusCard icon="👨‍👩‍👧" label="Parents" value={new Set(notices.map((notice) => notice.guardian_email.toLowerCase())).size} detail="Unique guardian emails" tone="blue" />
+      </div>
+      <div className="mt-4 grid gap-3">
+        {notices.slice(0, 8).map((notice) => (
+          <div key={notice.id} className="rounded-2xl border border-blue-200 bg-white p-4 text-sm shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="font-black">{notice.youth_name}</div>
+                <div className="mt-1 font-bold text-blue-900/70">{notice.guardian_email} • {notice.status}</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a href={`mailto:${notice.guardian_email}?subject=${encodeURIComponent(notice.subject)}&body=${encodeURIComponent(notice.body)}`} className="rounded-full bg-blue-700 px-4 py-2 text-xs font-black text-white">Open Email</a>
+                {notice.status === "Queued" && <button type="button" onClick={() => markSent(notice.id)} className="rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-xs font-black text-blue-950">Mark Sent</button>}
+              </div>
+            </div>
+            <div className="mt-3 truncate rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-950">{notice.parent_pathway_link}</div>
+          </div>
+        ))}
+        {!notices.length && <div className="rounded-2xl border border-blue-200 bg-white p-4 text-sm font-bold text-blue-900/75">No parent notices have been queued yet. Save a youth registration with guardian email to create one.</div>}
+      </div>
+    </div>
+  );
+}
+
+function MessagingCenter() {
+  const [messages, setMessages] = useState<BroadcastMessageRecord[]>(() => safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []));
+  const [audience, setAudience] = useState<BroadcastMessageRecord["audience"]>("Everyone");
+  const [priority, setPriority] = useState<BroadcastMessageRecord["priority"]>("Info");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [notice, setNotice] = useState("");
+  const saveMessage = (status: BroadcastMessageRecord["status"]) => {
+    if (!title.trim() || !body.trim()) {
+      setNotice("Add a title and message before saving.");
+      return;
+    }
+    const row: BroadcastMessageRecord = { id: uuid(), audience, priority, title: title.trim(), body: body.trim(), created_by: "Mission Control", status, created_at: new Date().toISOString() };
+    const next = [row, ...messages].slice(0, 250);
+    setMessages(next);
+    safeWrite(BROADCAST_MESSAGE_KEY, next);
+    const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+    safeWrite(NOTIFICATION_KEY, [{ id: row.id, audience: audience === "Parents" ? "Parent" : audience === "Supervisors" ? "Supervisor" : audience === "Everyone" ? "All" : audience === "Growers" ? "All" : "Youth", priority, title: row.title, body: row.body, created_at: row.created_at }, ...notifications].slice(0, 250));
+    setTitle("");
+    setBody("");
+    setNotice(status === "Sent" ? "Message recorded as sent and added to notifications." : "Message queued.");
+  };
+  return (
+    <div className="rounded-[1.5rem] border-2 border-amber-200 bg-amber-50 p-5 text-amber-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-amber-700">Messaging</div>
+      <h2 className="mt-2 text-3xl font-black">Send updates by group</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-amber-900/80">Use this for work status changes, half-day notices, safety reminders, parent updates, and farm-wide messages.</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <SelectField label="Audience" value={audience} onChange={(v) => setAudience(v as BroadcastMessageRecord["audience"])} options={["Youth", "Parents", "Supervisors", "Growers", "Everyone"]} />
+        <SelectField label="Priority" value={priority} onChange={(v) => setPriority(v as BroadcastMessageRecord["priority"])} options={["Info", "Action", "Safety", "Urgent"]} />
+        <Field label="Message Title" value={title} onChange={setTitle} placeholder="Example: Half-day schedule change" />
+        <TextArea label="Message" value={body} onChange={setBody} placeholder="Write the message here." />
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => saveMessage("Queued")} className="rounded-full border border-amber-300 bg-white px-5 py-3 text-sm font-black text-amber-950">Queue Message</button>
+        <button type="button" onClick={() => saveMessage("Sent")} className="rounded-full bg-amber-500 px-5 py-3 text-sm font-black text-white">Mark Sent</button>
+      </div>
+      {notice && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-amber-950">{notice}</div>}
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {messages.slice(0, 6).map((message) => <div key={message.id} className="rounded-2xl bg-white p-4 text-sm shadow-sm"><div className="font-black">{message.title}</div><div className="mt-1 text-xs font-bold text-amber-900/70">{message.audience} • {message.priority} • {message.status}</div><p className="mt-2 text-sm font-bold leading-5 text-amber-950/85">{message.body}</p></div>)}
+      </div>
+    </div>
+  );
+}
+
+function CropPlannerPanel() {
+  const [plans, setPlans] = useState<CropPlanRecord[]>(() => safeRead<CropPlanRecord[]>(CROP_PLAN_KEY, []));
+  const [crop, setCrop] = useState("Potatoes");
+  const [area, setArea] = useState("Grow Area");
+  const [goal, setGoal] = useState("Plant, monitor, and connect to harvest goals");
+  const [plantingDate, setPlantingDate] = useState(todayISO());
+  const [harvestDate, setHarvestDate] = useState("");
+  const [companions, setCompanions] = useState("Use companion planting notes and Almanac timing before planting.");
+  const [status, setStatus] = useState<CropPlanRecord["status"]>("Planned");
+  const savePlan = () => {
+    const row: CropPlanRecord = { id: uuid(), crop: crop.trim() || "Crop", bed_or_area: area.trim() || "Grow Area", goal: goal.trim(), planting_date: plantingDate, target_harvest: harvestDate, companion_notes: companions.trim(), status, created_at: new Date().toISOString() };
+    const next = [row, ...plans].slice(0, 150);
+    setPlans(next);
+    safeWrite(CROP_PLAN_KEY, next);
+  };
+  return (
+    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-emerald-50 p-5 text-emerald-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Crop Planner</div>
+      <h2 className="mt-2 text-3xl font-black">Crop plan connected to today's work</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-emerald-900/80">This keeps the crop planner operational: crop, location, goal, planting date, companion notes, harvest target, and status.</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <Field label="Crop" value={crop} onChange={setCrop} />
+        <Field label="Bed / Area" value={area} onChange={setArea} />
+        <Field label="Planting Date" value={plantingDate} onChange={setPlantingDate} type="date" />
+        <Field label="Target Harvest" value={harvestDate} onChange={setHarvestDate} type="date" />
+        <SelectField label="Status" value={status} onChange={(v) => setStatus(v as CropPlanRecord["status"])} options={["Planned", "Planted", "Growing", "Needs Attention", "Harvest Ready", "Completed"]} />
+        <TextArea label="Goal" value={goal} onChange={setGoal} />
+        <TextArea label="Companion / Almanac Notes" value={companions} onChange={setCompanions} />
+      </div>
+      <button type="button" onClick={savePlan} className="mt-4 rounded-full bg-emerald-700 px-6 py-3 text-sm font-black text-white">Save Crop Plan</button>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {plans.slice(0, 8).map((plan) => <div key={plan.id} className="rounded-2xl bg-white p-4 text-sm shadow-sm"><div className="font-black">{plan.crop} • {plan.bed_or_area}</div><div className="mt-1 text-xs font-bold text-emerald-900/70">{plan.status} • Plant {plan.planting_date || "TBD"} • Harvest {plan.target_harvest || "TBD"}</div><p className="mt-2 text-sm font-bold leading-5 text-emerald-950/85">{plan.goal}</p><p className="mt-2 text-xs font-bold leading-5 text-emerald-900/70">{plan.companion_notes}</p></div>)}
+      </div>
+    </div>
+  );
+}
+
 function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-5">
       <TodayFarmPlanCard setScreen={setScreen} />
+      <MessagingCenter />
+      <ParentNotificationCenter />
+      <CropPlannerPanel />
       <OperationsInventoryPanel />
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
