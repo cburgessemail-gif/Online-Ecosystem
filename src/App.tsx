@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 6.0.1 - WEEK 3 ACTIVE + REST-OF-WEEK CURRICULUM
+ * LAUNCH 6.0.2 - MASTER FULL REPLACEMENT + WEATHER CANCELLATION NOTIFICATIONS
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -37,6 +37,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Promotes LIVE visual weather, work status, today's goal, my contribution, and one-button work entry to the youth launch dashboard
  * - Adds Launch 6.0 layered flow: My Day → Activity Card → Info to Share → Contribution → Meaning → Tomorrow
  * - Advances active curriculum to Week 3 after Week 2 completion and shows the remaining week at a glance
+ * - Adds full Mission Control work-status launch engine for Monday, June 22, 2026 cancellation
+ * - Adds parent/youth/supervisor notification preparation, message log, and one-button cancellation launch
  */
 
 type Screen =
@@ -352,6 +354,8 @@ const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
 const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
 const PARENT_NOTIFICATION_KEY = "bff.launch.parentNotifications";
 const BROADCAST_MESSAGE_KEY = "bff.launch.broadcastMessages";
+const WORK_STATUS_KEY = "bff.launch.workStatus";
+const WORK_STATUS_LOG_KEY = "bff.launch.workStatusLog";
 const CROP_PLAN_KEY = "bff.launch.cropPlanner";
 const ECOSYSTEM_BASE_URL = "https://ecosystem.farmandfamilyalliance.org";
 
@@ -412,7 +416,7 @@ type ParentNotificationRecord = {
 
 type BroadcastMessageRecord = {
   id: string;
-  audience: "Youth" | "Parents" | "Supervisors" | "Growers" | "Everyone";
+  audience: "Youth" | "Parents" | "Supervisors" | "Growers" | "Partners" | "Everyone";
   priority: "Info" | "Action" | "Safety" | "Urgent";
   title: string;
   body: string;
@@ -433,6 +437,24 @@ type CropPlanRecord = {
   created_at: string;
 };
 
+
+type WorkStatusCode = "FULL_DAY" | "HALF_DAY" | "DELAYED_START" | "EARLY_DISMISSAL" | "WEATHER_SHELTER" | "CANCELLED";
+
+type WorkStatusUpdate = {
+  id: string;
+  date: string;
+  status: WorkStatusCode;
+  label: string;
+  reason: string;
+  action: string;
+  audiences: BroadcastMessageRecord["audience"][];
+  hangar_note: string;
+  parent_message: string;
+  created_by: string;
+  created_at: string;
+  launched_at?: string;
+};
+
 const defaultFarmStatus: FarmOperationStatus = {
   level: "Open",
   color: "green",
@@ -440,6 +462,39 @@ const defaultFarmStatus: FarmOperationStatus = {
   summary: "Begin with today’s assignment, check hydration, review conditions, and follow supervisor direction before outdoor work.",
   action: "Check the live farm conditions card, bring water, confirm PPE, and listen for any Mission Control updates.",
   updated_at: new Date().toISOString(),
+};
+
+
+const MONDAY_JUNE_22_CANCELLATION_MESSAGE = `Bronson Family Farm Work Status
+
+Monday, June 22, 2026
+
+STATUS: CANCELLED
+
+Due to forecasted rain and thunderstorms, the Cultivators Youth Workforce Program will not meet tomorrow.
+
+The hangar is available only for emergency cover and is not set up for normal program activities.
+
+Youth should remain safe at home and be prepared for the next scheduled workday.
+
+Parents/caregivers, thank you for your flexibility and continued support.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultWorkStatusUpdate: WorkStatusUpdate = {
+  id: "weather-cancel-2026-06-22",
+  date: "Monday, June 22, 2026",
+  status: "CANCELLED",
+  label: "Program Cancelled",
+  reason: "Forecasted rain and thunderstorms create unsafe conditions for normal outdoor farm operations.",
+  action: "Youth should remain safe at home. Parents/caregivers should watch for the next scheduled workday update.",
+  audiences: ["Parents", "Youth", "Supervisors"],
+  hangar_note: "The hangar is emergency cover only and is not set up for full-day programming.",
+  parent_message: MONDAY_JUNE_22_CANCELLATION_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
 };
 
 const launchAlmanacSnapshot = {
@@ -3195,8 +3250,70 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 }
 
 
-function getFarmStatus() {
+function getSavedWorkStatus() {
+  return safeRead<WorkStatusUpdate | null>(WORK_STATUS_KEY, defaultWorkStatusUpdate);
+}
+
+function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperationStatus {
+  if (!workStatus) return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+  if (workStatus.status === "CANCELLED") {
+    return {
+      level: "Closed",
+      color: "red",
+      title: workStatus.label,
+      summary: `${workStatus.reason} ${workStatus.hangar_note}`,
+      action: workStatus.action,
+      updated_at: workStatus.launched_at || workStatus.created_at,
+    };
+  }
+  if (["HALF_DAY", "DELAYED_START", "EARLY_DISMISSAL", "WEATHER_SHELTER"].includes(workStatus.status)) {
+    return {
+      level: "Modified Operations",
+      color: "amber",
+      title: workStatus.label,
+      summary: workStatus.reason,
+      action: workStatus.action,
+      updated_at: workStatus.launched_at || workStatus.created_at,
+    };
+  }
   return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+}
+
+function getFarmStatus() {
+  return workStatusToFarmStatus(getSavedWorkStatus());
+}
+
+function saveWorkStatusUpdate(update: WorkStatusUpdate) {
+  safeWrite(WORK_STATUS_KEY, update);
+  const existing = safeRead<WorkStatusUpdate[]>(WORK_STATUS_LOG_KEY, []);
+  safeWrite(WORK_STATUS_LOG_KEY, [update, ...existing].slice(0, 100));
+  safeWrite(FARM_STATUS_KEY, workStatusToFarmStatus(update));
+}
+
+function queueBroadcastMessage(row: BroadcastMessageRecord) {
+  const existing = safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []);
+  safeWrite(BROADCAST_MESSAGE_KEY, [row, ...existing].slice(0, 250));
+  const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+  const audience: EcosystemNotification["audience"] = row.audience === "Parents" ? "Parent" : row.audience === "Supervisors" ? "Supervisor" : row.audience === "Youth" ? "Youth" : "All";
+  safeWrite(NOTIFICATION_KEY, [{ id: row.id, audience, priority: row.priority, title: row.title, body: row.body, created_at: row.created_at }, ...notifications].slice(0, 250));
+}
+
+function launchTomorrowCancellationNotice() {
+  const launched: WorkStatusUpdate = { ...defaultWorkStatusUpdate, launched_at: new Date().toISOString() };
+  saveWorkStatusUpdate(launched);
+  launched.audiences.forEach((audience) => {
+    queueBroadcastMessage({
+      id: `${launched.id}-${audience}-${Date.now()}`,
+      audience,
+      priority: "Urgent",
+      title: "Bronson Family Farm Work Status: Cancelled",
+      body: launched.parent_message,
+      created_by: "Mission Control",
+      status: "Queued",
+      created_at: new Date().toISOString(),
+    });
+  });
+  return launched;
 }
 
 function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
@@ -7795,6 +7912,8 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         <div className="mt-4"><QuickActionBar setScreen={setScreen} /></div>
       </div>
 
+      <WorkStatusLaunchPanel />
+
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
         <OperationalStatusCard icon="👥" label="Registered" value={youth.length} detail="Youth roster" tone="blue" onClick={() => setScreen("supervisor")} />
         <OperationalStatusCard icon="✅" label="Present" value={present} detail="Verified attendance today" tone="green" onClick={() => setScreen("supervisor")} />
@@ -7853,6 +7972,37 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
 }
 
 
+
+function WorkStatusLaunchPanel() {
+  const [workStatus, setWorkStatus] = useState<WorkStatusUpdate | null>(() => getSavedWorkStatus());
+  const [notice, setNotice] = useState("");
+  const launched = workStatus?.launched_at;
+  const launchNow = () => {
+    const update = launchTomorrowCancellationNotice();
+    setWorkStatus(update);
+    setNotice("Cancellation notice queued for parents, youth, and supervisors. Use Open Email/Text paths for direct delivery if the backend email/SMS service is not connected yet.");
+  };
+  return (
+    <div className="rounded-[1.5rem] border-2 border-red-300 bg-red-50 p-5 text-red-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-red-700">Work Status Launch</div>
+      <h2 className="mt-2 text-3xl font-black">Monday, June 22, 2026: CANCELLED</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-red-900/85">{defaultWorkStatusUpdate.reason} {defaultWorkStatusUpdate.hangar_note}</p>
+      <div className="mt-4 rounded-2xl border border-red-200 bg-white p-4 text-sm font-bold leading-6 whitespace-pre-wrap">{MONDAY_JUNE_22_CANCELLATION_MESSAGE}</div>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <OperationalStatusCard icon="🚫" label="Status" value="Cancelled" detail="No youth workday tomorrow" tone="red" />
+        <OperationalStatusCard icon="📣" label="Audience" value="3 Groups" detail="Parents, Youth, Supervisors" tone="amber" />
+        <OperationalStatusCard icon="🛖" label="Hangar" value="Emergency Only" detail="Not a program space" tone="orange" />
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={launchNow} className="rounded-full bg-red-700 px-6 py-4 text-sm font-black text-white shadow-sm hover:bg-red-800">Launch Cancellation Notice</button>
+        <a href={`mailto:?subject=${encodeURIComponent("Bronson Family Farm Work Status: Cancelled")}&body=${encodeURIComponent(MONDAY_JUNE_22_CANCELLATION_MESSAGE)}`} className="rounded-full border border-red-300 bg-white px-6 py-4 text-sm font-black text-red-950">Open Email</a>
+      </div>
+      {launched && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-red-950">Launched: {new Date(launched).toLocaleString()}</div>}
+      {notice && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-red-950">{notice}</div>}
+    </div>
+  );
+}
+
 function ParentNotificationCenter() {
   const [notices, setNotices] = useState<ParentNotificationRecord[]>(() => safeRead<ParentNotificationRecord[]>(PARENT_NOTIFICATION_KEY, []));
   const markSent = (id: string) => {
@@ -7896,10 +8046,10 @@ function ParentNotificationCenter() {
 
 function MessagingCenter() {
   const [messages, setMessages] = useState<BroadcastMessageRecord[]>(() => safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []));
-  const [audience, setAudience] = useState<BroadcastMessageRecord["audience"]>("Everyone");
-  const [priority, setPriority] = useState<BroadcastMessageRecord["priority"]>("Info");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [audience, setAudience] = useState<BroadcastMessageRecord["audience"]>("Parents");
+  const [priority, setPriority] = useState<BroadcastMessageRecord["priority"]>("Urgent");
+  const [title, setTitle] = useState("Bronson Family Farm Work Status: Cancelled");
+  const [body, setBody] = useState(MONDAY_JUNE_22_CANCELLATION_MESSAGE);
   const [notice, setNotice] = useState("");
   const saveMessage = (status: BroadcastMessageRecord["status"]) => {
     if (!title.trim() || !body.trim()) {
@@ -7922,7 +8072,7 @@ function MessagingCenter() {
       <h2 className="mt-2 text-3xl font-black">Send updates by group</h2>
       <p className="mt-2 text-sm font-bold leading-6 text-amber-900/80">Use this for work status changes, half-day notices, safety reminders, parent updates, and farm-wide messages.</p>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <SelectField label="Audience" value={audience} onChange={(v) => setAudience(v as BroadcastMessageRecord["audience"])} options={["Youth", "Parents", "Supervisors", "Growers", "Everyone"]} />
+        <SelectField label="Audience" value={audience} onChange={(v) => setAudience(v as BroadcastMessageRecord["audience"])} options={["Youth", "Parents", "Supervisors", "Growers", "Partners", "Everyone"]} />
         <SelectField label="Priority" value={priority} onChange={(v) => setPriority(v as BroadcastMessageRecord["priority"])} options={["Info", "Action", "Safety", "Urgent"]} />
         <Field label="Message Title" value={title} onChange={setTitle} placeholder="Example: Half-day schedule change" />
         <TextArea label="Message" value={body} onChange={setBody} placeholder="Write the message here." />
