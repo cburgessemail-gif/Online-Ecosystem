@@ -1192,10 +1192,37 @@ type TodayFarmPlan = {
 function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
   const week = getCurrentYouthWeek();
   const plan = getCurrentYouthPlan(date);
-  const farmStatus = getFarmStatus();
-  const work = plan.work?.length ? plan.work : ["Check Mission Control for today's farm work"];
+  const cancellation = getOperationalCancellationForDate(date);
+  const farmStatus = cancellation ? workStatusToFarmStatus(cancellation) : getFarmStatus();
+  const work = cancellation
+    ? [
+        "Program cancelled due to weather — no onsite youth work today",
+        "Monday's Week 3 infrastructure lesson remains visible for continuity",
+        "Do not mark youth absent or incomplete because operations are cancelled",
+        "Mission Control should confirm parent/youth/supervisor notification status",
+      ]
+    : plan.work?.length
+      ? plan.work
+      : ["Check Mission Control for today's farm work"];
   const learning = normalizeLearningTags([...(week.skills || []), "Observation", "Contribution", "Stewardship"]);
   const iso = date.toISOString().slice(0, 10);
+  const cancelledSchedule: TodayFarmPlan["schedule"] = [
+    { time: "All Day", title: "Program Cancelled Due to Weather", kind: "safety", detail: cancellation ? `${cancellation.reason} ${cancellation.hangar_note}` : "Operations cancelled." },
+    { time: "Review", title: `Week ${week.week}: ${plan.curriculum}`, kind: "curriculum" as any, detail: "Curriculum remains visible; onsite work is postponed." },
+    { time: "Mission Control", title: "Parent / Youth / Supervisor Notice", kind: "operations", detail: "Cancellation notification should be queued or sent through Communications Center." },
+  ];
+  const normalSchedule: TodayFarmPlan["schedule"] = [
+    { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
+    { time: "8:15 AM", title: "Cultivator Almanac + Morning Briefing", kind: "conditions", detail: "Observe weather, work status, calendar, and today's focus." },
+    { time: "8:30 AM", title: work[0] || "Farm Work Block #1", kind: "work", detail: plan.curriculum },
+    { time: "10:00 AM", title: work[1] || "Farm Work Block #2", kind: "work", detail: "Document observations and contribution." },
+    { time: "11:00 AM", title: "Lunch", kind: "meal", detail: "Lunch begins at 11:00 AM." },
+    { time: "11:45 AM", title: work[2] || "Farm Work Block #3", kind: "work", detail: "Return to priority farm work." },
+    { time: "12:45 PM", title: "Uploads / Reflection / Documentation", kind: "reflection", detail: plan.reflection },
+    { time: "1:00 PM", title: "Cleanup & Tool Return", kind: "operations", detail: "Return tools, update inventory, clean work areas." },
+    { time: "1:30 PM", title: "Wrap-Up / Daily Farm Story", kind: "learning", detail: "What happened, what was learned, what remains." },
+    { time: "2:00 PM", title: "Departure", kind: "operations", detail: "Youth depart / parent pickup." },
+  ];
   return {
     date,
     week,
@@ -1203,26 +1230,21 @@ function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
     farmStatus,
     work,
     learning,
-    reflection: plan.reflection,
-    schedule: [
-      { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
-      { time: "8:15 AM", title: "Cultivator Almanac + Morning Briefing", kind: "conditions", detail: "Observe weather, work status, calendar, and today's focus." },
-      { time: "8:30 AM", title: work[0] || "Farm Work Block #1", kind: "work", detail: plan.curriculum },
-      { time: "10:00 AM", title: work[1] || "Farm Work Block #2", kind: "work", detail: "Document observations and contribution." },
-      { time: "11:00 AM", title: "Lunch", kind: "meal", detail: "Lunch begins at 11:00 AM." },
-      { time: "11:45 AM", title: work[2] || "Farm Work Block #3", kind: "work", detail: "Return to priority farm work." },
-      { time: "12:45 PM", title: "Uploads / Reflection / Documentation", kind: "reflection", detail: plan.reflection },
-      { time: "1:00 PM", title: "Cleanup & Tool Return", kind: "operations", detail: "Return tools, update inventory, clean work areas." },
-      { time: "1:30 PM", title: "Wrap-Up / Daily Farm Story", kind: "learning", detail: "What happened, what was learned, what remains." },
-      { time: "2:00 PM", title: "Departure", kind: "operations", detail: "Youth depart / parent pickup." },
-    ],
-    events: [
-      { title: `Week ${week.week}: ${week.title}`, kind: "curriculum", date: iso, time: "8:15 AM" },
-      ...work.slice(0, 6).map((title, index) => ({ title, kind: "work" as const, date: iso, time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : "11:45 AM" })),
-      { title: "Lunch", kind: "safety", date: iso, time: "11:00 AM" },
-      { title: "Uploads + Reflection", kind: "reflection", date: iso, time: "12:45 PM" },
-      { title: "Cleanup", kind: "work", date: iso, time: "1:00 PM" },
-    ],
+    reflection: cancellation ? "Operations are cancelled. Curriculum is postponed, not lost." : plan.reflection,
+    schedule: cancellation ? cancelledSchedule : normalSchedule,
+    events: cancellation
+      ? [
+          { title: "PROGRAM CANCELLED — Weather", kind: "safety", date: iso, time: "All Day" },
+          { title: `Week ${week.week}: ${plan.curriculum} — postponed onsite`, kind: "curriculum", date: iso, time: "Review" },
+          { title: "Parent/youth/supervisor cancellation notice", kind: "reflection", date: iso, time: "Mission Control" },
+        ]
+      : [
+          { title: `Week ${week.week}: ${week.title}`, kind: "curriculum", date: iso, time: "8:15 AM" },
+          ...work.slice(0, 6).map((title, index) => ({ title, kind: "work" as const, date: iso, time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : "11:45 AM" })),
+          { title: "Lunch", kind: "safety", date: iso, time: "11:00 AM" },
+          { title: "Uploads + Reflection", kind: "reflection", date: iso, time: "12:45 PM" },
+          { title: "Cleanup", kind: "work", date: iso, time: "1:00 PM" },
+        ],
   };
 }
 
@@ -1289,8 +1311,17 @@ function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => 
 
 function TodayFarmPlanCard({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
   const today = getTodayFarmPlan();
+  const cancellation = getOperationalCancellationForDate(today.date);
+  const isCancelled = Boolean(cancellation);
   return (
-    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm">
+    <div className={`rounded-[1.5rem] border-2 p-5 text-slate-950 shadow-sm ${isCancelled ? "border-red-300 bg-red-50" : "border-emerald-200 bg-white"}`}>
+      {isCancelled && (
+        <div className="mb-4 rounded-2xl border border-red-200 bg-white p-4 text-red-950">
+          <div className="text-xs font-black uppercase tracking-[0.24em] text-red-700">⚠ Program Cancelled Due to Weather</div>
+          <div className="mt-2 text-2xl font-black">No onsite youth work today</div>
+          <p className="mt-2 text-sm font-bold leading-6">Week 3 remains visible, but attendance, check-in, work completion, and assignments are disabled for the cancelled day. Youth are not absent and the lesson is postponed.</p>
+        </div>
+      )}
       <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Today at Bronson Family Farm</div>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -1301,9 +1332,9 @@ function TodayFarmPlanCard({ setScreen, compact = false }: { setScreen: (screen:
       </div>
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today's Farm Work</div>
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">{isCancelled ? "Cancelled Day Guidance" : "Today's Farm Work"}</div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {today.work.slice(0, compact ? 6 : 10).map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm">🌱 {item}</div>)}
+            {today.work.slice(0, compact ? 6 : 10).map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm">{isCancelled ? "🚫" : "🌱"} {item}</div>)}
           </div>
         </div>
         <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
@@ -1336,6 +1367,14 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
   const weekDays = Array.from({ length: 5 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
   const eventForDate = (d: Date) => {
     const day = d.getDay();
+    const cancellation = getOperationalCancellationForDate(d);
+    if (cancellation) {
+      return [
+        { title: "PROGRAM CANCELLED — Weather", kind: "safety" },
+        { title: "No onsite youth work", kind: "reflection" },
+        { title: "Parent/youth notice required", kind: "delivery" },
+      ];
+    }
     const week = getCurrentProgramWeek(d);
     const plan = getCurrentYouthPlan(d);
     const items = [{ title: `Week ${week}: ${getCurrentYouthWeek().title}`, kind: "curriculum" }, { title: plan.work?.[0] || plan.curriculum, kind: "work" }];
@@ -3283,6 +3322,29 @@ function getFarmStatus() {
   return workStatusToFarmStatus(getSavedWorkStatus());
 }
 
+function parseWorkStatusDate(value?: string) {
+  if (!value) return null;
+  const cleaned = value.replace(/^[A-Za-z]+,\s*/, "");
+  const parsed = new Date(cleaned);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function sameCalendarDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function getOperationalCancellationForDate(date = new Date()) {
+  const workStatus = getSavedWorkStatus();
+  if (!workStatus || workStatus.status !== "CANCELLED") return null;
+  const statusDate = parseWorkStatusDate(workStatus.date);
+  if (!statusDate) return null;
+  return sameCalendarDay(date, statusDate) ? workStatus : null;
+}
+
+function isOperationallyCancelled(date = new Date()) {
+  return Boolean(getOperationalCancellationForDate(date));
+}
+
 function saveWorkStatusUpdate(update: WorkStatusUpdate) {
   safeWrite(WORK_STATUS_KEY, update);
   const existing = safeRead<WorkStatusUpdate[]>(WORK_STATUS_LOG_KEY, []);
@@ -5094,7 +5156,10 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
 
 function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
   const currentWeek = getCurrentYouthWeek();
-  const todayPlan = getCurrentYouthPlan();
+  const todayDate = new Date();
+  const todayPlan = getCurrentYouthPlan(todayDate);
+  const cancellation = getOperationalCancellationForDate(todayDate);
+  const isCancelled = Boolean(cancellation);
   const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
   const nextWeek = youthCurriculumWeeks.find((week) => week.week === currentWeek.week + 1);
   const todayIndex = currentWeekPlans.findIndex((day) => day.day === todayPlan.day);
@@ -5105,6 +5170,11 @@ function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">📅 Curriculum Calendar</div>
           <h2 className="mt-2 text-2xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
           <p className="mt-2 text-sm font-bold leading-6 text-white/78">Today: {todayPlan.day} — {todayPlan.curriculum}</p>
+          {isCancelled && (
+            <div className="mt-3 rounded-2xl border border-red-200/30 bg-red-700/45 p-4 text-sm font-black leading-6 text-white">
+              🚫 Program Cancelled Due to Weather — Week 3 remains visible, but onsite work, attendance, check-in, work completion, and assignments are disabled for the cancelled day.
+            </div>
+          )}
         </div>
         <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Week {currentWeek.week} of 8</div>
       </div>
@@ -5114,9 +5184,9 @@ function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
           const isToday = day.day === todayPlan.day;
           const isPast = index < todayIndex;
           return (
-            <div key={day.day} className={`rounded-2xl border p-3 ${isToday ? "border-emerald-200 bg-emerald-300 text-black" : isPast ? "border-white/10 bg-white/12 text-white/80" : "border-white/10 bg-black/25 text-white/76"}`}>
-              <div className="text-sm font-black">{isPast ? "✓ " : isToday ? "● " : ""}{day.day}</div>
-              <div className="mt-1 text-xs font-black leading-4 opacity-85">{day.curriculum}</div>
+            <div key={day.day} className={`rounded-2xl border p-3 ${isToday && isCancelled ? "border-red-200 bg-red-700 text-white" : isToday ? "border-emerald-200 bg-emerald-300 text-black" : isPast ? "border-white/10 bg-white/12 text-white/80" : "border-white/10 bg-black/25 text-white/76"}`}>
+              <div className="text-sm font-black">{isToday && isCancelled ? "🚫 " : isPast ? "✓ " : isToday ? "● " : ""}{day.day}</div>
+              <div className="mt-1 text-xs font-black leading-4 opacity-85">{isToday && isCancelled ? "Cancelled — " : ""}{day.curriculum}</div>
             </div>
           );
         })}
@@ -5128,9 +5198,14 @@ function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
             <details key={day.day} className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <summary className="cursor-pointer text-sm font-black">{day.day}: {day.curriculum}</summary>
               <p className="mt-3 text-sm leading-6 text-white/78">{day.focus}</p>
+              {day.day === todayPlan.day && isCancelled && (
+                <div className="mt-3 rounded-xl border border-red-200/25 bg-red-700/40 p-3 text-sm font-black text-white">
+                  🚫 Cancelled due to weather. Curriculum remains visible; onsite work is postponed and should not count as an absence or incomplete assignment.
+                </div>
+              )}
               <div className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Work</div>
               <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
-                {day.work.map((item) => <li key={item}>• {item}</li>)}
+                {day.day === todayPlan.day && isCancelled ? ["No onsite youth work today", "Review Week 3 focus when operations resume", "Mission Control confirms notifications"] .map((item) => <li key={item}>• {item}</li>) : day.work.map((item) => <li key={item}>• {item}</li>)}
               </ul>
               <div className="mt-3 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
             </details>
