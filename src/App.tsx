@@ -1276,7 +1276,7 @@ function OperationalStatusCard({ icon, label, value, detail, tone = "slate", onC
 }
 
 function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const status = getFarmStatus();
+  const status = getFarmStatusForDate(new Date());
   const tone = status.color === "red" ? "red" : status.color === "amber" ? "amber" : "green";
   return (
     <div className="grid gap-2 md:grid-cols-4">
@@ -1375,9 +1375,11 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
         { title: "Parent/youth notice required", kind: "delivery" },
       ];
     }
-    const week = getCurrentProgramWeek(d);
     const plan = getCurrentYouthPlan(d);
-    const items = [{ title: `Week ${week}: ${getCurrentYouthWeek().title}`, kind: "curriculum" }, { title: plan.work?.[0] || plan.curriculum, kind: "work" }];
+    const items = [
+      { title: plan.curriculum, kind: "curriculum" },
+      { title: plan.work?.[0] || plan.focus, kind: "work" },
+    ];
     if (day === 3) items.push({ title: "Porta-potty service access", kind: "delivery" });
     if (day === 5) items.push({ title: "Water tote fill check", kind: "delivery" });
     return items;
@@ -1407,18 +1409,32 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
       </div>}
 
       {view === "week" && <div className="mt-5 overflow-x-auto">
-        <div className="grid min-w-[900px] grid-cols-[110px_repeat(5,1fr)] gap-2">
-          <div />
-          {weekDays.map((d) => <div key={d.toISOString()} className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">{d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}</div>)}
-          {todayPlan.schedule.map((slot) => <React.Fragment key={slot.time}>
-            <div className="rounded-xl bg-slate-100 p-3 text-sm font-black text-slate-700">{slot.time}</div>
-            {weekDays.map((d) => {
-              const p = getTodayFarmPlan(d);
-              const matching = p.schedule.find((s) => s.time === slot.time) || slot;
-              const tone = matching.kind === "meal" ? "border-amber-200 bg-amber-50" : matching.kind === "work" ? "border-emerald-200 bg-emerald-50" : matching.kind === "reflection" ? "border-purple-200 bg-purple-50" : matching.kind === "safety" ? "border-red-200 bg-red-50" : "border-blue-200 bg-blue-50";
-              return <div key={`${d.toISOString()}-${slot.time}`} className={`rounded-xl border p-3 ${tone}`}><div className="text-sm font-black">{matching.title}</div><div className="mt-1 text-xs font-bold text-slate-600">{matching.detail}</div></div>;
-            })}
-          </React.Fragment>)}
+        <div className="grid min-w-[900px] grid-cols-5 gap-2">
+          {weekDays.map((d) => {
+            const p = getTodayFarmPlan(d);
+            const cancellation = getOperationalCancellationForDate(d);
+            const isCancelled = Boolean(cancellation);
+            return (
+              <div key={d.toISOString()} className="grid gap-2">
+                <div className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">{d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}</div>
+                {isCancelled ? (
+                  <>
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-3"><div className="text-sm font-black">Program Cancelled Due to Weather</div><div className="mt-1 text-xs font-bold text-slate-600">{cancellation?.reason} {cancellation?.hangar_note}</div></div>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><div className="text-sm font-black">Week {p.week.week}: {p.plan.curriculum}</div><div className="mt-1 text-xs font-bold text-slate-600">Curriculum remains visible; onsite work is postponed for this day only.</div></div>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><div className="text-sm font-black">Parent / Youth / Supervisor Notice</div><div className="mt-1 text-xs font-bold text-slate-600">Cancellation notification should be queued or sent through Communications Center.</div></div>
+                  </>
+                ) : (
+                  <>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><div className="text-sm font-black">{p.plan.curriculum}</div><div className="mt-1 text-xs font-bold text-slate-600">{p.plan.focus}</div></div>
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3"><div className="text-sm font-black">Today's Work</div><div className="mt-1 grid gap-1 text-xs font-bold text-slate-600">{p.work.slice(0, 4).map((item) => <div key={item}>• {item}</div>)}</div></div>
+                    <div className="rounded-xl border border-purple-200 bg-purple-50 p-3"><div className="text-sm font-black">Reflection</div><div className="mt-1 text-xs font-bold text-slate-600">{p.reflection}</div></div>
+                    {d.getDay() === 3 && <div className="rounded-xl border border-orange-200 bg-orange-50 p-3"><div className="text-sm font-black">Porta-potty service access</div><div className="mt-1 text-xs font-bold text-slate-600">Keep service access clear.</div></div>}
+                    {d.getDay() === 5 && <div className="rounded-xl border border-orange-200 bg-orange-50 p-3"><div className="text-sm font-black">Water tote fill check</div><div className="mt-1 text-xs font-bold text-slate-600">Verify tote locations, access, and refill needs.</div></div>}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>}
 
