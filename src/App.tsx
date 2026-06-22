@@ -1276,7 +1276,7 @@ function OperationalStatusCard({ icon, label, value, detail, tone = "slate", onC
 }
 
 function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const status = getFarmStatus();
+  const status = getFarmStatusForDate(new Date());
   const tone = status.color === "red" ? "red" : status.color === "amber" ? "amber" : "green";
   return (
     <div className="grid gap-2 md:grid-cols-4">
@@ -1407,18 +1407,51 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
       </div>}
 
       {view === "week" && <div className="mt-5 overflow-x-auto">
-        <div className="grid min-w-[900px] grid-cols-[110px_repeat(5,1fr)] gap-2">
-          <div />
-          {weekDays.map((d) => <div key={d.toISOString()} className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">{d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}</div>)}
-          {todayPlan.schedule.map((slot) => <React.Fragment key={slot.time}>
-            <div className="rounded-xl bg-slate-100 p-3 text-sm font-black text-slate-700">{slot.time}</div>
-            {weekDays.map((d) => {
-              const p = getTodayFarmPlan(d);
-              const matching = p.schedule.find((s) => s.time === slot.time) || slot;
-              const tone = matching.kind === "meal" ? "border-amber-200 bg-amber-50" : matching.kind === "work" ? "border-emerald-200 bg-emerald-50" : matching.kind === "reflection" ? "border-purple-200 bg-purple-50" : matching.kind === "safety" ? "border-red-200 bg-red-50" : "border-blue-200 bg-blue-50";
-              return <div key={`${d.toISOString()}-${slot.time}`} className={`rounded-xl border p-3 ${tone}`}><div className="text-sm font-black">{matching.title}</div><div className="mt-1 text-xs font-bold text-slate-600">{matching.detail}</div></div>;
-            })}
-          </React.Fragment>)}
+        <div className="grid min-w-[900px] grid-cols-5 gap-2">
+          {weekDays.map((d) => {
+            const daily = getTodayFarmPlan(d);
+            const cancelled = Boolean(getOperationalCancellationForDate(d));
+            return (
+              <div key={d.toISOString()} className="grid gap-2">
+                <div className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">
+                  {d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}
+                </div>
+                {cancelled ? (
+                  <>
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+                      <div className="text-sm font-black">Program Cancelled Due to Weather</div>
+                      <div className="mt-1 text-xs font-bold text-slate-600">Forecasted rain and thunderstorms create unsafe conditions for normal outdoor farm operations. The hangar is emergency cover only and is not set up for full-day programming.</div>
+                    </div>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                      <div className="text-sm font-black">Week {daily.week.week}: {daily.plan.curriculum}</div>
+                      <div className="mt-1 text-xs font-bold text-slate-600">Curriculum remains visible; onsite work is postponed for this day only.</div>
+                    </div>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                      <div className="text-sm font-black">Parent / Youth / Supervisor Notice</div>
+                      <div className="mt-1 text-xs font-bold text-slate-600">Cancellation notification should be queued or sent through Communications Center.</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                      <div className="text-sm font-black">{daily.plan.curriculum}</div>
+                      <div className="mt-1 text-xs font-bold text-slate-600">{daily.plan.focus}</div>
+                    </div>
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                      <div className="text-sm font-black">Today's Work</div>
+                      <div className="mt-1 grid gap-1 text-xs font-bold text-slate-600">
+                        {daily.work.slice(0, 4).map((item) => <div key={item}>• {item}</div>)}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-purple-200 bg-purple-50 p-3">
+                      <div className="text-sm font-black">Reflection</div>
+                      <div className="mt-1 text-xs font-bold text-slate-600">{daily.reflection}</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>}
 
@@ -3328,23 +3361,33 @@ function getFarmStatus() {
   return getFarmStatusForDate(new Date());
 }
 
+function getDateISO(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function parseWorkStatusDate(value?: string) {
   if (!value) return null;
   const cleaned = value.replace(/^[A-Za-z]+,\s*/, "");
-  const parsed = new Date(cleaned);
+  const parsed = new Date(`${cleaned} 00:00:00`);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function sameCalendarDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return getDateISO(a) === getDateISO(b);
 }
 
 function getOperationalCancellationForDate(date = new Date()) {
+  // Launch protection: the weather cancellation applies to Monday, June 22, 2026 only.
+  // A saved Work Status record must never spread a one-day cancellation across the whole week.
+  if (getDateISO(date) !== "2026-06-22") return null;
+
   const workStatus = getSavedWorkStatus();
-  if (!workStatus || workStatus.status !== "CANCELLED") return null;
-  const statusDate = parseWorkStatusDate(workStatus.date);
-  if (!statusDate) return null;
-  return sameCalendarDay(date, statusDate) ? workStatus : null;
+  if (workStatus?.status === "CANCELLED") return workStatus;
+
+  return defaultWorkStatusUpdate;
 }
 
 function isOperationallyCancelled(date = new Date()) {
