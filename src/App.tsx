@@ -1009,7 +1009,7 @@ function getLiveWeatherGuidance(weather: LiveFarmWeather | null) {
   return guidance.join(" ");
 }
 
-function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatus(), weather: LiveFarmWeather | null = null) {
+function getTodayAlmanacCards(date = new Date(), farmStatus = getFarmStatusForDate(date), weather: LiveFarmWeather | null = null) {
   const temp = weather?.temperature;
   const apparent = weather?.apparent;
   return [
@@ -1047,7 +1047,7 @@ function LiveAlmanacResourceLinks() {
 }
 
 function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
-  const farmStatus = getFarmStatus();
+  const farmStatus = getFarmStatusForDate(new Date());
   const [liveWeather, setLiveWeather] = useState<LiveFarmWeather | null>(null);
 
   useEffect(() => {
@@ -1193,7 +1193,7 @@ function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
   const week = getCurrentYouthWeek();
   const plan = getCurrentYouthPlan(date);
   const cancellation = getOperationalCancellationForDate(date);
-  const farmStatus = cancellation ? workStatusToFarmStatus(cancellation) : getFarmStatus();
+  const farmStatus = getFarmStatusForDate(date);
   const work = cancellation
     ? [
         "Program cancelled due to weather — no onsite youth work today",
@@ -3290,7 +3290,7 @@ function TextArea(props: { label: string; value: string; onChange: (v: string) =
 
 
 function getSavedWorkStatus() {
-  return safeRead<WorkStatusUpdate | null>(WORK_STATUS_KEY, defaultWorkStatusUpdate);
+  return safeRead<WorkStatusUpdate | null>(WORK_STATUS_KEY, null);
 }
 
 function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperationStatus {
@@ -3318,8 +3318,14 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
   return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
 }
 
+function getFarmStatusForDate(date = new Date()) {
+  const cancellation = getOperationalCancellationForDate(date);
+  if (cancellation) return workStatusToFarmStatus(cancellation);
+  return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+}
+
 function getFarmStatus() {
-  return workStatusToFarmStatus(getSavedWorkStatus());
+  return getFarmStatusForDate(new Date());
 }
 
 function parseWorkStatusDate(value?: string) {
@@ -3349,7 +3355,11 @@ function saveWorkStatusUpdate(update: WorkStatusUpdate) {
   safeWrite(WORK_STATUS_KEY, update);
   const existing = safeRead<WorkStatusUpdate[]>(WORK_STATUS_LOG_KEY, []);
   safeWrite(WORK_STATUS_LOG_KEY, [update, ...existing].slice(0, 100));
-  safeWrite(FARM_STATUS_KEY, workStatusToFarmStatus(update));
+  // Do not permanently save a one-day cancellation as the global farm status.
+  // Screens must evaluate status by date through getFarmStatusForDate().
+  if (update.status !== "CANCELLED") {
+    safeWrite(FARM_STATUS_KEY, workStatusToFarmStatus(update));
+  }
 }
 
 function queueBroadcastMessage(row: BroadcastMessageRecord) {
@@ -3360,7 +3370,7 @@ function queueBroadcastMessage(row: BroadcastMessageRecord) {
   safeWrite(NOTIFICATION_KEY, [{ id: row.id, audience, priority: row.priority, title: row.title, body: row.body, created_at: row.created_at }, ...notifications].slice(0, 250));
 }
 
-function launchTomorrowCancellationNotice() {
+function launchMondayOnlyCancellationNotice() {
   const launched: WorkStatusUpdate = { ...defaultWorkStatusUpdate, launched_at: new Date().toISOString() };
   saveWorkStatusUpdate(launched);
   launched.audiences.forEach((audience) => {
@@ -3368,7 +3378,7 @@ function launchTomorrowCancellationNotice() {
       id: `${launched.id}-${audience}-${Date.now()}`,
       audience,
       priority: "Urgent",
-      title: "Bronson Family Farm Work Status: Cancelled",
+      title: "Bronson Family Farm Work Status: Monday Cancelled",
       body: launched.parent_message,
       created_by: "Mission Control",
       status: "Queued",
@@ -3385,7 +3395,7 @@ function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
 }
 
 function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
-  const farmStatus = getFarmStatus();
+  const farmStatus = getFarmStatusForDate(new Date());
   const notifications = getLaunchNotifications().slice(0, compact ? 3 : 4);
   const statusClass = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
 
@@ -5377,7 +5387,7 @@ function June2026CalendarGrid() {
 }
 
 function WorkStatusMiniCard() {
-  const farmStatus = getFarmStatus();
+  const farmStatus = getFarmStatusForDate(new Date());
   const label = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
   const className = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
   return (
@@ -8053,7 +8063,7 @@ function WorkStatusLaunchPanel() {
   const [notice, setNotice] = useState("");
   const launched = workStatus?.launched_at;
   const launchNow = () => {
-    const update = launchTomorrowCancellationNotice();
+    const update = launchMondayOnlyCancellationNotice();
     setWorkStatus(update);
     setNotice("Cancellation notice queued for parents, youth, and supervisors. Use Open Email/Text paths for direct delivery if the backend email/SMS service is not connected yet.");
   };
