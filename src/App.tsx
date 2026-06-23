@@ -3327,7 +3327,7 @@ function getSavedWorkStatus() {
 }
 
 function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperationStatus {
-  if (!workStatus) return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+  if (!workStatus) return defaultFarmStatus;
   if (workStatus.status === "CANCELLED") {
     return {
       level: "Closed",
@@ -3348,13 +3348,22 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
       updated_at: workStatus.launched_at || workStatus.created_at,
     };
   }
-  return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+  return {
+    ...defaultFarmStatus,
+    updated_at: workStatus.launched_at || workStatus.created_at || new Date().toISOString(),
+  };
 }
 
 function getFarmStatusForDate(date = new Date()) {
   const cancellation = getOperationalCancellationForDate(date);
   if (cancellation) return workStatusToFarmStatus(cancellation);
-  return safeRead<FarmOperationStatus>(FARM_STATUS_KEY, defaultFarmStatus);
+
+  const saved = getSavedWorkStatus();
+  if (saved && saved.status !== "CANCELLED") return workStatusToFarmStatus(saved);
+
+  // Critical day-advance protection:
+  // A saved Monday cancellation must not keep Tuesday or later screens red.
+  return defaultFarmStatus;
 }
 
 function getFarmStatus() {
