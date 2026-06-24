@@ -7703,6 +7703,62 @@ function CaseManagerPortal({ setScreen }: { setScreen: (screen: Screen) => void 
   );
 }
 
+
+function ActiveCurriculumProjectCard({ setScreen, compact = false }: { setScreen: (screen: Screen) => void; compact?: boolean }) {
+  const activeCurriculum = getActiveCurriculum();
+  const activities = activeCurriculum.activities || [];
+  const skills = Array.from(new Set(activities.flatMap((activity) => CURRICULUM_SKILL_MAP[activity.id] || [])));
+
+  return (
+    <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Workforce Project</div>
+      <h2 className="mt-2 text-2xl font-black">Week {activeCurriculum.week} — {activeCurriculum.theme}</h2>
+      <p className="mt-3 text-sm leading-7 text-white/82"><b>{activeCurriculum.featuredStory}</b></p>
+      <p className="mt-2 text-sm leading-7 text-white/78">{buildParentSummary(activeCurriculum)}</p>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+          <h3 className="font-black">Learning Objectives</h3>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+            {activities.slice(0, 5).map((activity) => <li key={activity.id}>✓ {activity.whyItMatters}</li>)}
+          </ul>
+        </div>
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
+          <h3 className="font-black">Skills Practiced</h3>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(skills.length ? skills : ["Observation", "Teamwork", "Farm Safety", "Planning"]).slice(0, 10).map((skill) => (
+              <span key={skill} className="rounded-full bg-black/30 px-3 py-2 text-xs font-black text-white/82">{skill}</span>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-[1.25rem] border border-white/10 bg-amber-300/12 p-4">
+          <h3 className="font-black">Completion Evidence</h3>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+            {activities.flatMap((activity) => activity.evidenceRequired.map((item) => `${activity.icon} ${item}`)).slice(0, 8).map((item) => <li key={item}>☐ {item}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      {!compact && (
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {activities.map((activity) => (
+            <div key={activity.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="text-2xl">{activity.icon}</div>
+              <div className="mt-2 font-black">{activity.title}</div>
+              <div className="mt-2 text-xs leading-5 text-white/70">{activity.summary}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button>
+        <button type="button" onClick={() => setScreen("operations")} className="rounded-full border border-white/15 bg-black/30 px-6 py-3 font-black">Mission Control</button>
+      </div>
+    </div>
+  );
+}
+
 function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
@@ -7743,51 +7799,7 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
         ))}
       </div>
 
-      <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/12 p-5">
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Workforce Project</div>
-        <h2 className="mt-2 text-2xl font-black">{featuredProject.title}</h2>
-        <p className="mt-3 text-sm leading-7 text-white/82">{featuredProject.farmConnection}</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-            <h3 className="font-black">Learning Objectives</h3>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>✓ Understand heat stress risks</li>
-              <li>✓ Follow PPE requirements</li>
-              <li>✓ Complete assigned team role</li>
-              <li>✓ Participate in final presentation</li>
-            </ul>
-          </div>
-          <div className="rounded-[1.25rem] border border-white/10 bg-white/10 p-4">
-            <h3 className="font-black">Career Connections</h3>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>Manufacturing Technician</li>
-              <li>Construction Trades</li>
-              <li>Product Designer</li>
-              <li>Quality Control</li>
-              <li>Entrepreneur</li>
-            </ul>
-          </div>
-          <div className="rounded-[1.25rem] border border-white/10 bg-amber-300/12 p-4">
-            <h3 className="font-black">Completion Evidence</h3>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-              <li>☐ Watched demonstration</li>
-              <li>☐ Participated in team assignment</li>
-              <li>☐ Practiced safe work procedures</li>
-              <li>☐ Added evidence to portfolio</li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          {coolingCenterTeams.map((team) => (
-            <div key={team.name} className="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <div className="text-2xl">{team.icon}</div>
-              <div className="mt-2 font-black">{team.name}</div>
-              <div className="mt-2 text-xs leading-5 text-white/70">{team.mission}</div>
-            </div>
-          ))}
-        </div>
-        <button type="button" onClick={() => setScreen("launchProject")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">View June 8 Project</button>
-      </div>
+      <ActiveCurriculumProjectCard setScreen={setScreen} />
 
       <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
         <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Child's Workforce Progress</div>
@@ -8699,7 +8711,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
             ["Feedback", feedback.length],
             ["Achievements", completions.length],
             ["Inventory Items", inventory.length],
-            ["Project Skills", coolingCenterTeams.length],
+            ["Curriculum Activities", getActiveCurriculum().activities.length],
           ].map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-5">
               <div className="text-3xl font-black">{value}</div>
