@@ -1185,66 +1185,391 @@ type TodayFarmPlan = {
   work: string[];
   learning: string[];
   reflection: string;
-  schedule: { time: string; title: string; kind: "conditions" | "work" | "meal" | "learning" | "reflection" | "operations" | "safety"; detail?: string }[];
+  schedule: { time: string; title: string; kind: "conditions" | "work" | "meal" | "learning" | "reflection" | "operations" | "safety" | "curriculum"; detail?: string }[];
   events: { title: string; kind: "curriculum" | "work" | "delivery" | "visitor" | "safety" | "meeting" | "reflection"; date: string; time?: string }[];
 };
 
+
+
+type CurriculumActivity = {
+  id: string;
+  title: string;
+  icon: string;
+  summary: string;
+  whyItMatters: string;
+  evidenceRequired: string[];
+  reflectionPrompt?: string;
+  resources?: string[];
+};
+
+type CurriculumDay = {
+  week: number;
+  theme: string;
+  featuredStory: string;
+  activities: CurriculumActivity[];
+};
+
+type LaunchedCurriculumDay = CurriculumDay & {
+  launched_at: string;
+  launched_by?: string;
+  status: "Launched" | "Closed";
+};
+
+type CurriculumActivityStatus = "Not Started" | "In Progress" | "Completed";
+
+type CurriculumProgressRecord = {
+  activityId: string;
+  status: CurriculumActivityStatus;
+  evidenceCount: number;
+  reflectionCount: number;
+  updatedAt: string;
+};
+
+type YouthAssignmentRecord = {
+  id: string;
+  participant_id: string;
+  youth_name: string;
+  activity_id: string;
+  activity_title: string;
+  date: string;
+  status: "Assigned" | "In Progress" | "Completed";
+  created_at: string;
+};
+
+type DailyCloseoutRecord = {
+  id: string;
+  date: string;
+  week: number;
+  theme: string;
+  featuredStory: string;
+  totalActivities: number;
+  totalAssignments: number;
+  completedAssignments: number;
+  inProgressAssignments: number;
+  assignedAssignments: number;
+  activities: { activityId: string; activityTitle: string; completedCount: number }[];
+  created_at: string;
+};
+
+const TODAY_CURRICULUM_KEY = "bff.launch.todayCurriculum";
+const CURRICULUM_PROGRESS_KEY = "bff.launch.curriculumProgress";
+const YOUTH_ASSIGNMENT_KEY = "bff.launch.youthAssignments";
+const DAILY_CLOSEOUT_KEY = "bff.launch.dailyCloseouts";
+
+const TODAY_CURRICULUM: CurriculumDay = {
+  week: 3,
+  theme: "Preparing for Future Growth",
+  featuredStory: "Building a Home for Future Pollinators",
+  activities: [
+    {
+      id: "pollinator-home",
+      icon: "🐝",
+      title: "Build a Home for Future Pollinators",
+      summary: "Relocate beehive equipment and prepare a better location for future pollinator activity. The beehive is not active today; this is pollinator infrastructure preparation.",
+      whyItMatters: "Farmers prepare systems before they are needed. A good hive location can support future pollination and future harvests.",
+      evidenceRequired: ["Before photo", "After photo", "Hive component identified", "Location observation"],
+      reflectionPrompt: "What makes a good home for future pollinators?",
+      resources: ["Beehive diagram", "Companion planting guide"],
+    },
+    {
+      id: "planting-ground",
+      icon: "🌱",
+      title: "Prepare Ground for Planting",
+      summary: "Clear planting areas, prepare rows, loosen soil where needed, add compost, and get rows ready for planting.",
+      whyItMatters: "Healthy soil and prepared rows give crops a better start.",
+      evidenceRequired: ["Row before photo", "Row after photo", "Soil observation"],
+      reflectionPrompt: "What did you notice about the soil before planting?",
+      resources: ["Crop maintenance chart", "Sowing and transplanting guide"],
+    },
+    {
+      id: "gates",
+      icon: "🚜",
+      title: "Prepare Gates",
+      summary: "Inspect, clear, and prepare gate/access areas so people, tools, and materials can move safely.",
+      whyItMatters: "Infrastructure helps the farm operate safely and efficiently.",
+      evidenceRequired: ["Gate area before photo", "Gate area after photo", "Safety observation"],
+      reflectionPrompt: "How do gates and access routes affect farm safety?",
+    },
+    {
+      id: "mowing",
+      icon: "🌾",
+      title: "Mow Grass",
+      summary: "Mow overgrown areas to improve access, appearance, safety, and farm readiness.",
+      whyItMatters: "Farm maintenance is farm management.",
+      evidenceRequired: ["Mowing before photo", "Mowing after photo", "Area improved"],
+      reflectionPrompt: "How did mowing improve the farm today?",
+    },
+    {
+      id: "compost",
+      icon: "♻️",
+      title: "Collect Grass for Compost",
+      summary: "Collect cut grass and move it into the compost system so waste becomes a soil resource.",
+      whyItMatters: "Compost turns today’s waste into tomorrow’s soil health.",
+      evidenceRequired: ["Grass collected photo", "Compost added photo", "Compost observation"],
+      reflectionPrompt: "How can grass clippings become future soil?",
+    },
+    {
+      id: "water",
+      icon: "💧",
+      title: "Water Plants",
+      summary: "Check moisture, water crops, and observe plant health.",
+      whyItMatters: "Water management is one of the most important farming skills.",
+      evidenceRequired: ["Watering photo", "Plant health observation"],
+      reflectionPrompt: "How did you know which plants needed water?",
+    },
+    {
+      id: "grow-plan",
+      icon: "📋",
+      title: "Create Grow Plan",
+      summary: "Decide what goes where, consider companion planting, pollinators, timing, water, and harvest goals.",
+      whyItMatters: "Farmers plan before they plant. A grow plan connects today’s work to tomorrow’s harvest.",
+      evidenceRequired: ["Grow plan photo", "Crop placement notes", "Companion planting idea"],
+      reflectionPrompt: "What should we plant where, and why?",
+      resources: ["Companion plants", "Crop rotation planning", "Plant families"],
+    },
+  ],
+};
+
+const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
+  "pollinator-home": ["Pollinator Infrastructure", "Environmental Stewardship", "Observation Skills", "Agricultural Planning"],
+  "planting-ground": ["Soil Preparation", "Agricultural Operations", "Teamwork", "Crop Establishment"],
+  "gates": ["Facility Maintenance", "Safety Awareness", "Infrastructure Management"],
+  "mowing": ["Grounds Maintenance", "Equipment Awareness", "Workplace Safety"],
+  "compost": ["Resource Recovery", "Composting", "Sustainability", "Soil Health"],
+  "water": ["Water Management", "Crop Monitoring", "Plant Health Observation"],
+  "grow-plan": ["Crop Planning", "Problem Solving", "Agricultural Decision Making", "Companion Planting Awareness"],
+};
+
+/**
+ * CURRICULUM-FIRST LAUNCH RULE
+ *
+ * Constance's curriculum is the source of truth.
+ * Every daily assignment, evidence prompt, parent summary, supervisor team,
+ * portfolio entry, resume skill, calendar event, and closeout report must be
+ * generated from the active curriculum. Do not hard-code generic daily activities elsewhere.
+ */
+function getActiveCurriculum(): CurriculumDay {
+  return safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, TODAY_CURRICULUM);
+}
+
+function buildParentSummary(curriculum: CurriculumDay = getActiveCurriculum()) {
+  const activities = curriculum.activities.map((activity) => activity.title).join(", ");
+  return `Today youth worked on ${curriculum.theme.toLowerCase()} through hands-on farm activities: ${activities}. The featured experience was "${curriculum.featuredStory}." Youth connected farm infrastructure, planting preparation, compost, water, and grow planning to future farm success.`;
+}
+
+function getCurriculumSchedule(date = new Date()): TodayFarmPlan["schedule"] {
+  const activeCurriculum = getActiveCurriculum();
+  return [
+    { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
+    { time: "8:15 AM", title: `Week ${activeCurriculum.week}: ${activeCurriculum.theme}`, kind: "curriculum", detail: activeCurriculum.featuredStory },
+    ...activeCurriculum.activities.map((activity, index) => ({
+      time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : index < 6 ? "11:45 AM" : "12:15 PM",
+      title: `${activity.icon} ${activity.title}`,
+      kind: "work" as const,
+      detail: activity.summary,
+    })),
+    { time: "11:00 AM", title: "Lunch", kind: "meal", detail: "Lunch begins at 11:00 AM." },
+    { time: "12:45 PM", title: "Evidence / Reflection / Documentation", kind: "reflection", detail: "What did you prepare today that will help the farm tomorrow?" },
+    { time: "1:00 PM", title: "Cleanup & Tool Return", kind: "operations", detail: "Return tools, update inventory, clean work areas." },
+    { time: "2:00 PM", title: "Departure", kind: "operations", detail: "Youth depart / parent pickup." },
+  ];
+}
+
+function getCurriculumCalendarEvents(date = new Date()): TodayFarmPlan["events"] {
+  const activeCurriculum = getActiveCurriculum();
+  const iso = date.toISOString().slice(0, 10);
+  return [
+    { title: `Week ${activeCurriculum.week}: ${activeCurriculum.theme}`, kind: "curriculum", date: iso, time: "8:15 AM" },
+    { title: activeCurriculum.featuredStory, kind: "work", date: iso, time: "8:30 AM" },
+    ...activeCurriculum.activities.map((activity, index) => ({
+      title: `${activity.icon} ${activity.title}`,
+      kind: "work" as const,
+      date: iso,
+      time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : "11:45 AM",
+    })),
+    { title: "Evidence + Reflection", kind: "reflection", date: iso, time: "12:45 PM" },
+    { title: "Cleanup + Tool Return", kind: "work", date: iso, time: "1:00 PM" },
+  ];
+}
+
+function initializeDailyOperations() {
+  const curriculum = getActiveCurriculum();
+  safeWrite(TODAY_CURRICULUM_KEY, curriculum);
+  safeWrite("bff.calendar.today", getCurriculumCalendarEvents());
+  safeWrite("bff.schedule.today", getCurriculumSchedule());
+  safeWrite(CURRICULUM_PROGRESS_KEY, []);
+  safeWrite(YOUTH_ASSIGNMENT_KEY, []);
+  return curriculum;
+}
+
+function launchMasterDay(activeUser?: EcosystemUser | null) {
+  const curriculum = initializeDailyOperations();
+  const launchedRecord: LaunchedCurriculumDay = {
+    ...curriculum,
+    launched_at: new Date().toISOString(),
+    launched_by: activeUser?.name || "Mission Control",
+    status: "Launched",
+  };
+  safeWrite(TODAY_CURRICULUM_KEY, launchedRecord);
+  alert(`Week ${curriculum.week} launched: ${curriculum.theme}`);
+}
+
+function getCurriculumProgress() {
+  return safeRead<CurriculumProgressRecord[]>(CURRICULUM_PROGRESS_KEY, []);
+}
+
+function getTodayAssignmentTeams() {
+  return getActiveCurriculum().activities.map((activity) => ({
+    id: activity.id,
+    teamName: activity.title,
+    icon: activity.icon,
+    assignment: activity.summary,
+    whyItMatters: activity.whyItMatters,
+    evidenceRequired: activity.evidenceRequired,
+  }));
+}
+
+function assignYouthToTodayActivity(participantId: string, youthName: string, activityId: string) {
+  const activity = getActiveCurriculum().activities.find((item) => item.id === activityId);
+  if (!activity) return;
+  const existing = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []);
+  const alreadyAssigned = existing.some((record) => record.participant_id === participantId && record.activity_id === activityId && record.date === todayISO());
+  if (alreadyAssigned) return;
+  const row: YouthAssignmentRecord = {
+    id: uuid(),
+    participant_id: participantId,
+    youth_name: youthName,
+    activity_id: activity.id,
+    activity_title: activity.title,
+    date: todayISO(),
+    status: "Assigned",
+    created_at: new Date().toISOString(),
+  };
+  safeWrite(YOUTH_ASSIGNMENT_KEY, [row, ...existing]);
+}
+
+function updateYouthAssignmentStatus(assignmentId: string, status: YouthAssignmentRecord["status"]) {
+  const existing = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []);
+  safeWrite(YOUTH_ASSIGNMENT_KEY, existing.map((record) => record.id === assignmentId ? { ...record, status } : record));
+}
+
+function getCompletedAssignmentsForYouth(participantId: string) {
+  return safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((record) => record.participant_id === participantId && record.status === "Completed");
+}
+
+function getResumeSkillsForYouth(participantId: string) {
+  return Array.from(new Set(getCompletedAssignmentsForYouth(participantId).flatMap((record) => CURRICULUM_SKILL_MAP[record.activity_id] || [])));
+}
+
+function saveDailyCloseout() {
+  const activeCurriculum = getActiveCurriculum();
+  const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
+  const record: DailyCloseoutRecord = {
+    id: uuid(),
+    date: todayISO(),
+    week: activeCurriculum.week,
+    theme: activeCurriculum.theme,
+    featuredStory: activeCurriculum.featuredStory,
+    totalActivities: activeCurriculum.activities.length,
+    totalAssignments: assignments.length,
+    completedAssignments: assignments.filter((row) => row.status === "Completed").length,
+    inProgressAssignments: assignments.filter((row) => row.status === "In Progress").length,
+    assignedAssignments: assignments.filter((row) => row.status === "Assigned").length,
+    activities: activeCurriculum.activities.map((activity) => ({
+      activityId: activity.id,
+      activityTitle: activity.title,
+      completedCount: assignments.filter((row) => row.activity_id === activity.id && row.status === "Completed").length,
+    })),
+    created_at: new Date().toISOString(),
+  };
+  const existing = safeRead<DailyCloseoutRecord[]>(DAILY_CLOSEOUT_KEY, []);
+  safeWrite(DAILY_CLOSEOUT_KEY, [record, ...existing]);
+  alert("Daily closeout saved.");
+}
+
+function exportDailyCloseoutReport(record: DailyCloseoutRecord) {
+  const lines = [
+    "Bronson Family Farm Daily Closeout Report",
+    "",
+    `Date: ${record.date}`,
+    `Week: ${record.week}`,
+    `Theme: ${record.theme}`,
+    `Featured Story: ${record.featuredStory}`,
+    "",
+    `Total Activities: ${record.totalActivities}`,
+    `Total Assignments: ${record.totalAssignments}`,
+    `Completed: ${record.completedAssignments}`,
+    `In Progress: ${record.inProgressAssignments}`,
+    `Assigned: ${record.assignedAssignments}`,
+    "",
+    "Activity Completion:",
+    ...record.activities.map((activity) => `- ${activity.activityTitle}: ${activity.completedCount} completed`),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `BFF-Daily-Closeout-${record.date}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function validateLaunchReadiness() {
+  const activeCurriculum = getActiveCurriculum();
+  const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
+  const closeouts = safeRead<DailyCloseoutRecord[]>(DAILY_CLOSEOUT_KEY, []).filter((row) => row.date === todayISO());
+  return {
+    curriculumLive: Boolean(activeCurriculum?.activities?.length),
+    hasTheme: Boolean(activeCurriculum.theme),
+    hasFeaturedStory: Boolean(activeCurriculum.featuredStory),
+    hasAssignments: assignments.length > 0,
+    hasCloseout: closeouts.length > 0,
+    activityCount: activeCurriculum.activities.length,
+    assignmentCount: assignments.length,
+    closeoutCount: closeouts.length,
+  };
+}
 function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
+  const activeCurriculum = getActiveCurriculum();
   const week = getCurrentYouthWeek(date);
   const plan = getCurrentYouthPlan(date);
   const cancellation = getOperationalCancellationForDate(date);
   const farmStatus = getFarmStatusForDate(date);
+  const curriculumWork = activeCurriculum.activities.map((activity) => `${activity.icon} ${activity.title}`);
   const work = cancellation
     ? [
         "Program cancelled due to weather — no onsite youth work today",
-        "Monday's Week 3 infrastructure lesson remains visible for continuity",
+        `${activeCurriculum.featuredStory} remains visible for continuity`,
         "Do not mark youth absent or incomplete because operations are cancelled",
         "Mission Control should confirm parent/youth/supervisor notification status",
       ]
-    : plan.work?.length
-      ? plan.work
-      : ["Check Mission Control for today's farm work"];
-  const learning = normalizeLearningTags([...(week.skills || []), "Observation", "Contribution", "Stewardship"]);
+    : curriculumWork.length
+      ? curriculumWork
+      : plan.work?.length
+        ? plan.work
+        : ["Check Mission Control for today's farm work"];
+  const learning = normalizeLearningTags(["Preparation", "Infrastructure", "Stewardship", "Observation", "Documentation", "Teamwork", "Planning"]);
   const iso = date.toISOString().slice(0, 10);
   const cancelledSchedule: TodayFarmPlan["schedule"] = [
     { time: "All Day", title: "Program Cancelled Due to Weather", kind: "safety", detail: cancellation ? `${cancellation.reason} ${cancellation.hangar_note}` : "Operations cancelled." },
-    { time: "Review", title: `Week ${week.week}: ${plan.curriculum}`, kind: "curriculum" as any, detail: "Curriculum remains visible; onsite work is postponed." },
+    { time: "Review", title: `Week ${activeCurriculum.week}: ${activeCurriculum.theme}`, kind: "curriculum", detail: "Curriculum remains visible; onsite work is postponed." },
     { time: "Mission Control", title: "Parent / Youth / Supervisor Notice", kind: "operations", detail: "Cancellation notification should be queued or sent through Communications Center." },
   ];
-  const normalSchedule: TodayFarmPlan["schedule"] = [
-    { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
-    { time: "8:15 AM", title: "Cultivator Almanac + Morning Briefing", kind: "conditions", detail: "Observe weather, work status, calendar, and today's focus." },
-    { time: "8:30 AM", title: work[0] || "Farm Work Block #1", kind: "work", detail: plan.curriculum },
-    { time: "10:00 AM", title: work[1] || "Farm Work Block #2", kind: "work", detail: "Document observations and contribution." },
-    { time: "11:00 AM", title: "Lunch", kind: "meal", detail: "Lunch begins at 11:00 AM." },
-    { time: "11:45 AM", title: work[2] || "Farm Work Block #3", kind: "work", detail: "Return to priority farm work." },
-    { time: "12:45 PM", title: "Uploads / Reflection / Documentation", kind: "reflection", detail: plan.reflection },
-    { time: "1:00 PM", title: "Cleanup & Tool Return", kind: "operations", detail: "Return tools, update inventory, clean work areas." },
-    { time: "1:30 PM", title: "Wrap-Up / Daily Farm Story", kind: "learning", detail: "What happened, what was learned, what remains." },
-    { time: "2:00 PM", title: "Departure", kind: "operations", detail: "Youth depart / parent pickup." },
+  const cancelledEvents: TodayFarmPlan["events"] = [
+    { title: "PROGRAM CANCELLED — Weather", kind: "safety", date: iso, time: "All Day" },
+    { title: `${activeCurriculum.featuredStory} — postponed onsite`, kind: "curriculum", date: iso, time: "Review" },
+    { title: "Parent/youth/supervisor cancellation notice", kind: "reflection", date: iso, time: "Mission Control" },
   ];
   return {
     date,
-    week,
-    plan,
+    week: { ...week, week: activeCurriculum.week, title: activeCurriculum.theme },
+    plan: { ...plan, curriculum: activeCurriculum.featuredStory, focus: activeCurriculum.theme, work, reflection: "What did you prepare today that will help the farm tomorrow?" },
     farmStatus,
     work,
     learning,
-    reflection: cancellation ? "Operations are cancelled. Curriculum is postponed, not lost." : plan.reflection,
-    schedule: cancellation ? cancelledSchedule : normalSchedule,
-    events: cancellation
-      ? [
-          { title: "PROGRAM CANCELLED — Weather", kind: "safety", date: iso, time: "All Day" },
-          { title: `Week ${week.week}: ${plan.curriculum} — postponed onsite`, kind: "curriculum", date: iso, time: "Review" },
-          { title: "Parent/youth/supervisor cancellation notice", kind: "reflection", date: iso, time: "Mission Control" },
-        ]
-      : [
-          { title: `Week ${week.week}: ${week.title}`, kind: "curriculum", date: iso, time: "8:15 AM" },
-          ...work.slice(0, 6).map((title, index) => ({ title, kind: "work" as const, date: iso, time: index < 2 ? "8:30 AM" : index < 4 ? "10:00 AM" : "11:45 AM" })),
-          { title: "Lunch", kind: "safety", date: iso, time: "11:00 AM" },
-          { title: "Uploads + Reflection", kind: "reflection", date: iso, time: "12:45 PM" },
-          { title: "Cleanup", kind: "work", date: iso, time: "1:00 PM" },
-        ],
+    reflection: cancellation ? "Operations are cancelled. Curriculum is postponed, not lost." : "What did you prepare today that will help the farm tomorrow?",
+    schedule: cancellation ? cancelledSchedule : getCurriculumSchedule(date),
+    events: cancellation ? cancelledEvents : getCurriculumCalendarEvents(date),
   };
 }
 
@@ -2959,6 +3284,272 @@ function SupportResponseFrameworkCard() {
   );
 }
 
+
+function CurriculumDrivenTodayCard() {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {activeCurriculum.week} • Today's Curriculum</div>
+      <h2 className="mt-2 text-3xl font-black">{activeCurriculum.theme}</h2>
+      <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">Featured Story: {activeCurriculum.featuredStory}</p>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {activeCurriculum.activities.map((activity) => (
+          <details key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <summary className="cursor-pointer text-lg font-black">{activity.icon} {activity.title}</summary>
+            <p className="mt-3 text-sm leading-6 text-white/80">{activity.summary}</p>
+            <p className="mt-3 text-sm leading-6 text-white/80"><strong>Why it matters:</strong> {activity.whyItMatters}</p>
+            <div className="mt-3 flex flex-wrap gap-2">{activity.evidenceRequired.map((item) => <span key={item} className="rounded-full bg-black/30 px-3 py-1 text-xs font-black">{item}</span>)}</div>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TodayAssignmentTeamsCard() {
+  const teams = getTodayAssignmentTeams();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Today's Assignment Teams</div>
+      <h2 className="mt-2 text-3xl font-black">Generated from the Curriculum</h2>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {teams.map((team) => (
+          <div key={team.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <h3 className="text-xl font-black">{team.icon} {team.teamName}</h3>
+            <p className="mt-2 text-sm leading-6 text-white/80">{team.assignment}</p>
+            <div className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-white/55">Evidence Needed</div>
+            <div className="mt-2 flex flex-wrap gap-2">{team.evidenceRequired.map((item) => <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-black">{item}</span>)}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CurriculumEvidenceCaptureCard() {
+  const [evidenceActivity, setEvidenceActivity] = useState<{ activityId: string; activityTitle: string; evidenceType: string } | null>(null);
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Evidence Capture</div>
+      <h2 className="mt-2 text-3xl font-black">Prove What You Helped Build Today</h2>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {activeCurriculum.activities.map((activity) => (
+          <div key={activity.id} className="rounded-2xl bg-black/25 p-4">
+            <h3 className="text-xl font-black">{activity.icon} {activity.title}</h3>
+            <div className="mt-3 grid gap-2">
+              {activity.evidenceRequired.map((item) => (
+                <button key={item} type="button" onClick={() => setEvidenceActivity({ activityId: activity.id, activityTitle: activity.title, evidenceType: item })} className="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black">📸 Add Evidence: {item}</button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      {evidenceActivity && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/10 p-4 text-sm font-black">Selected: {evidenceActivity.activityTitle} • {evidenceActivity.evidenceType}. Open Info to Share to upload the photo/video/commentary.</div>}
+    </section>
+  );
+}
+
+function CurriculumReflectionCard() {
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">End-of-Day Reflection</div>
+      <h2 className="mt-2 text-3xl font-black">Connect Today's Work to the Future</h2>
+      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">What did you prepare today that will help the farm tomorrow?</p>
+      <textarea placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
+      <button type="button" className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
+    </section>
+  );
+}
+
+function CurriculumParentSummaryCard() {
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Parent-Safe Summary</div>
+      <h2 className="mt-2 text-3xl font-black">Today's Message for Families</h2>
+      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-7 text-white/85">{buildParentSummary()}</p>
+      <button type="button" className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Parent Summary</button>
+    </section>
+  );
+}
+
+function MissionControlCurriculumBuilder({ activeUser }: { activeUser?: EcosystemUser | null }) {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Mission Control • Curriculum Builder</div>
+      <h2 className="mt-2 text-3xl font-black">Enter Today's Work One Time</h2>
+      <p className="mt-3 text-sm leading-6 text-white/75">This is the source of truth for youth assignments, parent updates, supervisor teams, evidence, reflections, portfolio records, and reports.</p>
+      <div className="mt-5 rounded-2xl bg-black/25 p-4">
+        <div className="text-sm font-black">Week {activeCurriculum.week}</div>
+        <div className="mt-1 text-2xl font-black">{activeCurriculum.theme}</div>
+        <div className="mt-2 text-lg font-black">Featured Story: {activeCurriculum.featuredStory}</div>
+      </div>
+      <div className="mt-5 grid gap-3">{activeCurriculum.activities.map((activity, index) => <div key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Activity {index + 1}</div><h3 className="mt-1 text-xl font-black">{activity.icon} {activity.title}</h3><p className="mt-2 text-sm leading-6 text-white/75">{activity.summary}</p></div>)}</div>
+      <button type="button" onClick={() => launchMasterDay(activeUser)} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Launch Master Day</button>
+    </section>
+  );
+}
+
+function MissionControlLiveCurriculumStatusCard() {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-100/75">Mission Control • Live Curriculum Status</div>
+      <h2 className="mt-2 text-3xl font-black">Week {activeCurriculum.week}: {activeCurriculum.theme}</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-4">
+        <div className="rounded-2xl bg-black/25 p-4 font-black">Activities: {activeCurriculum.activities.length}</div>
+        <div className="rounded-2xl bg-black/25 p-4 font-black">Featured: {activeCurriculum.featuredStory}</div>
+        <div className="rounded-2xl bg-black/25 p-4 font-black">Evidence Required</div>
+        <div className="rounded-2xl bg-black/25 p-4 font-black">Parent Summary Ready</div>
+      </div>
+    </section>
+  );
+}
+
+function CurriculumProgressBoard() {
+  const activeCurriculum = getActiveCurriculum();
+  const progress = getCurriculumProgress();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+      <h2 className="text-3xl font-black">Today's Progress</h2>
+      <div className="mt-5 grid gap-3">{activeCurriculum.activities.map((activity) => { const record = progress.find((p) => p.activityId === activity.id); return <div key={activity.id} className="rounded-2xl bg-black/25 p-4"><div className="flex items-center justify-between gap-3"><div className="font-black">{activity.icon} {activity.title}</div><div className="font-black">{record?.status ?? "Not Started"}</div></div></div>; })}</div>
+    </section>
+  );
+}
+
+function TodayYouthAssignmentBoard() {
+  const [, setVersion] = useState(0);
+  const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
+  const update = (id: string, status: YouthAssignmentRecord["status"]) => { updateYouthAssignmentStatus(id, status); setVersion((v) => v + 1); };
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+      <h2 className="text-3xl font-black">Youth Assignments Today</h2>
+      <div className="mt-4 grid gap-3">
+        {assignments.map((row) => <div key={row.id} className="rounded-2xl bg-black/25 p-4"><div className="font-black">{row.youth_name}</div><div className="text-sm text-white/75">{row.activity_title}</div><div className="mt-1 text-xs font-black">{row.status}</div><div className="mt-3 flex flex-wrap gap-2"><button type="button" onClick={() => update(row.id, "In Progress")} className="rounded-full bg-blue-300 px-4 py-2 text-xs font-black text-black">Start</button><button type="button" onClick={() => update(row.id, "Completed")} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Complete</button></div></div>)}
+        {!assignments.length && <div className="rounded-2xl bg-black/25 p-4 text-sm font-bold text-white/75">No youth assignments recorded yet. Assignments will appear as youth are assigned to today's curriculum activities.</div>}
+      </div>
+    </section>
+  );
+}
+
+function MissionControlDailyCloseoutCard() {
+  const activeCurriculum = getActiveCurriculum();
+  const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
+  const completed = assignments.filter((row) => row.status === "Completed");
+  const inProgress = assignments.filter((row) => row.status === "In Progress");
+  const assigned = assignments.filter((row) => row.status === "Assigned");
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">Mission Control • Daily Closeout</div>
+      <h2 className="mt-2 text-3xl font-black">Close Today's Curriculum Loop</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-4"><div className="rounded-2xl bg-black/25 p-4 font-black">Activities: {activeCurriculum.activities.length}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Completed: {completed.length}</div><div className="rounded-2xl bg-black/25 p-4 font-black">In Progress: {inProgress.length}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Assigned: {assigned.length}</div></div>
+      <div className="mt-5 grid gap-3">{activeCurriculum.activities.map((activity) => { const doneCount = assignments.filter((row) => row.activity_id === activity.id && row.status === "Completed").length; return <div key={activity.id} className="rounded-2xl bg-black/25 p-4"><div className="font-black">{activity.icon} {activity.title}</div><div className="mt-2 text-sm text-white/75">Completed youth records: {doneCount}</div></div>; })}</div>
+      <button type="button" onClick={saveDailyCloseout} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Close Today and Save Report</button>
+    </section>
+  );
+}
+
+function DailyCloseoutHistoryCard() {
+  const closeouts = safeRead<DailyCloseoutRecord[]>(DAILY_CLOSEOUT_KEY, []);
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Reports • Daily Closeout History</div>
+      <h2 className="mt-2 text-3xl font-black">Saved Curriculum Reports</h2>
+      <div className="mt-5 grid gap-3">{closeouts.map((record) => <details key={record.id} className="rounded-2xl bg-black/25 p-4"><summary className="cursor-pointer font-black">{record.date} • Week {record.week}: {record.theme}</summary><div className="mt-3 grid gap-2 text-sm text-white/80"><div>Featured Story: {record.featuredStory}</div><div>Total Activities: {record.totalActivities}</div><div>Total Assignments: {record.totalAssignments}</div><div>Completed: {record.completedAssignments}</div><div>In Progress: {record.inProgressAssignments}</div><div>Assigned: {record.assignedAssignments}</div></div><div className="mt-4 grid gap-2">{record.activities.map((activity) => <div key={activity.activityId} className="rounded-xl bg-white/10 p-3 text-sm">{activity.activityTitle}: {activity.completedCount} completed</div>)}</div><button type="button" onClick={() => exportDailyCloseoutReport(record)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Export Report</button></details>)}</div>
+    </section>
+  );
+}
+
+function LaunchReadinessValidatorCard() {
+  const [result, setResult] = useState<ReturnType<typeof validateLaunchReadiness> | null>(null);
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-red-200/25 bg-red-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-red-100/75">Mission Control • Launch Readiness</div>
+      <h2 className="mt-2 text-3xl font-black">Verify Today's System Before Youth Arrive</h2>
+      <button type="button" onClick={() => setResult(validateLaunchReadiness())} className="mt-5 rounded-full bg-red-300 px-6 py-3 font-black text-black">Run Launch Readiness Check</button>
+      {result && <div className="mt-5 grid gap-3 md:grid-cols-2"><div className="rounded-2xl bg-black/25 p-4 font-black">Curriculum Live: {result.curriculumLive ? "YES" : "NO"}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Theme Present: {result.hasTheme ? "YES" : "NO"}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Featured Story Present: {result.hasFeaturedStory ? "YES" : "NO"}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Assignments Created: {result.assignmentCount}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Activities: {result.activityCount}</div><div className="rounded-2xl bg-black/25 p-4 font-black">Closeout Saved Today: {result.hasCloseout ? "YES" : "NO"}</div></div>}
+    </section>
+  );
+}
+
+function YouthTodayWorkCard() {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Today's Work</div>
+      <h2 className="mt-2 text-3xl font-black">{activeCurriculum.theme}</h2>
+      <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">🌟 Featured Highlight: {activeCurriculum.featuredStory}</p>
+      <div className="mt-5 grid gap-3">{activeCurriculum.activities.map((activity) => <details key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><summary className="cursor-pointer text-lg font-black">{activity.icon} {activity.title}</summary><p className="mt-3 text-sm leading-6 text-white/80">{activity.summary}</p><p className="mt-2 text-sm leading-6 text-white/80"><strong>Why it matters:</strong> {activity.whyItMatters}</p></details>)}</div>
+    </section>
+  );
+}
+
+function SupervisorTodayTeamsCard() {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-blue-200/25 bg-blue-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-blue-100/75">Supervisor View • Today's Teams</div>
+      <h2 className="mt-2 text-3xl font-black">Assign Youth From Today's Curriculum</h2>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">{activeCurriculum.activities.map((activity) => <div key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><h3 className="text-xl font-black">{activity.icon} {activity.title}</h3><p className="mt-2 text-sm leading-6 text-white/80">{activity.summary}</p><div className="mt-3 text-xs font-black uppercase tracking-[0.2em] text-white/55">Evidence Needed</div><div className="mt-2 flex flex-wrap gap-2">{activity.evidenceRequired.map((item) => <span key={item} className="rounded-full bg-black/30 px-3 py-1 text-xs font-black">{item}</span>)}</div></div>)}</div>
+    </section>
+  );
+}
+
+function ParentTodayActivitiesCard() {
+  const activeCurriculum = getActiveCurriculum();
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Parent View • Today at Bronson Family Farm</div>
+      <h2 className="mt-2 text-3xl font-black">{activeCurriculum.theme}</h2>
+      <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">Featured Highlight: {activeCurriculum.featuredStory}</p>
+      <div className="mt-4 grid gap-2">{activeCurriculum.activities.map((activity) => <details key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><summary className="cursor-pointer font-black">{activity.icon} {activity.title}</summary><p className="mt-3 text-sm leading-6 text-white/80">{activity.summary}</p><p className="mt-2 text-sm leading-6 text-white/80"><strong>Why it matters:</strong> {activity.whyItMatters}</p></details>)}</div>
+    </section>
+  );
+}
+
+function ParentActionCenterCard() {
+  const [parentPanel, setParentPanel] = useState<"status" | "weather" | "question" | "absence" | "emergency" | "encouragement" | "acknowledge">("status");
+  const [parentMessage, setParentMessage] = useState("");
+  const saveParentMessage = async (type: "question" | "absence" | "encouragement") => {
+    const row: ParentContactLog = { id: uuid(), participant_id: "parent-linked-youth", youth_name: "Parent-linked youth", guardian_name: "Parent / Guardian", contact_method: "other", contact_reason: type === "absence" ? "attendance" : type === "encouragement" ? "encouragement" : "other", contact_notes: `[Parent ${type}] ${parentMessage}`, created_at: new Date().toISOString() };
+    const existing = safeRead<ParentContactLog[]>(PARENT_CONTACT_KEY, []);
+    safeWrite(PARENT_CONTACT_KEY, [row, ...existing]);
+    setParentMessage("");
+    alert("Parent message saved.");
+  };
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-cyan-200/25 bg-cyan-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Parent Action Center</div>
+      <h2 className="mt-2 text-3xl font-black">Communication, Weather, and Support</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-4">
+        {[["status", "📣 Work Status"], ["weather", "🌤 Weather"], ["question", "💬 Ask a Question"], ["absence", "📝 Report Absence"], ["emergency", "🚨 Emergency Info"], ["encouragement", "🌱 Send Encouragement"], ["acknowledge", "✅ Acknowledge Notice"]].map(([key, label]) => <button key={key} type="button" onClick={() => setParentPanel(key as any)} className="rounded-2xl bg-black/25 p-4 text-left font-black">{label}</button>)}
+      </div>
+      {parentPanel === "status" && <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5"><h3 className="text-xl font-black">Current Work Status</h3><WorkStatusMiniCard /></div>}
+      {parentPanel === "weather" && <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5"><h3 className="text-xl font-black">Weather & Work Decision</h3><div className="mt-4"><FarmConditionsCard compact /></div></div>}
+      {(parentPanel === "question" || parentPanel === "absence" || parentPanel === "encouragement") && <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5"><h3 className="text-xl font-black">{parentPanel === "question" ? "Ask a Question" : parentPanel === "absence" ? "Report Absence" : "Send Encouragement"}</h3><textarea value={parentMessage} onChange={(e) => setParentMessage(e.target.value)} placeholder="Type your message..." className="mt-3 w-full rounded-xl p-3 text-black" /><button onClick={() => saveParentMessage(parentPanel)} className="mt-4 rounded-full bg-cyan-300 px-5 py-3 font-black text-black">Send</button></div>}
+      {parentPanel === "emergency" && <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5"><h3 className="text-xl font-black">Parent / Emergency Information</h3><input placeholder="Emergency Contact Name" className="mt-3 w-full rounded-xl p-3 text-black" /><input placeholder="Emergency Contact Phone" className="mt-3 w-full rounded-xl p-3 text-black" /><textarea placeholder="Medical notes or safety concerns" className="mt-3 w-full rounded-xl p-3 text-black" /><button className="mt-4 rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Save</button></div>}
+      {parentPanel === "acknowledge" && <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-5"><h3 className="text-xl font-black">Parent Acknowledgement</h3><label className="mt-3 block font-bold"><input type="checkbox" /> I reviewed today's work status.</label><label className="mt-2 block font-bold"><input type="checkbox" /> I reviewed safety/weather updates.</label><button className="mt-4 rounded-full bg-yellow-300 px-5 py-3 font-black text-black">Submit Acknowledgement</button></div>}
+    </section>
+  );
+}
+
+function YouthWorkforcePortfolioCard({ participantId }: { participantId: string }) {
+  const completed = getCompletedAssignmentsForYouth(participantId);
+  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><h2 className="text-3xl font-black">My Workforce Portfolio</h2><div className="mt-4 grid gap-3">{completed.map((record) => <div key={record.id} className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase text-white/60">{record.date}</div><div className="mt-1 text-xl font-black">{record.activity_title}</div><div className="mt-2 text-sm text-white/75">Completed through today's curriculum.</div></div>)}</div></section>;
+}
+
+function YouthResumeSkillsCard({ participantId }: { participantId: string }) {
+  const skills = getResumeSkillsForYouth(participantId);
+  return <section className="mt-6 rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5"><h2 className="text-3xl font-black">Resume Skills Earned</h2><div className="mt-4 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div></section>;
+}
+
+function ParentYouthGrowthCard({ participantId }: { participantId: string }) {
+  const completed = getCompletedAssignmentsForYouth(participantId);
+  const skills = getResumeSkillsForYouth(participantId);
+  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><h2 className="text-3xl font-black">Today's Growth</h2><div className="mt-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-white/60">Completed Work</div><div className="mt-3 grid gap-2">{completed.map((record) => <div key={record.id} className="rounded-2xl bg-black/25 p-4 font-black">{record.activity_title}</div>)}</div></div><div className="mt-5"><div className="text-xs font-black uppercase tracking-[0.2em] text-white/60">Skills Practiced</div><div className="mt-3 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div></div></section>;
+}
+
 function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
   const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
@@ -3031,7 +3622,7 @@ function App() {
       {screen === "roles" && <MyWorkspace signIn={signIn} activeUser={activeUser} setScreen={setScreen} language={language} />}
       {screen === "youth" && <YouthScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "supervisor" && <SupervisorOperationsCenter setScreen={setScreen} activeUser={activeUser} language={language} />}
-      {screen === "parent" && <ParentScreen setScreen={setScreen} language={language} />}
+      {screen === "parent" && <ParentScreen setScreen={setScreen} activeUser={activeUser} language={language} />}
       {screen === "grower" && <GrowerJourney setScreen={setScreen} />}
       {screen === "partner" && <PartnerJourney setScreen={setScreen} />}
       {screen === "support" && <SupportJourney setScreen={setScreen} />}
@@ -3040,7 +3631,7 @@ function App() {
       {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
-      {screen === "operations" && <Operations setScreen={setScreen} />}
+      {screen === "operations" && <Operations setScreen={setScreen} activeUser={activeUser} />}
       {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "resources" && <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
@@ -5876,6 +6467,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     <div className="grid gap-3">
       <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
       <Launch60ActivityGoalCard todayPlan={todayPlan} />
+      <YouthTodayWorkCard />
+      <CurriculumEvidenceCaptureCard />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Today's Resources + Why It Matters</summary>
@@ -5891,6 +6484,9 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-4 grid gap-3">
           <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
+          <CurriculumReflectionCard />
+          <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
+          <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
           <Launch60EndMyDayCard />
           <TomorrowBeginsTodayCard todayPlan={todayPlan} />
           <div className="flex flex-wrap gap-2">
@@ -6102,6 +6698,9 @@ function SupervisorDashboard({
         <button type="button" onClick={() => setTab("project")} className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black">Open Current Week Activity</button>
       </div>
       <div className="mt-4">
+        <SupervisorTodayTeamsCard />
+        <TodayYouthAssignmentBoard />
+        <CurriculumProgressBoard />
         <TodayFarmOperationsBoard compact />
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
@@ -7104,7 +7703,7 @@ function CaseManagerPortal({ setScreen }: { setScreen: (screen: Screen) => void 
   );
 }
 
-function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => void; language: LanguageCode }) {
+function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
   const assessments = safeRead<AssessmentRecord[]>(ASSESSMENT_KEY, []);
@@ -7125,6 +7724,10 @@ function ParentScreen({ setScreen, language }: { setScreen: (screen: Screen) => 
       <LargerPictureCard layerKey="Parent / Guardian Portal" />
 
       <ParentEncouragementCard language={language} />
+
+      <ParentTodayActivitiesCard />
+      <ParentActionCenterCard />
+      <ParentYouthGrowthCard participantId={activeUser?.participant_id || ""} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {[
@@ -8046,6 +8649,7 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
         <h1 className="mt-2 text-4xl font-black md:text-6xl">Daily Command Center.</h1>
         <p className="mt-3 max-w-3xl text-sm font-bold leading-7 text-slate-700">Launch 6.0 restores the operating center: live conditions, actual calendar, workforce truth, safety, today's work, learning, uploads, reflections, and the Daily Farm Story.</p>
         <div className="mt-5"><PersistentSafetyStrip setScreen={setScreen} /></div>
+        <DailyCloseoutHistoryCard />
         <div className="mt-4"><QuickActionBar setScreen={setScreen} /></div>
       </div>
 
@@ -8263,9 +8867,20 @@ function CropPlannerPanel() {
   );
 }
 
-function Operations({ setScreen }: { setScreen: (screen: Screen) => void }) {
+function Operations({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   return (
     <div className="grid gap-5">
+      <LaunchReadinessValidatorCard />
+      <MissionControlCurriculumBuilder activeUser={activeUser} />
+      <MissionControlLiveCurriculumStatusCard />
+      <CurriculumDrivenTodayCard />
+      <TodayAssignmentTeamsCard />
+      <CurriculumProgressBoard />
+      <TodayYouthAssignmentBoard />
+      <CurriculumEvidenceCaptureCard />
+      <CurriculumParentSummaryCard />
+      <MissionControlDailyCloseoutCard />
+      <DailyCloseoutHistoryCard />
       <TodayFarmPlanCard setScreen={setScreen} />
       <MessagingCenter />
       <ParentNotificationCenter />
