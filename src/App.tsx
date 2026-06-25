@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * LAUNCH 6.0.2 - MASTER FULL REPLACEMENT + WEATHER CANCELLATION NOTIFICATIONS
+ * LAUNCH 6.2 - MASTER FULL REPLACEMENT + CURRICULUM PRESERVATION + TODAY PLANTING MISSION
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -38,6 +38,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Adds Launch 6.0 layered flow: My Day → Activity Card → Info to Share → Contribution → Meaning → Tomorrow
  * - Advances active curriculum to Week 3 after Week 2 completion and shows the remaining week at a glance
  * - Adds full Mission Control work-status launch engine for Monday, June 22, 2026 cancellation
+ * - Launch 6.2: preserves previous weeks in My Journey, adds Today Planting Mission, companion crop cards, and Living Farm framework.
  * - Adds parent/youth/supervisor notification preparation, message log, and one-button cancellation launch
  */
 
@@ -3544,6 +3545,208 @@ function YouthResumeSkillsCard({ participantId }: { participantId: string }) {
   return <section className="mt-6 rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5"><h2 className="text-3xl font-black">Resume Skills Earned</h2><div className="mt-4 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div></section>;
 }
 
+
+type CompanionCropCard = {
+  crop: string;
+  icon: string;
+  companions: string[];
+  avoid: string[];
+  water: string;
+  sun: string;
+  spacing: string;
+  harvest: string;
+  nutrition: string;
+  marketplace: string;
+  reflection: string;
+};
+
+const LAUNCH_62_RULES = {
+  version: "6.2",
+  currentWeekDefault: true,
+  previousWeeksAlwaysVisible: true,
+  futureWeeksVisibleAsComingSoon: true,
+  resourcesInsideAssignments: true,
+  nothingDeleted: true,
+};
+
+const launch62CompanionCropCards: CompanionCropCard[] = [
+  {
+    crop: "Tomatoes",
+    icon: "🍅",
+    companions: ["Basil", "Marigolds", "Garlic", "Onions", "Carrots"],
+    avoid: ["Potatoes", "Corn", "Fennel"],
+    water: "Water deeply after planting and keep soil evenly moist.",
+    sun: "Full sun",
+    spacing: "Give plants room for airflow; supervisor confirms field spacing.",
+    harvest: "Late summer when fruit is colored and firm.",
+    nutrition: "Vitamin C, potassium, and lycopene.",
+    marketplace: "Fresh tomatoes support market sales, recipes, and family food access.",
+    reflection: "What companion plant may help tomatoes today?",
+  },
+  {
+    crop: "Peppers",
+    icon: "🫑",
+    companions: ["Basil", "Onions", "Marigolds", "Carrots"],
+    avoid: ["Fennel"],
+    water: "Water at the base and avoid wetting leaves.",
+    sun: "Full sun",
+    spacing: "Space for airflow and easy harvest access.",
+    harvest: "Harvest when peppers reach usable size or mature color.",
+    nutrition: "Vitamin C, antioxidants, and color variety for meals.",
+    marketplace: "Peppers add value to produce boxes, recipes, and fresh market displays.",
+    reflection: "What does this pepper plant need before it can produce fruit?",
+  },
+  {
+    crop: "Collards / Brassicas",
+    icon: "🥬",
+    companions: ["Onions", "Garlic", "Dill", "Marigolds"],
+    avoid: ["Strawberries", "Tomatoes"],
+    water: "Keep soil moist during establishment.",
+    sun: "Full sun to partial sun",
+    spacing: "Allow leaf expansion and airflow.",
+    harvest: "Harvest outer leaves as plants mature.",
+    nutrition: "Greens support vitamins A, C, K, fiber, and family meals.",
+    marketplace: "Southern greens are culturally meaningful and marketable.",
+    reflection: "How does protection from deer help this crop survive?",
+  },
+  {
+    crop: "Melons — Zone 5 Vertical",
+    icon: "🍈",
+    companions: ["Nasturtiums", "Marigolds", "Radishes", "Pollinator flowers"],
+    avoid: ["Potatoes"],
+    water: "Water consistently; young plants should not dry out.",
+    sun: "Full sun",
+    spacing: "Train vines vertically and keep access clear along the grass path.",
+    harvest: "Harvest when fruit shows maturity signs confirmed by supervisor.",
+    nutrition: "Hydration, vitamin C, and summer fruit value.",
+    marketplace: "Vertical melons teach space efficiency and premium summer production.",
+    reflection: "How can the nearby pollinator area help melon production?",
+  },
+];
+
+function Launch62TodayPlantingMissionPanel() {
+  const activeCurriculum = getActiveCurriculum();
+  const zones = ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5 — Vertical Melons"];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Launch 6.2 • Today's Mission</div>
+      <h1 className="mt-2 text-4xl font-black leading-tight md:text-6xl">🌱 Plant the Farm</h1>
+      <p className="mt-3 max-w-4xl text-sm font-bold leading-6 text-white/78">
+        Week {activeCurriculum.week}: {activeCurriculum.theme}. Youth should see today's planting, companion information, weather, safety, and reflection without searching.
+      </p>
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {zones.map((zone) => (
+          <div key={zone} className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4">
+            <div className="text-lg font-black">{zone}</div>
+            <div className="mt-3 grid gap-1 text-xs font-bold leading-5 text-white/82">
+              <div>□ Prepare area</div>
+              <div>□ Plant assigned crops</div>
+              <div>□ Water after planting</div>
+              <div>□ Record observation</div>
+              <div>□ Upload one photo</div>
+              <div>□ Complete reflection</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function Launch62CompanionPlantingPanel({ compact = false }: { compact?: boolean }) {
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/75">Companion Planting Knowledge Engine</div>
+      <h2 className="mt-2 text-3xl font-black">Tap the crop before planting</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/75">Resources live inside the assignment. Youth should not have to search for companion planting while standing in the field.</p>
+      <div className={`mt-5 grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-2 xl:grid-cols-4"}`}>
+        {launch62CompanionCropCards.map((card) => (
+          <details key={card.crop} className="rounded-2xl border border-white/10 bg-black/25 p-4" open={!compact}>
+            <summary className="cursor-pointer text-lg font-black">{card.icon} {card.crop}</summary>
+            <div className="mt-3 grid gap-2 text-xs font-bold leading-5 text-white/82">
+              <div><span className="text-emerald-100">Good companions:</span> {card.companions.join(", ")}</div>
+              <div><span className="text-red-100">Avoid:</span> {card.avoid.join(", ")}</div>
+              <div>☀️ {card.sun}</div>
+              <div>💧 {card.water}</div>
+              <div>📏 {card.spacing}</div>
+              <div>🧺 {card.harvest}</div>
+              <div>🥗 {card.nutrition}</div>
+              <div>🛒 {card.marketplace}</div>
+              <div className="mt-2 rounded-xl bg-emerald-300/12 p-3 font-black text-emerald-50">Reflection: {card.reflection}</div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function Launch62MyJourneyPanel({ compact = false }: { compact?: boolean }) {
+  const currentWeekNumber = getCurrentProgramWeek();
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-100/75">My Journey • Permanent Curriculum Record</div>
+      <h2 className="mt-2 text-3xl font-black">The curriculum never disappears</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/75">
+        Current Week opens automatically. Previous weeks stay available. Future weeks are visible as Coming Soon. Photos, reflections, skills, and portfolio evidence remain attached to their original week.
+      </p>
+      <div className={`mt-5 grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-4"}`}>
+        {youthCurriculumWeeks.map((week) => {
+          const isCurrent = week.week === currentWeekNumber;
+          const isPast = week.week < currentWeekNumber;
+          return (
+            <details key={week.week} className={`rounded-2xl border p-4 ${isCurrent ? "border-emerald-200/40 bg-emerald-300/14" : isPast ? "border-cyan-200/30 bg-cyan-300/10" : "border-white/10 bg-white/10"}`} open={isCurrent && !compact}>
+              <summary className="cursor-pointer font-black">Week {week.week}: {week.title}</summary>
+              <div className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-white/55">{isCurrent ? "Current" : isPast ? "Completed" : "Coming Soon"}</div>
+              <p className="mt-2 text-sm leading-6 text-white/78">{week.focus}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {week.skills.map((skill) => <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-[11px] font-black">{skill}</span>)}
+              </div>
+            </details>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
+function Launch62LivingFarmFrameworkPanel({ compact = false }: { compact?: boolean }) {
+  const areas = [
+    ["North Grow Area", "Limited fencing, human hair deterrent, chicken-wire Southern Georgia collards."],
+    ["Garlic Observation Area", "Transition crop health observation; brown leaves and slow growth should be documented."],
+    ["Protected Grow Area", "Everything after the garlic is inside the wired deer-fenced area."],
+    ["Zones 1–4", "Main production quads for today's farm-wide planting mission."],
+    ["Zone 5", "Vertical melon production in the fenced grow area near the pollinator area."],
+    ["Butterfly / Pollinator Sanctuary", "Part of the grow area and part of the production ecosystem."],
+  ];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">Living Farm Framework</div>
+      <h2 className="mt-2 text-3xl font-black">Operational areas without forcing a final map</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/75">This launch uses named farm areas so youth can work today while the exact visual map is refined later without breaking the app.</p>
+      <div className={`mt-5 grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+        {areas.map(([name, detail]) => (
+          <div key={name} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="font-black">{name}</div>
+            <p className="mt-2 text-sm leading-6 text-white/75">{detail}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function Launch62ParentJourneyStatusCard() {
+  return (
+    <section className="mt-6 rounded-[1.5rem] border border-cyan-200/25 bg-cyan-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Parent View • Journey Status</div>
+      <h2 className="mt-2 text-3xl font-black">Weeks stay visible for families</h2>
+      <p className="mt-3 text-sm leading-7 text-white/80">Parents can review completed weeks, today's mission, attendance, completion, reflection, and tomorrow's reminder. Private staff notes remain protected.</p>
+      <div className="mt-4"><Launch62MyJourneyPanel compact /></div>
+    </section>
+  );
+}
+
 function ParentYouthGrowthCard({ participantId }: { participantId: string }) {
   const completed = getCompletedAssignmentsForYouth(participantId);
   const skills = getResumeSkillsForYouth(participantId);
@@ -6466,6 +6669,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   return (
     <div className="grid gap-3">
       <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
+      <Launch62TodayPlantingMissionPanel />
+      <Launch62CompanionPlantingPanel compact />
       <Launch60ActivityGoalCard todayPlan={todayPlan} />
       <YouthTodayWorkCard />
       <CurriculumEvidenceCaptureCard />
@@ -6500,6 +6705,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <summary className="cursor-pointer text-base font-black text-emerald-50">My Cultivator Journey + Weekly View</summary>
         <div className="mt-4 grid gap-3">
           <CultivatorIdentityLaunchCard />
+          <Launch62MyJourneyPanel compact />
           <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
           <CurriculumWeekViewCard compact />
           <Card className="p-4 md:p-5">
@@ -7783,6 +7989,7 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
 
       <ParentTodayActivitiesCard />
       <ParentActionCenterCard />
+      <Launch62ParentJourneyStatusCard />
       <ParentYouthGrowthCard participantId={activeUser?.participant_id || ""} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
@@ -8885,6 +9092,10 @@ function Operations({ setScreen, activeUser }: { setScreen: (screen: Screen) => 
       <LaunchReadinessValidatorCard />
       <MissionControlCurriculumBuilder activeUser={activeUser} />
       <MissionControlLiveCurriculumStatusCard />
+      <Launch62TodayPlantingMissionPanel />
+      <Launch62CompanionPlantingPanel />
+      <Launch62MyJourneyPanel />
+      <Launch62LivingFarmFrameworkPanel />
       <CurriculumDrivenTodayCard />
       <TodayAssignmentTeamsCard />
       <CurriculumProgressBoard />
