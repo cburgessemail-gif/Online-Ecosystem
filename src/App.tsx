@@ -3846,6 +3846,36 @@ function App() {
   );
 }
 
+
+function GlobalOperationsHeader({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
+  if (screen === "portal") {
+    return (
+      <div className="mb-3 rounded-[1.25rem] border border-emerald-200/25 bg-black/68 p-3 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Global Operations Header</div>
+            <div className="text-sm font-black text-white">🌤 Live weather and work status stay visible across the ecosystem.</div>
+          </div>
+          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black text-white hover:bg-white/18">Full Weather</button>
+        </div>
+        <FarmConditionsCard compact />
+      </div>
+    );
+  }
+
+  return (
+    <details open className="mb-3 rounded-[1.25rem] border border-emerald-200/25 bg-black/68 p-3 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 text-sm font-black text-white">
+        <span>🌤 Live Weather • Work Status • Farm Safety</span>
+        <button type="button" onClick={(event) => { event.preventDefault(); setScreen("almanac"); }} className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-black text-white hover:bg-white/18">Full Weather</button>
+      </summary>
+      <div className="mt-3">
+        <FarmConditionsCard compact />
+      </div>
+    </details>
+  );
+}
+
 function Shell({
   children,
   screen,
@@ -3913,7 +3943,11 @@ function Shell({
         <NurseLineBanner onOpen={() => setShowNurseLine(true)} />
         {showNurseLine && <NurseLineModal onClose={() => setShowNurseLine(false)} />}
 
-        <div className="sticky top-[4.2rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="sticky top-[4.2rem] z-50">
+          <GlobalOperationsHeader screen={screen} setScreen={setScreen} />
+        </div>
+
+        <div className="sticky top-[13rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
