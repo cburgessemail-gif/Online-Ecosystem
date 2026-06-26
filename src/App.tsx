@@ -3351,40 +3351,14 @@ function CurriculumEvidenceCaptureCard() {
   );
 }
 
-function CurriculumReflectionCard({ activeUser }: { activeUser?: EcosystemUser | null }) {
-  const [response, setResponse] = useState("");
-  const [status, setStatus] = useState("");
-  async function saveReflection() {
-    const clean = response.trim();
-    if (!clean) {
-      setStatus("Type or dictate your reflection first.");
-      return;
-    }
-    const row: CultivatorDiscovery = {
-      id: uuid(),
-      participant_id: launchParticipantId(activeUser),
-      user_name: launchParticipantName(activeUser),
-      date: todayISO(),
-      category: "Curriculum Reflection",
-      question: "What did you prepare today that will help the farm tomorrow?",
-      response: clean,
-      source: "Reflection",
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
-    setResponse("");
-    setStatus(saveModeMessage("Reflection", result));
-  }
+function CurriculumReflectionCard() {
   return (
     <section className="mt-6 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">End-of-Day Reflection</div>
       <h2 className="mt-2 text-3xl font-black">Connect Today's Work to the Future</h2>
       <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">What did you prepare today that will help the farm tomorrow?</p>
-      <textarea value={response} onChange={(e) => setResponse(e.target.value)} placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={saveReflection} className="rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
-        {status && <span className="text-sm font-black text-white/70">{status}</span>}
-      </div>
+      <textarea placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
+      <button type="button" className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
     </section>
   );
 }
@@ -3567,16 +3541,8 @@ function YouthWorkforcePortfolioCard({ participantId }: { participantId: string 
 }
 
 function YouthResumeSkillsCard({ participantId }: { participantId: string }) {
-  const skills = getCompleteResumeSkillsForYouth(participantId);
-  return (
-    <section className="mt-6 rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5">
-      <h2 className="text-3xl font-black">Resume Skills Earned</h2>
-      <p className="mt-2 text-sm font-bold leading-6 text-white/72">Skills are created from completed work, participation credit, saved responses, and curriculum assignments.</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {skills.length ? skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>) : <span className="rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm font-black text-white/72">No skills recorded yet. Complete work or save a reflection to begin building the resume.</span>}
-      </div>
-    </section>
-  );
+  const skills = getResumeSkillsForYouth(participantId);
+  return <section className="mt-6 rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5"><h2 className="text-3xl font-black">Resume Skills Earned</h2><div className="mt-4 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div></section>;
 }
 
 
@@ -3881,33 +3847,63 @@ function App() {
 }
 
 
-function GlobalOperationsHeader({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
-  if (screen === "portal") {
-    return (
-      <div className="mb-3 rounded-[1.25rem] border border-emerald-200/25 bg-black/68 p-3 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Global Operations Header</div>
-            <div className="text-sm font-black text-white">🌤 Live weather and work status stay visible across the ecosystem.</div>
-          </div>
-          <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-black text-white hover:bg-white/18">Full Weather</button>
-        </div>
-        <FarmConditionsCard compact />
-      </div>
-    );
-  }
+
+function OperationsOneLineWeather({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const farmStatus = getFarmStatusForDate(new Date());
+  const [liveWeather, setLiveWeather] = useState<LiveFarmWeather | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadLiveWeather() {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${FARM_LATITUDE}&longitude=${FARM_LONGITUDE}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,wind_speed_10m&daily=precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=${encodeURIComponent(FARM_TIME_ZONE)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
+        const data = await response.json();
+        if (cancelled) return;
+        setLiveWeather({
+          temperature: data.current?.temperature_2m,
+          apparent: data.current?.apparent_temperature,
+          humidity: data.current?.relative_humidity_2m,
+          wind: data.current?.wind_speed_10m,
+          precipitation: data.current?.precipitation ?? data.current?.rain,
+          rainChance: data.daily?.precipitation_probability_max?.[0],
+          updated: data.current?.time,
+        });
+      } catch (error) {
+        if (!cancelled) setLiveWeather({ error: "Live weather could not load" });
+      }
+    }
+    loadLiveWeather();
+    const timer = window.setInterval(loadLiveWeather, 15 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
+
+  const temp = formatLiveNumber(liveWeather?.temperature, "°F");
+  const feels = formatLiveNumber(liveWeather?.apparent, "°F");
+  const rain = liveWeather?.rainChance !== undefined ? `${Math.round(liveWeather.rainChance)}%` : "—";
+  const wind = liveWeather?.wind !== undefined ? `${Math.round(liveWeather.wind)} mph` : "—";
+  const workLabel = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Modified" : "Cancelled";
+  const impact = workImpactFor(liveWeather, farmStatus);
 
   return (
-    <details open className="mb-3 rounded-[1.25rem] border border-emerald-200/25 bg-black/68 p-3 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
-      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 text-sm font-black text-white">
-        <span>🌤 Live Weather • Work Status • Farm Safety</span>
-        <button type="button" onClick={(event) => { event.preventDefault(); setScreen("almanac"); }} className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-black text-white hover:bg-white/18">Full Weather</button>
-      </summary>
-      <div className="mt-3">
-        <FarmConditionsCard compact />
+    <div className="flex min-h-[44px] flex-wrap items-center justify-between gap-2 rounded-2xl border border-emerald-200/25 bg-black/70 px-3 py-2 text-xs font-black shadow-[0_12px_32px_rgba(0,0,0,.28)] backdrop-blur-xl md:flex-nowrap">
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="text-lg leading-none">{weatherIconFor(liveWeather)}</span>
+        <span className="text-white">Weather {temp}</span>
+        <span className="text-white/70">Feels {feels}</span>
+        <span className="text-white/70">Rain {rain}</span>
+        <span className="text-white/70">Wind {wind}</span>
+        <span className="rounded-full border border-white/15 bg-white/10 px-2 py-1 text-white">{workLabel}</span>
+        <span className="truncate text-white/80 md:max-w-[420px]">{impact}</span>
       </div>
-    </details>
+      <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-black text-white hover:bg-white/18">Weather</button>
+    </div>
   );
+}
+
+function GlobalOperationsHeader({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
+  return <OperationsOneLineWeather setScreen={setScreen} />;
 }
 
 function Shell({
@@ -3977,11 +3973,11 @@ function Shell({
         <NurseLineBanner onOpen={() => setShowNurseLine(true)} />
         {showNurseLine && <NurseLineModal onClose={() => setShowNurseLine(false)} />}
 
-        <div className="sticky top-[4.2rem] z-50">
+        <div className="sticky top-[4.2rem] z-50 mb-2">
           <GlobalOperationsHeader screen={screen} setScreen={setScreen} />
         </div>
 
-        <div className="sticky top-[13rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="sticky top-[7.4rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
@@ -5973,11 +5969,12 @@ function GrowingCenterPanel({ setScreen, compact = false }: { setScreen: (screen
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today’s Resource Pack</div>
           <div className="mt-3 grid gap-2">
             {resources.map((resource) => (
-              <div key={resource.title} className="rounded-xl bg-white p-3 shadow-sm">
-                <div className="text-sm font-black text-slate-900">{resource.title} <span className="text-[10px] uppercase text-slate-500">{resource.type}</span></div>
-                <div className="mt-1 text-xs font-bold leading-5 text-slate-600">{resource.note}</div>
+              <details key={resource.title} className="rounded-xl bg-white p-3 shadow-sm" open={Boolean(resource.url)}>
+                <summary className="cursor-pointer text-sm font-black text-slate-900">{resource.title} <span className="text-[10px] uppercase text-slate-500">{resource.type}</span></summary>
+                <div className="mt-2 text-xs font-bold leading-5 text-slate-600">{resource.note}</div>
+                <div className="mt-2 rounded-xl bg-emerald-50 p-3 text-xs font-bold leading-5 text-slate-700">Use this with today’s assignment. Youth should connect it to one observation, one photo, or one response in Info to Share.</div>
                 {resource.url && <a href={resource.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-black text-emerald-700">Open resource ↗</a>}
-              </div>
+              </details>
             ))}
           </div>
         </div>
@@ -6040,40 +6037,34 @@ function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
 function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "roles";
   const todayPlan = getCurrentYouthPlan();
-  const todayFarmPlan = getTodayFarmPlan();
   return (
-    <div className="grid gap-4">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 Weather + Almanac Utilities</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Farm Conditions</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">This is the compact utility view for weather, official Almanac links, and work status. The full resource experience is in the Growing Center.</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return to My Day</button>
-          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Growing Center</button>
-          <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
+    <div className="grid gap-3">
+      <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Weather + Almanac</div>
+            <h1 className="mt-1 text-2xl font-black">Farm Conditions</h1>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Return</button>
+            <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Growing Center</button>
+            <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Calendar</button>
+          </div>
         </div>
-      </Card>
+      </div>
 
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-2">
         <WorkStatusMiniCard />
-        <FarmConditionsCard compact />
         <TodaysAssignmentLaunchCard todayPlan={todayPlan} currentWeek={getCurrentYouthWeek()} />
       </div>
 
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
         <h2 className="mt-3 text-2xl font-black">Almanac and planting links</h2>
-        <p className="mt-3 text-sm leading-6 text-white/78">These links support today’s resource pack. They do not replace the curriculum-driven Growing Center.</p>
         <LiveAlmanacResourceLinks />
       </Card>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Today’s operating note</div>
-        <h2 className="mt-3 text-2xl font-black">{todayFarmPlan.farmStatus.level}</h2>
-        <p className="mt-3 text-sm font-bold leading-6 text-white/82">{todayFarmPlan.farmStatus.action}</p>
-      </Card>
-
-      <CurriculumWeekViewCard />
+      <CurriculumWeekViewCard compact />
     </div>
   );
 }
@@ -6680,199 +6671,30 @@ function Launch60ActivityGoalCard({ todayPlan }: { todayPlan: typeof youthWeekOn
   );
 }
 
-
-const END_MY_DAY_PROMPTS = [
-  {
-    category: "End My Day • Surprise / Interest",
-    icon: "👀",
-    question: "Did anything surprise or interest you today?",
-    choices: ["Plant growth", "Bee or insect activity", "Soil or compost", "Weather or sun/shadow", "Tool or equipment", "Teamwork", "Problem solved", "Something else"],
-    placeholder: "Tell us what surprised or interested you...",
-  },
-  {
-    category: "End My Day • Contribution",
-    icon: "🤝",
-    question: "How did you contribute today?",
-    choices: ["Planted", "Watered", "Mowed", "Collected grass", "Compost", "Fence work", "Prepared ground", "Cleaned up", "Helped a teammate", "Planned where crops go", "Something else"],
-    placeholder: "Tell us what you helped do today...",
-  },
-  {
-    category: "End My Day • Meaning",
-    icon: "🌱",
-    question: "Why did today's work matter?",
-    choices: ["Protected plants", "Helped food grow", "Made the farm safer", "Helped future pollinators", "Saved resources", "Helped my team", "Helped families", "Built a skill", "Something else"],
-    placeholder: "Tell us why today's work mattered...",
-  },
-  {
-    category: "End My Day • Tomorrow",
-    icon: "🌅",
-    question: "Tomorrow I want to...",
-    choices: ["Learn more", "Try a new task", "Help with planting", "Help with water", "Help with compost", "Help with tools", "Ask a question", "Take better photos", "Help a teammate", "Finish what we started"],
-    placeholder: "Tell us what you want to do or watch tomorrow...",
-  },
-];
-
-const INFO_TO_SHARE_PROMPTS = [
-  {
-    category: "Info to Share • Observation",
-    icon: "🌿",
-    question: "Did anything surprise or interest you today?",
-    choices: ["Plant", "Bug", "Soil", "Compost", "Water", "Weather", "Tool", "Person", "Problem", "Idea"],
-    placeholder: "Write the information, observation, discovery, idea, or accomplishment worth sharing...",
-  },
-  {
-    category: "Info to Share • Own Words",
-    icon: "✍️",
-    question: "Tell us about it in your own words.",
-    choices: ["I noticed...", "I learned...", "I helped...", "I wonder...", "I think families should know...", "I want the team to remember..."],
-    placeholder: "Use your own words here...",
-  },
-  {
-    category: "Info to Share • Save Decision",
-    icon: "⭐",
-    question: "Would you like to save it in Info to Share?",
-    choices: ["Yes, save for My Journey", "Yes, save for my team", "Yes, save for families", "Yes, save for future Cultivators", "Not yet"],
-    placeholder: "Explain where this should be saved or why it matters...",
-  },
-  {
-    category: "Info to Share • Help Someone Else",
-    icon: "🤲",
-    question: "Could this help someone else?",
-    choices: ["A teammate", "A supervisor", "A parent/caregiver", "Future Cultivators", "Farm visitors", "Families buying food", "The farm plan", "I am not sure yet"],
-    placeholder: "Who could this help, and how?",
-  },
-];
-
-const WORK_ITEM_SKILL_KEYWORDS: { keywords: string[]; skills: string[] }[] = [
-  { keywords: ["mow", "grass", "grounds"], skills: ["Grounds Maintenance", "Workplace Safety", "Agricultural Operations"] },
-  { keywords: ["compost", "clippings"], skills: ["Composting", "Resource Recovery", "Soil Health"] },
-  { keywords: ["water", "moisture", "irrigation"], skills: ["Water Management", "Crop Monitoring", "Plant Health Observation"] },
-  { keywords: ["plant", "seed", "seedling", "potato", "crop"], skills: ["Planting", "Crop Establishment", "Agricultural Operations"] },
-  { keywords: ["fence", "deer", "gate"], skills: ["Farm Infrastructure", "Tool Safety", "Facility Maintenance"] },
-  { keywords: ["tool", "inventory", "return"], skills: ["Tool Stewardship", "Inventory Awareness", "Responsibility"] },
-  { keywords: ["pollinator", "bee", "hive"], skills: ["Pollinator Infrastructure", "Environmental Stewardship", "Observation Skills"] },
-  { keywords: ["plan", "grow", "companion"], skills: ["Crop Planning", "Problem Solving", "Companion Planting Awareness"] },
-  { keywords: ["clean", "cleanup", "secure", "path"], skills: ["Site Readiness", "Teamwork", "Operational Safety"] },
-];
-
-function getResumeSkillsFromDailyWork(participantId: string) {
-  const rows = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []).filter((row) => row.participant_id === participantId && row.completed);
-  const derived = rows.flatMap((row) => {
-    const item = row.item.toLowerCase();
-    return WORK_ITEM_SKILL_KEYWORDS.filter((entry) => entry.keywords.some((keyword) => item.includes(keyword))).flatMap((entry) => entry.skills);
-  });
-  return Array.from(new Set(derived));
-}
-
-function getResumeSkillsFromDiscoveries(participantId: string) {
-  const rows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).filter((row) => row.participant_id === participantId);
-  if (!rows.length) return [];
-  const skills = ["Reflection", "Communication", "Observation Skills"];
-  if (rows.some((row) => row.category.includes("Contribution"))) skills.push("Workplace Contribution");
-  if (rows.some((row) => row.category.includes("Meaning"))) skills.push("Purposeful Work", "Critical Thinking");
-  if (rows.some((row) => row.category.includes("Tomorrow"))) skills.push("Goal Setting");
-  if (rows.some((row) => row.category.includes("Info to Share"))) skills.push("Documentation", "Knowledge Sharing");
-  return skills;
-}
-
-function getCompleteResumeSkillsForYouth(participantId: string) {
-  return Array.from(new Set([
-    ...getResumeSkillsForYouth(participantId),
-    ...getResumeSkillsFromDailyWork(participantId),
-    ...getResumeSkillsFromDiscoveries(participantId),
-  ]));
-}
-
-function YouthPromptResponseCard({ prompt, activeUser, onSaved, dark = true }: { prompt: { category: string; icon: string; question: string; choices: string[]; placeholder: string }; activeUser?: EcosystemUser | null; onSaved?: () => void; dark?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [response, setResponse] = useState("");
-  const [status, setStatus] = useState("");
-  const participantId = launchParticipantId(activeUser);
-  const existing = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, [])
-    .filter((row) => row.date === todayISO() && row.participant_id === participantId && row.category === prompt.category)
-    .slice(0, 2);
-
-  function toggleChoice(choice: string) {
-    setSelected((current) => current.includes(choice) ? current.filter((item) => item !== choice) : [...current, choice]);
-  }
-
-  async function saveResponse() {
-    const clean = response.trim();
-    if (!clean && selected.length === 0) {
-      setStatus("Choose an answer or type a response first.");
-      return;
-    }
-    const answer = [selected.length ? `Selected: ${selected.join(", ")}` : "", clean].filter(Boolean).join(" — ");
-    const row: CultivatorDiscovery = {
-      id: uuid(),
-      participant_id: participantId,
-      user_name: launchParticipantName(activeUser),
-      date: todayISO(),
-      category: prompt.category,
-      question: prompt.question,
-      response: answer,
-      source: "Reflection",
-      created_at: new Date().toISOString(),
-    };
-    const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
-    setSelected([]);
-    setResponse("");
-    setStatus(saveModeMessage("Response", result));
-    onSaved?.();
-  }
-
-  const closedClass = dark ? "rounded-2xl border border-white/10 bg-black/25 p-4 text-left text-sm font-black" : "rounded-xl border border-slate-200 bg-white p-3 text-left text-sm font-black text-slate-950";
-  const openClass = dark ? "rounded-2xl border border-emerald-200/25 bg-emerald-300/10 p-4" : "rounded-xl border border-emerald-200 bg-emerald-50 p-3";
-  return (
-    <div className={open ? openClass : ""}>
-      <button type="button" onClick={() => setOpen((value) => !value)} className={`${open ? "" : closedClass} w-full`}>
-        <span className="mr-2 rounded-full bg-emerald-300 px-2 py-1 text-xs text-black">{prompt.icon}</span>{prompt.question}
-        <span className="float-right text-xs opacity-75">{open ? "Close" : "Answer"}</span>
-      </button>
-      {open && (
-        <div className="mt-3 grid gap-3">
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {prompt.choices.map((choice) => {
-              const checked = selected.includes(choice);
-              return <button key={choice} type="button" onClick={() => toggleChoice(choice)} className={`rounded-xl border px-3 py-2 text-left text-xs font-black ${checked ? "border-emerald-200 bg-emerald-300 text-black" : dark ? "border-white/10 bg-black/25 text-white" : "border-slate-200 bg-white text-slate-800"}`}>{checked ? "☑" : "☐"} {choice}</button>;
-            })}
-          </div>
-          <textarea value={response} onChange={(e) => setResponse(e.target.value)} rows={3} placeholder={prompt.placeholder} className={`w-full rounded-xl border p-3 text-sm font-bold outline-none ${dark ? "border-white/10 bg-black/45 text-white placeholder:text-white/45" : "border-slate-200 bg-white text-slate-950"}`} />
-          <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={saveResponse} className="rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black">Save Response</button>
-            {status && <span className={`text-xs font-black ${dark ? "text-white/70" : "text-slate-600"}`}>{status}</span>}
-          </div>
-          {existing.length > 0 && <div className={`rounded-xl p-3 text-xs font-bold leading-5 ${dark ? "bg-black/25 text-white/75" : "bg-white text-slate-700"}`}><div className="font-black uppercase tracking-[0.18em] opacity-70">Saved today</div>{existing.map((row) => <div key={row.id} className="mt-2">“{row.response}”</div>)}</div>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function InfoToShareLaunch60Card({ activeUser }: { activeUser?: EcosystemUser | null }) {
-  const [, setRefresh] = useState(0);
+function InfoToShareLaunch60Card() {
   return (
     <Card className="p-4 md:p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Info to Share</div>
       <h2 className="mt-2 text-2xl font-black">Save something worth sharing.</h2>
       <p className="mt-2 text-sm font-bold leading-6 text-white/82">Info to Share means information, observations, discoveries, ideas, photos, videos, or accomplishments that may help you, your family, your team, future Cultivators, or the farm.</p>
-      <div className="mt-4 grid gap-2">
-        {INFO_TO_SHARE_PROMPTS.map((prompt) => <YouthPromptResponseCard key={prompt.category} prompt={prompt} activeUser={activeUser} onSaved={() => setRefresh((value) => value + 1)} />)}
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {["Did anything surprise or interest you today?", "Tell us about it in your own words.", "Would you like to save it in Info to Share?", "Could this help someone else?"].map((item) => (
+          <div key={item} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{item}</div>
+        ))}
       </div>
     </Card>
   );
 }
 
-function Launch60EndMyDayCard({ activeUser }: { activeUser?: EcosystemUser | null }) {
-  const [, setRefresh] = useState(0);
+function Launch60EndMyDayCard() {
   return (
     <Card className="p-4 md:p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">End My Day</div>
       <h2 className="mt-2 text-2xl font-black">One question at a time.</h2>
-      <p className="mt-2 text-sm font-bold leading-6 text-white/72">Tap a question, choose quick answers, add words if you want, and save. Each answer becomes part of My Journey.</p>
       <div className="mt-4 grid gap-2">
-        {END_MY_DAY_PROMPTS.map((prompt) => <YouthPromptResponseCard key={prompt.category} prompt={prompt} activeUser={activeUser} onSaved={() => setRefresh((value) => value + 1)} />)}
+        {["Did anything surprise or interest you today?", "How did you contribute today?", "Why did today's work matter?", "Tomorrow I want to..."].map((item, index) => (
+          <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black"><span className="mr-2 rounded-full bg-emerald-300 px-2 py-1 text-xs text-black">{index + 1}</span>{item}</div>
+        ))}
       </div>
       <p className="mt-4 text-xs font-bold leading-5 text-white/62">Youth should never see all program intelligence at once. The system captures work, discovery, contribution, meaning, and tomorrow behind the scenes.</p>
     </Card>
@@ -6924,12 +6746,12 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">End My Day: layered reflection</summary>
         <div className="mt-4 grid gap-3">
-          <InfoToShareLaunch60Card activeUser={activeUser} />
+          <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
-          <CurriculumReflectionCard activeUser={activeUser} />
+          <CurriculumReflectionCard />
           <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
           <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
-          <Launch60EndMyDayCard activeUser={activeUser} />
+          <Launch60EndMyDayCard />
           <TomorrowBeginsTodayCard todayPlan={todayPlan} />
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open Info to Share</button>
@@ -8788,12 +8610,16 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
 function LaunchEvents({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
-    <div className="grid gap-5">
-      <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Calendar</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Real calendar of the farm day.</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/78">Month, week, and day views show curriculum, actual farm work, lunch at 11:00 AM, cleanup, visitors, deliveries, weather decisions, uploads, reflections, and the Daily Farm Story.</p>
-      </Card>
+    <div className="grid gap-3">
+      <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Calendar</div>
+            <h1 className="mt-1 text-2xl font-black">Farm day calendar</h1>
+          </div>
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Return to My Day</button>
+        </div>
+      </div>
       <RealCalendarGrid setScreen={setScreen} />
       <TodayFarmPlanCard setScreen={setScreen} />
     </div>
