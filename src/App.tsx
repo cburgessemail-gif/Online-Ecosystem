@@ -352,6 +352,8 @@ const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
 const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
 const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
+const CURRICULUM_EVIDENCE_KEY = "bff.launch.curriculumEvidence";
+const CURRICULUM_REFLECTION_KEY = "bff.launch.curriculumReflections";
 const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
 const PARENT_NOTIFICATION_KEY = "bff.launch.parentNotifications";
 const BROADCAST_MESSAGE_KEY = "bff.launch.broadcastMessages";
@@ -1884,6 +1886,35 @@ type MediaAsset = {
   created_at: string;
 };
 
+type CurriculumEvidenceRecord = {
+  id: string;
+  participant_id?: string;
+  youth_name: string;
+  week: number;
+  date: string;
+  activity_id: string;
+  activity_title: string;
+  evidence_type: string;
+  note: string;
+  file_name?: string;
+  file_url?: string;
+  file_type?: string;
+  created_at: string;
+};
+
+type CurriculumReflectionRecord = {
+  id: string;
+  participant_id?: string;
+  youth_name: string;
+  week: number;
+  date: string;
+  activity_id?: string;
+  activity_title?: string;
+  question: string;
+  response: string;
+  created_at: string;
+};
+
 const launchVideos: LaunchVideo[] = [
   {
     title: "June 5 Staff & Supervisor Orientation Video",
@@ -3327,38 +3358,174 @@ function TodayAssignmentTeamsCard() {
   );
 }
 
-function CurriculumEvidenceCaptureCard() {
-  const [evidenceActivity, setEvidenceActivity] = useState<{ activityId: string; activityTitle: string; evidenceType: string } | null>(null);
+function CurriculumEvidenceCaptureCard({ activeUser }: { activeUser?: EcosystemUser | null }) {
   const activeCurriculum = getActiveCurriculum();
+  const [records, setRecords] = useState<CurriculumEvidenceRecord[]>(() => safeRead<CurriculumEvidenceRecord[]>(CURRICULUM_EVIDENCE_KEY, []));
+  const [selectedActivityId, setSelectedActivityId] = useState(activeCurriculum.activities[0]?.id || "");
+  const selectedActivity = activeCurriculum.activities.find((item) => item.id === selectedActivityId) || activeCurriculum.activities[0];
+  const [evidenceType, setEvidenceType] = useState(selectedActivity?.evidenceRequired?.[0] || "Photo / Observation");
+  const [note, setNote] = useState("");
+  const [fileData, setFileData] = useState<{ name: string; url: string; type: string } | null>(null);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    if (selectedActivity?.evidenceRequired?.length && !selectedActivity.evidenceRequired.includes(evidenceType)) {
+      setEvidenceType(selectedActivity.evidenceRequired[0]);
+    }
+  }, [selectedActivityId]);
+
+  const saveFilePreview = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => setFileData({ name: file.name, url: String(reader.result || ""), type: file.type || "file" });
+    reader.readAsDataURL(file);
+  };
+
+  const saveEvidence = () => {
+    if (!selectedActivity) return;
+    if (!note.trim() && !fileData) {
+      setNotice("Please add a note or choose a photo/video before saving evidence.");
+      return;
+    }
+    const row: CurriculumEvidenceRecord = {
+      id: uuid(),
+      participant_id: activeUser?.participant_id || activeUser?.profile_id || activeUser?.id,
+      youth_name: activeUser?.name || "Youth Workforce Participant",
+      week: activeCurriculum.week,
+      date: todayISO(),
+      activity_id: selectedActivity.id,
+      activity_title: selectedActivity.title,
+      evidence_type: evidenceType,
+      note: note.trim(),
+      file_name: fileData?.name,
+      file_url: fileData?.url,
+      file_type: fileData?.type,
+      created_at: new Date().toISOString(),
+    };
+    const next = [row, ...records].slice(0, 500);
+    setRecords(next);
+    safeWrite(CURRICULUM_EVIDENCE_KEY, next);
+
+    if (fileData) {
+      const mediaRows = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []);
+      const media: MediaAsset = {
+        id: row.id,
+        title: `${selectedActivity.title} — ${evidenceType}`,
+        category: "Curriculum Evidence",
+        file_name: fileData.name,
+        file_url: fileData.url,
+        file_type: fileData.type,
+        file_size: 0,
+        uploaded_by: row.youth_name,
+        storage_path: `local/curriculum-evidence/${row.id}/${fileData.name}`,
+        created_at: row.created_at,
+      };
+      safeWrite(MEDIA_ASSETS_KEY, [media, ...mediaRows].slice(0, 250));
+    }
+
+    setNote("");
+    setFileData(null);
+    setNotice("Saved to My Journey. This evidence is now connected to today’s activity.");
+  };
+
+  const todaysRecords = records.filter((record) => record.date === todayISO() && record.week === activeCurriculum.week);
+
   return (
     <section className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-white/65">Evidence Capture</div>
-      <h2 className="mt-2 text-3xl font-black">Prove What You Helped Build Today</h2>
+      <h2 className="mt-2 text-3xl font-black">Add Evidence Directly Here</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Youth should not have to leave the activity card. Choose the activity, choose the evidence type, add a note or photo, and save it to My Journey.</p>
+
       <div className="mt-5 grid gap-3 md:grid-cols-2">
-        {activeCurriculum.activities.map((activity) => (
-          <div key={activity.id} className="rounded-2xl bg-black/25 p-4">
-            <h3 className="text-xl font-black">{activity.icon} {activity.title}</h3>
-            <div className="mt-3 grid gap-2">
-              {activity.evidenceRequired.map((item) => (
-                <button key={item} type="button" onClick={() => setEvidenceActivity({ activityId: activity.id, activityTitle: activity.title, evidenceType: item })} className="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-left text-sm font-black">📸 Add Evidence: {item}</button>
-              ))}
-            </div>
-          </div>
-        ))}
+        <label className="grid gap-2 text-sm font-black">
+          Activity
+          <select value={selectedActivityId} onChange={(e) => setSelectedActivityId(e.target.value)} className="rounded-2xl border border-white/10 bg-black/45 p-3 text-white">
+            {activeCurriculum.activities.map((activity) => <option key={activity.id} value={activity.id}>{activity.icon} {activity.title}</option>)}
+          </select>
+        </label>
+        <label className="grid gap-2 text-sm font-black">
+          Evidence Type
+          <select value={evidenceType} onChange={(e) => setEvidenceType(e.target.value)} className="rounded-2xl border border-white/10 bg-black/45 p-3 text-white">
+            {(selectedActivity?.evidenceRequired?.length ? selectedActivity.evidenceRequired : ["Photo", "Observation", "Completed work"]).map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
       </div>
-      {evidenceActivity && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/10 p-4 text-sm font-black">Selected: {evidenceActivity.activityTitle} • {evidenceActivity.evidenceType}. Open Info to Share to upload the photo/video/commentary.</div>}
+
+      <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="What did you do, notice, build, plant, water, fix, or learn?" className="mt-4 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" />
+
+      <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-emerald-200/35 bg-emerald-300/10 p-5 text-center hover:bg-emerald-300/18">
+        <span className="text-xl font-black">📷 Add Photo / Video Evidence</span>
+        <span className="mt-1 text-xs font-bold text-white/62">Optional, but recommended for portfolio proof.</span>
+        <input className="hidden" type="file" accept="image/*,video/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) saveFilePreview(file); e.currentTarget.value = ""; }} />
+      </label>
+      {fileData && <div className="mt-3 rounded-2xl bg-black/25 p-3 text-sm font-black">Selected file: {fileData.name}</div>}
+      <button type="button" onClick={saveEvidence} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Evidence to My Journey</button>
+      {notice && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-bold text-emerald-50">{notice}</div>}
+
+      <div className="mt-5 grid gap-2 md:grid-cols-2">
+        {todaysRecords.slice(0, 6).map((record) => <div key={record.id} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm"><div className="font-black">{record.activity_title}</div><div className="mt-1 text-xs font-bold text-white/60">{record.evidence_type} • {record.youth_name}</div><p className="mt-2 text-white/80">{record.note || record.file_name || "Evidence saved"}</p></div>)}
+      </div>
     </section>
   );
 }
 
-function CurriculumReflectionCard() {
+function CurriculumReflectionCard({ activeUser }: { activeUser?: EcosystemUser | null }) {
+  const activeCurriculum = getActiveCurriculum();
+  const [records, setRecords] = useState<CurriculumReflectionRecord[]>(() => safeRead<CurriculumReflectionRecord[]>(CURRICULUM_REFLECTION_KEY, []));
+  const reflectionOptions = activeCurriculum.activities.map((activity) => ({ id: activity.id, title: activity.title, question: activity.reflectionPrompt || "What did this activity help you understand today?" }));
+  const defaultQuestion = "What did you prepare today that will help the farm tomorrow?";
+  const [activityId, setActivityId] = useState(reflectionOptions[0]?.id || "general");
+  const selected = reflectionOptions.find((item) => item.id === activityId);
+  const question = selected?.question || defaultQuestion;
+  const [response, setResponse] = useState("");
+  const [notice, setNotice] = useState("");
+
+  const saveReflection = () => {
+    if (!response.trim()) {
+      setNotice("Please answer the question before saving your reflection.");
+      return;
+    }
+    const row: CurriculumReflectionRecord = {
+      id: uuid(),
+      participant_id: activeUser?.participant_id || activeUser?.profile_id || activeUser?.id,
+      youth_name: activeUser?.name || "Youth Workforce Participant",
+      week: activeCurriculum.week,
+      date: todayISO(),
+      activity_id: selected?.id,
+      activity_title: selected?.title,
+      question,
+      response: response.trim(),
+      created_at: new Date().toISOString(),
+    };
+    const next = [row, ...records].slice(0, 500);
+    setRecords(next);
+    safeWrite(CURRICULUM_REFLECTION_KEY, next);
+    // Also save a discovery entry so older reports and parent-safe summaries can find it.
+    const discoveries = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    safeWrite(DISCOVERY_KEY, [{ id: row.id, participant_id: row.participant_id || "", user_name: row.youth_name, date: row.date, category: "Reflection", question: row.question, response: row.response, source: "Reflection", created_at: row.created_at }, ...discoveries].slice(0, 500));
+    setResponse("");
+    setNotice("Reflection saved to My Journey.");
+  };
+
+  const todaysRecords = records.filter((record) => record.date === todayISO() && record.week === activeCurriculum.week);
+
   return (
     <section className="mt-6 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">End-of-Day Reflection</div>
-      <h2 className="mt-2 text-3xl font-black">Connect Today's Work to the Future</h2>
-      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">What did you prepare today that will help the farm tomorrow?</p>
-      <textarea placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
-      <button type="button" className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">Thoughtful Questions</div>
+      <h2 className="mt-2 text-3xl font-black">Answer and Save</h2>
+      <label className="mt-4 grid gap-2 text-sm font-black">
+        Choose the question
+        <select value={activityId} onChange={(e) => setActivityId(e.target.value)} className="rounded-2xl border border-white/10 bg-black/45 p-3 text-white">
+          {reflectionOptions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+          <option value="general">General closeout question</option>
+        </select>
+      </label>
+      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">{question}</p>
+      <textarea value={response} onChange={(e) => setResponse(e.target.value)} placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" />
+      <button type="button" onClick={saveReflection} className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
+      {notice && <div className="mt-4 rounded-2xl border border-purple-200/25 bg-purple-300/12 p-3 text-sm font-bold text-purple-50">{notice}</div>}
+      <div className="mt-5 grid gap-2">
+        {todaysRecords.slice(0, 5).map((record) => <div key={record.id} className="rounded-2xl bg-black/25 p-3 text-sm"><div className="font-black">{record.question}</div><p className="mt-2 text-white/80">{record.response}</p></div>)}
+      </div>
     </section>
   );
 }
@@ -6707,7 +6874,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <Launch62CompanionPlantingPanel compact />
       <Launch60ActivityGoalCard todayPlan={todayPlan} />
       <YouthTodayWorkCard />
-      <CurriculumEvidenceCaptureCard />
+      <CurriculumEvidenceCaptureCard activeUser={activeUser} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Today's Resources + Why It Matters</summary>
@@ -6723,7 +6890,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-4 grid gap-3">
           <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
-          <CurriculumReflectionCard />
+          <CurriculumReflectionCard activeUser={activeUser} />
           <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
           <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
           <Launch60EndMyDayCard />
@@ -9134,7 +9301,7 @@ function Operations({ setScreen, activeUser }: { setScreen: (screen: Screen) => 
       <TodayAssignmentTeamsCard />
       <CurriculumProgressBoard />
       <TodayYouthAssignmentBoard />
-      <CurriculumEvidenceCaptureCard />
+      <CurriculumEvidenceCaptureCard activeUser={activeUser} />
       <CurriculumParentSummaryCard />
       <MissionControlDailyCloseoutCard />
       <DailyCloseoutHistoryCard />
