@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 9.0 - MASTER FULL REPLACEMENT + YOUTH DEVELOPMENT OPERATING SYSTEM
+ * CULTIVATOR ECOSYSTEM 10.0 - MASTER FULL REPLACEMENT + REGENERATIVE CULTIVATOR THEORY OF CHANGE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -42,6 +42,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Adds parent/youth/supervisor notification preparation, message log, and one-button cancellation launch
  * - Ecosystem 9.0: organizes the Youth pathway around Identity, Learning, Skills, Opportunity, and Legacy.
  * - Ecosystem 9.0: adds portfolio-in-progress, Cultivator Moments, Learning Tree, growth dashboard, parent growth report, supervisor growth notes, workforce transcript, career pathways, and legacy map foundations.
+ * - Ecosystem 10.0: adds the Regenerative Cultivator Theory of Change as the organizing layer for youth, parent, supervisor, portfolio, workbook, workforce transcript, and Mission Control.
+ * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
+ * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
  */
 
 type Screen =
@@ -3789,23 +3792,91 @@ function ParentYouthGrowthCard({ participantId }: { participantId: string }) {
 const CULTIVATOR_MOMENTS_KEY = "bff.cultivator.moments.v9";
 const SUPERVISOR_GROWTH_NOTES_KEY = "bff.supervisor.growthNotes.v9";
 
-function Cultivator90NorthStarCard() {
-  const pillars = [
-    ["🌱 Identity", "Who am I becoming?"],
-    ["📚 Learning", "What am I learning and why does it matter?"],
-    ["🛠 Skills", "What can I do now that I could not do before?"],
-    ["🚀 Opportunity", "Where can this experience take me next?"],
-    ["❤️ Legacy", "How did I contribute to something larger than myself?"],
+
+const CULTIVATOR_THEORY_OF_CHANGE = {
+  belief: "Current conditions do not determine future potential.",
+  youthFacingName: "The Cultivator Way",
+  professionalName: "Regenerative Cultivator Theory of Change",
+  tagline: "See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.",
+  stages: [
+    { title: "Encounter Possibility", short: "Encounter", icon: "✨", youthQuestion: "What new possibility did I discover?", explanation: "Exposure comes before imagination. Youth encounter new people, land, work, careers, questions, and proof that tomorrow can look different from today." },
+    { title: "See Potential", short: "Potential", icon: "👀", youthQuestion: "What potential do I notice here?", explanation: "A Cultivator observes honestly, thinks critically, and recognizes hidden value in people, places, projects, problems, and soil." },
+    { title: "Work the Possibility", short: "Possibility", icon: "🛠️", youthQuestion: "What can I do with what I have?", explanation: "Possibility becomes real through effort, learning, experimentation, problem solving, adaptation, responsibility, and action." },
+    { title: "Cultivate Growth", short: "Growth", icon: "🌱", youthQuestion: "How did I grow, and what helped something else grow?", explanation: "Skills, confidence, character, knowledge, teamwork, and opportunity are intentionally developed through meaningful work." },
+    { title: "Regenerate", short: "Regenerate", icon: "♻️", youthQuestion: "What became better because I was here?", explanation: "Regeneration means soil, projects, people, and communities are left healthier, stronger, and more capable than before." },
+    { title: "Legacy", short: "Legacy", icon: "🌳", youthQuestion: "What will continue after I leave?", explanation: "The greatest impact may benefit people we never meet. A Cultivator plants for tomorrow." },
+  ],
+  principles: ["Potential", "Possibility", "Growth", "Stewardship", "Regeneration", "Community", "Legacy"],
+  characterRoots: ["Consistency", "Reliability", "Responsibility", "Accountability", "Stewardship", "Maturity", "Critical Thinking"],
+};
+
+function CultivatorTheoryStageGrid({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`grid gap-3 ${compact ? "md:grid-cols-3" : "md:grid-cols-3 xl:grid-cols-6"}`}>
+      {CULTIVATOR_THEORY_OF_CHANGE.stages.map((stage) => (
+        <div key={stage.title} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+          <div className="text-2xl">{stage.icon}</div>
+          <div className="mt-2 text-sm font-black uppercase tracking-[0.16em] text-emerald-100/75">{stage.short}</div>
+          <div className="mt-1 text-lg font-black">{stage.title}</div>
+          {!compact && <p className="mt-2 text-xs font-bold leading-5 text-white/70">{stage.youthQuestion}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CultivatorTheoryOfChangeCard({ compact = false }: { compact?: boolean }) {
+  return (
+    <section className="rounded-[1.5rem] border border-amber-200/25 bg-gradient-to-br from-amber-300/15 via-emerald-300/10 to-cyan-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/80">{CULTIVATOR_THEORY_OF_CHANGE.professionalName}</div>
+      <h2 className="mt-2 text-3xl font-black md:text-4xl">{CULTIVATOR_THEORY_OF_CHANGE.belief}</h2>
+      <p className="mt-3 text-xl font-black text-emerald-100">{CULTIVATOR_THEORY_OF_CHANGE.tagline}</p>
+      {!compact && <p className="mt-3 max-w-5xl text-sm font-bold leading-6 text-white/78">Through meaningful work, stewardship, learning, critical thinking, entrepreneurship, and community, youth discover possibilities, develop capabilities, cultivate growth, and regenerate the future. This is the organizing layer beneath the workbook, portfolio, parent pathway, supervisor observations, workforce transcript, and Mission Control reports.</p>}
+      <div className="mt-5"><CultivatorTheoryStageGrid compact={compact} /></div>
+    </section>
+  );
+}
+
+function CultivatorWayCard() {
+  return (
+    <section className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth-Facing North Star • The Cultivator Way</div>
+      <h2 className="mt-2 text-4xl font-black leading-tight">See Potential.<br />Work the Possibility.<br />Cultivate Growth.</h2>
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl bg-black/25 p-4"><div className="font-black">See Potential</div><p className="mt-2 text-sm font-bold leading-6 text-white/75">Notice opportunity, promise, strengths, and hidden value where others may see limitations.</p></div>
+        <div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Work the Possibility</div><p className="mt-2 text-sm font-bold leading-6 text-white/75">Use effort, learning, critical thinking, teamwork, and perseverance to bring possibility to life.</p></div>
+        <div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Cultivate Growth</div><p className="mt-2 text-sm font-bold leading-6 text-white/75">Help soil, skills, confidence, projects, people, and community become stronger than before.</p></div>
+      </div>
+      <p className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-black leading-6 text-white/80">Start where you are. Do the best you can. Give it all you’ve got. Regeneration proves that today’s condition does not determine tomorrow’s potential.</p>
+    </section>
+  );
+}
+
+function RegenerativeSoilProofCard() {
+  const sites = [
+    ["Site 1", "Hidden Potential", "pH 5.3; low potassium and very low phosphorus. The soil is not finished — it is telling us what it needs."],
+    ["Site 2", "Emerging Potential", "Neutral pH with low fertility. A workable foundation that needs targeted care."],
+    ["Site 3", "Developing Potential", "Higher organic matter and very high potassium show regeneration beginning."],
+    ["Site 4", "Realized Potential", "Original grow area: high organic matter, stronger CEC, neutral pH, and abundant nutrients show what stewardship can build."],
   ];
   return (
-    <Card className="p-4 md:p-5">
-      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Cultivator Ecosystem 9.0</div>
-      <h2 className="mt-2 text-3xl font-black">It’s More Than a Job… We’re Building Our Future.</h2>
-      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Every check-in, project, photo, reflection, supervisor note, and Cultivator Moment becomes proof of growth for the portfolio, workforce transcript, resume, parent report, and future pathway.</p>
-      <div className="mt-5 grid gap-3 md:grid-cols-5">
-        {pillars.map(([title, body]) => <div key={title} className="rounded-2xl border border-white/10 bg-black/25 p-4"><div className="font-black">{title}</div><p className="mt-2 text-xs font-bold leading-5 text-white/70">{body}</p></div>)}
+    <section className="rounded-[1.5rem] border border-lime-200/25 bg-lime-300/10 p-5">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-lime-100/75">Soil Test Proof • Regeneration Is Possible</div>
+      <h2 className="mt-2 text-3xl font-black">The farm itself teaches the Theory of Change.</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/78">The soil journey from weaker fertility to the original grow area becomes a living lesson: current conditions do not determine future potential.</p>
+      <div className="mt-5 grid gap-3 md:grid-cols-4">
+        {sites.map(([site, stage, body]) => <div key={site} className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">{site}</div><div className="mt-1 text-xl font-black">{stage}</div><p className="mt-2 text-xs font-bold leading-5 text-white/70">{body}</p></div>)}
       </div>
-    </Card>
+    </section>
+  );
+}
+
+function Cultivator90NorthStarCard() {
+  return (
+    <div className="grid gap-3">
+      <CultivatorTheoryOfChangeCard />
+      <CultivatorWayCard />
+    </div>
   );
 }
 
@@ -3943,7 +4014,8 @@ function Cultivator90WorkforceTranscriptCard({ participantId }: { participantId:
   const completed = getCompletedAssignmentsForYouth(participantId);
   const skills = getResumeSkillsForYouth(participantId);
   const projects = completed.map((record) => record.activity_title);
-  return <section className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Workforce Transcript Foundation</div><h2 className="mt-2 text-3xl font-black">Documented skills, projects, and contribution.</h2><div className="mt-5 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Participation</div><p className="mt-2 text-sm text-white/75">Attendance, PPE, work status, and daily rhythm records.</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Projects</div><p className="mt-2 text-sm text-white/75">{projects.slice(0, 4).join(", ") || "Deer fence, planting, compost, infrastructure, pollinator habitat."}</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Skills</div><p className="mt-2 text-sm text-white/75">{skills.slice(0, 6).join(", ") || "Teamwork, communication, safety, observation, responsibility, problem solving."}</p></div></div></section>;
+  const characterRoots = CULTIVATOR_THEORY_OF_CHANGE.characterRoots;
+  return <section className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Workforce Transcript Foundation</div><h2 className="mt-2 text-3xl font-black">Documented skills, projects, and contribution.</h2><div className="mt-5 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Participation</div><p className="mt-2 text-sm text-white/75">Attendance, PPE, work status, and daily rhythm records.</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Projects</div><p className="mt-2 text-sm text-white/75">{projects.slice(0, 4).join(", ") || "Deer fence, planting, compost, infrastructure, pollinator habitat."}</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Skills</div><p className="mt-2 text-sm text-white/75">{skills.slice(0, 6).join(", ") || "Teamwork, communication, safety, observation, responsibility, problem solving."}</p></div></div><div className="mt-4 rounded-2xl bg-black/25 p-4"><div className="font-black">Character Roots</div><p className="mt-2 text-sm text-white/75">{characterRoots.join(", ")}</p></div></section>;
 }
 
 function Cultivator90LegacyMapCard() {
@@ -3951,8 +4023,23 @@ function Cultivator90LegacyMapCard() {
 }
 
 function Cultivator90DeclarationCard() {
-  const lines = ["I understand that growth takes time.", "I understand that every skill begins with learning.", "I understand that mistakes are opportunities to improve.", "I understand that questions lead to discovery.", "I understand that education happens everywhere.", "I understand that my future is something I help create.", "I understand that I can contribute to something larger than myself.", "I am a Cultivator."];
-  return <section className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Cultivator Declaration</div><div className="mt-4 grid gap-2">{lines.map((line) => <p key={line} className="rounded-xl bg-white/10 p-3 text-sm font-black">{line}</p>)}</div></section>;
+  const lines = [
+    "I am a Cultivator.",
+    "I believe current conditions do not determine future potential.",
+    "I see potential.",
+    "I work the possibility.",
+    "I cultivate growth.",
+    "I practice stewardship.",
+    "I help regenerate the future.",
+    "I grow with my community.",
+    "I plant seeds of legacy.",
+    "I start where I am.",
+    "I do the best I can.",
+    "I give it all I’ve got.",
+    "I leave things better than I found them.",
+    "I am a Cultivator.",
+  ];
+  return <section className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Cultivator Creed</div><h2 className="mt-2 text-3xl font-black">The Regenerative Cultivator Promise</h2><div className="mt-4 grid gap-2 md:grid-cols-2">{lines.map((line) => <p key={line} className="rounded-xl bg-white/10 p-3 text-sm font-black">{line}</p>)}</div></section>;
 }
 
 function Parent90GrowthReportCard({ participantId }: { participantId: string }) {
@@ -3960,7 +4047,7 @@ function Parent90GrowthReportCard({ participantId }: { participantId: string }) 
   const skills = getResumeSkillsForYouth(participantId);
   const moments = safeRead<any[]>(CULTIVATOR_MOMENTS_KEY, []);
   const latestMoment = moments[0]?.text || "Growth highlights will appear as youth reflections and Cultivator Moments are saved.";
-  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Parent Growth Summary • Ecosystem 9.0</div><h2 className="mt-2 text-3xl font-black">This week your youth is growing.</h2><div className="mt-5 grid gap-3 md:grid-cols-4"><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Projects</div><p className="mt-2 text-sm text-white/75">{completed.length || getActiveCurriculum().activities.length} documented or active</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Skills</div><p className="mt-2 text-sm text-white/75">{skills.slice(0, 5).join(", ") || "Teamwork, observation, responsibility"}</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Reflection Highlight</div><p className="mt-2 text-sm text-white/75">“{latestMoment}”</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Next Step</div><p className="mt-2 text-sm text-white/75">Encourage your youth to explain what they noticed, learned, and want to try next.</p></div></div></section>;
+  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Parent Growth Summary • Cultivator Theory of Change</div><h2 className="mt-2 text-3xl font-black">This week your youth is seeing potential, working possibility, and cultivating growth.</h2><div className="mt-5 grid gap-3 md:grid-cols-4"><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Projects</div><p className="mt-2 text-sm text-white/75">{completed.length || getActiveCurriculum().activities.length} documented or active</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Skills</div><p className="mt-2 text-sm text-white/75">{skills.slice(0, 5).join(", ") || "Teamwork, observation, responsibility"}</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Reflection Highlight</div><p className="mt-2 text-sm text-white/75">“{latestMoment}”</p></div><div className="rounded-2xl bg-black/25 p-4"><div className="font-black">Next Step</div><p className="mt-2 text-sm text-white/75">Encourage your youth to explain what they noticed, learned, and want to try next.</p></div></div></section>;
 }
 
 function Supervisor90GrowthNotesCard({ activeUser }: { activeUser: EcosystemUser | null }) {
@@ -3973,7 +4060,7 @@ function Supervisor90GrowthNotesCard({ activeUser }: { activeUser: EcosystemUser
     setNote("");
     alert("Growth note saved for portfolio and recommendation drafting.");
   };
-  return <section className="rounded-[1.5rem] border border-cyan-200/25 bg-cyan-300/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Supervisor Growth Notes</div><h2 className="mt-2 text-3xl font-black">Document strengths, potential, and recommendation material.</h2><div className="mt-4 flex flex-wrap gap-2">{["Leadership", "Initiative", "Curiosity", "Responsibility", "Communication", "Problem Solving", "Teamwork", "Persistence"].map((item) => <button key={item} type="button" onClick={() => setStrength(item)} className={`rounded-full px-4 py-2 text-xs font-black ${strength === item ? "bg-cyan-300 text-black" : "border border-white/15 bg-black/25"}`}>{item}</button>)}</div><textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Example: Helped another youth understand how to carry tools safely." className="mt-4 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" /><button type="button" onClick={save} className="mt-4 rounded-full bg-cyan-300 px-6 py-3 font-black text-black">Save Growth Note</button></section>;
+  return <section className="rounded-[1.5rem] border border-cyan-200/25 bg-cyan-300/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Supervisor Growth Notes</div><h2 className="mt-2 text-3xl font-black">Document strengths, potential, and recommendation material.</h2><div className="mt-4 flex flex-wrap gap-2">{["Opportunity Recognition", "Critical Thinking", "Leadership", "Initiative", "Stewardship", "Responsibility", "Accountability", "Maturity", "Communication", "Problem Solving", "Teamwork", "Persistence"].map((item) => <button key={item} type="button" onClick={() => setStrength(item)} className={`rounded-full px-4 py-2 text-xs font-black ${strength === item ? "bg-cyan-300 text-black" : "border border-white/15 bg-black/25"}`}>{item}</button>)}</div><textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Example: Helped another youth understand how to carry tools safely." className="mt-4 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" /><button type="button" onClick={save} className="mt-4 rounded-full bg-cyan-300 px-6 py-3 font-black text-black">Save Growth Note</button></section>;
 }
 
 function App() {
@@ -7016,6 +7103,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
       <Cultivator90PortfolioProgressCard participantId={activeUser?.participant_id || ""} />
       <Cultivator90MomentCaptureCard activeUser={activeUser} />
       <Cultivator90LearningTreeCard />
+      <RegenerativeSoilProofCard />
       <Cultivator90LearningConnectionsCard />
       <Cultivator90GrowthDashboardCard participantId={activeUser?.participant_id || ""} />
       <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
@@ -7199,6 +7287,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
       <div>
         {tab === "dashboard" && (
           <>
+            <CultivatorTheoryOfChangeCard compact />
             <Supervisor90GrowthNotesCard activeUser={activeUser} />
             <SupervisorDashboard
               youthCount={youthRows.length}
@@ -8351,6 +8440,7 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
       <ParentTodayActivitiesCard />
       <ParentActionCenterCard />
       <Launch62ParentJourneyStatusCard />
+      <CultivatorTheoryOfChangeCard compact />
       <ParentYouthGrowthCard participantId={activeUser?.participant_id || ""} />
       <Parent90GrowthReportCard participantId={activeUser?.participant_id || ""} />
 
