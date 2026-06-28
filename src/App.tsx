@@ -69,6 +69,7 @@ type Screen =
   | "resources"
   | "events"
   | "media"
+  | "journey"
   | "launchProject"
   | "feedback"
   | "completion";
@@ -903,23 +904,87 @@ const youthWeekThreeDailyPlan = [
   },
 ];
 
+const youthWeekFourDailyPlan = [
+  {
+    day: "Monday",
+    date: "Week 4 Monday",
+    curriculum: "Pollinators, production, and community systems",
+    focus: "Youth begin Week 4 by connecting pollinators, crops, water, habitat, and people to farm production and community value.",
+    work: ["Review Week 4 mission", "Walk pollinator and production areas", "Identify one opportunity to improve crop or pollinator support", "Choose today's contribution", "Document one observation"],
+    resources: ["Pollinator habitat card", "Production area checklist", "Observation prompt"],
+    reflection: "What possibility did you notice in the farm ecosystem today?",
+  },
+  {
+    day: "Tuesday",
+    date: "Week 4 Tuesday",
+    curriculum: "Melon thermal rock system",
+    focus: "Youth learn how thermal mass can hold heat and support melon production without additional energy use.",
+    work: ["Review Zone 5 melon area", "Gather and place thermal rocks safely", "Observe sun and heat patterns", "Document before-and-after progress", "Explain how the system supports melons"],
+    resources: ["Thermal mass explainer", "Melon zone safety card", "Photo documentation prompt"],
+    reflection: "How can rocks, sun, and placement help improve melon production?",
+  },
+  {
+    day: "Wednesday",
+    date: "Week 4 Wednesday",
+    curriculum: "Pollinator habitat stewardship and apiary readiness",
+    focus: "Youth prepare pollinator-support areas and learn how habitat, flowering plants, and apiary readiness support food production.",
+    work: ["Inspect pollinator sanctuary", "Identify flowers and habitat needs", "Prepare apiary area only as directed", "Keep service access clear", "Record a pollinator observation"],
+    resources: ["Apiary readiness safety note", "Pollinator observation guide", "Wednesday operations note"],
+    reflection: "How do pollinators support food, farms, and community?",
+  },
+  {
+    day: "Thursday",
+    date: "Week 4 Thursday",
+    curriculum: "Production area maintenance and plant health",
+    focus: "Youth practice stewardship through watering, mulching, weed suppression, and plant health checks.",
+    work: ["Check plant health", "Water where needed", "Apply mulch or grass clippings where directed", "Remove weeds carefully", "Share one improvement idea"],
+    resources: ["Plant health checklist", "Watering guide", "Mulch and weed suppression card"],
+    reflection: "What became healthier or better because of your work today?",
+  },
+  {
+    day: "Friday",
+    date: "Week 4 Friday",
+    curriculum: "Community midpoint progress and weekly reflection",
+    focus: "Youth review what improved during Week 4 and connect pollinators, production, and stewardship to community impact.",
+    work: ["Review Week 4 projects", "Confirm what was completed", "Document one Cultivator Moment", "Return tools and update inventory", "Complete weekly reflection"],
+    resources: ["Weekly progress checklist", "Cultivator Moment prompt", "Tool return checklist"],
+    reflection: "What did Week 4 teach you about seeing potential and working the possibility?",
+  },
+];
+
 const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
   1: youthWeekOneDailyPlan,
   2: youthWeekTwoDailyPlan,
   3: youthWeekThreeDailyPlan,
+  4: youthWeekFourDailyPlan,
 };
 
 const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
 const LAUNCH_MINIMUM_ACTIVE_WEEK = 3;
 
 function getCurrentProgramWeek(date = new Date()) {
-  const start = new Date(PROGRAM_START_DATE);
-  start.setHours(0, 0, 0, 0);
   const current = new Date(date);
   current.setHours(0, 0, 0, 0);
-  const diffDays = Math.floor((current.getTime() - start.getTime()) / 86400000);
-  const computed = Math.max(1, Math.floor(diffDays / 7) + 1);
-  return Math.min(8, Math.max(LAUNCH_MINIMUM_ACTIVE_WEEK, computed));
+
+  // Constance's curriculum rule: the new curriculum week becomes visible
+  // at midnight Saturday night / Sunday morning. Week 4 begins Sunday 6/28/2026.
+  const weekStarts: Array<[number, string]> = [
+    [8, "2026-07-26T00:00:00"],
+    [7, "2026-07-19T00:00:00"],
+    [6, "2026-07-12T00:00:00"],
+    [5, "2026-07-05T00:00:00"],
+    [4, "2026-06-28T00:00:00"],
+    [3, "2026-06-21T00:00:00"],
+    [2, "2026-06-14T00:00:00"],
+    [1, "2026-06-08T00:00:00"],
+  ];
+
+  for (const [week, iso] of weekStarts) {
+    const start = new Date(iso);
+    start.setHours(0, 0, 0, 0);
+    if (current >= start) return Math.min(8, Math.max(LAUNCH_MINIMUM_ACTIVE_WEEK, week));
+  }
+  return LAUNCH_MINIMUM_ACTIVE_WEEK;
 }
 
 function getProgramDayIndex(date = new Date()) {
@@ -1289,9 +1354,9 @@ const YOUTH_ASSIGNMENT_KEY = "bff.launch.youthAssignments";
 const DAILY_CLOSEOUT_KEY = "bff.launch.dailyCloseouts";
 
 const TODAY_CURRICULUM: CurriculumDay = {
-  week: 3,
-  theme: "Preparing for Future Growth",
-  featuredStory: "Building a Home for Future Pollinators",
+  week: 4,
+  theme: "Pollinators, Production & Community",
+  featuredStory: "Melon Thermal Rock System + Pollinator Habitat Stewardship",
   activities: [
     {
       id: "pollinator-home",
@@ -1381,7 +1446,11 @@ const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
  * generated from the active curriculum. Do not hard-code generic daily activities elsewhere.
  */
 function getActiveCurriculum(): CurriculumDay {
-  return safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, TODAY_CURRICULUM);
+  const stored = safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, TODAY_CURRICULUM);
+  const currentWeek = getCurrentProgramWeek();
+  // Do not let older localStorage records hold the interface on Week 3 after Sunday advancement.
+  if (currentWeek >= 4 && stored.week < currentWeek) return TODAY_CURRICULUM;
+  return stored;
 }
 
 function buildParentSummary(curriculum: CurriculumDay = getActiveCurriculum()) {
@@ -3083,6 +3152,7 @@ function screenLabel(screen: Screen) {
     resources: "Explore & Discover / Knowledge Network",
     events: "Events & Orientation",
     media: "Media Center",
+    journey: "My Journey",
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
     completion: "Achievement Center",
@@ -4145,6 +4215,7 @@ function App() {
       {screen === "resources" && <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MyStoryScreen setScreen={setScreen} />}
+      {screen === "journey" && <MyCultivatorJourneyScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
@@ -4237,9 +4308,11 @@ function Shell({
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
+        { label: "Today's Work", screen: "wellness" },
+        { label: "Explore & Discover", screen: "resources" },
         { label: "Calendar", screen: "events" },
         { label: "Share My Learning", screen: "media" },
-        { label: "My Journey", screen: "completion" },
+        { label: "My Journey", screen: "journey" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
@@ -8106,18 +8179,21 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [energy, setEnergy] = useState("Medium");
   const [sleep, setSleep] = useState("Okay");
   const [breakfast, setBreakfast] = useState("Yes");
+  const [attitude, setAttitude] = useState("Ready to Learn");
   const [hope, setHope] = useState(3);
   const [belonging, setBelonging] = useState(3);
   const [trustedAdult, setTrustedAdult] = useState(3);
-  const [closedToeShoes, setClosedToeShoes] = useState(true);
-  const [waterBottle, setWaterBottle] = useState(true);
-  const [workGloves, setWorkGloves] = useState(true);
-  const [appropriateClothing, setAppropriateClothing] = useState(true);
+  const [closedToeShoes, setClosedToeShoes] = useState(false);
+  const [waterBottle, setWaterBottle] = useState(false);
+  const [workGloves, setWorkGloves] = useState(false);
+  const [appropriateClothing, setAppropriateClothing] = useState(false);
   const [dailyGoal, setDailyGoal] = useState("");
   const [support, setSupport] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const currentWeek = getCurrentYouthWeek(currentTime);
+  const todayPlan = getCurrentYouthPlan(currentTime);
 
   useEffect(() => {
     const timer = window.setInterval(() => setCurrentTime(new Date()), 30000);
@@ -8164,6 +8240,10 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
   const save = async () => {
     if (saving) return;
+    if (!allRequiredPPE) {
+      setMessage("Complete each PPE item before submitting. PPE resets every day and must be confirmed again today.");
+      return;
+    }
     setSaving(true);
     const now = new Date();
     const iso = now.toISOString();
@@ -8196,7 +8276,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       hope_score: hope,
       belonging_score: belonging,
       trusted_adult_score: trustedAdult,
-      support_needed: `${support.trim()}${dailyGoal.trim() ? ` | Goal: ${dailyGoal.trim()}` : ""}`.trim(),
+      support_needed: `${support.trim()}${dailyGoal.trim() ? ` | Goal: ${dailyGoal.trim()}` : ""} | Attitude: ${attitude}`.trim(),
       private_note: "",
       safety_flag: safetyFlag,
       created_at: iso,
@@ -8252,6 +8332,16 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
       </div>
 
+      <div className="mt-4 rounded-2xl border border-emerald-200/30 bg-black/30 p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Today's Mission • Week {currentWeek.week}</div>
+        <h2 className="mt-2 text-2xl font-black">{todayPlan.curriculum}</h2>
+        <p className="mt-2 text-sm font-bold leading-6 text-white/82">{todayPlan.focus}</p>
+        <div className="mt-3 grid gap-2 md:grid-cols-2">
+          <div className="rounded-xl bg-emerald-300/12 p-3 text-sm font-bold"><span className="font-black text-emerald-50">Why it matters: </span>{currentWeek.project}</div>
+          <div className="rounded-xl bg-white/10 p-3 text-sm font-bold"><span className="font-black text-emerald-50">Skills: </span>{currentWeek.skills.join(", ")}</div>
+        </div>
+      </div>
+
       <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3">
         <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Today's Cultivator Focus</div>
         <div className="mt-2 grid gap-2 md:grid-cols-4">
@@ -8291,18 +8381,19 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Gloves" checked={workGloves} setChecked={setWorkGloves} />
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <button type="button" onClick={save} disabled={saving} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:opacity-60">
-            {saving ? "Saving..." : "Begin Today's Work"}
+          <button type="button" onClick={save} disabled={saving || !allRequiredPPE} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:cursor-not-allowed disabled:opacity-50">
+            {saving ? "Saving..." : allRequiredPPE ? "Begin Today's Mission" : "Complete PPE First"}
           </button>
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
-          <div className="mt-2 grid gap-2 sm:grid-cols-4">
+          <div className="mt-2 grid gap-2 sm:grid-cols-5">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
             <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
             <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
             <SelectField label="Food" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
+            <SelectField label="Attitude" value={attitude} onChange={setAttitude} options={["Ready to Learn", "Ready to Work", "Need Support", "Not Ready Yet"]} />
           </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-3">
             <MiniSlider label="Hope" value={hope} setValue={setHope} />
@@ -8319,7 +8410,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to Today’s Work</button>
-        <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">My Journey</button>
+        <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">My Journey</button>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
@@ -10394,6 +10485,69 @@ function CoolingCenterProjectModule({
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cultivator Reflection</button>
       </div>
     </Card>
+  );
+}
+
+function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const currentWeek = getCurrentYouthWeek();
+  const completed = getCompletedAssignmentsForYouth(launchParticipantId(activeUser));
+  const skills = getResumeSkillsForYouth(launchParticipantId(activeUser));
+  const discoveries = todayDiscoveries(activeUser);
+  const characterRoots = ["Consistency", "Reliability", "Responsibility", "Accountability", "Stewardship", "Maturity", "Critical Thinking"];
+
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey • Personal Growth Center</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Cultivator Journey</h1>
+        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is about me: my growth, skills, reflections, achievements, portfolio evidence, workforce transcript, and future pathways.</p>
+        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Current Week</div>
+          <h2 className="mt-2 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm font-bold leading-7 text-white/80">{currentWeek.focus}</p>
+          <div className="mt-4 flex flex-wrap gap-2">{currentWeek.skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div>
+        </div>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card className="p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Growth</div>
+          <h2 className="mt-2 text-2xl font-black">Character Roots</h2>
+          <div className="mt-4 grid gap-2">{characterRoots.map((root) => <div key={root} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">🌱 {root}</div>)}</div>
+        </Card>
+        <Card className="p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Skills Passport</div>
+          <h2 className="mt-2 text-2xl font-black">Skills I am building</h2>
+          <div className="mt-4 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).slice(0, 12).map((skill) => <span key={skill} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">{skill}</span>)}</div>
+        </Card>
+        <Card className="p-5">
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Portfolio Progress</div>
+          <h2 className="mt-2 text-2xl font-black">Evidence collected</h2>
+          <div className="mt-4 grid gap-2 text-sm font-black">
+            <div className="rounded-xl bg-white/10 p-3">Assignments: {completed.length}</div>
+            <div className="rounded-xl bg-white/10 p-3">Today's responses: {discoveries.length}</div>
+            <div className="rounded-xl bg-white/10 p-3">Resume / transcript: in progress</div>
+          </div>
+        </Card>
+      </div>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Journey Timeline</div>
+        <h2 className="mt-2 text-3xl font-black">My weeks stay visible</h2>
+        <div className="mt-4"><Launch62MyJourneyPanel compact /></div>
+      </Card>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">My Future</div>
+        <h2 className="mt-2 text-3xl font-black">Career, education, and entrepreneurship pathways</h2>
+        <p className="mt-3 text-sm font-bold leading-7 text-white/78">Use Explore & Discover for resources. Use Share My Learning to add photos, videos, observations, and Cultivator Moments to this journey.</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start / Continue Today</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Share My Learning</button>
+          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Explore & Discover</button>
+        </div>
+      </Card>
+    </div>
   );
 }
 
