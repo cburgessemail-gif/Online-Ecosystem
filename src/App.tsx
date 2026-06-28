@@ -1449,11 +1449,33 @@ const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
  * portfolio entry, resume skill, calendar event, and closeout report must be
  * generated from the active curriculum. Do not hard-code generic daily activities elsewhere.
  */
-function getActiveCurriculum(): CurriculumDay {
-  const stored = safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, TODAY_CURRICULUM);
-  const currentWeek = getCurrentProgramWeek();
-  // Do not let older localStorage records hold the interface on Week 3 after Sunday advancement.
-  if (currentWeek >= 4 && stored.week < currentWeek) return TODAY_CURRICULUM;
+function getCurriculumForWeek(weekNumber: number): CurriculumDay {
+  if (weekNumber === 4) return TODAY_CURRICULUM;
+  const weekMeta = youthCurriculumWeeks.find((week) => week.week === weekNumber) || youthCurriculumWeeks[0];
+  const plans = youthDailyPlansByWeek[weekNumber] || youthWeekOneDailyPlan;
+  return {
+    week: weekNumber,
+    theme: weekMeta.title,
+    featuredStory: weekMeta.project || weekMeta.focus,
+    activities: plans.map((plan, index) => ({
+      id: `week-${weekNumber}-day-${index + 1}`,
+      icon: weekNumber === 1 ? "🛠️" : weekNumber === 2 ? "🌱" : weekNumber === 3 ? "🏗️" : "🌿",
+      title: plan.curriculum,
+      summary: plan.focus,
+      whyItMatters: plan.focus,
+      evidenceRequired: ["Photo or observation", "Work completed note", "Reflection response"],
+      reflectionPrompt: plan.reflection,
+      resources: plan.resources,
+    })),
+  };
+}
+
+function getActiveCurriculum(date = new Date()): CurriculumDay {
+  const currentWeek = getCurrentProgramWeek(date);
+  const dateScopedCurriculum = getCurriculumForWeek(currentWeek);
+  const stored = safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, dateScopedCurriculum);
+  // Do not let older localStorage records or demo records hold the interface on a prior week.
+  if (stored.week !== currentWeek) return dateScopedCurriculum;
   return stored;
 }
 
@@ -1567,7 +1589,7 @@ function getResumeSkillsForYouth(participantId: string) {
 }
 
 function saveDailyCloseout() {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(new Date());
   const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
   const record: DailyCloseoutRecord = {
     id: uuid(),
@@ -1620,7 +1642,7 @@ function exportDailyCloseoutReport(record: DailyCloseoutRecord) {
 }
 
 function validateLaunchReadiness() {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(new Date());
   const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
   const closeouts = safeRead<DailyCloseoutRecord[]>(DAILY_CLOSEOUT_KEY, []).filter((row) => row.date === todayISO());
   return {
@@ -1635,7 +1657,7 @@ function validateLaunchReadiness() {
   };
 }
 function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(date);
   const week = getCurrentYouthWeek(date);
   const plan = getCurrentYouthPlan(date);
   const cancellation = getOperationalCancellationForDate(date);
@@ -1785,9 +1807,16 @@ function CalendarEventPill({ title, kind }: { title: string; kind: string }) {
   return <div className={`truncate rounded-md border px-1.5 py-1 text-[10px] font-black ${tone}`}>{title}</div>;
 }
 
+function getCalendarDisplayBase(date = new Date()) {
+  const display = new Date(date);
+  // Weekend preview rule: on Sunday, show the coming program week, not the week that just ended.
+  if (display.getDay() === 0) display.setDate(display.getDate() + 1);
+  return display;
+}
+
 function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [view, setView] = useState<"month" | "week" | "day">("week");
-  const base = new Date();
+  const base = getCalendarDisplayBase(new Date());
   const todayPlan = getTodayFarmPlan(base);
   const monthStart = new Date(base.getFullYear(), base.getMonth(), 1);
   const gridStart = new Date(monthStart);
@@ -1807,7 +1836,7 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
     }
     const week = getCurrentProgramWeek(d);
     const plan = getCurrentYouthPlan(d);
-    const items = [{ title: `Week ${week}: ${getCurrentYouthWeek().title}`, kind: "curriculum" }, { title: plan.work?.[0] || plan.curriculum, kind: "work" }];
+    const items = [{ title: `Week ${week}: ${getCurrentYouthWeek(d).title}`, kind: "curriculum" }, { title: plan.work?.[0] || plan.curriculum, kind: "work" }];
     if (day === 3) items.push({ title: "Porta-potty service access", kind: "delivery" });
     if (day === 5) items.push({ title: "Water tote fill check", kind: "delivery" });
     return items;
@@ -3570,7 +3599,7 @@ function TodayYouthAssignmentBoard() {
 }
 
 function MissionControlDailyCloseoutCard() {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(new Date());
   const assignments = safeRead<YouthAssignmentRecord[]>(YOUTH_ASSIGNMENT_KEY, []).filter((row) => row.date === todayISO());
   const completed = assignments.filter((row) => row.status === "Completed");
   const inProgress = assignments.filter((row) => row.status === "In Progress");
