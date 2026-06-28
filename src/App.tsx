@@ -1139,36 +1139,32 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
 
   if (compact) {
     return (
-      <div className={`rounded-[1.25rem] border p-4 ${statusClass}`}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">LIVE FARM WEATHER</div>
-            <div className="mt-2 flex items-center gap-3">
-              <div className="text-5xl leading-none">{icon}</div>
-              <div>
-                <div className="text-4xl font-black leading-none">{temp}</div>
-                <div className="mt-1 text-xs font-black text-white/70">Feels like {feels}</div>
-              </div>
-            </div>
+      <details className={`rounded-2xl border px-3 py-2 ${statusClass}`}>
+        <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-2xl leading-none">{icon}</span>
+            <span className="text-lg font-black leading-none">{temp}</span>
+            <span className="text-xs font-black text-white/65">Feels {feels}</span>
+            <span className="rounded-full bg-black/25 px-3 py-1 text-[11px] font-black">Rain {rain}</span>
+            <span className="rounded-full bg-black/25 px-3 py-1 text-[11px] font-black">Wind {wind}</span>
+            <span className="rounded-full bg-black/25 px-3 py-1 text-[11px] font-black">Heat {heat}</span>
           </div>
-          <span className="rounded-full border border-white/20 bg-black/25 px-3 py-1 text-[11px] font-black">{farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Cancelled"}</span>
-        </div>
-        <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black leading-5 text-white/88">{impact}</div>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Rain</div><div className="font-black">{rain}</div></div>
-          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Wind</div><div className="font-black">{wind}</div></div>
-          <div className="rounded-xl bg-black/20 p-2"><div className="text-[9px] font-black uppercase text-white/55">Heat</div><div className="font-black">{heat}</div></div>
-        </div>
-        <div className="mt-3 grid grid-cols-4 gap-2">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full border border-white/20 bg-black/25 px-3 py-1 text-[11px] font-black">{farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Cancelled"}</span>
+            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white/70">Weather</span>
+          </div>
+        </summary>
+        <div className="mt-2 rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-black leading-5 text-white/82">{impact}</div>
+        <div className="mt-2 grid grid-cols-4 gap-2">
           {(hourly.length ? hourly : [0, 1, 2, 3].map((i) => ({ time: "", temp: undefined, apparent: undefined, rain: undefined }))).map((slot, index) => (
             <div key={`${slot.time || "loading"}-${index}`} className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
               <div className="text-[10px] font-black text-white/60">{slot.time ? new Date(slot.time).toLocaleTimeString("en-US", { hour: "numeric" }) : "—"}</div>
-              <div className="mt-1 text-lg font-black">{typeof slot.temp === "number" ? `${Math.round(slot.temp)}°` : "--"}</div>
+              <div className="mt-1 text-sm font-black">{typeof slot.temp === "number" ? `${Math.round(slot.temp)}°` : "--"}</div>
             </div>
           ))}
         </div>
-        <div className="mt-3 text-[10px] font-bold text-white/55">Updated {formatLiveTime(liveWeather?.updated)} • visual live card, not a word list</div>
-      </div>
+        <div className="mt-2 text-[10px] font-bold text-white/55">Updated {formatLiveTime(liveWeather?.updated)} • compact support strip; open only when detail is needed</div>
+      </details>
     );
   }
 
@@ -8241,8 +8237,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">Begin Today’s Work</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Fast check-in for attendance, PPE, daily goal, and support needs.</p>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Begin Today’s Journey</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Start with purpose, then complete attendance, PPE, daily goal, and support needs.</p>
           {activeUser?.needs_supervisor_verification && (
             <div className="mt-3 rounded-2xl border border-amber-300/40 bg-amber-300/14 p-3 text-sm font-bold text-amber-50">
               Supervisor-assisted access is active. This check-in will still save, and staff can verify the youth record later.
@@ -8256,7 +8252,17 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
       </div>
 
-      <div className="mt-4"><FarmConditionsCard compact /></div>
+      <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3">
+        <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">Today's Cultivator Focus</div>
+        <div className="mt-2 grid gap-2 md:grid-cols-4">
+          <div className="rounded-xl bg-black/24 p-3"><div className="text-[10px] font-black uppercase text-white/55">See Potential</div><div className="mt-1 text-sm font-black leading-5">Notice the opportunity in today's work.</div></div>
+          <div className="rounded-xl bg-black/24 p-3"><div className="text-[10px] font-black uppercase text-white/55">Work the Possibility</div><div className="mt-1 text-sm font-black leading-5">Use effort, learning, and problem solving.</div></div>
+          <div className="rounded-xl bg-black/24 p-3"><div className="text-[10px] font-black uppercase text-white/55">Cultivate Growth</div><div className="mt-1 text-sm font-black leading-5">Build skill, maturity, and confidence.</div></div>
+          <div className="rounded-xl bg-black/24 p-3"><div className="text-[10px] font-black uppercase text-white/55">Regenerate</div><div className="mt-1 text-sm font-black leading-5">Leave the work, team, and farm better.</div></div>
+        </div>
+      </div>
+
+      <div className="mt-3"><FarmConditionsCard compact /></div>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-[1fr_1.15fr_1.2fr]">
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
