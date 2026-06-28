@@ -45,6 +45,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 10.0: adds the Regenerative Cultivator Theory of Change as the organizing layer for youth, parent, supervisor, portfolio, workbook, workforce transcript, and Mission Control.
  * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
+ * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
  */
 
 type Screen =
@@ -67,6 +68,7 @@ type Screen =
   | "operations"
   | "almanac"
   | "resources"
+  | "health"
   | "events"
   | "media"
   | "journey"
@@ -4213,6 +4215,7 @@ function App() {
       {screen === "operations" && <Operations setScreen={setScreen} activeUser={activeUser} />}
       {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "resources" && <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "health" && <CultivatorHealthNutritionScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MyStoryScreen setScreen={setScreen} />}
       {screen === "journey" && <MyCultivatorJourneyScreen setScreen={setScreen} activeUser={activeUser} />}
@@ -7166,36 +7169,35 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   const knowledgePack = getActivityKnowledgePack(todayPlan);
 
   return (
-    <div className="grid gap-3">
-      <Cultivator90NorthStarCard />
-      <Cultivator90DashboardGrid setScreen={setScreen} />
-      <Cultivator90PortfolioProgressCard participantId={activeUser?.participant_id || ""} />
-      <Cultivator90MomentCaptureCard activeUser={activeUser} />
-      <Cultivator90LearningTreeCard />
-      <RegenerativeSoilProofCard />
-      <Cultivator90LearningConnectionsCard />
-      <Cultivator90GrowthDashboardCard participantId={activeUser?.participant_id || ""} />
-      <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
-      <Launch8FarmWisdomCard />
-      <Launch62TodayPlantingMissionPanel />
-      <Launch62CompanionPlantingPanel compact />
-      <Launch60ActivityGoalCard todayPlan={todayPlan} />
-      <YouthTodayWorkCard />
-      <CurriculumEvidenceCaptureCard />
+    <div className="grid gap-4">
+      <YouthProgressiveDiscoveryDashboard setScreen={setScreen} activeUser={activeUser} todayPlan={todayPlan} currentWeek={currentWeek} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Today’s Explore & Discover + Why It Matters</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open Today’s Work details</summary>
         <div className="mt-4 grid gap-3">
+          <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
+          <Launch62TodayPlantingMissionPanel />
+          <Launch60ActivityGoalCard todayPlan={todayPlan} />
+          <YouthTodayWorkCard />
+          <CurriculumEvidenceCaptureCard />
+        </div>
+      </details>
+
+      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Explore & Discover + Why It Matters</summary>
+        <div className="mt-4 grid gap-3">
+          <CultivatorHealthBiteCard setScreen={setScreen} />
           <GrowingCenterPanel setScreen={setScreen} compact />
           <Launch8FarmKnowledgeMapCard />
           <Launch8TakeItHomeCard />
+          <Launch62CompanionPlantingPanel compact />
           <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
           <ToolStewardshipLaunchCard />
         </div>
       </details>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Complete Today: layered reflection</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Complete Today: reflection, media, and portfolio</summary>
         <div className="mt-4 grid gap-3">
           <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
@@ -7240,6 +7242,174 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
     </div>
   );
 }
+
+const CULTIVATOR_NUTRITION_CROPS = [
+  { crop: "Collard Greens", emoji: "🥬", nutrients: ["Vitamin K", "Vitamin A", "Calcium", "Fiber"], body: ["Bones", "Eyes", "Immune System", "Digestion"], how: "Vitamin K helps blood clot and supports bone strength. Calcium is a building material for bones and teeth. Fiber helps digestion keep moving.", compare: "Collards give the body building materials, not just quick energy.", careers: ["Nurse", "Dietitian", "Agricultural Scientist"] },
+  { crop: "Tomatoes", emoji: "🍅", nutrients: ["Lycopene", "Vitamin C", "Potassium"], body: ["Heart", "Cells", "Immune System"], how: "Lycopene acts like a cell-protection shield. Vitamin C helps tissue repair and supports immune cells.", compare: "A tomato provides water, vitamins, minerals, and plant compounds together.", careers: ["Food Scientist", "Public Health", "Nutrition Educator"] },
+  { crop: "Watermelon", emoji: "🍉", nutrients: ["Water", "Potassium", "Lycopene", "Vitamin C"], body: ["Hydration", "Muscles", "Heart"], how: "Water supports blood flow and temperature control. Potassium helps nerves and muscles send electrical messages.", compare: "Watermelon hydrates while also giving useful nutrients.", careers: ["Athletic Trainer", "Nurse", "Public Health"] },
+  { crop: "Beans", emoji: "🫘", nutrients: ["Protein", "Iron", "Fiber", "Folate"], body: ["Muscles", "Blood", "Brain", "Digestion"], how: "Protein repairs tissue. Iron helps blood carry oxygen. Folate helps the body make new cells.", compare: "Beans deliver energy plus repair materials and oxygen-supporting minerals.", careers: ["Physician", "Dietitian", "Food Systems Entrepreneur"] },
+  { crop: "Broccoli", emoji: "🥦", nutrients: ["Vitamin C", "Vitamin K", "Fiber", "Folate"], body: ["Immune System", "Bones", "Brain", "Digestion"], how: "Vitamin C supports healing and immune defense. Vitamin K supports bones. Fiber feeds helpful gut bacteria.", compare: "Broccoli gives multiple body systems useful support at once.", careers: ["Nurse", "Biologist", "Public Health"] },
+  { crop: "Peppers", emoji: "🫑", nutrients: ["Vitamin C", "Vitamin A", "Antioxidants"], body: ["Immune System", "Eyes", "Skin", "Heart"], how: "Vitamin C helps repair tissues. Vitamin A helps eyes process light. Antioxidants help protect cells from wear and tear.", compare: "Bright colors are clues that plants carry protective compounds.", careers: ["Nutrition Educator", "Chef", "Food Scientist"] }
+];
+
+const CULTIVATOR_NUTRIENT_GLOSSARY = [
+  { nutrient: "Vitamin A", what: "A nutrient that helps eyes, skin, and immune defenses.", how: "It helps the eye turn light into signals the brain understands." },
+  { nutrient: "Vitamin C", what: "A nutrient used for repair and immune support.", how: "It helps immune cells function and helps the body make collagen for skin and tissue repair." },
+  { nutrient: "Vitamin K", what: "A nutrient for blood clotting and bone health.", how: "It activates proteins that help blood clot and helps direct calcium into bone." },
+  { nutrient: "Calcium", what: "A mineral used as building material.", how: "It strengthens bones and teeth and helps muscles contract." },
+  { nutrient: "Potassium", what: "A mineral that supports nerves, muscles, and heart rhythm.", how: "It helps tiny electrical signals move through nerves and muscles." },
+  { nutrient: "Fiber", what: "The part of plants the body does not fully digest.", how: "It helps food move through digestion and feeds helpful gut bacteria." },
+  { nutrient: "Protein", what: "The body’s repair and construction material.", how: "It provides amino acids used to build and repair muscles, tissues, and enzymes." },
+  { nutrient: "Iron", what: "A mineral that helps blood carry oxygen.", how: "It is part of hemoglobin, the oxygen-carrying protein in red blood cells." },
+  { nutrient: "Folate", what: "A B vitamin used to make new cells.", how: "It supports DNA production and healthy blood cell formation." },
+  { nutrient: "Lycopene", what: "A red plant compound found in tomatoes and watermelon.", how: "It helps protect cells from oxidative stress, like a shield against wear and tear." }
+];
+
+function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, currentWeek }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number] }) {
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Cultivator Dashboard • Bite-sized</div>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">What do I do next?</h1>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/76">Welcome {activeUser?.name || "Cultivator"}. Action first. Deeper learning opens only when you choose it.</p>
+        </div>
+        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-black text-emerald-50">Week {currentWeek.week}: {currentWeek.title}</div>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="rounded-[1.35rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Today’s Mission</div>
+          <div className="mt-2 text-2xl font-black">{todayPlan.curriculum}</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/78">{todayPlan.focus}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">Start Today’s Work</button>
+            <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">My Journey</button>
+          </div>
+        </div>
+        <div className="grid gap-3">
+          <WorkStatusMiniCard />
+          <div className="rounded-[1.15rem] border border-sky-200/20 bg-sky-300/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100/75">Weather Strip</div>
+            <div className="mt-2 text-xl font-black">Check heat, water, and shelter plan.</div>
+            <button type="button" onClick={() => setScreen("almanac")} className="mt-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Open Weather + Almanac</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {[{label:"Calendar",screen:"events"},{label:"Messages",screen:"feedback"},{label:"Explore",screen:"resources"},{label:"Health & Nutrition",screen:"health"}].map((item)=>(
+          <button key={item.label} type="button" onClick={() => setScreen(item.screen as Screen)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">
+            {item.label}
+            <div className="mt-1 text-xs font-bold text-white/60">Open when needed</div>
+          </button>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function CultivatorHealthBiteCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const crop = CULTIVATOR_NUTRITION_CROPS[0];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/75">Health & Nutrition Bite</div>
+      <h2 className="mt-2 text-2xl font-black">{crop.emoji} {crop.crop}: food builds the body.</h2>
+      <p className="mt-2 text-sm leading-6 text-white/78">{crop.nutrients.join(", ")} support {crop.body.join(", ")}.</p>
+      <p className="mt-2 text-sm font-bold leading-6 text-lime-50">How: {crop.how}</p>
+      <button type="button" onClick={() => setScreen("health")} className="mt-4 rounded-full bg-lime-300 px-5 py-3 text-sm font-black text-black">Open Health & Nutrition Pathway</button>
+    </Card>
+  );
+}
+
+function CultivatorHealthNutritionScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [selectedCrop, setSelectedCrop] = useState(CULTIVATOR_NUTRITION_CROPS[0]);
+  const [bodySystem, setBodySystem] = useState("Heart");
+  const bodyMatches = CULTIVATOR_NUTRITION_CROPS.filter((crop) => crop.body.includes(bodySystem));
+  return (
+    <div className="grid gap-4">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-lime-100/75">Cultivator Health & Nutrition Pathway</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">Healthy soil grows healthy people.</h1>
+        <p className="mt-3 max-w-3xl text-sm font-bold leading-7 text-white/78">Bite-sized nutrition connects the crop, the nutrient, the body system, how it works, and why nutrient-rich food is different from foods that mainly provide quick energy.</p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Back to Dashboard</button>
+          <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">My Nutrition Passport</button>
+          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Explore & Discover</button>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/75">Crop → Nutrient → Body → How</div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[260px_1fr]">
+          <div className="grid gap-2">
+            {CULTIVATOR_NUTRITION_CROPS.map((crop) => (
+              <button key={crop.crop} type="button" onClick={() => setSelectedCrop(crop)} className={`rounded-2xl border p-3 text-left text-sm font-black ${selectedCrop.crop === crop.crop ? "border-lime-200 bg-lime-300 text-black" : "border-white/10 bg-white/10 text-white"}`}>
+                {crop.emoji} {crop.crop}
+              </button>
+            ))}
+          </div>
+          <div className="rounded-[1.35rem] border border-white/10 bg-white/10 p-5">
+            <div className="text-5xl">{selectedCrop.emoji}</div>
+            <h2 className="mt-2 text-3xl font-black">{selectedCrop.crop}</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-white/60">Nutrients</div><div className="mt-2 text-lg font-black">{selectedCrop.nutrients.join(" • ")}</div></div>
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-white/60">Body Benefits</div><div className="mt-2 text-lg font-black">{selectedCrop.body.join(" • ")}</div></div>
+            </div>
+            <div className="mt-4 rounded-2xl border border-lime-200/20 bg-lime-300/10 p-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-lime-100/75">How it works</div><p className="mt-2 text-sm font-bold leading-6 text-white/82">{selectedCrop.how}</p></div>
+            <div className="mt-3 rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4"><div className="text-xs font-black uppercase tracking-[0.2em] text-amber-100/75">Food vs ultra-processed lens</div><p className="mt-2 text-sm font-bold leading-6 text-white/82">{selectedCrop.compare} Ask: what building materials does this food provide?</p></div>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-100/75">Body Map</div>
+        <h2 className="mt-2 text-3xl font-black">Tap a body system.</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {["Heart","Brain","Bones","Muscles","Digestion","Immune System","Eyes","Blood"].map((system)=>(
+            <button key={system} type="button" onClick={() => setBodySystem(system)} className={`rounded-full border px-4 py-2 text-sm font-black ${bodySystem === system ? "border-sky-200 bg-sky-300 text-black" : "border-white/15 bg-white/10 text-white"}`}>{system}</button>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {(bodyMatches.length ? bodyMatches : CULTIVATOR_NUTRITION_CROPS.filter((crop)=> crop.body.some((b)=> b.includes(bodySystem)))).map((crop)=>(
+            <div key={crop.crop} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-3xl">{crop.emoji}</div>
+              <div className="mt-2 text-lg font-black">{crop.crop}</div>
+              <div className="mt-1 text-xs font-bold text-white/65">{crop.nutrients.join(" • ")}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">Nutrient Glossary • What is it? How does it work?</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {CULTIVATOR_NUTRIENT_GLOSSARY.map((item)=>(
+            <details key={item.nutrient} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <summary className="cursor-pointer text-lg font-black">{item.nutrient}</summary>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/78">What: {item.what}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-lime-50">How: {item.how}</p>
+            </details>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">From Soil to Society</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-6">
+          {["Soil","Plant","Food","Body","Family","Community"].map((step, index)=>(
+            <div key={step} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-center">
+              <div className="text-2xl font-black">{index + 1}</div>
+              <div className="mt-2 text-sm font-black">{step}</div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-bold leading-7 text-white/78">Healthy soil supports healthy plants. Healthy plants provide nutrient-rich foods. Nutrient-rich foods help people grow, repair, learn, work, and serve. Healthy people strengthen communities.</p>
+      </Card>
+    </div>
+  );
+}
+
 function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
