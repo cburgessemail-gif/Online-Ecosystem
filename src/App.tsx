@@ -46,6 +46,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
  * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
+ * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
 type Screen =
@@ -102,12 +103,29 @@ type Role =
 type AccessLevel = "public" | "participant" | "family" | "staff" | "admin" | "board";
 type ProfileType = "youth" | "supervisor" | "case_manager" | "parent" | "grower" | "value_added" | "volunteer" | "partner" | "customer" | "board";
 
+type ParticipantLifecycleStatus = "pending" | "active" | "completed" | "inactive";
+
+type ParticipantLifecycleRecord = {
+  id: string;
+  profile_id?: string;
+  participant_id?: string;
+  role: Role;
+  profile_type: ProfileType;
+  status: ParticipantLifecycleStatus;
+  alumni?: boolean;
+  status_reason?: string;
+  created_at: string;
+  updated_at: string;
+};
+
 type EcosystemUser = {
   id: string;
   name: string;
   role: Role;
   accessLevel: AccessLevel;
   status: "online" | "active" | "viewing";
+  lifecycle_status: ParticipantLifecycleStatus;
+  alumni?: boolean;
   lastSeen: string;
   participant_id?: string;
   profile_id?: string;
@@ -127,6 +145,8 @@ type MasterProfile = {
   state?: string;
   zip?: string;
   active: boolean;
+  participant_status?: ParticipantLifecycleStatus;
+  alumni?: boolean;
   created_at: string;
 };
 
@@ -141,6 +161,8 @@ type EcosystemRegistration = {
   phone?: string;
   profile_type: ProfileType;
   active: boolean;
+  participant_status?: ParticipantLifecycleStatus;
+  alumni?: boolean;
   created_at: string;
 };
 
@@ -150,6 +172,8 @@ type YouthRegistration = {
   participant_id: string;
   active?: boolean;
   archived?: boolean;
+  participant_status?: ParticipantLifecycleStatus;
+  alumni?: boolean;
   age_range: string;
   crew: string;
   guardian_name: string;
@@ -336,6 +360,7 @@ const supabase: SupabaseClient | null =
   SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const SESSION_KEY = "bff.launch.activeUser";
+const PARTICIPANT_LIFECYCLE_KEY = "bff.participant.lifecycle.v11_5";
 const PROFILE_KEY = "bff.launch.profiles";
 const REGISTRATION_KEY = "bff.launch.ecosystem_registrations";
 const YOUTH_KEY = "bff.launch.youth";
@@ -3081,6 +3106,7 @@ function isActiveYouthRosterRow(row: { registration: YouthRegistration; profile?
   if (ids.some((id) => deletedYouthIds.includes(id))) return false;
   if (row.registration.active === false || row.registration.archived === true) return false;
   if (row.profile && row.profile.active === false) return false;
+  if (lifecycleStatusForYouthRow(row) !== "active") return false;
   return true;
 }
 
@@ -3377,6 +3403,88 @@ function youthSupervisorOption(row: { registration: YouthRegistration; profile?:
   return `${youthDisplayName(row)} — ${youthPinLabel(row.registration.participant_id)}`;
 }
 
+function normalizeParticipantLifecycleStatus(status?: ParticipantLifecycleStatus | string, active?: boolean, archived?: boolean): ParticipantLifecycleStatus {
+  if (status === "pending" || status === "active" || status === "completed" || status === "inactive") return status;
+  if (archived === true || active === false) return "inactive";
+  return "active";
+}
+
+function isParticipantActiveStatus(status?: ParticipantLifecycleStatus | string) {
+  return normalizeParticipantLifecycleStatus(status) === "active";
+}
+
+function isParticipantInactiveStatus(status?: ParticipantLifecycleStatus | string) {
+  return normalizeParticipantLifecycleStatus(status) === "inactive";
+}
+
+function isParticipantCompletedStatus(status?: ParticipantLifecycleStatus | string) {
+  return normalizeParticipantLifecycleStatus(status) === "completed";
+}
+
+function effectiveRoleForUser(user: EcosystemUser | null): Role {
+  if (!user) return "Guest";
+  return user.lifecycle_status === "inactive" ? "Guest" : user.role;
+}
+
+function effectiveAccessLevelForUser(user: EcosystemUser | null): AccessLevel {
+  if (!user) return "public";
+  return user.lifecycle_status === "inactive" ? "public" : user.accessLevel;
+}
+
+function lifecycleStatusForYouthRow(row: { registration: YouthRegistration; profile?: MasterProfile }): ParticipantLifecycleStatus {
+  return normalizeParticipantLifecycleStatus(row.registration.participant_status || row.profile?.participant_status, row.registration.active !== false && row.profile?.active !== false, row.registration.archived);
+}
+
+function saveParticipantLifecycleRecord(user: EcosystemUser) {
+  const existing = safeRead<ParticipantLifecycleRecord[]>(PARTICIPANT_LIFECYCLE_KEY, []);
+  const row: ParticipantLifecycleRecord = {
+    id: user.id,
+    profile_id: user.profile_id,
+    participant_id: user.participant_id,
+    role: user.role,
+    profile_type: roleToProfileType(user.role),
+    status: user.lifecycle_status,
+    alumni: user.alumni,
+    status_reason: user.lifecycle_status === "inactive" ? "Inactive users retain Guest/Visitor access only." : user.lifecycle_status === "completed" ? "Completed participant history preserved." : undefined,
+    created_at: existing.find((item) => item.id === user.id)?.created_at || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  safeWrite(PARTICIPANT_LIFECYCLE_KEY, [row, ...existing.filter((item) => item.id !== row.id)].slice(0, 500));
+}
+
+function participantLifecycleSummary() {
+  const lifecycleRows = safeRead<ParticipantLifecycleRecord[]>(PARTICIPANT_LIFECYCLE_KEY, []);
+  const masterProfiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
+  const registrations = safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []);
+  const youthRegistrations = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+  const counts = { registered: 0, pending: 0, active: 0, completed: 0, inactive: 0, alumni: 0 };
+  const seen = new Set<string>();
+  const add = (key: string, status: ParticipantLifecycleStatus, alumni?: boolean) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    counts.registered += 1;
+    counts[status] += 1;
+    if (alumni || status === "completed") counts.alumni += 1;
+  };
+  lifecycleRows.forEach((row) => add(row.id, normalizeParticipantLifecycleStatus(row.status), row.alumni));
+  masterProfiles.forEach((row) => add(`profile:${row.id}`, normalizeParticipantLifecycleStatus(row.participant_status, row.active), row.alumni));
+  registrations.forEach((row) => add(`registration:${row.id}`, normalizeParticipantLifecycleStatus(row.participant_status, row.active), row.alumni));
+  youthRegistrations.forEach((row) => add(`youth:${row.id}`, normalizeParticipantLifecycleStatus(row.participant_status, row.active, row.archived), row.alumni));
+  return counts;
+}
+
+function setParticipantInactive(user: EcosystemUser): EcosystemUser {
+  const next = { ...user, lifecycle_status: "inactive" as ParticipantLifecycleStatus, accessLevel: "public" as AccessLevel, lastSeen: nowLabel() };
+  saveParticipantLifecycleRecord(next);
+  return next;
+}
+
+function setParticipantCompleted(user: EcosystemUser): EcosystemUser {
+  const next = { ...user, lifecycle_status: "completed" as ParticipantLifecycleStatus, alumni: true, lastSeen: nowLabel() };
+  saveParticipantLifecycleRecord(next);
+  return next;
+}
+
 function roleToProfileType(role: Role): ProfileType {
   const map: Record<Role, ProfileType> = {
     Guest: "customer",
@@ -3414,9 +3522,10 @@ function routeForRole(role: Role): Screen {
 }
 
 function canEnter(user: EcosystemUser | null, screen: Screen) {
-  // Launch demo mode: all role pathways must be auditable from the nav.
-  // The Supervisor Center still separates private staff notes inside the workflow,
-  // but the button should not redirect reviewers back to the Grower workspace.
+  const publicScreens: Screen[] = ["portal", "demo", "guest", "registration", "roles", "resources", "events", "almanac", "support", "feedback"];
+  if (!user) return publicScreens.includes(screen);
+  if (user.lifecycle_status === "inactive") return publicScreens.includes(screen) || screen === "guest";
+  if (user.lifecycle_status === "pending") return publicScreens.includes(screen);
   return true;
 }
 
@@ -4194,7 +4303,10 @@ function Supervisor90GrowthNotesCard({ activeUser }: { activeUser: EcosystemUser
 
 function App() {
   const [screen, setScreenState] = useState<Screen>("portal");
-  const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => safeRead<EcosystemUser | null>(SESSION_KEY, null));
+  const [activeUser, setActiveUser] = useState<EcosystemUser | null>(() => {
+    const saved = safeRead<EcosystemUser | null>(SESSION_KEY, null);
+    return saved ? { ...saved, lifecycle_status: saved.lifecycle_status || "active" } : null;
+  });
   const [message, setMessage] = useState("");
   const [language, setLanguage] = useState<LanguageCode>(() => safeRead<LanguageCode>(LANGUAGE_KEY, "en"));
 
@@ -4217,8 +4329,8 @@ function App() {
 
   const setScreen = (target: Screen) => {
     if (!canEnter(activeUser, target)) {
-      setMessage(translatePhrase(language, "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first."));
-      setScreenState("roles");
+      setMessage(translatePhrase(language, activeUser?.lifecycle_status === "inactive" ? "This account is inactive. Guest/Visitor access only is available until reactivated." : activeUser?.lifecycle_status === "pending" ? "This account is pending. Guest/Visitor access only is available until activation." : "Protected area. Enter with an active authorized role first."));
+      setScreenState(activeUser?.lifecycle_status === "inactive" ? "guest" : "roles");
       return;
     }
     setMessage("");
@@ -4234,15 +4346,19 @@ function App() {
       role,
       accessLevel: roleAccess[role],
       status: "active",
+      lifecycle_status: options?.lifecycle_status || "active",
+      alumni: options?.alumni,
       lastSeen: nowLabel(),
       participant_id: options?.participant_id,
       profile_id: options?.profile_id,
       needs_supervisor_verification: options?.needs_supervisor_verification,
     };
-    safeWrite(SESSION_KEY, user);
-    const target = routeForRole(role);
-    recordJourney(target, user);
-    setActiveUser(user);
+    const normalizedUser = user.lifecycle_status === "inactive" ? { ...user, accessLevel: "public" as AccessLevel } : user;
+    safeWrite(SESSION_KEY, normalizedUser);
+    saveParticipantLifecycleRecord(normalizedUser);
+    const target = normalizedUser.lifecycle_status === "inactive" || normalizedUser.lifecycle_status === "pending" ? "guest" : routeForRole(role);
+    recordJourney(target, normalizedUser);
+    setActiveUser(normalizedUser);
     setScreenState(target);
     scrollToTop();
   };
@@ -4426,12 +4542,12 @@ function Shell({
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
               <div className="truncate text-sm font-black leading-tight md:text-base">
-                {screen === "portal" ? "🌲 Forest Gate Portal" : activeUser?.role === "Youth Workforce Participant" ? `🌱 Cultivator | Week ${getCurrentProgramWeek(new Date())}` : activeUser ? `${activeUser.name} • ${activeUser.role}` : "Choose Your Path"}
+                {screen === "portal" ? "🌲 Forest Gate Portal" : role === "Youth Workforce Participant" ? `🌱 Cultivator | Week ${getCurrentProgramWeek(new Date())}` : activeUser ? `${activeUser.name} • ${role}${activeUser.lifecycle_status !== "active" ? ` • ${activeUser.lifecycle_status.toUpperCase()}` : ""}` : "Choose Your Path"}
               </div>
             </button>
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
-              <button type="button" onClick={() => setScreen(activeUser?.role ? routeForRole(activeUser.role) : "portal")} className={buttonClass(activeUser?.role ? routeForRole(activeUser.role) : "portal")}>Dashboard</button>
+              <button type="button" onClick={() => setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
               <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? "Today’s Work" : "Choose Role"}</button>
               <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>🌿 Explore & Discover</button>
               {primaryNav.map((item) => (
@@ -10055,9 +10171,46 @@ function CropPlannerPanel() {
   );
 }
 
+function ParticipantLifecycleGovernancePanel() {
+  const [summary, setSummary] = useState(() => participantLifecycleSummary());
+  const refresh = () => setSummary(participantLifecycleSummary());
+  const cards: [string, number, string][] = [
+    ["Registered", summary.registered, "All preserved participant records"],
+    ["Pending", summary.pending, "Guest-only until activated"],
+    ["Active", summary.active, "Role-based operating access"],
+    ["Completed", summary.completed, "Program finished; history preserved"],
+    ["Inactive", summary.inactive, "Guest/Visitor access only"],
+    ["Alumni", summary.alumni, "Long-term impact relationship"],
+  ];
+  return (
+    <div className="rounded-[1.5rem] border-2 border-slate-200 bg-white p-5 text-slate-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-600">Participant Lifecycle Governance</div>
+      <h2 className="mt-2 text-3xl font-black">Pending → Active → Completed / Inactive</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">No suspension status. No default deletion. Inactive participants remain in history but lose all privileges except Visitor/Guest access. Completed participants preserve workbook, portfolio, hours, attendance, reflections, and career evidence.</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {cards.map(([label, value, detail]) => (
+          <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-3xl font-black">{value}</div>
+            <div className="mt-1 text-sm font-black">{label}</div>
+            <div className="mt-1 text-xs font-bold leading-5 text-slate-600">{detail}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-950"><b>Active</b><br />Full access according to assigned role.</div>
+        <div className="rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950"><b>Completed</b><br />Alumni history preserved; operating privileges can be removed when moved inactive.</div>
+        <div className="rounded-2xl bg-slate-100 p-4 text-sm font-bold text-slate-800"><b>Inactive</b><br />Guest/Visitor access only. Records remain available for reports.</div>
+      </div>
+      <button type="button" onClick={refresh} className="mt-4 rounded-full bg-slate-900 px-5 py-3 text-sm font-black text-white">Refresh Lifecycle Counts</button>
+    </div>
+  );
+}
+
+
 function Operations({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   return (
     <div className="grid gap-5">
+      <ParticipantLifecycleGovernancePanel />
       <LaunchReadinessValidatorCard />
       <MissionControlCurriculumBuilder activeUser={activeUser} />
       <MissionControlLiveCurriculumStatusCard />
