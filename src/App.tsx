@@ -148,6 +148,8 @@ type YouthRegistration = {
   id: string;
   profile_id: string;
   participant_id: string;
+  active?: boolean;
+  archived?: boolean;
   age_range: string;
   crew: string;
   guardian_name: string;
@@ -3045,6 +3047,14 @@ function preferYouthRosterRow(current: { registration: YouthRegistration; profil
   return String(incoming.registration.id || "") > String(current.registration.id || "") ? incoming : current;
 }
 
+function isActiveYouthRosterRow(row: { registration: YouthRegistration; profile?: MasterProfile }, deletedYouthIds: string[]) {
+  const ids = [row.registration.id, row.registration.profile_id, row.registration.participant_id].filter(Boolean);
+  if (ids.some((id) => deletedYouthIds.includes(id))) return false;
+  if (row.registration.active === false || row.registration.archived === true) return false;
+  if (row.profile && row.profile.active === false) return false;
+  return true;
+}
+
 function dedupeYouthRosterRows(rows: { registration: YouthRegistration; profile?: MasterProfile }[]) {
   const map = new Map<string, { registration: YouthRegistration; profile?: MasterProfile }>();
   rows.forEach((row) => {
@@ -3281,6 +3291,28 @@ async function archiveSupabaseProfile(profileId: string) {
     } catch (error) {
       lastError = error;
       console.warn(`Supabase archive failed for ${candidate}:`, error);
+    }
+  }
+  return { ok: false, mode: "local-fallback", table: "localStorage", error: lastError };
+}
+
+async function archiveSupabaseYouth(registration: YouthRegistration) {
+  if (!supabase) return { ok: true, mode: "local", table: "localStorage", error: null };
+  let lastError: unknown = null;
+  for (const candidate of ["youth_participants", "youth"]) {
+    for (const match of [
+      { column: "id", value: registration.id },
+      { column: "profile_id", value: registration.profile_id },
+      { column: "participant_id", value: registration.participant_id },
+    ]) {
+      if (!match.value) continue;
+      try {
+        const { error } = await supabase.from(candidate).update({ active: false, archived: true }).eq(match.column, match.value);
+        if (!error) return { ok: true, mode: "supabase", table: candidate, error: null };
+        lastError = error;
+      } catch (error) {
+        lastError = error;
+      }
     }
   }
   return { ok: false, mode: "local-fallback", table: "localStorage", error: lastError };
@@ -7481,9 +7513,8 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
   const deletedYouthIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
   const youthRows = dedupeYouthRosterRows(
     youth
-      .filter((y) => !deletedYouthIds.includes(y.id) && !deletedYouthIds.includes(y.profile_id) && !deletedYouthIds.includes(y.participant_id))
       .map((y) => ({ registration: y, profile: profiles.find((p) => p.id === y.profile_id) }))
-      .filter((row) => row.profile?.active !== false)
+      .filter((row) => isActiveYouthRosterRow(row, deletedYouthIds))
   );
   const todayAttendance = attendance.filter((a) => a.date === todayISO());
   const supportFlags = wellness.filter((w) => w.safety_flag);
@@ -7546,7 +7577,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
         {tab === "parent" && <ParentSummaryTool youthRows={youthRows} activeUser={activeUser} assessments={assessments} attendance={attendance} onSaved={refresh} />}
         {tab === "guardian" && <GuardianContactTool youthRows={youthRows} activeUser={activeUser} parentContacts={parentContacts} onSaved={refresh} />}
         {tab === "feedback" && <FeedbackCenter feedbackRows={feedbackRows} />}
-        {tab === "reports" && <SupervisorReports profiles={profiles} youth={youth} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} parentSummaries={parentSummaries} />}
+        {tab === "reports" && <SupervisorReports profiles={profiles.filter((p) => p.active !== false)} youth={youthRows.map((row) => row.registration)} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} parentSummaries={parentSummaries} />}
       </div>
     </div>
   );
@@ -7650,7 +7681,11 @@ function YouthRosterModule({
 
     setRosterMessage(`${mode === "delete" ? "Deleting" : "Archiving"} ${label}...`);
 
-    const nextYouth = safeRead<YouthRegistration[]>(YOUTH_KEY, []).filter((item) => item.id !== row.registration.id);
+    const nextYouth = safeRead<YouthRegistration[]>(YOUTH_KEY, []).map((item) =>
+      item.id === row.registration.id || item.profile_id === row.registration.profile_id || item.participant_id === row.registration.participant_id
+        ? { ...item, active: false, archived: true }
+        : item
+    );
     safeWrite(YOUTH_KEY, nextYouth);
     const deletedIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
     safeWrite(DELETED_YOUTH_KEY, Array.from(new Set([...deletedIds, row.registration.id, row.registration.profile_id, row.registration.participant_id])));
@@ -7906,6 +7941,16 @@ function AssessmentTool({
     label: youthSupervisorOption(row),
   }));
 
+  useEffect(() => {
+    if (!participantOptions.length) {
+      if (participantId) setParticipantId("");
+      return;
+    }
+    if (!participantOptions.some((option) => option.value === participantId)) {
+      setParticipantId(participantOptions[0].value);
+    }
+  }, [participantOptions, participantId]);
+
   const scoreFor = (key: AssessmentCategoryKey) => Math.max(1, Math.min(5, observedBehaviors[key].length));
 
   const toggleBehavior = (key: AssessmentCategoryKey, behavior: string) => {
@@ -7919,6 +7964,10 @@ function AssessmentTool({
   };
 
   const save = async () => {
+    if (!participantId) {
+      setMessage("No active youth are available for assessment. Archived youth are hidden from daily operations.");
+      return;
+    }
     const observedSummary = assessmentKeys
       .map((key) => {
         const rubric = assessmentBehaviorRubric[key];
@@ -7981,6 +8030,11 @@ function AssessmentTool({
       <p className="mt-3 max-w-4xl text-sm leading-6 text-white/80">
         Supervisors select what they actually observed. The system calculates the score. Higher numbers mean stronger observed readiness.
       </p>
+      {!participantOptions.length && (
+        <div className="mt-6 rounded-2xl border border-amber-200/25 bg-amber-300/15 p-4 text-sm font-bold leading-6 text-amber-50">
+          No active youth are available for assessment. Archived youth are preserved in history, but removed from daily operations.
+        </div>
+      )}
       <div className="mt-6">
         <label className="block">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
@@ -7999,7 +8053,7 @@ function AssessmentTool({
       <div className="mt-5">
         <TextArea label="Supervisor Notes" value={notes} onChange={setNotes} placeholder="Add context only if needed: task completed, support given, concern, or next step." />
       </div>
-      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Assessment</button>
+      <button type="button" onClick={save} disabled={!participantOptions.length} className={`mt-6 rounded-full px-7 py-4 font-black ${participantOptions.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>Save Assessment</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -8126,6 +8180,11 @@ function ParentSummaryTool({
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent-Safe Summary Generator</div>
       <h2 className="mt-3 text-4xl font-black">Share progress without exposing private youth reflection.</h2>
+      {!youthRows.length && (
+        <div className="mt-6 rounded-2xl border border-amber-200/25 bg-amber-300/15 p-4 text-sm font-bold leading-6 text-amber-50">
+          No active youth are available for parent-safe summaries. Archived youth are preserved in history, but removed from daily operations.
+        </div>
+      )}
       <div className="mt-6">
         <label className="block">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
