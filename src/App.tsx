@@ -479,6 +479,8 @@ type WorkStatusCode = "FULL_DAY" | "HALF_DAY" | "DELAYED_START" | "EARLY_DISMISS
 type WorkStatusUpdate = {
   id: string;
   date: string;
+  effective_date?: string;
+  expires_date?: string;
   status: WorkStatusCode;
   label: string;
   reason: string;
@@ -522,6 +524,8 @@ Farm & Family Alliance
 const defaultWorkStatusUpdate: WorkStatusUpdate = {
   id: "weather-cancel-2026-06-22",
   date: "Monday, June 22, 2026",
+  effective_date: "2026-06-22",
+  expires_date: "2026-06-22",
   status: "CANCELLED",
   label: "Program Cancelled",
   reason: "Forecasted rain and thunderstorms create unsafe conditions for normal outdoor farm operations.",
@@ -4803,10 +4807,10 @@ function getFarmStatusForDate(date = new Date()) {
   if (cancellation) return workStatusToFarmStatus(cancellation);
 
   const saved = getSavedWorkStatus();
-  if (saved && saved.status !== "CANCELLED") return workStatusToFarmStatus(saved);
+  if (saved && saved.status !== "CANCELLED" && isWorkStatusActiveForDate(saved, date)) return workStatusToFarmStatus(saved);
 
   // Critical day-advance protection:
-  // A saved Monday cancellation must not keep Tuesday or later screens red.
+  // Expired work-status records must not keep later screens red, amber, or stale.
   return defaultFarmStatus;
 }
 
@@ -4823,6 +4827,8 @@ function getDateISO(date = new Date()) {
 
 function parseWorkStatusDate(value?: string) {
   if (!value) return null;
+  const iso = value.match(/\d{4}-\d{2}-\d{2}/)?.[0];
+  if (iso) return new Date(`${iso}T00:00:00`);
   const cleaned = value.replace(/^[A-Za-z]+,\s*/, "");
   const parsed = new Date(`${cleaned} 00:00:00`);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -4832,15 +4838,39 @@ function sameCalendarDay(a: Date, b: Date) {
   return getDateISO(a) === getDateISO(b);
 }
 
+function workStatusEffectiveISO(workStatus: WorkStatusUpdate) {
+  return workStatus.effective_date || getDateISO(parseWorkStatusDate(workStatus.date) || new Date(workStatus.created_at));
+}
+
+function workStatusExpiresISO(workStatus: WorkStatusUpdate) {
+  return workStatus.expires_date || workStatusEffectiveISO(workStatus);
+}
+
+function isWorkStatusActiveForDate(workStatus: WorkStatusUpdate | null, date = new Date()) {
+  if (!workStatus) return false;
+  const today = getDateISO(date);
+  return today >= workStatusEffectiveISO(workStatus) && today <= workStatusExpiresISO(workStatus);
+}
+
+function isStaleOperationalText(text = "", date = new Date()) {
+  const today = getDateISO(date);
+  const legacyJune22 = /June\s+22,\s+2026|2026-06-22|Monday Cancelled|Monday, June 22/i.test(text);
+  return legacyJune22 && today > "2026-06-22";
+}
+
+function isStaleNotification(item: EcosystemNotification | BroadcastMessageRecord, date = new Date()) {
+  return isStaleOperationalText(`${item.title} ${item.body}`, date);
+}
+
 function getOperationalCancellationForDate(date = new Date()) {
-  // Launch protection: the weather cancellation applies to Monday, June 22, 2026 only.
-  // A saved Work Status record must never spread a one-day cancellation across the whole week.
-  if (getDateISO(date) !== "2026-06-22") return null;
+  const saved = getSavedWorkStatus();
+  if (saved?.status === "CANCELLED" && isWorkStatusActiveForDate(saved, date)) return saved;
 
-  const workStatus = getSavedWorkStatus();
-  if (workStatus?.status === "CANCELLED") return workStatus;
+  // Historical one-day launch cancellation: available only on its effective date.
+  // It must never appear on later weeks as a current advisory.
+  if (isWorkStatusActiveForDate(defaultWorkStatusUpdate, date)) return defaultWorkStatusUpdate;
 
-  return defaultWorkStatusUpdate;
+  return null;
 }
 
 function isOperationallyCancelled(date = new Date()) {
@@ -4848,20 +4878,25 @@ function isOperationallyCancelled(date = new Date()) {
 }
 
 function saveWorkStatusUpdate(update: WorkStatusUpdate) {
-  safeWrite(WORK_STATUS_KEY, update);
+  const normalized: WorkStatusUpdate = {
+    ...update,
+    effective_date: update.effective_date || getDateISO(parseWorkStatusDate(update.date) || new Date()),
+    expires_date: update.expires_date || update.effective_date || getDateISO(parseWorkStatusDate(update.date) || new Date()),
+  };
+  safeWrite(WORK_STATUS_KEY, normalized);
   const existing = safeRead<WorkStatusUpdate[]>(WORK_STATUS_LOG_KEY, []);
-  safeWrite(WORK_STATUS_LOG_KEY, [update, ...existing].slice(0, 100));
+  safeWrite(WORK_STATUS_LOG_KEY, [normalized, ...existing].slice(0, 100));
   // Do not permanently save a one-day cancellation as the global farm status.
   // Screens must evaluate status by date through getFarmStatusForDate().
-  if (update.status !== "CANCELLED") {
-    safeWrite(FARM_STATUS_KEY, workStatusToFarmStatus(update));
+  if (normalized.status !== "CANCELLED") {
+    safeWrite(FARM_STATUS_KEY, workStatusToFarmStatus(normalized));
   }
 }
 
 function queueBroadcastMessage(row: BroadcastMessageRecord) {
   const existing = safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []);
   safeWrite(BROADCAST_MESSAGE_KEY, [row, ...existing].slice(0, 250));
-  const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+  const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications).filter((item) => !isStaleNotification(item));
   const audience: EcosystemNotification["audience"] = row.audience === "Parents" ? "Parent" : row.audience === "Supervisors" ? "Supervisor" : row.audience === "Youth" ? "Youth" : "All";
   safeWrite(NOTIFICATION_KEY, [{ id: row.id, audience, priority: row.priority, title: row.title, body: row.body, created_at: row.created_at }, ...notifications].slice(0, 250));
 }
@@ -4885,7 +4920,7 @@ function launchMondayOnlyCancellationNotice() {
 }
 
 function getLaunchNotifications(audience?: EcosystemNotification["audience"]) {
-  const rows = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+  const rows = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications).filter((item) => !isStaleNotification(item));
   if (!audience) return rows;
   return rows.filter((item) => item.audience === audience || item.audience === "All");
 }
@@ -10046,30 +10081,73 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
 
 function WorkStatusLaunchPanel() {
   const [workStatus, setWorkStatus] = useState<WorkStatusUpdate | null>(() => getSavedWorkStatus());
+  const [status, setStatus] = useState<WorkStatusCode>("FULL_DAY");
+  const [effectiveDate, setEffectiveDate] = useState(todayISO());
+  const [expiresDate, setExpiresDate] = useState(todayISO());
+  const [label, setLabel] = useState("Normal Operations");
+  const [reason, setReason] = useState("Outdoor work allowed with water breaks, PPE, and supervisor direction.");
+  const [action, setAction] = useState("Begin with today's assignment, check hydration, and follow Mission Control updates.");
   const [notice, setNotice] = useState("");
-  const launched = workStatus?.launched_at;
-  const launchNow = () => {
-    const update = launchMondayOnlyCancellationNotice();
-    setWorkStatus(update);
-    setNotice("Cancellation notice queued for parents, youth, and supervisors. Use Open Email/Text paths for direct delivery if the backend email/SMS service is not connected yet.");
+  const currentFarmStatus = getFarmStatusForDate(new Date());
+
+  const saveStatus = () => {
+    const normalizedLabel = label.trim() || (status === "CANCELLED" ? "Program Cancelled" : status === "HALF_DAY" ? "Half Day Operations" : "Normal Operations");
+    const row: WorkStatusUpdate = {
+      id: `work-status-${effectiveDate}-${Date.now()}`,
+      date: effectiveDate,
+      effective_date: effectiveDate,
+      expires_date: expiresDate || effectiveDate,
+      status,
+      label: normalizedLabel,
+      reason: reason.trim(),
+      action: action.trim(),
+      audiences: ["Parents", "Youth", "Supervisors"],
+      hangar_note: status === "CANCELLED" ? "The hangar is emergency cover only unless Mission Control states otherwise." : "Use the hangar only as directed by site leadership.",
+      parent_message: `Bronson Family Farm Work Status\n\n${effectiveDate}${expiresDate && expiresDate !== effectiveDate ? ` through ${expiresDate}` : ""}\n\nSTATUS: ${status.replaceAll("_", " ")}\n\n${reason.trim()}\n\nAction: ${action.trim()}\n\nBronson Family Farm / Farm & Family Alliance`,
+      created_by: "Mission Control",
+      created_at: new Date().toISOString(),
+      launched_at: new Date().toISOString(),
+    };
+    saveWorkStatusUpdate(row);
+    setWorkStatus(row);
+    setNotice("Work status saved with an effective date and expiration date. Expired notices will no longer display as current advisories.");
   };
+
+  const clearExpiredLocalStatus = () => {
+    const saved = getSavedWorkStatus();
+    if (saved && !isWorkStatusActiveForDate(saved)) {
+      window.localStorage.removeItem(WORK_STATUS_KEY);
+      setWorkStatus(null);
+      setNotice("Expired work status cleared. Current screens now use normal operations unless a new active status is saved.");
+    } else {
+      setNotice("No expired current work status was found. Stale June 22 notifications are filtered from display automatically.");
+    }
+  };
+
   return (
-    <div className="rounded-[1.5rem] border-2 border-red-300 bg-red-50 p-5 text-red-950 shadow-sm">
-      <div className="text-xs font-black uppercase tracking-[0.28em] text-red-700">Work Status Launch</div>
-      <h2 className="mt-2 text-3xl font-black">Monday, June 22, 2026: CANCELLED</h2>
-      <p className="mt-2 text-sm font-bold leading-6 text-red-900/85">{defaultWorkStatusUpdate.reason} {defaultWorkStatusUpdate.hangar_note}</p>
-      <div className="mt-4 rounded-2xl border border-red-200 bg-white p-4 text-sm font-bold leading-6 whitespace-pre-wrap">{MONDAY_JUNE_22_CANCELLATION_MESSAGE}</div>
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <OperationalStatusCard icon="🚫" label="Status" value="Cancelled" detail="No youth workday tomorrow" tone="red" />
-        <OperationalStatusCard icon="📣" label="Audience" value="3 Groups" detail="Parents, Youth, Supervisors" tone="amber" />
-        <OperationalStatusCard icon="🛖" label="Hangar" value="Emergency Only" detail="Not a program space" tone="orange" />
+    <div className="rounded-[1.5rem] border-2 border-emerald-200 bg-emerald-50 p-5 text-emerald-950 shadow-sm">
+      <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Work Status Control</div>
+      <h2 className="mt-2 text-3xl font-black">Current operating status only</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-emerald-900/85">Work status now uses effective and expiration dates. Last week's advisories stay in history but do not display as current guidance.</p>
+      <div className="mt-4 rounded-2xl border border-emerald-200 bg-white p-4 text-sm font-bold leading-6">
+        <div className="text-xs uppercase tracking-[0.2em] text-emerald-700">Live display right now</div>
+        <div className="mt-1 text-2xl font-black">{currentFarmStatus.title}</div>
+        <div className="mt-1 text-emerald-900/80">{currentFarmStatus.summary}</div>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <SelectField label="Status" value={status} onChange={(v) => setStatus(v as WorkStatusCode)} options={["FULL_DAY", "HALF_DAY", "DELAYED_START", "EARLY_DISMISSAL", "WEATHER_SHELTER", "CANCELLED"]} />
+        <Field label="Label" value={label} onChange={setLabel} />
+        <Field label="Effective Date" type="date" value={effectiveDate} onChange={setEffectiveDate} />
+        <Field label="Expires Date" type="date" value={expiresDate} onChange={setExpiresDate} />
+        <TextArea label="Reason / Conditions" value={reason} onChange={setReason} />
+        <TextArea label="Action" value={action} onChange={setAction} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={launchNow} className="rounded-full bg-red-700 px-6 py-4 text-sm font-black text-white shadow-sm hover:bg-red-800">Launch Cancellation Notice</button>
-        <a href={`mailto:?subject=${encodeURIComponent("Bronson Family Farm Work Status: Cancelled")}&body=${encodeURIComponent(MONDAY_JUNE_22_CANCELLATION_MESSAGE)}`} className="rounded-full border border-red-300 bg-white px-6 py-4 text-sm font-black text-red-950">Open Email</a>
+        <button type="button" onClick={saveStatus} className="rounded-full bg-emerald-700 px-6 py-4 text-sm font-black text-white shadow-sm hover:bg-emerald-800">Save Current Work Status</button>
+        <button type="button" onClick={clearExpiredLocalStatus} className="rounded-full border border-emerald-300 bg-white px-6 py-4 text-sm font-black text-emerald-950">Clear Expired Local Status</button>
       </div>
-      {launched && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-red-950">Launched: {new Date(launched).toLocaleString()}</div>}
-      {notice && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-red-950">{notice}</div>}
+      {workStatus && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-emerald-950">Saved status: {workStatus.label} • {workStatus.effective_date || workStatus.date} through {workStatus.expires_date || workStatus.date}</div>}
+      {notice && <div className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-emerald-950">{notice}</div>}
     </div>
   );
 }
@@ -10116,11 +10194,11 @@ function ParentNotificationCenter() {
 }
 
 function MessagingCenter() {
-  const [messages, setMessages] = useState<BroadcastMessageRecord[]>(() => safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []));
+  const [messages, setMessages] = useState<BroadcastMessageRecord[]>(() => safeRead<BroadcastMessageRecord[]>(BROADCAST_MESSAGE_KEY, []).filter((item) => !isStaleNotification(item)));
   const [audience, setAudience] = useState<BroadcastMessageRecord["audience"]>("Parents");
   const [priority, setPriority] = useState<BroadcastMessageRecord["priority"]>("Urgent");
-  const [title, setTitle] = useState("Bronson Family Farm Work Status: Cancelled");
-  const [body, setBody] = useState(MONDAY_JUNE_22_CANCELLATION_MESSAGE);
+  const [title, setTitle] = useState("Bronson Family Farm Work Status Update");
+  const [body, setBody] = useState("Please check Mission Control for today’s current farm conditions, assignment, and operating status.");
   const [notice, setNotice] = useState("");
   const saveMessage = (status: BroadcastMessageRecord["status"]) => {
     if (!title.trim() || !body.trim()) {
@@ -10131,7 +10209,7 @@ function MessagingCenter() {
     const next = [row, ...messages].slice(0, 250);
     setMessages(next);
     safeWrite(BROADCAST_MESSAGE_KEY, next);
-    const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications);
+    const notifications = safeRead<EcosystemNotification[]>(NOTIFICATION_KEY, defaultNotifications).filter((item) => !isStaleNotification(item));
     safeWrite(NOTIFICATION_KEY, [{ id: row.id, audience: audience === "Parents" ? "Parent" : audience === "Supervisors" ? "Supervisor" : audience === "Everyone" ? "All" : audience === "Growers" ? "All" : "Youth", priority, title: row.title, body: row.body, created_at: row.created_at }, ...notifications].slice(0, 250));
     setTitle("");
     setBody("");
