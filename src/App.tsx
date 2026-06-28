@@ -1495,12 +1495,38 @@ function getCurriculumForWeek(weekNumber: number): CurriculumDay {
   };
 }
 
+function getDailyCurriculumForDate(date = new Date()): CurriculumDay {
+  const weekNumber = getCurrentProgramWeek(date);
+  const weekMeta = getCurrentYouthWeek(date);
+  const plan = getCurrentYouthPlan(date);
+  const dayLabel = plan.day || date.toLocaleDateString("en-US", { weekday: "long" });
+  return {
+    week: weekNumber,
+    theme: weekMeta.title,
+    // Daily curriculum must advance. This is what the calendar, Start My Day,
+    // workbook, portfolio, parent summary, and supervisor tools should render.
+    featuredStory: `${dayLabel}: ${plan.curriculum}`,
+    activities: (plan.work || []).map((item, index) => ({
+      id: `week-${weekNumber}-${dayLabel.toLowerCase()}-${index + 1}`.replace(/[^a-z0-9-]/g, "-"),
+      icon: index === 0 ? "🌱" : index === 1 ? "🛠️" : index === 2 ? "📋" : index === 3 ? "🤝" : "📝",
+      title: item,
+      summary: plan.focus,
+      whyItMatters: plan.focus,
+      evidenceRequired: ["Photo or observation", "Work completed note", "Reflection response"],
+      reflectionPrompt: plan.reflection,
+      resources: plan.resources,
+    })),
+  };
+}
+
 function getActiveCurriculum(date = new Date()): CurriculumDay {
   const currentWeek = getCurrentProgramWeek(date);
-  const dateScopedCurriculum = getCurriculumForWeek(currentWeek);
+  const dateScopedCurriculum = getDailyCurriculumForDate(date);
   const stored = safeRead<CurriculumDay>(TODAY_CURRICULUM_KEY, dateScopedCurriculum);
-  // Do not let older localStorage records or demo records hold the interface on a prior week.
+  // Do not let older localStorage records, demo records, or weekly placeholder
+  // records repeat the same activities across every day of the week.
   if (stored.week !== currentWeek) return dateScopedCurriculum;
+  if (!stored.featuredStory?.includes(getCurrentYouthPlan(date).curriculum)) return dateScopedCurriculum;
   return stored;
 }
 
@@ -1510,7 +1536,7 @@ function buildParentSummary(curriculum: CurriculumDay = getActiveCurriculum()) {
 }
 
 function getCurriculumSchedule(date = new Date()): TodayFarmPlan["schedule"] {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(date);
   return [
     { time: "8:00 AM", title: "Arrival / Check-In / Wellness / PPE", kind: "safety", detail: "Confirm youth by name or PIN. Nurse Line stays visible." },
     { time: "8:15 AM", title: `Week ${activeCurriculum.week}: ${activeCurriculum.theme}`, kind: "curriculum", detail: activeCurriculum.featuredStory },
@@ -1528,7 +1554,7 @@ function getCurriculumSchedule(date = new Date()): TodayFarmPlan["schedule"] {
 }
 
 function getCurriculumCalendarEvents(date = new Date()): TodayFarmPlan["events"] {
-  const activeCurriculum = getActiveCurriculum();
+  const activeCurriculum = getActiveCurriculum(date);
   const iso = date.toISOString().slice(0, 10);
   return [
     { title: `Week ${activeCurriculum.week}: ${activeCurriculum.theme}`, kind: "curriculum", date: iso, time: "8:15 AM" },
@@ -1715,11 +1741,11 @@ function getTodayFarmPlan(date = new Date()): TodayFarmPlan {
   return {
     date,
     week: { ...week, week: activeCurriculum.week, title: activeCurriculum.theme },
-    plan: { ...plan, curriculum: activeCurriculum.featuredStory, focus: activeCurriculum.theme, work, reflection: "What did you prepare today that will help the farm tomorrow?" },
+    plan: { ...plan, curriculum: activeCurriculum.featuredStory, focus: plan.focus, work, reflection: plan.reflection },
     farmStatus,
     work,
     learning,
-    reflection: cancellation ? "Operations are cancelled. Curriculum is postponed, not lost." : "What did you prepare today that will help the farm tomorrow?",
+    reflection: cancellation ? "Operations are cancelled. Curriculum is postponed, not lost." : plan.reflection,
     schedule: cancellation ? cancelledSchedule : getCurriculumSchedule(date),
     events: cancellation ? cancelledEvents : getCurriculumCalendarEvents(date),
   };
