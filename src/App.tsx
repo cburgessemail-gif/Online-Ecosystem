@@ -7449,7 +7449,7 @@ function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) 
 }
 
 function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const [tab, setTab] = useState<"dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "project" | "profiles" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports">("dashboard");
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
@@ -7492,6 +7492,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
   const tabs: { key: typeof tab; label: string }[] = [
     { key: "dashboard", label: "Dashboard" },
     { key: "project", label: "Current Week Activity" },
+    { key: "profiles", label: "Individual Profiles" },
     { key: "roster", label: "Youth Roster" },
     { key: "attendance", label: "Attendance / PPE" },
     { key: "wellness", label: "Wellness Review" },
@@ -7525,21 +7526,18 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
 
       <div>
         {tab === "dashboard" && (
-          <>
-            <CultivatorTheoryOfChangeCard compact />
-            <Supervisor90GrowthNotesCard activeUser={activeUser} />
-            <SupervisorDashboard
-              youthCount={youthRows.length}
-              attendanceCount={todayAttendance.length}
-              supportFlags={supportFlags.length}
-              incidentCount={todayIncidents.length}
-              parentSummaryCount={parentSummaries.length}
-              setTab={setTab}
-              setScreen={setScreen}
-            />
-          </>
+          <SupervisorDashboard
+            youthCount={youthRows.length}
+            attendanceCount={todayAttendance.length}
+            supportFlags={supportFlags.length}
+            incidentCount={todayIncidents.length}
+            parentSummaryCount={parentSummaries.length}
+            setTab={setTab}
+            setScreen={setScreen}
+          />
         )}
         {tab === "project" && <CurrentWeekActivityModule setScreen={setScreen} />}
+        {tab === "profiles" && <IndividualYouthProfilesModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} parentSummaries={parentSummaries} parentContacts={parentContacts} setTab={setTab} />}
         {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} onChanged={refresh} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
@@ -7568,10 +7566,11 @@ function SupervisorDashboard({
   supportFlags: number;
   incidentCount: number;
   parentSummaryCount: number;
-  setTab: (tab: "dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
+  setTab: (tab: "dashboard" | "project" | "profiles" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
   setScreen: (screen: Screen) => void;
 }) {
   const stats = [
+    { title: "Individual Profiles", value: youthCount, action: () => setTab("profiles") },
     { title: "Youth Roster", value: youthCount, action: () => setTab("roster") },
     { title: "Today Attendance", value: attendanceCount, action: () => setTab("attendance") },
     { title: "Support Flags", value: supportFlags, action: () => setTab("wellness") },
@@ -7592,11 +7591,8 @@ function SupervisorDashboard({
         <div className="mt-1 text-sm font-bold text-white/78">Today: {getCurrentYouthPlan().day} — {getCurrentYouthPlan().curriculum}</div>
         <button type="button" onClick={() => setTab("project")} className="mt-3 rounded-full bg-emerald-300 px-5 py-2 text-sm font-black text-black">Open Current Week Activity</button>
       </div>
-      <div className="mt-4">
-        <SupervisorTodayTeamsCard />
-        <TodayYouthAssignmentBoard />
-        <CurriculumProgressBoard />
-        <TodayFarmOperationsBoard compact />
+      <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
+        This dashboard is intentionally brief. Detailed team boards, assignments, reports, parent contact, and individual youth records are available in the tabs so information is not repeated on the main supervisor screen.
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
@@ -8286,6 +8282,143 @@ function FeedbackCenter({ feedbackRows }: { feedbackRows: FeedbackRecord[] }) {
   );
 }
 
+
+function IndividualYouthProfilesModule({
+  youthRows,
+  attendance,
+  assessments,
+  wellness,
+  incidents,
+  parentSummaries,
+  parentContacts,
+  setTab,
+}: {
+  youthRows: { registration: YouthRegistration; profile?: MasterProfile }[];
+  attendance: AttendanceRecord[];
+  assessments: AssessmentRecord[];
+  wellness: WellnessCheckIn[];
+  incidents: IncidentRecord[];
+  parentSummaries: ParentSummary[];
+  parentContacts: ParentContactLog[];
+  setTab: (tab: "dashboard" | "project" | "profiles" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
+}) {
+  const [participantId, setParticipantId] = useState(youthRows[0]?.registration.participant_id || "");
+  const selected = youthRows.find((row) => row.registration.participant_id === participantId) || youthRows[0];
+
+  if (!selected) {
+    return (
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Individual Profiles</div>
+        <h2 className="mt-3 text-4xl font-black">No youth profiles found yet.</h2>
+        <p className="mt-3 text-sm leading-6 text-white/78">Once youth are registered or loaded from Supabase, supervisors will be able to open one youth at a time and work from that individual profile.</p>
+      </Card>
+    );
+  }
+
+  const registration = selected.registration;
+  const profile = selected.profile;
+  const displayName = youthDisplayName(selected);
+  const participantAttendance = attendance.filter((row) => row.participant_id === registration.participant_id);
+  const participantAssessments = assessments.filter((row) => row.participant_id === registration.participant_id);
+  const participantWellness = wellness.filter((row) => row.profile_id === registration.profile_id || row.profile_id === profile?.id);
+  const participantIncidents = incidents.filter((row) => row.participant_id === registration.participant_id);
+  const participantSummaries = parentSummaries.filter((row) => row.participant_id === registration.participant_id);
+  const participantContacts = parentContacts.filter((row) => row.participant_id === registration.participant_id);
+  const lastAttendance = participantAttendance[0];
+  const avg = (field: keyof Pick<AssessmentRecord, "safety" | "teamwork" | "communication" | "responsibility" | "initiative" | "problem_solving">) => {
+    if (!participantAssessments.length) return "—";
+    return (participantAssessments.reduce((sum, row) => sum + Number(row[field] || 0), 0) / participantAssessments.length).toFixed(1);
+  };
+  const latestSummary = participantSummaries[0];
+  const latestWellness = participantWellness[0];
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Individual Youth Profile</div>
+      <h2 className="mt-3 text-4xl font-black">Work with one youth at a time.</h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This profile gathers the youth roster record, attendance, PPE status, supervisor assessments, wellness flags, incidents, parent-safe summaries, and guardian contact history in one place. It prevents duplicate information by linking each item back to the same participant ID.</p>
+
+      <label className="mt-6 block">
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Select Youth</span>
+        <select value={registration.participant_id} onChange={(e) => setParticipantId(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-white outline-none focus:border-emerald-200">
+          {youthRows.map((row) => (
+            <option key={row.registration.participant_id} value={row.registration.participant_id} className="bg-black">{youthSupervisorOption(row)}</option>
+          ))}
+        </select>
+      </label>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-3xl border border-white/10 bg-white/10 p-5">
+          <div className="text-2xl font-black">{displayName}</div>
+          <div className="mt-1 text-sm font-bold text-white/70">PIN / Participant ID: {registration.participant_id}</div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><b>Age Range:</b> {registration.age_range || "Not entered"}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><b>Program Goal:</b> {registration.program_goal || "Not entered"}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><b>Transportation:</b> {registration.transportation_plan || "Not entered"}</div>
+            <div className="rounded-2xl border border-white/10 bg-black/25 p-4"><b>Medical Notes:</b> {registration.medical_notes || "None entered"}</div>
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/10 bg-black/25 p-5 text-sm leading-6 text-white/84">
+          <div className="text-lg font-black text-white">Guardian / Emergency</div>
+          <div className="mt-3"><b>Guardian:</b> {registration.guardian_name || "Not entered"}</div>
+          <div><b>Phone:</b> {registration.guardian_phone || "Not entered"}</div>
+          <div><b>Email:</b> {registration.guardian_email || "Not entered"}</div>
+          <div><b>Emergency:</b> {registration.emergency_contact || "Not entered"}</div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <Metric title="Attendance Records" value={participantAttendance.length} />
+        <Metric title="Assessments" value={participantAssessments.length} />
+        <Metric title="Wellness Flags" value={participantWellness.filter((row) => row.safety_flag).length} />
+        <Metric title="Incidents" value={participantIncidents.length} />
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-white/10 bg-white/10 p-5">
+          <div className="text-lg font-black">Current Status</div>
+          <div className="mt-3 text-sm leading-6 text-white/82">
+            <div><b>Last attendance:</b> {lastAttendance ? `${lastAttendance.date} — ${lastAttendance.status} / ${lastAttendance.ppe_status}` : "No attendance recorded"}</div>
+            <div><b>Latest wellness:</b> {latestWellness ? `${new Date(latestWellness.created_at).toLocaleDateString()} — ${latestWellness.mood || "mood not entered"}, ${latestWellness.energy || "energy not entered"}` : "No wellness check-in recorded"}</div>
+            <div><b>Latest parent-safe summary:</b> {latestSummary?.parent_safe_message || "No parent summary yet"}</div>
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/10 bg-white/10 p-5">
+          <div className="text-lg font-black">Supervisor Assessment Average</div>
+          <div className="mt-3 grid gap-2 text-sm font-bold text-white/82 md:grid-cols-2">
+            <div>Safety: {avg("safety")}</div>
+            <div>Teamwork: {avg("teamwork")}</div>
+            <div>Communication: {avg("communication")}</div>
+            <div>Responsibility: {avg("responsibility")}</div>
+            <div>Initiative: {avg("initiative")}</div>
+            <div>Problem Solving: {avg("problem_solving")}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-4">
+        <button type="button" onClick={() => setTab("assessment")} className="rounded-full bg-emerald-300 px-5 py-3 font-black text-black">Add Assessment</button>
+        <button type="button" onClick={() => setTab("parent")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Parent Summary</button>
+        <button type="button" onClick={() => setTab("guardian")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Guardian Contact</button>
+        <button type="button" onClick={() => setTab("incident")} className="rounded-full border border-rose-200/30 bg-rose-500/15 px-5 py-3 font-black text-rose-50">Incident / Concern</button>
+      </div>
+
+      <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-5">
+        <div className="text-lg font-black">Recent Individual History</div>
+        <div className="mt-3 grid gap-3">
+          {[...participantAssessments.slice(0, 3).map((row) => ({ id: row.id, title: `Assessment — ${row.date}`, body: row.notes || "No notes entered." })), ...participantContacts.slice(0, 3).map((row) => ({ id: row.id, title: `Guardian Contact — ${row.contact_reason}`, body: row.contact_notes || "No notes entered." })), ...participantIncidents.slice(0, 3).map((row) => ({ id: row.id, title: `Incident / Concern — ${row.urgency}`, body: row.summary }))].slice(0, 6).map((row) => (
+            <div key={row.id} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm leading-6 text-white/84">
+              <div className="font-black text-white">{row.title}</div>
+              <div>{row.body}</div>
+            </div>
+          ))}
+          {participantAssessments.length + participantContacts.length + participantIncidents.length === 0 && <div className="text-sm text-white/65">No individual history recorded yet.</div>}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function SupervisorReports({
   profiles,
   youth,
@@ -8345,7 +8478,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [profiles, setProfiles] = useState<MasterProfile[]>(() => safeRead<MasterProfile[]>(PROFILE_KEY, []));
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [participantId, setParticipantId] = useState(activeUser?.participant_id || "");
-  const [mood, setMood] = useState("Okay");
+  const [mood, setMood] = useState("");
   const [energy, setEnergy] = useState("Medium");
   const [sleep, setSleep] = useState("Okay");
   const [breakfast, setBreakfast] = useState("Yes");
@@ -8405,13 +8538,19 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const checkinDate = currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   const checkinTime = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
-  const readinessStatus = allRequiredPPE ? "Ready for assignment" : "Supervisor review needed";
+  const moodSelected = mood.trim().length > 0;
+  const readyToSave = allRequiredPPE && moodSelected;
+  const remainingRequiredItems = [
+    !allRequiredPPE ? "PPE check" : "",
+    !moodSelected ? "Mood / readiness" : "",
+  ].filter(Boolean);
+  const readinessStatus = readyToSave ? "Ready for assignment" : "Required items missing";
   const safetyFlag = hope <= 1 || trustedAdult <= 1 || !allRequiredPPE || /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(support);
 
   const save = async () => {
     if (saving) return;
-    if (!allRequiredPPE) {
-      setMessage("Complete each PPE item before submitting. PPE resets every day and must be confirmed again today.");
+    if (!readyToSave) {
+      setMessage(`Required to save: ${remainingRequiredItems.join(" and ")}. Complete the required items before beginning today's mission.`);
       return;
     }
     setSaving(true);
@@ -8457,7 +8596,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("attendance_records", ATTENDANCE_KEY, attendanceRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
-      setMessage(allRequiredPPE ? `Today’s Work check-in saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.` : `Check-in saved. ${selectedYouth.participant_id} needs supervisor review before assignment. Opening today's project for supervisor guidance.`);
+      setMessage(`Today’s Work check-in saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.`);
       window.setTimeout(() => setScreen("youth"), 650);
     } catch (error) {
       console.error("Today’s Work check-in save issue:", error);
@@ -8545,21 +8684,31 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
               {readinessStatus}
             </span>
           </div>
+          <div className={`mt-3 rounded-2xl border p-3 text-sm font-black ${allRequiredPPE ? "border-emerald-200/30 bg-emerald-300/12 text-emerald-50" : "border-amber-300/40 bg-amber-300/14 text-amber-50"}`}>
+            <div className="text-[10px] uppercase tracking-[0.22em] opacity-80">Required to Save</div>
+            <div className="mt-1">PPE Completed: {allRequiredPPE ? "✅" : "❌"}</div>
+            {!allRequiredPPE && <div className="mt-1 text-xs leading-5 opacity-90">Complete boots/shoes, water, gloves, and outdoor clothing before saving.</div>}
+          </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <Toggle label="Boots / Shoes" checked={closedToeShoes} setChecked={setClosedToeShoes} />
             <Toggle label="Water" checked={waterBottle} setChecked={setWaterBottle} />
             <Toggle label="Gloves" checked={workGloves} setChecked={setWorkGloves} />
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <button type="button" onClick={save} disabled={saving || !allRequiredPPE} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:cursor-not-allowed disabled:opacity-50">
-            {saving ? "Saving..." : allRequiredPPE ? "Begin Today's Mission" : "Complete PPE First"}
+          <button type="button" onClick={save} disabled={saving || !readyToSave} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:cursor-not-allowed disabled:opacity-50">
+            {saving ? "Saving..." : readyToSave ? "Begin Today's Mission ✓ Ready to Save" : "Complete Required Items Above"}
           </button>
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-black/28 p-3">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
+          <div className={`mt-3 rounded-2xl border p-3 text-sm font-black ${moodSelected ? "border-emerald-200/30 bg-emerald-300/12 text-emerald-50" : "border-amber-300/40 bg-amber-300/14 text-amber-50"}`}>
+            <div className="text-[10px] uppercase tracking-[0.22em] opacity-80">Required to Save</div>
+            <div className="mt-1">Mood / Readiness Selected: {moodSelected ? "✅" : "❌"}</div>
+            {!moodSelected && <div className="mt-1 text-xs leading-5 opacity-90">Select how you feel today before saving. This resets every day.</div>}
+          </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-5">
-            <SelectField label="Mood" value={mood} onChange={setMood} options={["Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
+            <SelectField label="Mood" value={mood} onChange={setMood} options={["", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
             <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
             <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
             <SelectField label="Food" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
@@ -8576,6 +8725,15 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <TextArea label="Daily Goal" value={dailyGoal} onChange={setDailyGoal} placeholder="What do you want to accomplish today?" />
         <TextArea label="Need supervisor support?" value={support} onChange={setSupport} placeholder="Optional. A supervisor can check in privately." />
+      </div>
+
+      <div className={`mt-3 rounded-2xl border p-4 ${readyToSave ? "border-emerald-200/35 bg-emerald-300/14" : "border-amber-300/45 bg-amber-300/14"}`}>
+        <div className="text-[10px] font-black uppercase tracking-[0.24em] text-white/70">Daily Readiness Status • Required to Save</div>
+        <div className="mt-2 grid gap-2 text-sm font-black sm:grid-cols-3">
+          <div>PPE Completed: {allRequiredPPE ? "✅" : "❌"}</div>
+          <div>Mood Selected: {moodSelected ? "✅" : "❌"}</div>
+          <div>{readyToSave ? "Ready to Save" : `${remainingRequiredItems.length} required item${remainingRequiredItems.length === 1 ? "" : "s"} remaining`}</div>
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
