@@ -1109,6 +1109,92 @@ function maxNumber(values?: number[], limit = values?.length || 0) {
   return usable.length ? Math.max(...usable) : undefined;
 }
 
+
+type HeatAdvisoryLevel = "normal" | "watch" | "high" | "danger";
+
+type ProgramHeatAdvisory = {
+  date: string;
+  day: string;
+  level: HeatAdvisoryLevel;
+  heatIndex: number;
+  label: string;
+  instruction: string;
+};
+
+const PROGRAM_HEAT_ADVISORY_WEEK: ProgramHeatAdvisory[] = [
+  {
+    date: "2026-06-29",
+    day: "Mon 6/29",
+    level: "watch",
+    heatIndex: 90,
+    label: "Heat Watch",
+    instruction: "Water visible, shade plan reviewed, wellness checks before outdoor work.",
+  },
+  {
+    date: "2026-06-30",
+    day: "Tue 6/30",
+    level: "high",
+    heatIndex: 96,
+    label: "High Heat",
+    instruction: "Shorten outdoor blocks and require shade / water breaks.",
+  },
+  {
+    date: "2026-07-01",
+    day: "Wed 7/1",
+    level: "danger",
+    heatIndex: 101,
+    label: "Major Heat Alert",
+    instruction: "Mission Control must review half-day, indoor/shaded work, or cancellation.",
+  },
+  {
+    date: "2026-07-02",
+    day: "Thu 7/2",
+    level: "danger",
+    heatIndex: 102,
+    label: "Major Heat Alert",
+    instruction: "Mission Control must review half-day, indoor/shaded work, or cancellation.",
+  },
+  {
+    date: "2026-07-03",
+    day: "Fri 7/3",
+    level: "high",
+    heatIndex: 96,
+    label: "High Heat",
+    instruction: "Early-day work only if cleared; hydration and shade protocol active.",
+  },
+];
+
+function heatSeverity(level: HeatAdvisoryLevel | "checking") {
+  if (level === "danger") return 4;
+  if (level === "high") return 3;
+  if (level === "watch") return 2;
+  if (level === "normal") return 1;
+  return 0;
+}
+
+function toLocalISODate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getProgramHeatAdvisories(date = new Date()) {
+  // Date-bound operational override for the launch week. This makes known weekly heat risk visible
+  // even when the current early-morning weather strip is cool.
+  const today = toLocalISODate(date);
+  const first = PROGRAM_HEAT_ADVISORY_WEEK[0]?.date;
+  const last = PROGRAM_HEAT_ADVISORY_WEEK[PROGRAM_HEAT_ADVISORY_WEEK.length - 1]?.date;
+  if (!first || !last || today > last) return [];
+  return PROGRAM_HEAT_ADVISORY_WEEK.filter((item) => item.date >= today || (today >= first && today <= last));
+}
+
+function getHighestProgramHeatAdvisory(date = new Date()) {
+  const advisories = getProgramHeatAdvisories(date);
+  if (!advisories.length) return undefined;
+  return advisories.reduce((best, item) => (heatSeverity(item.level) > heatSeverity(best.level) ? item : best), advisories[0]);
+}
+
 function getHeatAlertFor(weather: LiveFarmWeather | null) {
   if (!weather || weather.error) {
     return {
@@ -1122,7 +1208,36 @@ function getHeatAlertFor(weather: LiveFarmWeather | null) {
   const apparentNow = weather.apparent ?? weather.temperature;
   const todayMaxFeels = maxNumber(weather.hourlyApparent, 24);
   const weekMaxHigh = maxNumber(weather.weekHighs, 7);
-  const highest = maxNumber([apparentNow, todayMaxFeels, weekMaxHigh].filter((value): value is number => typeof value === "number"), 3);
+  const programHeatAdvisory = getHighestProgramHeatAdvisory(new Date());
+  const programHeatIndex = programHeatAdvisory?.heatIndex;
+  const highest = maxNumber([apparentNow, todayMaxFeels, weekMaxHigh, programHeatIndex].filter((value): value is number => typeof value === "number"), 4);
+
+  if (programHeatAdvisory && heatSeverity(programHeatAdvisory.level) >= heatSeverity("danger")) {
+    return {
+      level: "danger" as const,
+      label: "MAJOR HEAT ALERT THIS WEEK",
+      message: `Known weekly heat index risk reaches ${programHeatAdvisory.heatIndex}°F on ${programHeatAdvisory.day}. ${programHeatAdvisory.instruction} Heat protocol must be visible to youth, parents, supervisors, and Mission Control even if the current morning temperature is lower.`,
+      tone: "border-red-200/70 bg-red-700/70 text-white",
+    };
+  }
+
+  if (programHeatAdvisory && heatSeverity(programHeatAdvisory.level) >= heatSeverity("high")) {
+    return {
+      level: "high" as const,
+      label: "HIGH HEAT THIS WEEK",
+      message: `Known weekly heat index risk reaches ${programHeatAdvisory.heatIndex}°F on ${programHeatAdvisory.day}. ${programHeatAdvisory.instruction} Heat protocol is active even if the current weather strip is cool.`,
+      tone: "border-orange-200/70 bg-orange-600/65 text-white",
+    };
+  }
+
+  if (programHeatAdvisory && heatSeverity(programHeatAdvisory.level) >= heatSeverity("watch")) {
+    return {
+      level: "watch" as const,
+      label: "HEAT WATCH THIS WEEK",
+      message: `Known weekly heat index risk reaches ${programHeatAdvisory.heatIndex}°F on ${programHeatAdvisory.day}. ${programHeatAdvisory.instruction}`,
+      tone: "border-amber-200/60 bg-amber-500/45 text-white",
+    };
+  }
 
   if (typeof highest !== "number") {
     return {
@@ -1177,6 +1292,37 @@ function WeatherAlertBanner({ alert, compact = false }: { alert: ReturnType<type
         <div className="rounded-full border border-white/25 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Always Visible</div>
       </div>
       <div className={`${compact ? "mt-1 text-xs" : "mt-2 text-sm"} font-black leading-5`}>{alert.message}</div>
+    </div>
+  );
+}
+
+
+function WeeklyHeatOutlook({ compact = false }: { compact?: boolean }) {
+  const advisories = getProgramHeatAdvisories(new Date());
+  if (!advisories.length) return null;
+  const visible = compact ? advisories.slice(0, 3) : advisories;
+  return (
+    <div className="rounded-2xl border border-red-200/45 bg-black/45 px-4 py-3 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-red-100">🔥 Weekly Heat Operations Outlook</div>
+          {!compact && <div className="mt-1 text-xs font-bold text-white/70">This is operational safety information, not a hidden weather detail.</div>}
+        </div>
+        <div className="rounded-full border border-red-100/40 bg-red-700/55 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Visible All Week</div>
+      </div>
+      <div className={`mt-3 grid gap-2 ${compact ? "grid-cols-1 sm:grid-cols-3" : "sm:grid-cols-5"}`}>
+        {visible.map((item) => {
+          const tone = item.level === "danger" ? "border-red-200/55 bg-red-700/55" : item.level === "high" ? "border-orange-200/55 bg-orange-600/45" : "border-amber-200/55 bg-amber-500/35";
+          return (
+            <div key={item.date} className={`rounded-xl border p-3 ${tone}`}>
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/70">{item.day}</div>
+              <div className="mt-1 text-sm font-black">{item.label}</div>
+              <div className="mt-1 text-xl font-black">HI {item.heatIndex}°F</div>
+              {!compact && <div className="mt-2 text-[11px] font-bold leading-4 text-white/82">{item.instruction}</div>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1319,6 +1465,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
     return (
       <div className="space-y-2">
       <WeatherAlertBanner alert={heatAlert} compact />
+      <WeeklyHeatOutlook compact />
       <details className={`rounded-2xl border px-3 py-2 ${statusClass}`}>
         <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-3">
@@ -1353,6 +1500,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Weather</div>
       <div className="mt-4"><WeatherAlertBanner alert={heatAlert} /></div>
+      <div className="mt-4"><WeeklyHeatOutlook /></div>
       <div className={`mt-4 rounded-[1.75rem] border p-5 ${statusClass}`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
