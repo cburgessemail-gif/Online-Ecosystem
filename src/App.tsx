@@ -1102,6 +1102,85 @@ function heatLabelFor(weather: LiveFarmWeather | null) {
   return "Normal";
 }
 
+
+function maxNumber(values?: number[], limit = values?.length || 0) {
+  if (!values?.length) return undefined;
+  const usable = values.slice(0, limit).filter((value) => typeof value === "number" && Number.isFinite(value));
+  return usable.length ? Math.max(...usable) : undefined;
+}
+
+function getHeatAlertFor(weather: LiveFarmWeather | null) {
+  if (!weather || weather.error) {
+    return {
+      level: "checking" as const,
+      label: "Weather Alert Checking",
+      message: "Live heat index is loading. Supervisors should use direct observation until the live card updates.",
+      tone: "border-slate-200/30 bg-slate-700/35 text-white",
+    };
+  }
+
+  const apparentNow = weather.apparent ?? weather.temperature;
+  const todayMaxFeels = maxNumber(weather.hourlyApparent, 24);
+  const weekMaxHigh = maxNumber(weather.weekHighs, 7);
+  const highest = maxNumber([apparentNow, todayMaxFeels, weekMaxHigh].filter((value): value is number => typeof value === "number"), 3);
+
+  if (typeof highest !== "number") {
+    return {
+      level: "checking" as const,
+      label: "Weather Alert Checking",
+      message: "Heat conditions are loading. Keep water visible and confirm PPE before outdoor work.",
+      tone: "border-slate-200/30 bg-slate-700/35 text-white",
+    };
+  }
+
+  if (highest >= 100) {
+    return {
+      level: "danger" as const,
+      label: "MAJOR HEAT ALERT",
+      message: `Heat index / feels-like conditions may reach ${Math.round(highest)}°F. Mission Control must review work status, shorten outdoor blocks, require water/shade breaks, and consider half-day or cancellation.`,
+      tone: "border-red-200/60 bg-red-700/60 text-white",
+    };
+  }
+
+  if (highest >= 95) {
+    return {
+      level: "high" as const,
+      label: "HIGH HEAT ALERT",
+      message: `Feels-like conditions may reach ${Math.round(highest)}°F. Activate heat safety mode: water, shade, buddy checks, and shorter outdoor work blocks.`,
+      tone: "border-orange-200/60 bg-orange-600/55 text-white",
+    };
+  }
+
+  if (highest >= 85) {
+    return {
+      level: "watch" as const,
+      label: "HEAT WATCH",
+      message: `Feels-like conditions may reach ${Math.round(highest)}°F. Keep water visible and schedule hydration breaks before youth enter outdoor work.`,
+      tone: "border-amber-200/55 bg-amber-500/35 text-white",
+    };
+  }
+
+  return {
+    level: "normal" as const,
+    label: "Normal Heat Watch",
+    message: "No major heat alert from the live data right now. Keep hydration visible.",
+    tone: "border-emerald-200/35 bg-emerald-500/20 text-white",
+  };
+}
+
+function WeatherAlertBanner({ alert, compact = false }: { alert: ReturnType<typeof getHeatAlertFor>; compact?: boolean }) {
+  if (alert.level === "normal" && compact) return null;
+  return (
+    <div className={`rounded-2xl border px-4 py-3 ${alert.tone}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs font-black uppercase tracking-[0.22em]">⚠ {alert.label}</div>
+        <div className="rounded-full border border-white/25 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Always Visible</div>
+      </div>
+      <div className={`${compact ? "mt-1 text-xs" : "mt-2 text-sm"} font-black leading-5`}>{alert.message}</div>
+    </div>
+  );
+}
+
 function workImpactFor(weather: LiveFarmWeather | null, status: FarmOperationStatus) {
   if (status.level === "Closed") return "Work cancelled. Follow Mission Control instructions.";
   if (status.level === "Modified Operations") return "Half-day or modified work. Check with supervisor before outdoor tasks.";
@@ -1234,9 +1313,12 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
   const rain = liveWeather?.rainChance !== undefined ? `${Math.round(liveWeather.rainChance)}%` : "—";
   const wind = liveWeather?.wind !== undefined ? `${Math.round(liveWeather.wind)} mph` : "—";
   const heat = heatLabelFor(liveWeather);
+  const heatAlert = getHeatAlertFor(liveWeather);
 
   if (compact) {
     return (
+      <div className="space-y-2">
+      <WeatherAlertBanner alert={heatAlert} compact />
       <details className={`rounded-2xl border px-3 py-2 ${statusClass}`}>
         <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-3">
@@ -1263,12 +1345,14 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
         </div>
         <div className="mt-2 text-[10px] font-bold text-white/55">Updated {formatLiveTime(liveWeather?.updated)} • compact support strip; open only when detail is needed</div>
       </details>
+      </div>
     );
   }
 
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Weather</div>
+      <div className="mt-4"><WeatherAlertBanner alert={heatAlert} /></div>
       <div className={`mt-4 rounded-[1.75rem] border p-5 ${statusClass}`}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
