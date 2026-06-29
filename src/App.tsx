@@ -46,6 +46,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
  * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
+ * - Ecosystem 11.12: fixes Returning access blank screen by defining the heat operations gate used by the header.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -1193,6 +1194,21 @@ function getHighestProgramHeatAdvisory(date = new Date()) {
   const advisories = getProgramHeatAdvisories(date);
   if (!advisories.length) return undefined;
   return advisories.reduce((best, item) => (heatSeverity(item.level) > heatSeverity(best.level) ? item : best), advisories[0]);
+}
+
+function hasOperationalHeatRestriction(date = new Date()) {
+  const advisory = getHighestProgramHeatAdvisory(date);
+  if (!advisory) return false;
+  return heatSeverity(advisory.level) >= heatSeverity("high");
+}
+
+function heatRequiredActionLabel(date = new Date()) {
+  const advisory = getHighestProgramHeatAdvisory(date);
+  if (!advisory) return "Normal Operations";
+  if (advisory.level === "danger") return "Heat Review Required";
+  if (advisory.level === "high") return "High Heat Protocol";
+  if (advisory.level === "watch") return "Heat Watch";
+  return "Normal Operations";
 }
 
 function getHeatAlertFor(weather: LiveFarmWeather | null) {
