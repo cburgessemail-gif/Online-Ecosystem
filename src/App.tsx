@@ -4760,10 +4760,7 @@ function Shell({
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
-        { label: "Today's Work", screen: "wellness" },
-        { label: "Explore & Discover", screen: "resources" },
         { label: "Calendar", screen: "events" },
-        { label: "Share My Learning", screen: "media" },
         { label: "My Journey", screen: "journey" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
@@ -4805,11 +4802,11 @@ function Shell({
         <NurseLineBanner onOpen={() => setShowNurseLine(true)} />
         {showNurseLine && <NurseLineModal onClose={() => setShowNurseLine(false)} />}
 
-        <div className="sticky top-[4.2rem] z-50 mb-2">
+        <div className="relative z-50 mb-2">
           <GlobalOperationsHeader screen={screen} setScreen={setScreen} />
         </div>
 
-        <div className="sticky top-[7.4rem] z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/60 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="relative z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/70 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <button type="button" onClick={() => setScreen("portal")} className="min-w-[180px] flex-1 px-2 text-left">
               <div className="text-[10px] uppercase tracking-[0.28em] text-emerald-100/70">Bronson Family Farm</div>
@@ -4820,8 +4817,7 @@ function Shell({
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
-              <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? "Today’s Work" : "Choose Role"}</button>
-              <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>🌿 Explore & Discover</button>
+              <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -4855,6 +4851,7 @@ function Shell({
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
               <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>🌿 Explore & Discover</button>
+              <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🔥 Weather Operations</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>📅 Calendar</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Share My Learning</button>
               <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
@@ -7156,13 +7153,14 @@ function June2026CalendarGrid() {
 
 function WorkStatusMiniCard() {
   const farmStatus = getFarmStatusForDate(new Date());
-  const label = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
-  const className = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
+  const heatRestricted = hasOperationalHeatRestriction();
+  const label = heatRestricted ? heatRequiredActionLabel() : farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
+  const className = heatRestricted ? "border-red-200/50 bg-red-700/35" : farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
   return (
     <div className={`rounded-[1.15rem] border p-4 ${className}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">🟢 Work Status</div>
+      <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">{heatRestricted ? "🔴 Required Action" : "🟢 Work Status"}</div>
       <div className="mt-2 text-2xl font-black">{label}</div>
-      <p className="mt-2 text-xs font-bold leading-5 text-white/72">Bring water. Confirm PPE. Follow supervisor direction.</p>
+      <p className="mt-2 text-xs font-bold leading-5 text-white/72">{heatRestricted ? "Do not begin outdoor work until a supervisor confirms the safe plan for today." : "Bring water. Confirm PPE. Follow supervisor direction."}</p>
     </div>
   );
 }
@@ -7757,13 +7755,26 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
         <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-black text-emerald-50">Week {currentWeek.week}: {currentWeek.title}</div>
       </div>
 
+      {hasOperationalHeatRestriction() && (
+        <div className="mt-4 rounded-[1.35rem] border border-red-200/60 bg-red-700/45 p-4 text-white shadow-[0_18px_60px_rgba(127,29,29,.35)]">
+          <div className="text-xs font-black uppercase tracking-[0.28em] text-red-100">Today’s Required Action</div>
+          <div className="mt-2 text-3xl font-black">Heat Review Required Before Outdoor Work</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/86">Check in first. Wait for supervisor direction. Only begin the safe assignment after the daily heat plan is confirmed.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-white px-6 py-3 text-sm font-black text-red-800">Start Safe Check-In</button>
+            <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/25 bg-black/25 px-5 py-3 text-sm font-black text-white">Wait for Supervisor Direction</button>
+            <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/25 bg-black/25 px-5 py-3 text-sm font-black text-white">View Heat Plan</button>
+          </div>
+        </div>
+      )}
+
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_.8fr]">
         <div className="rounded-[1.35rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Today’s Mission</div>
           <div className="mt-2 text-2xl font-black">{todayPlan.curriculum}</div>
           <p className="mt-2 text-sm font-bold leading-6 text-white/78">{todayPlan.focus}</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">Start Today’s Work</button>
+            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">{hasOperationalHeatRestriction() ? "Start Safe Check-In" : "Start Today’s Work"}</button>
             <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">My Journey</button>
           </div>
         </div>
@@ -7771,7 +7782,7 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
           <WorkStatusMiniCard />
           <div className="rounded-[1.15rem] border border-red-200/35 bg-red-950/30 p-4">
             <div className="text-[10px] font-black uppercase tracking-[0.22em] text-red-100/80">Weather Operations</div>
-            <div className="mt-2 text-xl font-black">Heat advisory must be checked before outdoor work.</div>
+            <div className="mt-2 text-xl font-black">Heat advisory controls today’s first action.</div>
             <div className="mt-3"><WeatherAlertBanner alert={getHeatAlertFor(null)} /></div>
             <div className="mt-3"><WeeklyHeatOutlook compact /></div>
             <button type="button" onClick={() => setScreen("almanac")} className="mt-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Open Weather + Almanac</button>
