@@ -1196,21 +1196,9 @@ function getHighestProgramHeatAdvisory(date = new Date()) {
 }
 
 function getHeatAlertFor(weather: LiveFarmWeather | null) {
-  if (!weather || weather.error) {
-    return {
-      level: "checking" as const,
-      label: "Weather Alert Checking",
-      message: "Live heat index is loading. Supervisors should use direct observation until the live card updates.",
-      tone: "border-slate-200/30 bg-slate-700/35 text-white",
-    };
-  }
-
-  const apparentNow = weather.apparent ?? weather.temperature;
-  const todayMaxFeels = maxNumber(weather.hourlyApparent, 24);
-  const weekMaxHigh = maxNumber(weather.weekHighs, 7);
+  // Safety-critical rule: program heat advisories must render even before live weather loads
+  // and even when the current morning temperature is cool.
   const programHeatAdvisory = getHighestProgramHeatAdvisory(new Date());
-  const programHeatIndex = programHeatAdvisory?.heatIndex;
-  const highest = maxNumber([apparentNow, todayMaxFeels, weekMaxHigh, programHeatIndex].filter((value): value is number => typeof value === "number"), 4);
 
   if (programHeatAdvisory && heatSeverity(programHeatAdvisory.level) >= heatSeverity("danger")) {
     return {
@@ -1238,6 +1226,20 @@ function getHeatAlertFor(weather: LiveFarmWeather | null) {
       tone: "border-amber-200/60 bg-amber-500/45 text-white",
     };
   }
+
+  if (!weather || weather.error) {
+    return {
+      level: "checking" as const,
+      label: "Weather Alert Checking",
+      message: "Live heat index is loading. Supervisors should use direct observation until the live card updates.",
+      tone: "border-slate-200/30 bg-slate-700/35 text-white",
+    };
+  }
+
+  const apparentNow = weather.apparent ?? weather.temperature;
+  const todayMaxFeels = maxNumber(weather.hourlyApparent, 24);
+  const weekMaxHigh = maxNumber(weather.weekHighs, 7);
+  const highest = maxNumber([apparentNow, todayMaxFeels, weekMaxHigh].filter((value): value is number => typeof value === "number"), 4);
 
   if (typeof highest !== "number") {
     return {
@@ -4703,7 +4705,8 @@ function OperationsOneLineWeather({ setScreen }: { setScreen: (screen: Screen) =
   const rain = liveWeather?.rainChance !== undefined ? `${Math.round(liveWeather.rainChance)}%` : "—";
   const wind = liveWeather?.wind !== undefined ? `${Math.round(liveWeather.wind)} mph` : "—";
   const workLabel = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Modified" : "Cancelled";
-  const impact = workImpactFor(liveWeather, farmStatus);
+  const heatAlert = getHeatAlertFor(liveWeather);
+  const impact = heatAlert.level === "danger" || heatAlert.level === "high" || heatAlert.level === "watch" ? heatAlert.label : workImpactFor(liveWeather, farmStatus);
 
   return (
     <div className="flex min-h-[44px] flex-wrap items-center justify-between gap-2 rounded-2xl border border-emerald-200/25 bg-black/70 px-3 py-2 text-xs font-black shadow-[0_12px_32px_rgba(0,0,0,.28)] backdrop-blur-xl md:flex-nowrap">
@@ -4722,7 +4725,14 @@ function OperationsOneLineWeather({ setScreen }: { setScreen: (screen: Screen) =
 }
 
 function GlobalOperationsHeader({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
-  return <OperationsOneLineWeather setScreen={setScreen} />;
+  const heatAlert = getHeatAlertFor(null);
+  return (
+    <div className="grid gap-2">
+      <OperationsOneLineWeather setScreen={setScreen} />
+      <WeatherAlertBanner alert={heatAlert} />
+      <WeeklyHeatOutlook compact />
+    </div>
+  );
 }
 
 function Shell({
@@ -7759,9 +7769,11 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
         </div>
         <div className="grid gap-3">
           <WorkStatusMiniCard />
-          <div className="rounded-[1.15rem] border border-sky-200/20 bg-sky-300/10 p-4">
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100/75">Weather Strip</div>
-            <div className="mt-2 text-xl font-black">Check heat, water, and shelter plan.</div>
+          <div className="rounded-[1.15rem] border border-red-200/35 bg-red-950/30 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-red-100/80">Weather Operations</div>
+            <div className="mt-2 text-xl font-black">Heat advisory must be checked before outdoor work.</div>
+            <div className="mt-3"><WeatherAlertBanner alert={getHeatAlertFor(null)} /></div>
+            <div className="mt-3"><WeeklyHeatOutlook compact /></div>
             <button type="button" onClick={() => setScreen("almanac")} className="mt-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Open Weather + Almanac</button>
           </div>
         </div>
