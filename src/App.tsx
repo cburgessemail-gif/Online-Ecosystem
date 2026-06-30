@@ -50,6 +50,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 11.13: Supervisor pathway buttons are active; Clear becomes Submit/Confirm Participant; youth registration is saved and verified before daily records.
  * - Ecosystem 11.14: Week 4 operations update adds Zone 5 Melon Improvement Project, thermal rock safety boundaries, pepper supports, Grow Area Manicure Day, and reflection response capture.
  * - Ecosystem 11.15: Removes Casper Stewart from active roster, restores functional roster archive/delete actions, and adds add/edit/remove controls for Attendance/PPE records.
+ * - Ecosystem 11.16: Makes Half Day the operating authority for June 30 heat operations, calms overpowering heat alerts, and adds concise calendar heat/status badges.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -539,6 +540,39 @@ const defaultWorkStatusUpdate: WorkStatusUpdate = {
   parent_message: MONDAY_JUNE_22_CANCELLATION_MESSAGE,
   created_by: "Mission Control",
   created_at: new Date().toISOString(),
+};
+
+const TUESDAY_JUNE_30_HALF_DAY_HEAT_MESSAGE = `Bronson Family Farm Work Status
+
+Tuesday, June 30, 2026
+
+STATUS: HALF DAY OPERATIONS
+
+Due to high heat conditions, Bronson Family Farm will operate on a Half Day schedule.
+
+Youth will complete priority outdoor work during the cooler morning hours. Hydration, cooling towels, shade breaks, and wellness monitoring are required.
+
+Parents/caregivers, please follow the adjusted pickup guidance from Mission Control.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultHalfDayHeatStatusUpdate: WorkStatusUpdate = {
+  id: "heat-half-day-2026-06-30",
+  date: "Tuesday, June 30, 2026",
+  effective_date: "2026-06-30",
+  expires_date: "2026-06-30",
+  status: "HALF_DAY",
+  label: "Half Day Operations",
+  reason: "High heat conditions require shortened outdoor work during the cooler morning hours.",
+  action: "Complete priority outdoor tasks early, use shade and hydration checks, monitor cooling towel use, and dismiss before peak afternoon heat.",
+  audiences: ["Parents", "Youth", "Supervisors"],
+  hangar_note: "Use shade and the hangar only as directed by site leadership; the hangar is not a substitute for full-day indoor programming.",
+  parent_message: TUESDAY_JUNE_30_HALF_DAY_HEAT_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
+  launched_at: new Date().toISOString(),
 };
 
 const launchAlmanacSnapshot = {
@@ -1323,14 +1357,27 @@ function getHeatAlertFor(weather: LiveFarmWeather | null) {
 
 function WeatherAlertBanner({ alert, compact = false }: { alert: ReturnType<typeof getHeatAlertFor>; compact?: boolean }) {
   if (alert.level === "normal" && compact) return null;
-  return (
-    <div className={`rounded-2xl border px-4 py-3 ${alert.tone}`}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="text-xs font-black uppercase tracking-[0.22em]">⚠ {alert.label}</div>
-        <div className="rounded-full border border-white/25 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Always Visible</div>
+
+  const label = alert.level === "danger" ? "Major Heat" : alert.level === "high" ? "High Heat" : alert.level === "watch" ? "Heat Watch" : alert.label;
+  const badgeTone = alert.level === "danger" ? "border-red-200/55 bg-red-700/55 text-white" : alert.level === "high" ? "border-orange-200/55 bg-orange-600/45 text-white" : alert.level === "watch" ? "border-amber-200/55 bg-amber-500/35 text-white" : "border-slate-200/30 bg-slate-700/35 text-white";
+
+  if (compact) {
+    return (
+      <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] ${badgeTone}`} title={alert.message}>
+        <span>⚠</span>
+        <span>{label}</span>
       </div>
-      <div className={`${compact ? "mt-1 text-xs" : "mt-2 text-sm"} font-black leading-5`}>{alert.message}</div>
-    </div>
+    );
+  }
+
+  return (
+    <details className={`rounded-2xl border px-4 py-3 ${badgeTone}`}>
+      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
+        <div className="text-xs font-black uppercase tracking-[0.22em]">⚠ {label}</div>
+        <div className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Details</div>
+      </summary>
+      <div className="mt-2 text-sm font-bold leading-6 text-white/88">{alert.message}</div>
+    </details>
   );
 }
 
@@ -1338,17 +1385,34 @@ function WeatherAlertBanner({ alert, compact = false }: { alert: ReturnType<type
 function WeeklyHeatOutlook({ compact = false }: { compact?: boolean }) {
   const advisories = getProgramHeatAdvisories(new Date());
   if (!advisories.length) return null;
-  const visible = compact ? advisories.slice(0, 3) : advisories;
-  return (
-    <div className="rounded-2xl border border-red-200/45 bg-black/45 px-4 py-3 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-red-100">🔥 Weekly Heat Operations Outlook</div>
-          {!compact && <div className="mt-1 text-xs font-bold text-white/70">This is operational safety information, not a hidden weather detail.</div>}
-        </div>
-        <div className="rounded-full border border-red-100/40 bg-red-700/55 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Visible All Week</div>
+  const visible = compact ? advisories.slice(0, 5) : advisories;
+
+  if (compact) {
+    return (
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-white">
+        <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/65">Heat Outlook</div>
+        {visible.map((item) => {
+          const tone = item.level === "danger" ? "border-red-200/55 bg-red-700/55" : item.level === "high" ? "border-orange-200/55 bg-orange-600/45" : "border-amber-200/55 bg-amber-500/35";
+          return (
+            <span key={item.date} className={`rounded-full border px-3 py-1 text-[11px] font-black ${tone}`} title={item.instruction}>
+              {item.day}: HI {item.heatIndex}°
+            </span>
+          );
+        })}
       </div>
-      <div className={`mt-3 grid gap-2 ${compact ? "grid-cols-1 sm:grid-cols-3" : "sm:grid-cols-5"}`}>
+    );
+  }
+
+  return (
+    <details className="rounded-2xl border border-red-200/35 bg-black/35 px-4 py-3 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-red-100">🔥 Weekly Heat Outlook</div>
+          <div className="mt-1 text-xs font-bold text-white/65">Concise safety highlights. Open for details only when needed.</div>
+        </div>
+        <div className="rounded-full border border-red-100/35 bg-red-700/45 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em]">Highlighted</div>
+      </summary>
+      <div className="mt-3 grid gap-2 sm:grid-cols-5">
         {visible.map((item) => {
           const tone = item.level === "danger" ? "border-red-200/55 bg-red-700/55" : item.level === "high" ? "border-orange-200/55 bg-orange-600/45" : "border-amber-200/55 bg-amber-500/35";
           return (
@@ -1356,12 +1420,12 @@ function WeeklyHeatOutlook({ compact = false }: { compact?: boolean }) {
               <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/70">{item.day}</div>
               <div className="mt-1 text-sm font-black">{item.label}</div>
               <div className="mt-1 text-xl font-black">HI {item.heatIndex}°F</div>
-              {!compact && <div className="mt-2 text-[11px] font-bold leading-4 text-white/82">{item.instruction}</div>}
+              <div className="mt-2 text-[11px] font-bold leading-4 text-white/82">{item.instruction}</div>
             </div>
           );
         })}
       </div>
-    </div>
+    </details>
   );
 }
 
@@ -2139,6 +2203,30 @@ function getCalendarDisplayBase(date = new Date()) {
   return display;
 }
 
+function calendarWeekRangeLabel(weekDays: Date[]) {
+  if (!weekDays.length) return "";
+  const first = weekDays[0];
+  const last = weekDays[weekDays.length - 1];
+  const firstLabel = first.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const lastLabel = last.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return `${firstLabel} – ${lastLabel}`;
+}
+
+function calendarStatusBadgesForDate(date: Date) {
+  const iso = getDateISO(date);
+  const badges: Array<{ label: string; className: string }> = [];
+  const farmStatus = getFarmStatusForDate(date);
+  if (farmStatus.level === "Modified Operations") badges.push({ label: "Half Day", className: "border-orange-200 bg-orange-100 text-orange-950" });
+  if (farmStatus.level === "Closed") badges.push({ label: "Cancelled", className: "border-red-200 bg-red-100 text-red-950" });
+  const advisory = PROGRAM_HEAT_ADVISORY_WEEK.find((item) => item.date === iso);
+  if (advisory) {
+    const label = advisory.level === "danger" ? "Major Heat" : advisory.level === "high" ? "High Heat" : "Heat Watch";
+    const className = advisory.level === "danger" ? "border-red-200 bg-red-100 text-red-950" : advisory.level === "high" ? "border-orange-200 bg-orange-100 text-orange-950" : "border-amber-200 bg-amber-100 text-amber-950";
+    badges.push({ label, className });
+  }
+  return badges;
+}
+
 function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const [view, setView] = useState<"month" | "week" | "day">("week");
   const base = getCalendarDisplayBase(new Date());
@@ -2171,7 +2259,7 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Actual Calendar</div>
-          <h2 className="mt-1 text-3xl font-black">{base.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</h2>
+          <h2 className="mt-1 text-3xl font-black">{view === "week" ? `Week ${getCurrentProgramWeek(base)} • ${calendarWeekRangeLabel(weekDays)}` : base.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</h2>
         </div>
         <div className="flex rounded-full border border-slate-200 bg-slate-50 p-1">
           {(["month", "week", "day"] as const).map((item) => <button key={item} onClick={() => setView(item)} className={`rounded-full px-4 py-2 text-sm font-black capitalize ${view === item ? "bg-slate-900 text-white" : "text-slate-700"}`}>{item}</button>)}
@@ -2184,7 +2272,8 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
           const inMonth = d.getMonth() === base.getMonth();
           const isToday = d.toDateString() === base.toDateString();
           return <button key={d.toISOString()} type="button" onClick={() => setView("day")} className={`min-h-[110px] rounded-xl border p-2 text-left ${isToday ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white"} ${inMonth ? "opacity-100" : "opacity-45"}`}>
-            <div className="text-sm font-black">{d.getDate()}</div>
+            <div className="flex items-center justify-between gap-1"><span className="text-sm font-black">{d.getDate()}</span></div>
+            <div className="mt-1 flex flex-wrap gap-1">{calendarStatusBadgesForDate(d).slice(0, 2).map((badge) => <span key={`${d.toISOString()}-${badge.label}`} className={`rounded-full border px-1.5 py-0.5 text-[9px] font-black ${badge.className}`}>{badge.label}</span>)}</div>
             <div className="mt-2 grid gap-1">{eventForDate(d).slice(0, 3).map((e) => <CalendarEventPill key={`${d.toISOString()}-${e.title}`} title={e.title} kind={e.kind} />)}</div>
           </button>;
         })}
@@ -2195,10 +2284,12 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
           {weekDays.map((d) => {
             const daily = getTodayFarmPlan(d);
             const cancelled = Boolean(getOperationalCancellationForDate(d));
+            const statusBadges = calendarStatusBadgesForDate(d);
             return (
               <div key={d.toISOString()} className="grid gap-2">
                 <div className="rounded-xl bg-slate-900 p-3 text-center font-black text-white">
                   {d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })}
+                  {statusBadges.length > 0 && <div className="mt-2 flex flex-wrap justify-center gap-1">{statusBadges.map((badge) => <span key={`${d.toISOString()}-${badge.label}`} className={`rounded-full border px-2 py-0.5 text-[10px] font-black ${badge.className}`}>{badge.label}</span>)}</div>}
                 </div>
                 {cancelled ? (
                   <>
@@ -5167,12 +5258,24 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
   };
 }
 
+function getOperationalHeatStatusForDate(date = new Date()) {
+  if (isWorkStatusActiveForDate(defaultHalfDayHeatStatusUpdate, date)) return defaultHalfDayHeatStatusUpdate;
+  return null;
+}
+
 function getFarmStatusForDate(date = new Date()) {
   const cancellation = getOperationalCancellationForDate(date);
   if (cancellation) return workStatusToFarmStatus(cancellation);
 
+  const heatDefault = getOperationalHeatStatusForDate(date);
   const saved = getSavedWorkStatus();
-  if (saved && saved.status !== "CANCELLED" && isWorkStatusActiveForDate(saved, date)) return workStatusToFarmStatus(saved);
+  if (saved && saved.status !== "CANCELLED" && isWorkStatusActiveForDate(saved, date)) {
+    // Safety hierarchy: a stale/default FULL_DAY must not overpower a known heat half-day.
+    if (saved.status === "FULL_DAY" && heatDefault) return workStatusToFarmStatus(heatDefault);
+    return workStatusToFarmStatus(saved);
+  }
+
+  if (heatDefault) return workStatusToFarmStatus(heatDefault);
 
   // Critical day-advance protection:
   // Expired work-status records must not keep later screens red, amber, or stale.
@@ -7326,13 +7429,13 @@ function June2026CalendarGrid() {
 function WorkStatusMiniCard() {
   const farmStatus = getFarmStatusForDate(new Date());
   const heatRestricted = hasOperationalHeatRestriction();
-  const label = heatRestricted ? heatRequiredActionLabel() : farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
-  const className = heatRestricted ? "border-red-200/50 bg-red-700/35" : farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/35 bg-amber-300/14" : "border-emerald-200/30 bg-emerald-300/12";
+  const label = farmStatus.level === "Open" ? "Full Day" : farmStatus.level === "Modified Operations" ? "Half Day" : "Work Cancelled";
+  const className = farmStatus.color === "red" ? "border-red-200/40 bg-red-700/35" : farmStatus.color === "amber" ? "border-amber-200/45 bg-orange-500/25" : "border-emerald-200/30 bg-emerald-300/12";
   return (
     <div className={`rounded-[1.15rem] border p-4 ${className}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">{heatRestricted ? "🔴 Required Action" : "🟢 Work Status"}</div>
+      <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">{farmStatus.level === "Modified Operations" ? "🟠 Work Status" : farmStatus.level === "Closed" ? "🔴 Work Status" : "🟢 Work Status"}</div>
       <div className="mt-2 text-2xl font-black">{label}</div>
-      <p className="mt-2 text-xs font-bold leading-5 text-white/72">{heatRestricted ? "Do not begin outdoor work until a supervisor confirms the safe plan for today." : "Bring water. Confirm PPE. Follow supervisor direction."}</p>
+      <p className="mt-2 text-xs font-bold leading-5 text-white/72">{farmStatus.level === "Modified Operations" ? "Half-day plan is the operating decision. Heat information is a safety highlight, not a competing status." : heatRestricted ? "Heat is highlighted; follow supervisor direction before outdoor work." : "Bring water. Confirm PPE. Follow supervisor direction."}</p>
     </div>
   );
 }
@@ -10652,12 +10755,13 @@ function Reports({ setScreen, language }: { setScreen: (screen: Screen) => void;
 
 function WorkStatusLaunchPanel() {
   const [workStatus, setWorkStatus] = useState<WorkStatusUpdate | null>(() => getSavedWorkStatus());
-  const [status, setStatus] = useState<WorkStatusCode>("FULL_DAY");
+  const isDefaultHalfDayHeatDate = todayISO() === "2026-06-30";
+  const [status, setStatus] = useState<WorkStatusCode>(isDefaultHalfDayHeatDate ? "HALF_DAY" : "FULL_DAY");
   const [effectiveDate, setEffectiveDate] = useState(todayISO());
   const [expiresDate, setExpiresDate] = useState(todayISO());
-  const [label, setLabel] = useState("Normal Operations");
-  const [reason, setReason] = useState("Outdoor work allowed with water breaks, PPE, and supervisor direction.");
-  const [action, setAction] = useState("Begin with today's assignment, check hydration, and follow Mission Control updates.");
+  const [label, setLabel] = useState(isDefaultHalfDayHeatDate ? "Half Day Operations" : "Normal Operations");
+  const [reason, setReason] = useState(isDefaultHalfDayHeatDate ? "High heat conditions require shortened outdoor work during the cooler morning hours." : "Outdoor work allowed with water breaks, PPE, and supervisor direction.");
+  const [action, setAction] = useState(isDefaultHalfDayHeatDate ? "Complete priority outdoor tasks early, use shade and hydration checks, and dismiss before peak afternoon heat." : "Begin with today's assignment, check hydration, and follow Mission Control updates.");
   const [notice, setNotice] = useState("");
   const currentFarmStatus = getFarmStatusForDate(new Date());
 
