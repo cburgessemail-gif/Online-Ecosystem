@@ -47,6 +47,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
  * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
  * - Ecosystem 11.12: fixes Returning access blank screen by defining the heat operations gate used by the header.
+ * - Ecosystem 11.13: Supervisor pathway buttons are active; Clear becomes Submit/Confirm Participant; youth registration is saved and verified before daily records.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -3715,6 +3716,61 @@ function lifecycleStatusForYouthRow(row: { registration: YouthRegistration; prof
   return normalizeParticipantLifecycleStatus(row.registration.participant_status || row.profile?.participant_status, row.registration.active !== false && row.profile?.active !== false, row.registration.archived);
 }
 
+function youthRegistrationMissingItems(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  const missing: string[] = [];
+  const registration = row.registration;
+  const profile = row.profile;
+  if (!profile?.first_name && !profile?.preferred_name) missing.push("Youth first/preferred name");
+  if (!profile?.last_name) missing.push("Youth last name");
+  if (!isValidNescoPin(normalizeNescoPin(registration.participant_id))) missing.push("Valid Nesco 4-digit PIN");
+  if (!registration.guardian_name?.trim()) missing.push("Parent/guardian name");
+  if (!registration.guardian_phone?.trim()) missing.push("Parent/guardian phone");
+  if (!registration.guardian_email?.trim()) missing.push("Parent/guardian email");
+  if (!registration.emergency_contact?.trim()) missing.push("Emergency contact");
+  return missing;
+}
+
+function youthRegistrationIsComplete(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  return youthRegistrationMissingItems(row).length === 0;
+}
+
+function saveSupervisorParticipantConfirmation(row: { registration: YouthRegistration; profile?: MasterProfile }, activeUser: EcosystemUser | null) {
+  const missing = youthRegistrationMissingItems(row);
+  const nextStatus: ParticipantLifecycleStatus = missing.length ? "pending" : "active";
+  const now = new Date().toISOString();
+
+  safeWrite(YOUTH_KEY, safeRead<YouthRegistration[]>(YOUTH_KEY, []).map((item) =>
+    item.id === row.registration.id || item.profile_id === row.registration.profile_id || item.participant_id === row.registration.participant_id
+      ? { ...item, active: true, archived: false, participant_status: nextStatus }
+      : item
+  ));
+
+  safeWrite(PROFILE_KEY, safeRead<MasterProfile[]>(PROFILE_KEY, []).map((profile) =>
+    profile.id === row.registration.profile_id ? { ...profile, active: true, participant_status: nextStatus } : profile
+  ));
+
+  safeWrite(REGISTRATION_KEY, safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).map((registration) =>
+    registration.id === row.registration.profile_id ? { ...registration, active: true, participant_status: nextStatus } : registration
+  ));
+
+  const existing = safeRead<ParticipantLifecycleRecord[]>(PARTICIPANT_LIFECYCLE_KEY, []);
+  const recordId = `youth:${row.registration.id}`;
+  const lifecycleRecord: ParticipantLifecycleRecord = {
+    id: recordId,
+    profile_id: row.registration.profile_id,
+    participant_id: row.registration.participant_id,
+    role: "Youth Workforce Participant",
+    profile_type: "youth",
+    status: nextStatus,
+    status_reason: missing.length ? `Supervisor ${activeUser?.name || "staff"} reviewed registration. Missing: ${missing.join(", ")}.` : `Supervisor ${activeUser?.name || "staff"} confirmed participant registration.`,
+    created_at: existing.find((item) => item.id === recordId)?.created_at || now,
+    updated_at: now,
+  };
+  safeWrite(PARTICIPANT_LIFECYCLE_KEY, [lifecycleRecord, ...existing.filter((item) => item.id !== recordId)].slice(0, 500));
+
+  return { status: nextStatus, missing };
+}
+
 function saveParticipantLifecycleRecord(user: EcosystemUser) {
   const existing = safeRead<ParticipantLifecycleRecord[]>(PARTICIPANT_LIFECYCLE_KEY, []);
   const row: ParticipantLifecycleRecord = {
@@ -3922,7 +3978,7 @@ function CurriculumParentSummaryCard() {
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Parent-Safe Summary</div>
       <h2 className="mt-2 text-3xl font-black">Today's Message for Families</h2>
       <p className="mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-7 text-white/85">{buildParentSummary()}</p>
-      <button type="button" className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Parent Summary</button>
+      <button type="button" className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Submit Parent Summary</button>
     </section>
   );
 }
@@ -6472,6 +6528,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       email: email.trim(),
       phone: phone.trim(),
       active: true,
+      participant_status: profileType === "youth" ? "pending" : "active",
       created_at: new Date().toISOString(),
     };
 
@@ -6486,6 +6543,7 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
       phone: phone.trim(),
       profile_type: profileType,
       active: true,
+      participant_status: profileType === "youth" ? "pending" : "active",
       created_at: profile.created_at,
     };
 
@@ -6510,6 +6568,9 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
         medical_notes: medicalNotes.trim(),
         transportation_plan: "Parent/guardian pickup",
         program_goal: programGoal.trim(),
+        active: true,
+        archived: false,
+        participant_status: "pending",
       };
       const youthResult = await insertRow("youth_participants", YOUTH_KEY, youth);
       if (!youthResult.ok) errors.push(`youth_participants: ${String((youthResult.error as any)?.message || youthResult.error)}`);
@@ -8046,7 +8107,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
         )}
         {tab === "project" && <CurrentWeekActivityModule setScreen={setScreen} />}
         {tab === "profiles" && <IndividualYouthProfilesModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} parentSummaries={parentSummaries} parentContacts={parentContacts} setTab={setTab} />}
-        {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} onChanged={refresh} />}
+        {tab === "roster" && <YouthRosterModule youthRows={youthRows} attendance={attendance} assessments={assessments} wellness={wellness} incidents={incidents} setScreen={setScreen} setTab={setTab} activeUser={activeUser} onChanged={refresh} />}
         {tab === "attendance" && <AttendanceTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
         {tab === "wellness" && <WellnessReview wellness={wellness} profiles={profiles} />}
         {tab === "assessment" && <AssessmentTool youthRows={youthRows} activeUser={activeUser} onSaved={refresh} />}
@@ -8132,6 +8193,7 @@ function YouthRosterModule({
   incidents,
   setScreen,
   setTab,
+  activeUser,
   onChanged,
 }: {
   youthRows: { registration: YouthRegistration; profile?: MasterProfile }[];
@@ -8141,12 +8203,24 @@ function YouthRosterModule({
   incidents: IncidentRecord[];
   setScreen: (screen: Screen) => void;
   setTab: (tab: "dashboard" | "project" | "roster" | "attendance" | "wellness" | "assessment" | "incident" | "parent" | "guardian" | "feedback" | "reports") => void;
+  activeUser?: EcosystemUser | null;
   onChanged: () => void | Promise<void>;
 }) {
   const today = todayISO();
   const nameFor = (row: { registration: YouthRegistration; profile?: MasterProfile }) =>
     row.profile ? `${row.profile.first_name} ${row.profile.last_name}`.trim() : row.registration.participant_id;
   const [rosterMessage, setRosterMessage] = useState("");
+
+  const confirmParticipant = async (row: { registration: YouthRegistration; profile?: MasterProfile }) => {
+    const youthName = nameFor(row);
+    const result = saveSupervisorParticipantConfirmation(row, activeUser || null);
+    await onChanged();
+    if (result.status === "active") {
+      setRosterMessage(`${youthName} is confirmed as an active participant. Registration, PIN, parent, and emergency information are saved.`);
+    } else {
+      setRosterMessage(`${youthName} remains pending. Missing: ${result.missing.join(", ")}. Parent/guardian information must be completed before full confirmation.`);
+    }
+  };
 
   const removeYouthFromRoster = async (row: { registration: YouthRegistration; profile?: MasterProfile }, mode: "archive" | "delete") => {
     const youthName = nameFor(row);
@@ -8177,10 +8251,10 @@ function YouthRosterModule({
     );
     safeWrite(REGISTRATION_KEY, nextRegistrations);
 
-    await deleteSupabaseRow("youth_participants", row.registration.id);
+    await archiveSupabaseYouth(row.registration);
     await archiveSupabaseProfile(row.registration.profile_id);
     await onChanged();
-    setRosterMessage(`${label} removed from the active youth roster.`);
+    setRosterMessage(`${label} marked inactive. History remains preserved.`);
   };
 
   return (
@@ -8219,12 +8293,12 @@ function YouthRosterModule({
                   <div>Week {getCurrentYouthWeek().week}: {getCurrentYouthWeek().title}</div>
                   <div className="capitalize">{todayStatus.replaceAll("_", " ")}</div>
                   <div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>{hasFlag ? "Review" : "Clear"}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black ${hasFlag ? "bg-amber-300 text-black" : youthRegistrationIsComplete(row) ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"}`}>{hasFlag ? "Review" : youthRegistrationIsComplete(row) ? "Ready" : "Pending"}</span>
                     {lastAssessment && <div className="mt-1 text-xs text-white/60">Safety {lastAssessment.safety}/5</div>}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => removeYouthFromRoster(row, "archive")} className="rounded-full border border-amber-200/25 bg-amber-300/15 px-3 py-2 text-xs font-black text-amber-50 hover:bg-amber-300 hover:text-black">Archive</button>
-                    <button type="button" onClick={() => removeYouthFromRoster(row, "delete")} className="rounded-full border border-red-200/30 bg-red-700/25 px-3 py-2 text-xs font-black text-red-50 hover:bg-red-400 hover:text-black">Delete</button>
+                    <button type="button" onClick={() => confirmParticipant(row)} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black hover:bg-emerald-200">Confirm Participant</button>
+                    <button type="button" onClick={() => removeYouthFromRoster(row, "archive")} className="rounded-full border border-amber-200/25 bg-amber-300/15 px-3 py-2 text-xs font-black text-amber-50 hover:bg-amber-300 hover:text-black">Mark Inactive</button>
                   </div>
                 </div>
               );
@@ -8258,6 +8332,10 @@ function AttendanceTool({
   const [message, setMessage] = useState("");
 
   const save = async () => {
+    if (!participantId) {
+      setMessage("Select or confirm a youth participant before submitting attendance.");
+      return;
+    }
     const row: AttendanceRecord = {
       id: uuid(),
       participant_id: participantId,
@@ -8272,6 +8350,9 @@ function AttendanceTool({
     };
     const result = await insertRow("attendance_records", ATTENDANCE_KEY, row);
     setMessage(saveModeMessage("Attendance and PPE", result));
+    setNotes("");
+    setStatus("present");
+    setPpe("complete");
     onSaved();
   };
 
@@ -8279,6 +8360,9 @@ function AttendanceTool({
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Attendance / PPE</div>
       <h2 className="mt-3 text-4xl font-black">Check youth in and document readiness.</h2>
+      <div className="mt-4 rounded-2xl border border-orange-200/30 bg-orange-300/15 p-4 text-sm font-bold leading-6 text-orange-50">
+        Cooling towels were handed out yesterday. Supervisors should remind youth: wet the towel, wear it around the neck, re-wet it as needed, and do not snap, throw, trade, or play with cooling towels. They are heat-safety equipment.
+      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <label className="block">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Youth Name / PIN</span>
@@ -8292,7 +8376,7 @@ function AttendanceTool({
         <SelectField label="PPE / Readiness" value={ppe} onChange={(v) => setPpe(v as AttendanceRecord["ppe_status"])} options={["complete", "missing_gloves", "missing_shoes", "missing_water", "needs_review"]} />
         <TextArea label="Notes" value={notes} onChange={setNotes} />
       </div>
-      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Attendance</button>
+      <button type="button" onClick={save} disabled={!youthRows.length} className={`mt-6 rounded-full px-7 py-4 font-black ${youthRows.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>Submit Attendance / PPE</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -8469,6 +8553,8 @@ function AssessmentTool({
     };
     const result = await insertRow("supervisor_assessments", ASSESSMENT_KEY, row);
     setMessage(saveModeMessage("Supervisor assessment", result));
+    setObservedBehaviors({ safety: [], teamwork: [], communication: [], responsibility: [], initiative: [], problemSolving: [] });
+    setNotes("");
     onSaved();
   };
 
@@ -8530,7 +8616,7 @@ function AssessmentTool({
       <div className="mt-5">
         <TextArea label="Supervisor Notes" value={notes} onChange={setNotes} placeholder="Add context only if needed: task completed, support given, concern, or next step." />
       </div>
-      <button type="button" onClick={save} disabled={!participantOptions.length} className={`mt-6 rounded-full px-7 py-4 font-black ${participantOptions.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>Save Assessment</button>
+      <button type="button" onClick={save} disabled={!participantOptions.length} className={`mt-6 rounded-full px-7 py-4 font-black ${participantOptions.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>Submit Assessment</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -8554,6 +8640,14 @@ function IncidentTool({
   const [message, setMessage] = useState("");
 
   const save = async () => {
+    if (!participantId) {
+      setMessage("Select a youth participant before submitting a staff log.");
+      return;
+    }
+    if (!summary.trim() || !action.trim()) {
+      setMessage("Enter what happened and the action taken before submitting.");
+      return;
+    }
     const row: IncidentRecord = {
       id: uuid(),
       participant_id: participantId,
@@ -8567,6 +8661,9 @@ function IncidentTool({
     };
     const result = await insertRow("incident_logs", INCIDENT_KEY, row);
     setMessage(saveModeMessage("Incident/support log", result));
+    setSummary("");
+    setAction("");
+    setParentContacted(false);
     onSaved();
   };
 
@@ -8597,7 +8694,7 @@ function IncidentTool({
         <TextArea label="What happened?" value={summary} onChange={setSummary} />
         <TextArea label="Action taken / next step" value={action} onChange={setAction} />
       </div>
-      <button type="button" onClick={save} className="mt-6 rounded-full bg-red-300 px-7 py-4 font-black text-black">Save Staff Log</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-red-300 px-7 py-4 font-black text-black">Submit Staff Log</button>
       {message && <Notice text={message} />}
     </Card>
   );
@@ -8636,6 +8733,10 @@ function ParentSummaryTool({
   }, [selectedYouth, participantAttendance, latestAssessment, progress, strengths, needs]);
 
   const save = async () => {
+    if (!participantId) {
+      setMessage("Select a youth participant before submitting a parent-safe summary.");
+      return;
+    }
     const row: ParentSummary = {
       id: uuid(),
       participant_id: participantId,
@@ -8650,6 +8751,10 @@ function ParentSummaryTool({
     };
     const result = await insertRow("parent_summaries", PARENT_SUMMARY_KEY, row);
     setMessage(saveModeMessage("Parent-safe summary", result));
+    setStrengths("");
+    setProgress("");
+    setNeeds("");
+    setPrivateNotes("");
     onSaved();
   };
 
@@ -8682,7 +8787,7 @@ function ParentSummaryTool({
         <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100">Generated Parent Message</div>
         <p className="mt-3 text-sm leading-7 text-white/88">{generated}</p>
       </div>
-      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Parent Summary</button>
+      <button type="button" onClick={save} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Submit Parent Summary</button>
       {message && <Notice text={message} />}
     </Card>
   );
