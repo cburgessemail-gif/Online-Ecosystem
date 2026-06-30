@@ -49,6 +49,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 11.12: fixes Returning access blank screen by defining the heat operations gate used by the header.
  * - Ecosystem 11.13: Supervisor pathway buttons are active; Clear becomes Submit/Confirm Participant; youth registration is saved and verified before daily records.
  * - Ecosystem 11.14: Week 4 operations update adds Zone 5 Melon Improvement Project, thermal rock safety boundaries, pepper supports, Grow Area Manicure Day, and reflection response capture.
+ * - Ecosystem 11.15: Removes Casper Stewart from active roster, restores functional roster archive/delete actions, and adds add/edit/remove controls for Attendance/PPE records.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -3390,6 +3391,36 @@ function youthRosterKey(row: { registration: YouthRegistration; profile?: Master
   return name ? `${name}|${guardian}` : normalizeLaunchPin(row.registration.participant_id || row.registration.id);
 }
 
+function isCasperStewartYouthRow(row: { registration: YouthRegistration; profile?: MasterProfile }) {
+  const profileName = normalizeLaunchText(`${row.profile?.first_name || ""} ${row.profile?.last_name || ""}`);
+  const preferredName = normalizeLaunchText(`${row.profile?.preferred_name || ""} ${row.profile?.last_name || ""}`);
+  const registrationName = normalizeLaunchText(`${(row.registration as any).first_name || ""} ${(row.registration as any).last_name || ""}`);
+  return profileName === "casper stewart" || preferredName === "casper stewart" || registrationName === "casper stewart";
+}
+
+function cleanupCasperStewartFromLocalRoster() {
+  const profiles = safeRead<MasterProfile[]>(PROFILE_KEY, []);
+  const youth = safeRead<YouthRegistration[]>(YOUTH_KEY, []);
+  const registrations = safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []);
+
+  const casperProfiles = profiles.filter((profile) =>
+    normalizeLaunchText(`${profile.first_name || profile.preferred_name || ""} ${profile.last_name || ""}`) === "casper stewart"
+  );
+  const casperProfileIds = new Set(casperProfiles.map((profile) => profile.id));
+  const casperYouth = youth.filter((item) => casperProfileIds.has(item.profile_id));
+  const deletionIds = [
+    ...casperProfiles.map((profile) => profile.id),
+    ...casperYouth.flatMap((item) => [item.id, item.profile_id, item.participant_id]),
+  ].filter(Boolean);
+
+  if (!deletionIds.length) return;
+
+  safeWrite(DELETED_YOUTH_KEY, Array.from(new Set([...safeRead<string[]>(DELETED_YOUTH_KEY, []), ...deletionIds])));
+  safeWrite(PROFILE_KEY, profiles.map((profile) => casperProfileIds.has(profile.id) ? { ...profile, active: false, participant_status: "inactive" as ParticipantLifecycleStatus } : profile));
+  safeWrite(YOUTH_KEY, youth.map((item) => casperProfileIds.has(item.profile_id) ? { ...item, active: false, archived: true, participant_status: "inactive" as ParticipantLifecycleStatus } : item));
+  safeWrite(REGISTRATION_KEY, registrations.map((registration) => casperProfileIds.has(registration.id) ? { ...registration, active: false, participant_status: "inactive" as ParticipantLifecycleStatus } : registration));
+}
+
 function preferYouthRosterRow(current: { registration: YouthRegistration; profile?: MasterProfile }, incoming: { registration: YouthRegistration; profile?: MasterProfile }) {
   const currentPin = normalizeNescoPin(current.registration.participant_id);
   const incomingPin = normalizeNescoPin(incoming.registration.participant_id);
@@ -3401,6 +3432,7 @@ function preferYouthRosterRow(current: { registration: YouthRegistration; profil
 }
 
 function isActiveYouthRosterRow(row: { registration: YouthRegistration; profile?: MasterProfile }, deletedYouthIds: string[]) {
+  if (isCasperStewartYouthRow(row)) return false;
   const ids = [row.registration.id, row.registration.profile_id, row.registration.participant_id].filter(Boolean);
   if (ids.some((id) => deletedYouthIds.includes(id))) return false;
   if (row.registration.active === false || row.registration.archived === true) return false;
@@ -4670,6 +4702,10 @@ function App() {
     document.documentElement.lang = next;
     document.documentElement.dir = languageDir(next);
   };
+
+  useEffect(() => {
+    cleanupCasperStewartFromLocalRoster();
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -8291,29 +8327,30 @@ function YouthRosterModule({
 
     setRosterMessage(`${mode === "delete" ? "Deleting" : "Archiving"} ${label}...`);
 
-    const nextYouth = safeRead<YouthRegistration[]>(YOUTH_KEY, []).map((item) =>
-      item.id === row.registration.id || item.profile_id === row.registration.profile_id || item.participant_id === row.registration.participant_id
-        ? { ...item, active: false, archived: true }
-        : item
-    );
-    safeWrite(YOUTH_KEY, nextYouth);
+    const matchesYouth = (item: YouthRegistration) =>
+      item.id === row.registration.id || item.profile_id === row.registration.profile_id || item.participant_id === row.registration.participant_id;
+    const matchesProfile = (profile: MasterProfile) => profile.id === row.registration.profile_id;
+    const matchesRegistration = (registration: EcosystemRegistration) => registration.id === row.registration.profile_id;
+
     const deletedIds = safeRead<string[]>(DELETED_YOUTH_KEY, []);
-    safeWrite(DELETED_YOUTH_KEY, Array.from(new Set([...deletedIds, row.registration.id, row.registration.profile_id, row.registration.participant_id])));
+    safeWrite(DELETED_YOUTH_KEY, Array.from(new Set([...deletedIds, row.registration.id, row.registration.profile_id, row.registration.participant_id].filter(Boolean))));
 
-    const nextProfiles = safeRead<MasterProfile[]>(PROFILE_KEY, []).map((profile) =>
-      profile.id === row.registration.profile_id ? { ...profile, active: false } : profile
-    );
-    safeWrite(PROFILE_KEY, nextProfiles);
+    if (mode === "delete") {
+      safeWrite(YOUTH_KEY, safeRead<YouthRegistration[]>(YOUTH_KEY, []).filter((item) => !matchesYouth(item)));
+      safeWrite(PROFILE_KEY, safeRead<MasterProfile[]>(PROFILE_KEY, []).filter((profile) => !matchesProfile(profile)));
+      safeWrite(REGISTRATION_KEY, safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).filter((registration) => !matchesRegistration(registration)));
+      await deleteSupabaseRow("youth_participants", row.registration.id);
+      await deleteSupabaseRow("profiles", row.registration.profile_id);
+    } else {
+      safeWrite(YOUTH_KEY, safeRead<YouthRegistration[]>(YOUTH_KEY, []).map((item) => matchesYouth(item) ? { ...item, active: false, archived: true, participant_status: "inactive" } : item));
+      safeWrite(PROFILE_KEY, safeRead<MasterProfile[]>(PROFILE_KEY, []).map((profile) => matchesProfile(profile) ? { ...profile, active: false, participant_status: "inactive" } : profile));
+      safeWrite(REGISTRATION_KEY, safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).map((registration) => matchesRegistration(registration) ? { ...registration, active: false, participant_status: "inactive" } : registration));
+      await archiveSupabaseYouth(row.registration);
+      await archiveSupabaseProfile(row.registration.profile_id);
+    }
 
-    const nextRegistrations = safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).map((registration) =>
-      registration.id === row.registration.profile_id ? { ...registration, active: false } : registration
-    );
-    safeWrite(REGISTRATION_KEY, nextRegistrations);
-
-    await archiveSupabaseYouth(row.registration);
-    await archiveSupabaseProfile(row.registration.profile_id);
     await onChanged();
-    setRosterMessage(`${label} marked inactive. History remains preserved.`);
+    setRosterMessage(mode === "delete" ? `${label} deleted from the active roster. Safety/history records are preserved.` : `${label} marked inactive. History remains preserved.`);
   };
 
   return (
@@ -8358,6 +8395,7 @@ function YouthRosterModule({
                   <div className="flex flex-wrap gap-2">
                     <button type="button" onClick={() => confirmParticipant(row)} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black hover:bg-emerald-200">Confirm Participant</button>
                     <button type="button" onClick={() => removeYouthFromRoster(row, "archive")} className="rounded-full border border-amber-200/25 bg-amber-300/15 px-3 py-2 text-xs font-black text-amber-50 hover:bg-amber-300 hover:text-black">Mark Inactive</button>
+                    <button type="button" onClick={() => removeYouthFromRoster(row, "delete")} className="rounded-full border border-red-200/25 bg-red-500/15 px-3 py-2 text-xs font-black text-red-50 hover:bg-red-400 hover:text-black">Delete</button>
                   </div>
                 </div>
               );
@@ -8389,12 +8427,53 @@ function AttendanceTool({
   const [ppe, setPpe] = useState<AttendanceRecord["ppe_status"]>("complete");
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
+  const [records, setRecords] = useState<AttendanceRecord[]>(() => safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!participantId && youthRows[0]?.registration.participant_id) setParticipantId(youthRows[0].registration.participant_id);
+  }, [youthRows, participantId]);
+
+  const todayRecords = records.filter((record) => record.date === todayISO());
+
+  const refreshRecords = () => setRecords(safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []));
+
+  const resetForm = () => {
+    setNotes("");
+    setStatus("present");
+    setPpe("complete");
+    setEditingId(null);
+  };
 
   const save = async () => {
     if (!participantId) {
       setMessage("Select or confirm a youth participant before submitting attendance.");
       return;
     }
+
+    if (editingId) {
+      const nextRecords = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []).map((record) =>
+        record.id === editingId
+          ? { ...record, participant_id: participantId, supervisor_id: activeUser?.id, status, ppe_status: ppe, notes, check_in_time: record.check_in_time || nowLabel() }
+          : record
+      );
+      safeWrite(ATTENDANCE_KEY, nextRecords);
+      if (supabase) {
+        for (const candidate of supabaseTableCandidates("attendance_records")) {
+          try {
+            await supabase.from(candidate).update({ participant_id: participantId, supervisor_id: activeUser?.id, status, ppe_status: ppe, notes }).eq("id", editingId);
+          } catch (error) {
+            console.warn("Attendance/PPE edit stayed local:", error);
+          }
+        }
+      }
+      setMessage("Attendance/PPE record updated.");
+      resetForm();
+      refreshRecords();
+      onSaved();
+      return;
+    }
+
     const row: AttendanceRecord = {
       id: uuid(),
       participant_id: participantId,
@@ -8409,11 +8488,34 @@ function AttendanceTool({
     };
     const result = await insertRow("attendance_records", ATTENDANCE_KEY, row);
     setMessage(saveModeMessage("Attendance and PPE", result));
-    setNotes("");
-    setStatus("present");
-    setPpe("complete");
+    resetForm();
+    refreshRecords();
     onSaved();
   };
+
+  const editRecord = (record: AttendanceRecord) => {
+    setEditingId(record.id);
+    setParticipantId(record.participant_id);
+    setStatus(record.status);
+    setPpe(record.ppe_status);
+    setNotes(record.notes || "");
+    setMessage("Editing selected Attendance/PPE record. Press Update to save changes.");
+  };
+
+  const removeRecord = async (record: AttendanceRecord) => {
+    if (!window.confirm("Remove this Attendance/PPE record?")) return;
+    safeWrite(ATTENDANCE_KEY, safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []).filter((item) => item.id !== record.id));
+    await deleteSupabaseRow("attendance_records", record.id);
+    if (editingId === record.id) resetForm();
+    refreshRecords();
+    onSaved();
+    setMessage("Attendance/PPE record removed.");
+  };
+
+  const nameForParticipant = (participant_id: string) =>
+    youthRows.find((row) => row.registration.participant_id === participant_id)?.profile
+      ? profileName(youthRows.find((row) => row.registration.participant_id === participant_id)?.profile)
+      : participant_id;
 
   return (
     <Card>
@@ -8435,8 +8537,42 @@ function AttendanceTool({
         <SelectField label="PPE / Readiness" value={ppe} onChange={(v) => setPpe(v as AttendanceRecord["ppe_status"])} options={["complete", "missing_gloves", "missing_shoes", "missing_water", "needs_review"]} />
         <TextArea label="Notes" value={notes} onChange={setNotes} />
       </div>
-      <button type="button" onClick={save} disabled={!youthRows.length} className={`mt-6 rounded-full px-7 py-4 font-black ${youthRows.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>Submit Attendance / PPE</button>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={save} disabled={!youthRows.length} className={`rounded-full px-7 py-4 font-black ${youthRows.length ? "bg-emerald-300 text-black" : "cursor-not-allowed bg-white/15 text-white/50"}`}>{editingId ? "Update Attendance / PPE" : "Submit Attendance / PPE"}</button>
+        {editingId && <button type="button" onClick={resetForm} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Cancel Edit</button>}
+      </div>
       {message && <Notice text={message} />}
+
+      <div className="mt-8 rounded-3xl border border-white/10 bg-black/25 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Today’s Attendance/PPE Records</div>
+            <div className="mt-1 text-sm font-bold text-white/70">Supervisors can change or remove a mistaken entry here.</div>
+          </div>
+          <button type="button" onClick={refreshRecords} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black">Refresh Records</button>
+        </div>
+        {todayRecords.length === 0 ? (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">No Attendance/PPE records have been submitted today.</div>
+        ) : (
+          <div className="mt-4 grid gap-3">
+            {todayRecords.map((record) => (
+              <div key={record.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="font-black text-white">{nameForParticipant(record.participant_id)}</div>
+                    <div className="mt-1 text-xs font-bold text-white/60">{record.check_in_time || "No time"} · {record.status.replaceAll("_", " ")} · PPE: {record.ppe_status.replaceAll("_", " ")}</div>
+                    {record.notes && <div className="mt-2 text-sm leading-6 text-white/78">{record.notes}</div>}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => editRecord(record)} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Change</button>
+                    <button type="button" onClick={() => removeRecord(record)} className="rounded-full border border-red-200/25 bg-red-500/15 px-4 py-2 text-xs font-black text-red-50 hover:bg-red-400 hover:text-black">Remove</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </Card>
   );
 }
