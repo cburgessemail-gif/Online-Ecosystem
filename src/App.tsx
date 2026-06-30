@@ -48,6 +48,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
  * - Ecosystem 11.12: fixes Returning access blank screen by defining the heat operations gate used by the header.
  * - Ecosystem 11.13: Supervisor pathway buttons are active; Clear becomes Submit/Confirm Participant; youth registration is saved and verified before daily records.
+ * - Ecosystem 11.14: Week 4 operations update adds Zone 5 Melon Improvement Project, thermal rock safety boundaries, pepper supports, Grow Area Manicure Day, and reflection response capture.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -951,21 +952,38 @@ const youthWeekFourDailyPlan = [
   },
   {
     day: "Tuesday",
-    date: "Week 4 Tuesday",
-    curriculum: "Melon thermal rock system",
-    focus: "Youth learn how thermal mass can hold heat and support melon production without additional energy use.",
-    work: ["Review Zone 5 melon area", "Gather and place thermal rocks safely", "Observe sun and heat patterns", "Document before-and-after progress", "Explain how the system supports melons"],
-    resources: ["Thermal mass explainer", "Melon zone safety card", "Photo documentation prompt"],
-    reflection: "How can rocks, sun, and placement help improve melon production?",
+    date: "June 30, 2026",
+    curriculum: "Zone 5 Melon Improvement Project",
+    focus: "Youth improve Zone 5 by watering crops, removing weeds, installing a thermal rock system for melons, and collecting safe pepper supports from the forest.",
+    work: [
+      "Water crops before improvement work begins",
+      "Weed Zone 5 melon area carefully so melon vines are protected",
+      "Collect rocks only from approved natural areas",
+      "Do not collect rocks from airport driveways, cement or concrete, taxiways, runways, parking areas, roadways, hangar areas, or active airport operational areas",
+      "Deliver rocks directly to Zone 5",
+      "Install the thermal rock system around melons as directed by the supervisor",
+      "Enter the forest only with permission and collect pepper supports approximately 18 inches long, straight if possible, and strong enough to support pepper plants",
+      "Document before-and-after progress"
+    ],
+    resources: ["Zone 5 melon safety card", "Thermal mass explainer", "Airport operations boundary reminder", "Pepper support collection guide", "Photo documentation prompt"],
+    reflection: "Why remove weeds before improving a growing area? How might rocks help melons grow better? Why are supports important for pepper plants? What did you help accomplish today? What are you proud of today?",
   },
   {
     day: "Wednesday",
-    date: "Week 4 Wednesday",
-    curriculum: "Pollinator habitat stewardship and apiary readiness",
-    focus: "Youth prepare pollinator-support areas and learn how habitat, flowering plants, and apiary readiness support food production.",
-    work: ["Inspect pollinator sanctuary", "Identify flowers and habitat needs", "Prepare apiary area only as directed", "Keep service access clear", "Record a pollinator observation"],
-    resources: ["Apiary readiness safety note", "Pollinator observation guide", "Wednesday operations note"],
-    reflection: "How do pollinators support food, farms, and community?",
+    date: "July 1, 2026",
+    curriculum: "Grow Area Manicure Day",
+    focus: "Youth practice stewardship, production readiness, plant health observation, edge cleanup, and community pride by carefully improving the appearance and condition of the grow area.",
+    work: [
+      "Use scissors, hoes, and hand shovels only as directed",
+      "Remove weeds without damaging crop plants",
+      "Clean edges and improve the appearance of the grow area",
+      "Care for plants while working around them",
+      "Remove debris and return tools",
+      "Observe plant health and identify the healthiest-looking plant",
+      "Document the area that improved the most"
+    ],
+    resources: ["Hand tool safety card", "Plant health checklist", "Weed removal guide", "Site appearance and community pride prompt"],
+    reflection: "What difference did you notice after removing weeds? Why is regular maintenance important on a farm? What plant appeared healthiest? What area improved the most? What surprised or interested you?",
   },
   {
     day: "Thursday",
@@ -1640,78 +1658,78 @@ const DAILY_CLOSEOUT_KEY = "bff.launch.dailyCloseouts";
 const TODAY_CURRICULUM: CurriculumDay = {
   week: 4,
   theme: "Pollinators, Production & Community",
-  featuredStory: "Melon Thermal Rock System + Pollinator Habitat Stewardship",
+  featuredStory: "Zone 5 Melon Improvement Project + Grow Area Manicure Day",
   activities: [
     {
-      id: "pollinator-home",
-      icon: "🐝",
-      title: "Build a Home for Future Pollinators",
-      summary: "Relocate beehive equipment and prepare a better location for future pollinator activity. The beehive is not active today; this is pollinator infrastructure preparation.",
-      whyItMatters: "Farmers prepare systems before they are needed. A good hive location can support future pollination and future harvests.",
-      evidenceRequired: ["Before photo", "After photo", "Hive component identified", "Location observation"],
-      reflectionPrompt: "What makes a good home for future pollinators?",
-      resources: ["Beehive diagram", "Companion planting guide"],
-    },
-    {
-      id: "planting-ground",
-      icon: "🌱",
-      title: "Prepare Ground for Planting",
-      summary: "Clear planting areas, prepare rows, loosen soil where needed, add compost, and get rows ready for planting.",
-      whyItMatters: "Healthy soil and prepared rows give crops a better start.",
-      evidenceRequired: ["Row before photo", "Row after photo", "Soil observation"],
-      reflectionPrompt: "What did you notice about the soil before planting?",
-      resources: ["Crop maintenance chart", "Sowing and transplanting guide"],
-    },
-    {
-      id: "gates",
-      icon: "🚜",
-      title: "Prepare Gates",
-      summary: "Inspect, clear, and prepare gate/access areas so people, tools, and materials can move safely.",
-      whyItMatters: "Infrastructure helps the farm operate safely and efficiently.",
-      evidenceRequired: ["Gate area before photo", "Gate area after photo", "Safety observation"],
-      reflectionPrompt: "How do gates and access routes affect farm safety?",
-    },
-    {
-      id: "mowing",
-      icon: "🌾",
-      title: "Mow Grass",
-      summary: "Mow overgrown areas to improve access, appearance, safety, and farm readiness.",
-      whyItMatters: "Farm maintenance is farm management.",
-      evidenceRequired: ["Mowing before photo", "Mowing after photo", "Area improved"],
-      reflectionPrompt: "How did mowing improve the farm today?",
-    },
-    {
-      id: "compost",
-      icon: "♻️",
-      title: "Collect Grass for Compost",
-      summary: "Collect cut grass and move it into the compost system so waste becomes a soil resource.",
-      whyItMatters: "Compost turns today’s waste into tomorrow’s soil health.",
-      evidenceRequired: ["Grass collected photo", "Compost added photo", "Compost observation"],
-      reflectionPrompt: "How can grass clippings become future soil?",
-    },
-    {
-      id: "water",
+      id: "zone-5-water",
       icon: "💧",
-      title: "Water Plants",
-      summary: "Check moisture, water crops, and observe plant health.",
-      whyItMatters: "Water management is one of the most important farming skills.",
-      evidenceRequired: ["Watering photo", "Plant health observation"],
-      reflectionPrompt: "How did you know which plants needed water?",
+      title: "Water Crops",
+      summary: "Water crops before improvement work begins and observe which plants need support.",
+      whyItMatters: "Watering first protects plant health and teaches youth to observe before acting.",
+      evidenceRequired: ["Watering photo", "Plant health observation", "Work completed note"],
+      reflectionPrompt: "What plant looked like it needed water or care today?",
+      resources: ["Watering guide", "Plant health checklist"],
     },
     {
-      id: "grow-plan",
-      icon: "📋",
-      title: "Create Grow Plan",
-      summary: "Decide what goes where, consider companion planting, pollinators, timing, water, and harvest goals.",
-      whyItMatters: "Farmers plan before they plant. A grow plan connects today’s work to tomorrow’s harvest.",
-      evidenceRequired: ["Grow plan photo", "Crop placement notes", "Companion planting idea"],
-      reflectionPrompt: "What should we plant where, and why?",
-      resources: ["Companion plants", "Crop rotation planning", "Plant families"],
+      id: "zone-5-weed",
+      icon: "🌿",
+      title: "Weed Zone 5 Melon Area",
+      summary: "Remove weeds from Zone 5 while protecting melon vines and improving the growing area.",
+      whyItMatters: "Weed removal reduces competition for water, nutrients, sunlight, and space.",
+      evidenceRequired: ["Before photo", "After photo", "Weed removal observation"],
+      reflectionPrompt: "Why remove weeds before improving a growing area?",
+      resources: ["Weed removal guide", "Zone 5 melon safety card"],
+    },
+    {
+      id: "zone-5-thermal-rocks",
+      icon: "🪨",
+      title: "Install Thermal Rock System",
+      summary: "Collect rocks only from approved natural areas, deliver them directly to Zone 5, and place them around melons as directed.",
+      whyItMatters: "Rocks can hold warmth from the sun and support melon production without using electricity.",
+      evidenceRequired: ["Approved collection area note", "Thermal rock placement photo", "Supervisor confirmation"],
+      reflectionPrompt: "How might rocks help melons grow better?",
+      resources: ["Thermal mass explainer", "Airport operations boundary reminder"],
+    },
+    {
+      id: "airport-boundary-safety",
+      icon: "🛑",
+      title: "Airport Boundary Safety",
+      summary: "Do not collect rocks from airport driveways, cement or concrete, taxiways, runways, parking areas, roadways, hangar areas, or active airport operational areas.",
+      whyItMatters: "Bronson Family Farm operates on a private airport site. Youth safety and airport boundaries must be protected at all times.",
+      evidenceRequired: ["Supervisor safety check", "Boundary understood note"],
+      reflectionPrompt: "Why do airport boundaries matter when we work on the farm?",
+      resources: ["Airport operations boundary reminder", "Supervisor direction required"],
+    },
+    {
+      id: "pepper-supports",
+      icon: "🫑",
+      title: "Collect Pepper Supports",
+      summary: "Enter the forest only with permission and collect supports approximately 18 inches long, straight if possible, and strong enough to support pepper plants.",
+      whyItMatters: "Supports help pepper plants stay upright, reduce damage, and prepare the crop for production.",
+      evidenceRequired: ["Support collection photo", "Pepper support placement note", "Tool return confirmation"],
+      reflectionPrompt: "Why are supports important for pepper plants?",
+      resources: ["Pepper support collection guide", "Forest entry safety reminder"],
+    },
+    {
+      id: "grow-area-manicure",
+      icon: "✂️",
+      title: "Grow Area Manicure Day",
+      summary: "Use scissors, hoes, and hand shovels to remove weeds, clean edges, care for plants, improve appearance, remove debris, and observe plant health.",
+      whyItMatters: "Regular maintenance shows stewardship, production readiness, responsibility, site appearance, and community pride.",
+      evidenceRequired: ["Before photo", "After photo", "Healthiest plant observation", "Area improved note"],
+      reflectionPrompt: "What difference did you notice after removing weeds? Why is regular maintenance important on a farm? What plant appeared healthiest? What area improved the most? What surprised or interested you?",
+      resources: ["Hand tool safety card", "Plant health checklist", "Site appearance and community pride prompt"],
     },
   ],
 };
 
 const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
+  "zone-5-water": ["Water Management", "Crop Monitoring", "Plant Health Observation"],
+  "zone-5-weed": ["Weed Identification", "Plant Protection", "Agricultural Operations", "Stewardship"],
+  "zone-5-thermal-rocks": ["Thermal Mass Awareness", "Crop Support Systems", "Observation Skills", "Safe Material Handling"],
+  "airport-boundary-safety": ["Airport Boundary Awareness", "Workplace Safety", "Following Supervisor Direction"],
+  "pepper-supports": ["Crop Support", "Forest Material Selection", "Plant Care", "Tool and Site Safety"],
+  "grow-area-manicure": ["Grounds Maintenance", "Hand Tool Safety", "Plant Health Observation", "Community Pride", "Production Readiness"],
   "pollinator-home": ["Pollinator Infrastructure", "Environmental Stewardship", "Observation Skills", "Agricultural Planning"],
   "planting-ground": ["Soil Preparation", "Agricultural Operations", "Teamwork", "Crop Establishment"],
   "gates": ["Facility Maintenance", "Safety Awareness", "Infrastructure Management"],
@@ -5420,6 +5438,9 @@ function CultivatorMomentShadowCard() {
 }
 
 function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: ReturnType<typeof getActivityKnowledgePack> }) {
+  const activeUser = safeRead<EcosystemUser | null>(SESSION_KEY, null);
+  const [responses, setResponses] = useState<Record<string, string>>({});
+  const [saved, setSaved] = useState("");
   const questions = [
     "What did I notice today?",
     "What did it mean?",
@@ -5427,6 +5448,32 @@ function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: Retu
     knowledgePack.reflectionPrompt,
     "What is one thing future cultivators should know?",
   ];
+  const saveResponses = () => {
+    const answered = questions
+      .map((question) => ({ question, response: (responses[question] || "").trim() }))
+      .filter((row) => row.response.length > 0);
+    if (!answered.length) {
+      setSaved("Write at least one reflection response before submitting.");
+      return;
+    }
+    const existing = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const next: CultivatorDiscovery[] = [
+      ...answered.map((row) => ({
+        id: uuid(),
+        participant_id: activeUser?.participant_id || activeUser?.id || "guest-youth",
+        user_name: activeUser?.name || "Youth Workforce Participant",
+        date: todayISO(),
+        category: "Daily Reflection",
+        question: row.question,
+        response: row.response,
+        source: "Reflection" as const,
+        created_at: new Date().toISOString(),
+      })),
+      ...existing,
+    ].slice(0, 500);
+    safeWrite(DISCOVERY_KEY, next);
+    setSaved("Reflection submitted. Your responses were saved to My Journey and Mission Control records.");
+  };
   return (
     <Card className="p-4 md:p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">🌱 Cultivator Reflection</div>
@@ -5449,9 +5496,21 @@ function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: Retu
           <p className="mt-2 text-sm font-bold leading-6 text-emerald-50">What is one thing future cultivators should know?</p>
         </div>
       </div>
-      <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {questions.map((q) => <div key={q} className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-black">{q}</div>)}
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {questions.map((q) => (
+          <label key={q} className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-black">
+            <span>{q}</span>
+            <textarea
+              value={responses[q] || ""}
+              onChange={(e) => setResponses((prev) => ({ ...prev, [q]: e.target.value }))}
+              placeholder="Tap here and write your response..."
+              className="mt-3 min-h-[96px] w-full rounded-xl border border-white/10 bg-white p-3 text-sm font-bold text-slate-950"
+            />
+          </label>
+        ))}
       </div>
+      <button type="button" onClick={saveResponses} className="mt-4 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Submit Reflection</button>
+      {saved && <Notice text={saved} />}
     </Card>
   );
 }
