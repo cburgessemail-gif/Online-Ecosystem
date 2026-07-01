@@ -51,6 +51,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 11.14: Week 4 operations update adds Zone 5 Melon Improvement Project, thermal rock safety boundaries, pepper supports, Grow Area Manicure Day, and reflection response capture.
  * - Ecosystem 11.15: Removes Casper Stewart from active roster, restores functional roster archive/delete actions, and adds add/edit/remove controls for Attendance/PPE records.
  * - Ecosystem 11.16: Makes Half Day the operating authority for June 30 heat operations, calms overpowering heat alerts, and adds concise calendar heat/status badges.
+ * - Ecosystem 11.17: July 1 auto-advance fix: active Half Day schedule, Wednesday assignment, stale Monday notice suppression, and bulk roster actions.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -550,6 +551,11 @@ STATUS: HALF DAY OPERATIONS
 
 Due to high heat conditions, Bronson Family Farm will operate on a Half Day schedule.
 
+8:00 AM – 10:45 AM: Farm work assignments.
+10:45 AM – 11:00 AM: Cleanup.
+11:00 AM – 12:00 PM: Lunch, hydration, reflection, and daily review.
+12:00 PM: Dismissal.
+
 Youth will complete priority outdoor work during the cooler morning hours. Hydration, cooling towels, shade breaks, and wellness monitoring are required.
 
 Parents/caregivers, please follow the adjusted pickup guidance from Mission Control.
@@ -566,10 +572,46 @@ const defaultHalfDayHeatStatusUpdate: WorkStatusUpdate = {
   status: "HALF_DAY",
   label: "Half Day Operations",
   reason: "High heat conditions require shortened outdoor work during the cooler morning hours.",
-  action: "Complete priority outdoor tasks early, use shade and hydration checks, monitor cooling towel use, and dismiss before peak afternoon heat.",
+  action: "8:00–10:45 farm work. 10:45 cleanup. 11:00 lunch, hydration, reflection, and review. 12:00 dismissal.",
   audiences: ["Parents", "Youth", "Supervisors"],
   hangar_note: "Use shade and the hangar only as directed by site leadership; the hangar is not a substitute for full-day indoor programming.",
   parent_message: TUESDAY_JUNE_30_HALF_DAY_HEAT_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
+  launched_at: new Date().toISOString(),
+};
+
+const WEDNESDAY_JULY_1_HALF_DAY_MESSAGE = `Bronson Family Farm Work Status
+
+Wednesday, July 1, 2026
+
+STATUS: HALF DAY OPERATIONS
+
+8:00 AM – 10:45 AM: Farm work assignments.
+10:45 AM – 11:00 AM: Cleanup.
+11:00 AM – 12:00 PM: Lunch, hydration, reflection, and daily review.
+12:00 PM: Dismissal.
+
+Today’s priority work: thoroughly water all grow areas including flowers, fence the flower patch, prepare and set pest traps, weed Zone 5 melon patch, and collect rocks from approved natural areas only for Zone 5.
+
+Parents/caregivers, please pick up youth at 12:00 PM.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultWednesdayJuly1HalfDayStatusUpdate: WorkStatusUpdate = {
+  id: "heat-half-day-2026-07-01",
+  date: "Wednesday, July 1, 2026",
+  effective_date: "2026-07-01",
+  expires_date: "2026-07-01",
+  status: "HALF_DAY",
+  label: "Half Day Operations — 12:00 PM Dismissal",
+  reason: "High heat conditions require a shortened workday with priority outdoor tasks completed before late morning.",
+  action: "8:00–10:45 farm work. 10:45 cleanup. 11:00 lunch, hydration, reflection, and review. 12:00 dismissal.",
+  audiences: ["Parents", "Youth", "Supervisors"],
+  hangar_note: "Use shade and the hangar only as directed by site leadership; the hangar is not a substitute for full-day indoor programming.",
+  parent_message: WEDNESDAY_JULY_1_HALF_DAY_MESSAGE,
   created_by: "Mission Control",
   created_at: new Date().toISOString(),
   launched_at: new Date().toISOString(),
@@ -1006,19 +1048,23 @@ const youthWeekFourDailyPlan = [
   {
     day: "Wednesday",
     date: "July 1, 2026",
-    curriculum: "Grow Area Manicure Day",
-    focus: "Youth practice stewardship, production readiness, plant health observation, edge cleanup, and community pride by carefully improving the appearance and condition of the grow area.",
+    curriculum: "Half-Day Grow Area Protection, Watering, Pest Traps, and Zone 5 Melon Support",
+    focus: "Youth complete essential morning-only work before peak heat: water all grow areas, protect flowers, prepare pest monitoring, weed Zone 5, and collect approved rocks for the melon patch.",
     work: [
-      "Use scissors, hoes, and hand shovels only as directed",
-      "Remove weeds without damaging crop plants",
-      "Clean edges and improve the appearance of the grow area",
-      "Care for plants while working around them",
-      "Remove debris and return tools",
-      "Observe plant health and identify the healthiest-looking plant",
-      "Document the area that improved the most"
+      "8:00–10:45 AM farm work only; cleanup begins at 10:45 AM",
+      "Thoroughly water the entire grow area, including vegetables, herbs, flowers, pollinator areas, butterfly sanctuary, milkweed, Zone 5 melons, and newly planted crops",
+      "Fence off the flower patch to protect pollinator habitat and growing flowers",
+      "Prepare pest traps according to supervisor instructions",
+      "Set pest traps in approved locations and record trap location, type, date, and first observation",
+      "Carefully weed Zone 5 melon patch before rocks are placed so melon vines are protected",
+      "Collect rocks only from approved natural areas; do not take rocks from driveways, airport cement/concrete, taxiways, runways, parking areas, roadways, hangars, or active airport operational areas",
+      "Deliver collected rocks directly to Zone 5 and leave/place them only as directed by the supervisor",
+      "Observe plant stress, insect activity, wilting, dry soil, or disease concerns and report them",
+      "10:45–11:00 AM cleanup: return tools, clear pathways, secure materials, and complete supervisor inspection",
+      "11:00 AM lunch, hydration, reflection, and daily review; 12:00 PM dismissal"
     ],
-    resources: ["Hand tool safety card", "Plant health checklist", "Weed removal guide", "Site appearance and community pride prompt"],
-    reflection: "What difference did you notice after removing weeds? Why is regular maintenance important on a farm? What plant appeared healthiest? What area improved the most? What surprised or interested you?",
+    resources: ["Half-day heat operations card", "Watering and plant stress checklist", "Flower patch protection guide", "Pest trap setup log", "Zone 5 melon safety card", "Approved rock collection boundaries"],
+    reflection: "What did you observe while watering? Why are flowers important to the farm ecosystem? Why remove weeds before improving Zone 5? How can pest traps help protect crops? How might rocks help melons grow better? What surprised or interested you today?",
   },
   {
     day: "Thursday",
@@ -5259,6 +5305,7 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
 }
 
 function getOperationalHeatStatusForDate(date = new Date()) {
+  if (isWorkStatusActiveForDate(defaultWednesdayJuly1HalfDayStatusUpdate, date)) return defaultWednesdayJuly1HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultHalfDayHeatStatusUpdate, date)) return defaultHalfDayHeatStatusUpdate;
   return null;
 }
@@ -5322,7 +5369,7 @@ function isWorkStatusActiveForDate(workStatus: WorkStatusUpdate | null, date = n
 
 function isStaleOperationalText(text = "", date = new Date()) {
   const today = getDateISO(date);
-  const legacyJune22 = /June\s+22,\s+2026|2026-06-22|Monday Cancelled|Monday, June 22/i.test(text);
+  const legacyJune22 = /June\s+22,\s+2026|2026-06-22|Monday Cancelled|Monday, June 22|Closed on Monday|Monday work is cancelled|work is cancelled due to weather/i.test(text);
   return legacyJune22 && today > "2026-06-22";
 }
 
@@ -8408,6 +8455,11 @@ function YouthRosterModule({
   const nameFor = (row: { registration: YouthRegistration; profile?: MasterProfile }) =>
     row.profile ? `${row.profile.first_name} ${row.profile.last_name}`.trim() : row.registration.participant_id;
   const [rosterMessage, setRosterMessage] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const selectedRows = youthRows.filter((row) => selectedIds.includes(row.registration.id));
+  const allSelected = youthRows.length > 0 && selectedRows.length === youthRows.length;
+  const toggleSelected = (id: string) => setSelectedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const toggleAllSelected = () => setSelectedIds(allSelected ? [] : youthRows.map((row) => row.registration.id));
 
   const confirmParticipant = async (row: { registration: YouthRegistration; profile?: MasterProfile }) => {
     const youthName = nameFor(row);
@@ -8456,6 +8508,67 @@ function YouthRosterModule({
     setRosterMessage(mode === "delete" ? `${label} deleted from the active roster. Safety/history records are preserved.` : `${label} marked inactive. History remains preserved.`);
   };
 
+  const confirmSelectedParticipants = async () => {
+    if (!selectedRows.length) {
+      setRosterMessage("Select at least one youth first.");
+      return;
+    }
+    selectedRows.forEach((row) => saveSupervisorParticipantConfirmation(row, activeUser || null));
+    await onChanged();
+    setRosterMessage(`${selectedRows.length} selected participant(s) processed for confirmation. Complete records are Active; incomplete records remain Pending.`);
+  };
+
+  const markSelectedInactive = async () => {
+    if (!selectedRows.length) {
+      setRosterMessage("Select at least one youth first.");
+      return;
+    }
+    if (!window.confirm(`Mark ${selectedRows.length} selected participant(s) inactive? History will be preserved.`)) return;
+    const ids = new Set(selectedRows.flatMap((row) => [row.registration.id, row.registration.profile_id, row.registration.participant_id]));
+    safeWrite(YOUTH_KEY, safeRead<YouthRegistration[]>(YOUTH_KEY, []).map((item) => ids.has(item.id) || ids.has(item.profile_id) || ids.has(item.participant_id) ? { ...item, active: false, archived: true, participant_status: "inactive" } : item));
+    safeWrite(PROFILE_KEY, safeRead<MasterProfile[]>(PROFILE_KEY, []).map((profile) => ids.has(profile.id) ? { ...profile, active: false, participant_status: "inactive" } : profile));
+    safeWrite(REGISTRATION_KEY, safeRead<EcosystemRegistration[]>(REGISTRATION_KEY, []).map((registration) => ids.has(registration.id) ? { ...registration, active: false, participant_status: "inactive" } : registration));
+    for (const row of selectedRows) {
+      await archiveSupabaseYouth(row.registration);
+      await archiveSupabaseProfile(row.registration.profile_id);
+    }
+    setSelectedIds([]);
+    await onChanged();
+    setRosterMessage(`${selectedRows.length} selected participant(s) marked inactive. History remains preserved.`);
+  };
+
+  const checkInSelected = async () => {
+    if (!selectedRows.length) {
+      setRosterMessage("Select at least one youth first.");
+      return;
+    }
+    const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const existing = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
+    const next = [...existing];
+    selectedRows.forEach((row) => {
+      const participantId = row.registration.participant_id;
+      const index = next.findIndex((record) => record.participant_id === participantId && record.date === today);
+      const record: AttendanceRecord = {
+        id: index >= 0 ? next[index].id : uid("att"),
+        participant_id: participantId,
+        supervisor_id: activeUser?.id,
+        date: today,
+        check_in_time: index >= 0 ? next[index].check_in_time || now : now,
+        status: "present",
+        ppe_status: "complete",
+        qr_method: "supervisor",
+        notes: "Bulk supervisor check-in / PPE complete.",
+        created_at: index >= 0 ? next[index].created_at : new Date().toISOString(),
+      };
+      if (index >= 0) next[index] = { ...next[index], ...record };
+      else next.unshift(record);
+    });
+    safeWrite(ATTENDANCE_KEY, next);
+    setSelectedIds([]);
+    await onChanged();
+    setRosterMessage(`${selectedRows.length} selected participant(s) checked in and marked PPE complete.`);
+  };
+
   return (
     <Card>
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Roster</div>
@@ -8469,12 +8582,30 @@ function YouthRosterModule({
       {rosterMessage && <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black text-amber-50">{rosterMessage}</div>}
       <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-bold leading-6 text-amber-50">Launch 6.0 roster rule: youth use assigned PINs. Supervisors create their own 4-digit PIN at first access. Old generated values are hidden until corrected.</div>
 
+      {youthRows.length > 0 && (
+        <div className="mt-4 rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="flex items-center gap-3 text-sm font-black text-white">
+              <input type="checkbox" checked={allSelected} onChange={toggleAllSelected} className="h-5 w-5 accent-emerald-300" />
+              Select All Active Youth
+            </label>
+            <div className="text-sm font-black text-emerald-50">Selected: {selectedRows.length}</div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={confirmSelectedParticipants} className="rounded-full bg-emerald-300 px-4 py-2 text-xs font-black text-black">Confirm Selected</button>
+            <button type="button" onClick={checkInSelected} className="rounded-full border border-emerald-200/25 bg-emerald-300/15 px-4 py-2 text-xs font-black text-emerald-50">Check In + PPE Selected</button>
+            <button type="button" onClick={markSelectedInactive} className="rounded-full border border-amber-200/25 bg-amber-300/15 px-4 py-2 text-xs font-black text-amber-50">Mark Selected Inactive</button>
+            <button type="button" onClick={() => setTab("parent")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black">Parent Summary / Message</button>
+          </div>
+        </div>
+      )}
+
       {youthRows.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/35 p-5 text-white/84">No youth are registered yet. Add the first youth profile from Registration, then return here to manage attendance, wellness review, assessments, and parent summaries.</div>
       ) : (
         <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
-          <div className="grid grid-cols-[1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
-            <div>Youth</div><div>PIN</div><div>Current Curriculum</div><div>Today</div><div>Status</div><div>Actions</div>
+          <div className="grid grid-cols-[0.25fr_1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] gap-0 bg-black/45 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-emerald-100/80">
+            <div><input type="checkbox" checked={allSelected} onChange={toggleAllSelected} className="h-4 w-4 accent-emerald-300" /></div><div>Youth</div><div>PIN</div><div>Current Curriculum</div><div>Today</div><div>Status</div><div>Actions</div>
           </div>
           <div className="divide-y divide-white/10">
             {youthRows.map((row) => {
@@ -8483,7 +8614,8 @@ function YouthRosterModule({
               const lastAssessment = assessments.filter((a) => a.participant_id === participantId).sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const hasFlag = wellness.some((w) => w.profile_id === row.registration.profile_id && w.safety_flag) || incidents.some((i) => i.participant_id === participantId && i.urgency !== "low");
               return (
-                <div key={row.registration.id} className="grid grid-cols-[1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
+                <div key={row.registration.id} className="grid grid-cols-[0.25fr_1.3fr_0.75fr_1.1fr_0.75fr_0.8fr_1.25fr] items-center gap-0 px-4 py-4 text-sm text-white/88">
+                  <div><input type="checkbox" checked={selectedIds.includes(row.registration.id)} onChange={() => toggleSelected(row.registration.id)} className="h-5 w-5 accent-emerald-300" /></div>
                   <div>
                     <div className="font-black text-white">{nameFor(row)}</div>
                     <div className="text-xs text-white/60">Guardian: {row.registration.guardian_name || "not entered"}</div>
