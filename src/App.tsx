@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 10.0 - MASTER FULL REPLACEMENT + REGENERATIVE CULTIVATOR THEORY OF CHANGE
+ * CULTIVATOR ECOSYSTEM 12.0 - MASTER FULL REPLACEMENT + COMMUNITY & ENVIRONMENT PATHWAY
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -52,6 +52,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 11.15: Removes Casper Stewart from active roster, restores functional roster archive/delete actions, and adds add/edit/remove controls for Attendance/PPE records.
  * - Ecosystem 11.16: Makes Half Day the operating authority for June 30 heat operations, calms overpowering heat alerts, and adds concise calendar heat/status badges.
  * - Ecosystem 11.17: July 1 auto-advance fix: active Half Day schedule, Wednesday assignment, stale Monday notice suppression, and bulk roster actions.
+ * - Ecosystem 12.0: Youth pathway reorganized around Self, Work, Environment, Community, Opportunity, and Legacy.
+ * - Ecosystem 12.0: Community & Environment Pathway makes the farm a lens for understanding Youngstown, neighborhood woods, parks, water, wildlife, vacant lots, and local history.
+ * - Ecosystem 12.0: July 2 auto-advance lock: Thursday 7/2 renders Week 4 Thursday Production Area Maintenance & Plant Health, with July 1 assignments archived after midnight.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  */
 
@@ -617,6 +620,45 @@ const defaultWednesdayJuly1HalfDayStatusUpdate: WorkStatusUpdate = {
   launched_at: new Date().toISOString(),
 };
 
+const THURSDAY_JULY_2_HALF_DAY_MESSAGE = `Bronson Family Farm Work Status
+
+Thursday, July 2, 2026
+
+STATUS: HALF DAY OPERATIONS
+
+8:00 AM – 10:45 AM: Farm work assignments.
+10:45 AM – 11:00 AM: Cleanup.
+11:00 AM – 12:00 PM: Lunch, hydration, reflection, and daily review.
+12:00 PM: Dismissal.
+
+Today’s priority work: production area maintenance and plant health. Youth will check plant health, water where needed, apply mulch or grass clippings where directed, remove weeds carefully, and share one improvement idea.
+
+Community connection: youth should notice where plants, trees, vacant lots, parks, or neighborhood woods show signs of stress or health in Youngstown.
+
+Parents/caregivers, please pick up youth at 12:00 PM.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultThursdayJuly2HalfDayStatusUpdate: WorkStatusUpdate = {
+  id: "heat-half-day-2026-07-02",
+  date: "Thursday, July 2, 2026",
+  effective_date: "2026-07-02",
+  expires_date: "2026-07-02",
+  status: "HALF_DAY",
+  label: "Half Day Operations — 12:00 PM Dismissal",
+  reason: "High heat conditions require a shortened workday with priority outdoor tasks completed before late morning.",
+  action: "8:00–10:45 farm work. 10:45 cleanup. 11:00 lunch, hydration, reflection, and review. 12:00 dismissal.",
+  audiences: ["Parents", "Youth", "Supervisors"],
+  hangar_note: "Use shade and the hangar only as directed by site leadership; the hangar is not a substitute for full-day indoor programming.",
+  parent_message: THURSDAY_JULY_2_HALF_DAY_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
+  launched_at: new Date().toISOString(),
+};
+
+
 const launchAlmanacSnapshot = {
   label: "Today’s Farm Conditions",
   note: "Live weather appears on the workday screen. The official Almanac is opened through the live Youngstown Almanac links instead of being replaced by static text.",
@@ -1068,12 +1110,23 @@ const youthWeekFourDailyPlan = [
   },
   {
     day: "Thursday",
-    date: "Week 4 Thursday",
-    curriculum: "Production area maintenance and plant health",
-    focus: "Youth practice stewardship through watering, mulching, weed suppression, and plant health checks.",
-    work: ["Check plant health", "Water where needed", "Apply mulch or grass clippings where directed", "Remove weeds carefully", "Share one improvement idea"],
-    resources: ["Plant health checklist", "Watering guide", "Mulch and weed suppression card"],
-    reflection: "What became healthier or better because of your work today?",
+    date: "July 2, 2026",
+    curriculum: "Production Area Maintenance & Plant Health",
+    focus: "Youth practice stewardship through watering, mulching, weed suppression, plant health checks, and connecting farm observations to Youngstown neighborhoods, wooded areas, parks, and vacant lots.",
+    work: [
+      "8:00–10:45 AM farm work only; cleanup begins at 10:45 AM",
+      "Check plant health across production areas: color, wilting, insect damage, dry soil, flowers, new growth, and signs of stress",
+      "Water where needed and report plants that still look stressed after watering",
+      "Apply mulch or grass clippings where directed to protect soil, hold moisture, and reduce weed pressure",
+      "Remove weeds carefully without damaging crop roots, melon vines, flowers, or pollinator habitat",
+      "Look for examples of healthy plants and stressed plants and record what you noticed",
+      "Make one improvement idea for the farm: water, shade, mulch, pathway, plant support, pest monitoring, or cleanup",
+      "Community connection: identify where you have seen similar plant stress, weeds, trees, flowers, or wildlife near your home, school, park, vacant lot, or neighborhood woods",
+      "10:45–11:00 AM cleanup: return tools, clear pathways, secure materials, and complete supervisor inspection",
+      "11:00 AM lunch, hydration, reflection, and daily review; 12:00 PM dismissal"
+    ],
+    resources: ["Plant health checklist", "Watering guide", "Mulch and weed suppression card", "Youngstown plant stress observation prompt", "Community & Environment reflection"],
+    reflection: "What became healthier or better because of your work today? Where have you seen similar plant stress, weeds, trees, flowers, water movement, or wildlife near the place where you live? What will you notice differently now?",
   },
   {
     day: "Friday",
@@ -1916,7 +1969,7 @@ function getActiveCurriculum(date = new Date()): CurriculumDay {
 
 function buildParentSummary(curriculum: CurriculumDay = getActiveCurriculum()) {
   const activities = curriculum.activities.map((activity) => activity.title).join(", ");
-  return `Today youth worked on ${curriculum.theme.toLowerCase()} through hands-on farm activities: ${activities}. The featured experience was "${curriculum.featuredStory}." Youth connected farm infrastructure, planting preparation, compost, water, and grow planning to future farm success.`;
+  return `Today youth worked on ${curriculum.theme.toLowerCase()} through hands-on farm activities: ${activities}. The featured experience was "${curriculum.featuredStory}." Youth connected farm work to their own environment: Youngstown parks, neighborhood woods, vacant lots, water movement, wildlife, plant health, and community stewardship.`;
 }
 
 function getCurriculumSchedule(date = new Date()): TodayFarmPlan["schedule"] {
@@ -5305,6 +5358,7 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
 }
 
 function getOperationalHeatStatusForDate(date = new Date()) {
+  if (isWorkStatusActiveForDate(defaultThursdayJuly2HalfDayStatusUpdate, date)) return defaultThursdayJuly2HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultWednesdayJuly1HalfDayStatusUpdate, date)) return defaultWednesdayJuly1HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultHalfDayHeatStatusUpdate, date)) return defaultHalfDayHeatStatusUpdate;
   return null;
@@ -8043,6 +8097,31 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   );
 }
 
+const CULTIVATOR_FRAMEWORK_LAYERS = [
+  { key: "self", icon: "🌱", title: "Self", question: "Who am I becoming?", detail: "Strengths, interests, confidence, responsibility, and personal growth." },
+  { key: "work", icon: "🛠", title: "Work", question: "What am I doing today?", detail: "Today's assignment, schedule, PPE, attendance, team role, and completion." },
+  { key: "environment", icon: "🌳", title: "Environment", question: "What am I learning about the place where I live?", detail: "Woods, water, wildlife, soil, trees, pollinators, weather, parks, and vacant lots." },
+  { key: "community", icon: "🏘", title: "Community", question: "How does this connect to Youngstown?", detail: "Neighborhood assets, park systems, Lansdowne Airport history, food systems, and community challenges." },
+  { key: "opportunity", icon: "🚀", title: "Opportunity", question: "Where can this lead?", detail: "Careers, trades, college, entrepreneurship, certifications, and local workforce pathways." },
+  { key: "legacy", icon: "⭐", title: "Legacy", question: "What difference am I making?", detail: "Portfolio, workbook, achievements, supervisor notes, parent notes, community service, and completion proof." },
+];
+
+const YOUNGSTOWN_ENVIRONMENT_PROMPTS = [
+  "Where have you seen this near your home, school, park, vacant lot, or neighborhood woods?",
+  "What does this teach me about the place where I live?",
+  "What will I notice differently now?",
+  "How could I help improve one small part of my community?",
+];
+
+function getCommunityConnectionForPlan(plan: typeof youthWeekOneDailyPlan[number]) {
+  const text = `${plan.curriculum} ${plan.focus} ${(plan.work || []).join(" ")}`.toLowerCase();
+  if (text.includes("water")) return { topic: "Water Around Me", prompt: "Where does rain or water collect, flow, or help living things near where you live?", examples: ["Creek", "Storm drain", "Wet area", "Park", "Backyard", "Vacant lot", "Other"] };
+  if (text.includes("weed") || text.includes("mulch") || text.includes("plant health")) return { topic: "Plants Under Stress", prompt: "Where have you seen healthy plants or stressed plants in Youngstown?", examples: ["Neighborhood woods", "Park", "School", "Vacant lot", "Sidewalk crack", "Garden", "Other"] };
+  if (text.includes("pollinator") || text.includes("flower")) return { topic: "Pollinators Near Me", prompt: "Where have you seen bees, butterflies, flowers, or other pollinators near where you live?", examples: ["Yard", "Park", "Vacant lot", "Sidewalk flowers", "School", "Never noticed before", "Other"] };
+  if (text.includes("forest") || text.includes("creek") || text.includes("wildlife")) return { topic: "Woods, Water & Wildlife", prompt: "What wildlife, trees, water, or insects have you noticed near your home or parks?", examples: ["Deer", "Rabbit", "Bird", "Frog", "Creek", "Unknown", "Other"] };
+  return { topic: "My Community Through New Eyes", prompt: "What does today’s work teach you about the place where you live?", examples: ["Home", "School", "Park", "Vacant lot", "Woods", "Neighborhood", "Other"] };
+}
+
 const CULTIVATOR_NUTRITION_CROPS = [
   { crop: "Collard Greens", emoji: "🥬", nutrients: ["Vitamin K", "Vitamin A", "Calcium", "Fiber"], body: ["Bones", "Eyes", "Immune System", "Digestion"], how: "Vitamin K helps blood clot and supports bone strength. Calcium is a building material for bones and teeth. Fiber helps digestion keep moving.", compare: "Collards give the body building materials, not just quick energy.", careers: ["Nurse", "Dietitian", "Agricultural Scientist"] },
   { crop: "Tomatoes", emoji: "🍅", nutrients: ["Lycopene", "Vitamin C", "Potassium"], body: ["Heart", "Cells", "Immune System"], how: "Lycopene acts like a cell-protection shield. Vitamin C helps tissue repair and supports immune cells.", compare: "A tomato provides water, vitamins, minerals, and plant compounds together.", careers: ["Food Scientist", "Public Health", "Nutrition Educator"] },
@@ -8066,57 +8145,75 @@ const CULTIVATOR_NUTRIENT_GLOSSARY = [
 ];
 
 function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, currentWeek }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number] }) {
+  const communityConnection = getCommunityConnectionForPlan(todayPlan);
+  const farmStatus = getFarmStatusForDate(new Date());
+  const statusLabel = farmStatus.level === "Modified Operations" ? "Half Day" : farmStatus.level === "Closed" ? "Cancelled" : "Full Day";
   return (
     <Card className="p-4 md:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Cultivator Dashboard • Bite-sized</div>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">What do I do next?</h1>
-          <p className="mt-2 text-sm font-bold leading-6 text-white/76">Welcome {activeUser?.name || "Cultivator"}. Action first. Deeper learning opens only when you choose it.</p>
+          <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Cultivator Dashboard 12.0 • Self → Work → Environment → Community → Opportunity → Legacy</div>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Good Morning, {activeUser?.name || "Cultivator"}</h1>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/76">Today is {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. The curriculum auto-advances by date.</p>
         </div>
-        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-black text-emerald-50">Week {currentWeek.week}: {currentWeek.title}</div>
+        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 p-3 text-sm font-black text-emerald-50">Week {currentWeek.week}: {currentWeek.title} • {statusLabel}</div>
       </div>
 
-      {hasOperationalHeatRestriction() && (
-        <div className="mt-4 rounded-[1.35rem] border border-red-200/60 bg-red-700/45 p-4 text-white shadow-[0_18px_60px_rgba(127,29,29,.35)]">
-          <div className="text-xs font-black uppercase tracking-[0.28em] text-red-100">Today’s Required Action</div>
-          <div className="mt-2 text-3xl font-black">Heat Review Required Before Outdoor Work</div>
-          <p className="mt-2 text-sm font-bold leading-6 text-white/86">Check in first. Wait for supervisor direction. Only begin the safe assignment after the daily heat plan is confirmed.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-white px-6 py-3 text-sm font-black text-red-800">Start Safe Check-In</button>
-            <button type="button" onClick={() => setScreen("supervisor")} className="rounded-full border border-white/25 bg-black/25 px-5 py-3 text-sm font-black text-white">Wait for Supervisor Direction</button>
-            <button type="button" onClick={() => setScreen("almanac")} className="rounded-full border border-white/25 bg-black/25 px-5 py-3 text-sm font-black text-white">View Heat Plan</button>
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1.35fr_.65fr]">
+        <div className="rounded-[1.35rem] border border-emerald-200/25 bg-emerald-300/12 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">🛠 Work • Today's Assignment</div>
+          <div className="mt-2 text-3xl font-black">{todayPlan.day}: {todayPlan.curriculum}</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {(todayPlan.work || []).slice(0, 6).map((item) => (
+              <div key={item} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">☐ {item}</div>
+            ))}
           </div>
-        </div>
-      )}
-
-      <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_.8fr]">
-        <div className="rounded-[1.35rem] border border-emerald-200/20 bg-emerald-300/10 p-4">
-          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Today’s Mission</div>
-          <div className="mt-2 text-2xl font-black">{todayPlan.curriculum}</div>
-          <p className="mt-2 text-sm font-bold leading-6 text-white/78">{todayPlan.focus}</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">{hasOperationalHeatRestriction() ? "Start Safe Check-In" : "Start Today’s Work"}</button>
+            <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">Start Today’s Work</button>
             <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">My Journey</button>
+            <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Explore</button>
           </div>
         </div>
+
         <div className="grid gap-3">
           <WorkStatusMiniCard />
-          <div className="rounded-[1.15rem] border border-red-200/35 bg-red-950/30 p-4">
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-red-100/80">Weather Operations</div>
-            <div className="mt-2 text-xl font-black">Heat advisory controls today’s first action.</div>
-            <div className="mt-3"><WeatherAlertBanner alert={getHeatAlertFor(null)} /></div>
-            <div className="mt-3"><WeeklyHeatOutlook compact /></div>
-            <button type="button" onClick={() => setScreen("almanac")} className="mt-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Open Weather + Almanac</button>
+          <div className="rounded-[1.15rem] border border-amber-200/25 bg-amber-300/10 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-100/80">Weather & Safety • Compact</div>
+            <div className="mt-2 text-lg font-black">Safety stays visible without overpowering today’s work.</div>
+            <div className="mt-3"><WeatherAlertBanner alert={getHeatAlertFor(null)} compact /></div>
+            <button type="button" onClick={() => setScreen("almanac")} className="mt-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Open Details</button>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {[{label:"Calendar",screen:"events"},{label:"Messages",screen:"feedback"},{label:"Explore",screen:"resources"},{label:"Health & Nutrition",screen:"health"}].map((item)=>(
-          <button key={item.label} type="button" onClick={() => setScreen(item.screen as Screen)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">
-            {item.label}
-            <div className="mt-1 text-xs font-bold text-white/60">Open when needed</div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="rounded-[1.35rem] border border-lime-200/20 bg-lime-300/10 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-lime-100/80">🌳 Environment • Community Connection</div>
+          <div className="mt-2 text-2xl font-black">{communityConnection.topic}</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/82">{communityConnection.prompt}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {communityConnection.examples.map((item) => <span key={item} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-white/80">☐ {item}</span>)}
+          </div>
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black leading-6 text-white/84">Core question: What did this teach me about the place where I live?</div>
+        </div>
+
+        <div className="rounded-[1.35rem] border border-sky-200/20 bg-sky-300/10 p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">🚀 Opportunity + ⭐ Legacy</div>
+          <div className="mt-2 text-2xl font-black">Where can this lead?</div>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/82">Today’s farm work connects to environmental science, horticulture, urban forestry, conservation, park stewardship, public health, trades, and entrepreneurship.</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {["What skill did I practice?", "Who gets paid to understand this?", "What became better because I helped?", "What will I notice differently now?"].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">☐ {item}</div>)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+        {CULTIVATOR_FRAMEWORK_LAYERS.map((layer) => (
+          <button key={layer.key} type="button" onClick={() => setScreen(layer.key === "legacy" ? "journey" : layer.key === "opportunity" ? "resources" : layer.key === "work" ? "wellness" : "resources")} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-white hover:bg-white/16">
+            <div className="text-2xl">{layer.icon}</div>
+            <div className="mt-2 text-sm font-black">{layer.title}</div>
+            <div className="mt-1 text-[11px] font-bold leading-4 text-white/62">{layer.question}</div>
           </button>
         ))}
       </div>
