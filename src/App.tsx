@@ -8147,46 +8147,325 @@ function MiracleGroYouthResourceCard() {
   );
 }
 
+
+
+type FieldMissionStop = {
+  id: string;
+  mission: string;
+  time: string;
+  icon: string;
+  title: string;
+  prompt: string;
+  actions: string[];
+  learnTitle: string;
+  learnBody: string;
+  connection: "Work" | "Environment" | "Community" | "Opportunity" | "Legacy";
+};
+
+const FIELD_MISSION_STOPS_13: FieldMissionStop[] = [
+  {
+    id: "water-plant-health",
+    mission: "Mission 1 of 3 • Watering the Grow Area",
+    time: "Stop 1 • 5 minutes",
+    icon: "🌱",
+    title: "Plant Health Check",
+    prompt: "Which plants appear to need water the most?",
+    actions: ["Photo", "Voice", "Write"],
+    learnTitle: "Plant stress",
+    learnBody: "Wilting, dry soil, curled leaves, yellowing, and slow growth can be signs that a plant needs attention.",
+    connection: "Work",
+  },
+  {
+    id: "water-delivery",
+    mission: "Mission 1 of 3 • Watering the Grow Area",
+    time: "Stop 2 • 15 minutes",
+    icon: "💧",
+    title: "Water Delivery",
+    prompt: "What changes do you notice as water reaches the soil?",
+    actions: ["Observe", "Photo", "Write"],
+    learnTitle: "Where water goes",
+    learnBody: "Water can soak into soil, move toward roots, evaporate, run off, or be held by mulch and organic matter.",
+    connection: "Work",
+  },
+  {
+    id: "soil-comparison",
+    mission: "Mission 1 of 3 • Watering the Grow Area",
+    time: "Stop 3 • 10 minutes",
+    icon: "🌎",
+    title: "Soil Comparison",
+    prompt: "Is soil under mulch different from exposed soil?",
+    actions: ["Moisture", "Temperature", "Texture"],
+    learnTitle: "Mulch protects soil",
+    learnBody: "Mulch shades the soil, slows evaporation, reduces weeds, and helps soil life stay active.",
+    connection: "Environment",
+  },
+  {
+    id: "grow-ecosystem-scan",
+    mission: "Mission 1 of 3 • Watering the Grow Area",
+    time: "Stop 4 • 10 minutes",
+    icon: "🐝",
+    title: "Living Things Scan",
+    prompt: "What evidence shows the grow area is alive?",
+    actions: ["Pollinator", "Beneficial insect", "New growth"],
+    learnTitle: "Farm ecosystem",
+    learnBody: "A grow area includes crops, weeds, insects, soil organisms, water, sunlight, and human care. Everything interacts.",
+    connection: "Environment",
+  },
+  {
+    id: "forest-bridge",
+    mission: "Mission 1 of 3 • Watering the Grow Area",
+    time: "Stop 5 • 5 minutes",
+    icon: "🌳",
+    title: "Bridge to the Forest",
+    prompt: "We spent 45 minutes watering crops. How does the forest survive without us?",
+    actions: ["My idea", "Question", "Continue"],
+    learnTitle: "Forest water wisdom",
+    learnBody: "Forests hold water with shade, roots, leaf litter, organic matter, and soil structure built over time.",
+    connection: "Environment",
+  },
+  {
+    id: "forest-cooler",
+    mission: "Mission 2 of 3 • Forest Investigation",
+    time: "Forest stop • 8 minutes",
+    icon: "🌡️",
+    title: "Cooler Forest",
+    prompt: "Why is it 10–20 degrees cooler here?",
+    actions: ["Notice shade", "Notice moisture", "Record"],
+    learnTitle: "Canopy cooling",
+    learnBody: "Trees cool places through shade, moisture, soil cover, and water moving through leaves.",
+    connection: "Community",
+  },
+  {
+    id: "forest-soil",
+    mission: "Mission 2 of 3 • Forest Investigation",
+    time: "Forest stop • 8 minutes",
+    icon: "🍂",
+    title: "Forest Soil",
+    prompt: "Is soil something that exists, or something that is created?",
+    actions: ["Leaves", "Roots", "Dark soil"],
+    learnTitle: "Soil is created",
+    learnBody: "Forest soil is made from minerals, water, air, roots, fungi, insects, bacteria, dead plants, and dead animals over time.",
+    connection: "Environment",
+  },
+  {
+    id: "deer-discovery",
+    mission: "Mission 2 of 3 • Forest Investigation",
+    time: "Forest stop • 8 minutes",
+    icon: "🦌",
+    title: "Deer Discovery",
+    prompt: "What do you think is happening here?",
+    actions: ["Respect", "Observe", "Record"],
+    learnTitle: "Nature recycles everything",
+    learnBody: "Soft tissue decomposes first. Bones break down slowly, and minerals like calcium and phosphorus eventually return to the soil.",
+    connection: "Environment",
+  },
+  {
+    id: "pest-prediction",
+    mission: "Mission 3 of 3 • Pest Trap Investigation",
+    time: "Trap stop • 5 minutes",
+    icon: "🐞",
+    title: "Prediction",
+    prompt: "What do you think we caught in the pest trap?",
+    actions: ["Flying", "Crawling", "Not sure"],
+    learnTitle: "Traps are information",
+    learnBody: "A trap helps us observe insect activity before we decide what action is needed.",
+    connection: "Work",
+  },
+  {
+    id: "pest-findings",
+    mission: "Mission 3 of 3 • Pest Trap Investigation",
+    time: "Trap stop • 10 minutes",
+    icon: "🔍",
+    title: "Examine the Trap",
+    prompt: "Which insect appears most often?",
+    actions: ["Count", "Photo", "Notes"],
+    learnTitle: "Friend or foe",
+    learnBody: "Not every insect is a pest. Some pollinate, some decompose, and some eat pests.",
+    connection: "Opportunity",
+  },
+  {
+    id: "legacy-reflection",
+    mission: "Closing • Workbook + Portfolio",
+    time: "Final stop • 5 minutes",
+    icon: "⭐",
+    title: "Legacy Reflection",
+    prompt: "What are you helping build today that will help someone tomorrow?",
+    actions: ["Reflect", "Save", "Complete"],
+    learnTitle: "Everything is connected",
+    learnBody: "Water grows crops. Forests build soil. Decomposition returns nutrients. Insects reveal ecosystem health. Communities benefit when people learn to steward land.",
+    connection: "Legacy",
+  },
+];
+
+const KNOWLEDGE_DRAWERS_13 = [
+  { title: "Miracle-Gro", body: "Commercial fertilizer usually provides soluble nutrients such as nitrogen, phosphorus, and potassium. Read labels and use only with supervisor direction." },
+  { title: "Compost", body: "Compost is decomposed organic matter. It feeds soil life, improves soil structure, and helps hold moisture." },
+  { title: "Mulch", body: "Mulch covers soil, reduces evaporation, suppresses weeds, and protects soil organisms." },
+  { title: "Forest Soil", body: "Forest soil is built from rock particles, dead leaves, roots, fungi, insects, microorganisms, water, and time." },
+  { title: "Decomposition", body: "Decomposition is nature breaking once-living material into nutrients that return to the soil." },
+  { title: "Pest Trap", body: "A pest trap is an observation tool. It helps farmers monitor insects before deciding what to do." },
+  { title: "Pollinator", body: "Pollinators move pollen between flowers. Many fruits and vegetables depend on them." },
+];
+
+function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
+  const [stopIndex, setStopIndex] = useState(0);
+  const [response, setResponse] = useState("");
+  const [status, setStatus] = useState("");
+  const [saved, setSaved] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
+  const [openDrawer, setOpenDrawer] = useState<string | null>(null);
+  const stop = FIELD_MISSION_STOPS_13[stopIndex];
+  const progress = Math.round(((stopIndex + 1) / FIELD_MISSION_STOPS_13.length) * 100);
+  const previousDisabled = stopIndex === 0;
+  const nextLabel = stopIndex === FIELD_MISSION_STOPS_13.length - 1 ? "Complete Day" : "Next";
+
+  async function saveResponse(extra = "") {
+    const clean = (extra || response).trim();
+    if (!clean) {
+      setStatus("Add one answer, voice note summary, or observation first.");
+      return false;
+    }
+    const row: CultivatorDiscovery = {
+      id: uuid(),
+      participant_id: launchParticipantId(activeUser),
+      user_name: launchParticipantName(activeUser),
+      date: todayISO(),
+      category: stop.title,
+      question: stop.prompt,
+      response: clean,
+      source: "Today's Work",
+      created_at: new Date().toISOString(),
+    };
+    const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
+    setSaved((rows) => [row, ...rows].slice(0, 60));
+    setResponse("");
+    setStatus(saveModeMessage("Workbook + portfolio entry", result));
+    return true;
+  }
+
+  async function saveAndNext() {
+    if (response.trim()) await saveResponse();
+    setStatus("");
+    if (stopIndex < FIELD_MISSION_STOPS_13.length - 1) {
+      setStopIndex((value) => value + 1);
+      return;
+    }
+    setScreen("feedback");
+  }
+
+  const stopResponses = saved.filter((row) => row.category === stop.title);
+
+  return (
+    <div className="grid gap-4">
+      <Card className="p-4 md:p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Master Launch 13.0 • One mission • One question • One action</div>
+            <h1 className="mt-2 text-3xl font-black md:text-5xl">Good Morning, {activeUser?.name || "Cultivator"}</h1>
+          </div>
+          <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">{progress}%</div>
+        </div>
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/12">
+          <div className="h-full rounded-full bg-emerald-300" style={{ width: `${progress}%` }} />
+        </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/75">{stop.mission}</div>
+            <div className="mt-1 text-xs font-black text-white/65">{stop.time}</div>
+          </div>
+          <div className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/80">{stop.connection}</div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-[72px_1fr]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-4xl shadow-sm">{stop.icon}</div>
+          <div>
+            <h2 className="text-3xl font-black md:text-4xl">{stop.title}</h2>
+            <div className="mt-3 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-xl font-black leading-8 text-emerald-50">{stop.prompt}</div>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {stop.actions.map((action) => (
+            <button key={action} type="button" onClick={() => setResponse((value) => value ? `${value}; ${action}` : action)} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black text-white hover:bg-white/16">{action}</button>
+          ))}
+          <button type="button" onClick={() => setOpenDrawer(openDrawer === stop.id ? null : stop.id)} className="rounded-full bg-amber-200 px-4 py-2 text-sm font-black text-amber-950">Learn More</button>
+        </div>
+
+        {openDrawer === stop.id && (
+          <div className="mt-4 rounded-[1.25rem] border border-amber-200/25 bg-amber-300/12 p-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-100/80">Quick Learning Drawer</div>
+            <div className="mt-2 text-2xl font-black">{stop.learnTitle}</div>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/82">{stop.learnBody}</p>
+          </div>
+        )}
+
+        <div className="mt-5 grid gap-3">
+          <textarea value={response} onChange={(event) => setResponse(event.target.value)} rows={4} placeholder="Write one answer, observation, question, or voice-note summary..." className="w-full rounded-[1.15rem] border border-white/10 bg-white p-4 text-base font-bold text-slate-950 outline-none focus:border-emerald-400" />
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => saveResponse()} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Save</button>
+            <button type="button" disabled={previousDisabled} onClick={() => setStopIndex((value) => Math.max(0, value - 1))} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white disabled:opacity-40">Back</button>
+            <button type="button" onClick={saveAndNext} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">{nextLabel}</button>
+            {status && <span className="text-xs font-black text-emerald-50">{status}</span>}
+          </div>
+        </div>
+
+        {stopResponses.length > 0 && (
+          <details className="mt-4 rounded-[1.15rem] border border-white/10 bg-black/25 p-3">
+            <summary className="cursor-pointer text-sm font-black text-emerald-50">Saved answers for this stop</summary>
+            <div className="mt-3 grid gap-2">
+              {stopResponses.slice(0, 3).map((row) => <div key={row.id} className="rounded-xl bg-white/10 p-3 text-sm font-bold text-white/80">“{row.response}”</div>)}
+            </div>
+          </details>
+        )}
+      </Card>
+
+      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Open Knowledge Library</summary>
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {KNOWLEDGE_DRAWERS_13.map((item) => (
+            <details key={item.title} className="rounded-xl border border-white/10 bg-white/10 p-3">
+              <summary className="cursor-pointer text-sm font-black">{item.title}</summary>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/76">{item.body}</p>
+            </details>
+          ))}
+        </div>
+      </details>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        {["Start My Day", "My Workbook", "My Journey", "My Team", "Learn & Explore", "My Portfolio"].map((label) => (
+          <button key={label} type="button" onClick={() => label.includes("Journey") || label.includes("Portfolio") ? setScreen("journey") : label.includes("Learn") ? setScreen("resources") : label.includes("Team") ? setScreen("roles") : setStopIndex(0)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">{label}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
   const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
-  const whyLines = whyAreWeDoingThis(todayPlan);
-  const connections = connectionPathForPlan(todayPlan);
   const knowledgePack = getActivityKnowledgePack(todayPlan);
 
   return (
     <div className="grid gap-4">
-      <YouthProgressiveDiscoveryDashboard setScreen={setScreen} activeUser={activeUser} todayPlan={todayPlan} currentWeek={currentWeek} />
-      <YouthActivityWorkflowCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} activeUser={activeUser} />
-      <MiracleGroYouthResourceCard />
+      <YouthMicroMissionEngine13 activeUser={activeUser} setScreen={setScreen} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open Today’s Work details</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Supervisor / adult view: full details only when needed</summary>
         <div className="mt-4 grid gap-3">
           <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
           <Launch62TodayPlantingMissionPanel />
           <Launch60ActivityGoalCard todayPlan={todayPlan} />
           <YouthTodayWorkCard />
           <CurriculumEvidenceCaptureCard />
+          <MiracleGroYouthResourceCard />
         </div>
       </details>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open only when needed: Explore & Discover + Why It Matters</summary>
-        <div className="mt-4 grid gap-3">
-          <CultivatorHealthBiteCard setScreen={setScreen} />
-          <GrowingCenterPanel setScreen={setScreen} compact />
-          <Launch8FarmKnowledgeMapCard />
-          <Launch8TakeItHomeCard />
-          <Launch62CompanionPlantingPanel compact />
-          <WhyTodaysWorkMattersCard whyLines={whyLines} connections={connections} />
-          <ToolStewardshipLaunchCard />
-        </div>
-      </details>
-
-      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Complete Today: reflection, media, and portfolio</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Workbook, portfolio, journey, and weekly view</summary>
         <div className="mt-4 grid gap-3">
           <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
@@ -8194,25 +8473,11 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
           <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
           <Launch60EndMyDayCard />
-          <Launch8GenerationalWisdomArchiveCard />
-          <TomorrowBeginsTodayCard todayPlan={todayPlan} />
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Open Share My Learning</button>
-            <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Complete Today</button>
-          </div>
-        </div>
-      </details>
-
-      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">My Journey + Weekly View</summary>
-        <div className="mt-4 grid gap-3">
-          <CultivatorIdentityLaunchCard />
           <Launch62MyJourneyPanel compact />
           <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
           <Cultivator90CareerPathwaysCard />
           <Cultivator90WorkforceTranscriptCard participantId={activeUser?.participant_id || ""} />
           <Cultivator90LegacyMapCard />
-          <Cultivator90DeclarationCard />
           <CurriculumWeekViewCard compact />
           <Card className="p-4 md:p-5">
             <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Monday–Friday Curriculum</div>
