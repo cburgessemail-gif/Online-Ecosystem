@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 12.0 - MASTER FULL REPLACEMENT + COMMUNITY & ENVIRONMENT PATHWAY
+ * CULTIVATOR ECOSYSTEM 13.1 - WORKBOOK MASTER FULL REPLACEMENT + FIELD INVESTIGATION ENGINE
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -56,6 +56,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 12.0: Community & Environment Pathway makes the farm a lens for understanding Youngstown, neighborhood woods, parks, water, wildlife, vacant lots, and local history.
  * - Ecosystem 12.0: July 2 auto-advance lock: Thursday 7/2 renders Week 4 Thursday Production Area Maintenance & Plant Health, with July 1 assignments archived after midnight.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
+ * - Ecosystem 13.1: Makes the youth workbook the central operating system. Field work, forest discoveries, pest traps, questions, reflections, journey, and portfolio evidence flow into one downloadable workbook record.
  */
 
 type Screen =
@@ -8359,7 +8360,7 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
       <Card className="p-4 md:p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Master Launch 13.0 • One mission • One question • One action</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Master Launch 13.1 • Workbook-centered • One mission • One question</div>
             <h1 className="mt-2 text-3xl font-black md:text-5xl">Good Morning, {activeUser?.name || "Cultivator"}</h1>
           </div>
           <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">{progress}%</div>
@@ -8442,6 +8443,125 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
   );
 }
 
+
+const WORKBOOK_SECTIONS_13_1 = [
+  { key: "Watering", icon: "🌱", title: "Work", subtitle: "Watering the Grow Area", match: ["Plant Health Check", "Water Delivery", "Soil Comparison", "Living Things Scan", "Bridge to the Forest"] },
+  { key: "Forest", icon: "🌳", title: "Environment", subtitle: "Forest Investigation", match: ["Cooler Forest", "Forest Soil"] },
+  { key: "Discovery", icon: "🦌", title: "Discovery", subtitle: "Deer Carcass + Decomposition", match: ["Deer Discovery"] },
+  { key: "Traps", icon: "🐞", title: "Investigation", subtitle: "Pest Trap Findings", match: ["Prediction", "Examine the Trap"] },
+  { key: "Community", icon: "🏘", title: "Community", subtitle: "Youngstown Connection", match: ["Cooler Forest", "Forest Soil", "Living Things Scan"] },
+  { key: "Opportunity", icon: "🚀", title: "Opportunity", subtitle: "Career + Skill Connection", match: ["Examine the Trap", "Plant Health Check", "Water Delivery"] },
+  { key: "Legacy", icon: "⭐", title: "Legacy", subtitle: "What I Am Helping Build", match: ["Legacy Reflection"] },
+];
+
+function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
+  const [entries, setEntries] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
+  const [message, setMessage] = useState("");
+  const refreshWorkbook = () => {
+    setEntries(todayDiscoveries(activeUser));
+    setMessage("Workbook refreshed.");
+  };
+  const workbookText = useMemo(() => {
+    const name = launchParticipantName(activeUser);
+    const lines = [
+      "Bronson Family Farm Cultivator Workbook",
+      `Cultivator: ${name}`,
+      `Date: ${todayISO()}`,
+      "",
+      "Field Investigation Record",
+    ];
+    WORKBOOK_SECTIONS_13_1.forEach((section) => {
+      const matches = entries.filter((entry) => section.match.includes(entry.category));
+      lines.push("", `${section.icon} ${section.title}: ${section.subtitle}`);
+      if (!matches.length) {
+        lines.push("- Not completed yet.");
+      } else {
+        matches.forEach((entry) => {
+          lines.push(`- ${entry.question}`);
+          lines.push(`  Response: ${entry.response}`);
+        });
+      }
+    });
+    lines.push("", "Legacy Question: What should future Cultivators know because of what we observed today?");
+    return lines.join("\n");
+  }, [activeUser, entries]);
+
+  const downloadWorkbook = () => {
+    const blob = new Blob([workbookText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `cultivator-workbook-${todayISO()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setMessage("Workbook download prepared.");
+  };
+
+  const totalSections = WORKBOOK_SECTIONS_13_1.length;
+  const completedSections = WORKBOOK_SECTIONS_13_1.filter((section) => entries.some((entry) => section.match.includes(entry.category))).length;
+  const percent = Math.round((completedSections / totalSections) * 100);
+
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook 1.0 • Central Record</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">My workbook is being built while I work.</h2>
+          <p className="mt-2 max-w-3xl text-sm font-bold leading-6 text-white/78">Every saved observation becomes part of the workbook, journey, and portfolio. Youth should see one question at a time; the workbook organizes the learning behind the scenes.</p>
+        </div>
+        <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-center">
+          <div className="text-2xl font-black text-emerald-50">{percent}%</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Workbook</div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {WORKBOOK_SECTIONS_13_1.map((section) => {
+          const matches = entries.filter((entry) => section.match.includes(entry.category));
+          const complete = matches.length > 0;
+          return (
+            <details key={section.key} className={`rounded-2xl border p-4 ${complete ? "border-emerald-200/25 bg-emerald-300/10" : "border-white/10 bg-white/10"}`}>
+              <summary className="cursor-pointer list-none">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-2xl">{section.icon}</div>
+                  <div className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${complete ? "bg-emerald-300 text-black" : "bg-white/10 text-white/70"}`}>{complete ? "Saved" : "Open"}</div>
+                </div>
+                <div className="mt-3 text-lg font-black">{section.title}</div>
+                <div className="mt-1 text-xs font-bold leading-5 text-white/68">{section.subtitle}</div>
+              </summary>
+              <div className="mt-3 grid gap-2">
+                {matches.length ? matches.slice(0, 4).map((entry) => (
+                  <div key={entry.id} className="rounded-xl bg-black/25 p-3 text-xs font-bold leading-5 text-white/78">
+                    <div className="font-black text-emerald-50">{entry.question}</div>
+                    <div className="mt-1">{entry.response}</div>
+                  </div>
+                )) : <div className="rounded-xl bg-black/25 p-3 text-xs font-bold leading-5 text-white/65">This page will fill in when the youth saves an observation from the mission.</div>}
+              </div>
+            </details>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 rounded-[1.25rem] border border-amber-200/20 bg-amber-300/10 p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-100/80">Monday Reopen Ready</div>
+        <div className="mt-2 text-2xl font-black">Forest Investigation Continued</div>
+        <div className="mt-3 grid gap-2 md:grid-cols-4">
+          {["Where do trees get water?", "Do bones decompose?", "What is forest soil made of?", "What insects are in our pest traps?"].map((question) => <div key={question} className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">☐ {question}</div>)}
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={refreshWorkbook} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Refresh Workbook</button>
+        <button type="button" onClick={downloadWorkbook} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Download Workbook Draft</button>
+        <button type="button" onClick={() => setScreen("journey")} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">Open Portfolio / Journey</button>
+        {message && <span className="self-center text-xs font-black text-emerald-50">{message}</span>}
+      </div>
+    </Card>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -8451,6 +8571,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   return (
     <div className="grid gap-4">
       <YouthMicroMissionEngine13 activeUser={activeUser} setScreen={setScreen} />
+      <YouthWorkbookCenter13_1 activeUser={activeUser} setScreen={setScreen} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Supervisor / adult view: full details only when needed</summary>
