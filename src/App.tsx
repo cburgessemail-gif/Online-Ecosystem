@@ -658,6 +658,40 @@ const defaultThursdayJuly2HalfDayStatusUpdate: WorkStatusUpdate = {
   launched_at: new Date().toISOString(),
 };
 
+const FRIDAY_JULY_3_HALF_DAY_MESSAGE = `Bronson Family Farm Work Status
+
+Friday, July 3, 2026
+
+STATUS: HALF DAY OPERATIONS
+
+8:00 AM – 10:45 AM: Farm work assignments.
+10:45 AM – 11:00 AM: Cleanup.
+11:00 AM – 12:00 PM: Lunch, hydration, reflection, weekly review, and dismissal preparation.
+12:00 PM: Dismissal.
+
+Today is not a Full Day. Youth should complete only priority morning work, weekly reflection, tool return, and supervisor-directed cleanup before dismissal.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultFridayJuly3HalfDayStatusUpdate: WorkStatusUpdate = {
+  id: "heat-half-day-2026-07-03",
+  date: "Friday, July 3, 2026",
+  effective_date: "2026-07-03",
+  expires_date: "2026-07-03",
+  status: "HALF_DAY",
+  label: "Half Day Operations — 12:00 PM Dismissal",
+  reason: "High heat conditions require Friday to operate as a half day, not a full day.",
+  action: "8:00–10:45 farm work. 10:45 cleanup. 11:00 lunch, hydration, reflection, weekly review. 12:00 dismissal.",
+  audiences: ["Parents", "Youth", "Supervisors"],
+  hangar_note: "Use shade and the hangar only as directed by site leadership; the hangar is emergency cover, not full-day indoor programming.",
+  parent_message: FRIDAY_JULY_3_HALF_DAY_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
+  launched_at: new Date().toISOString(),
+};
+
 
 const launchAlmanacSnapshot = {
   label: "Today’s Farm Conditions",
@@ -3714,7 +3748,7 @@ function inventoryStatus(total: number, available: number): OperationsInventoryI
   if (available <= 0) return "Missing";
   if (available < total) return "Checked Out";
   if (available <= Math.max(1, Math.floor(total * 0.25))) return "Low";
-  return "Full Day";
+  return "Ready";
 }
 
 function screenLabel(screen: Screen) {
@@ -5358,6 +5392,7 @@ function workStatusToFarmStatus(workStatus: WorkStatusUpdate | null): FarmOperat
 }
 
 function getOperationalHeatStatusForDate(date = new Date()) {
+  if (isWorkStatusActiveForDate(defaultFridayJuly3HalfDayStatusUpdate, date)) return defaultFridayJuly3HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultThursdayJuly2HalfDayStatusUpdate, date)) return defaultThursdayJuly2HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultWednesdayJuly1HalfDayStatusUpdate, date)) return defaultWednesdayJuly1HalfDayStatusUpdate;
   if (isWorkStatusActiveForDate(defaultHalfDayHeatStatusUpdate, date)) return defaultHalfDayHeatStatusUpdate;
@@ -7265,6 +7300,7 @@ function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
         </div>
       </Card>
       <GrowingCenterPanel setScreen={setScreen} />
+      <MiracleGroYouthResourceCard />
       <CurriculumWeekViewCard />
     </div>
   );
@@ -8014,6 +8050,103 @@ function Launch60DailyRhythmCard({ todayPlan, currentWeek, setScreen }: { todayP
   );
 }
 
+
+function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUser }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [completed, setCompleted] = useState<Record<string, boolean>>({});
+  const [reflection, setReflection] = useState("");
+  const [savedMessage, setSavedMessage] = useState("");
+  const workItems = todayPlan.work || [];
+  const doneCount = workItems.filter((item) => completed[item]).length;
+  const saveProgress = async () => {
+    const now = new Date().toISOString();
+    const rows: WorkCompletionRecord[] = workItems.map((item) => ({
+      id: uuid(),
+      participant_id: activeUser?.participant_id || activeUser?.id || "youth-device",
+      user_name: activeUser?.name || "Youth Participant",
+      date: now.slice(0, 10),
+      item,
+      completed: Boolean(completed[item]),
+      created_at: now,
+    }));
+    safeWrite(WORK_COMPLETION_KEY, [...rows, ...safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, [])].slice(0, 500));
+    if (reflection.trim()) {
+      const discovery: CultivatorDiscovery = {
+        id: uuid(),
+        participant_id: activeUser?.participant_id || activeUser?.id || "youth-device",
+        user_name: activeUser?.name || "Youth Participant",
+        date: now.slice(0, 10),
+        category: "Daily Reflection",
+        question: todayPlan.reflection,
+        response: reflection.trim(),
+        source: "Today's Work",
+        created_at: now,
+      };
+      safeWrite(DISCOVERY_KEY, [discovery, ...safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, [])].slice(0, 250));
+    }
+    setSavedMessage(`Saved ${doneCount} completed item${doneCount === 1 ? "" : "s"}.`);
+  };
+
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Active Today’s Work — Youth Can Click Here</div>
+          <h2 className="mt-2 text-3xl font-black">{todayPlan.day}: {todayPlan.curriculum}</h2>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
+        </div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Week {currentWeek.week} • {doneCount}/{workItems.length} done</div>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {workItems.map((item) => (
+          <button key={item} type="button" onClick={() => setCompleted((prev) => ({ ...prev, [item]: !prev[item] }))} className={`rounded-2xl border px-4 py-3 text-left text-sm font-black transition hover:scale-[1.01] ${completed[item] ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-black/25 text-white"}`}>
+            {completed[item] ? "☑" : "☐"} {item}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <button type="button" onClick={() => setScreen("media")} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left font-black text-white hover:bg-white/16">📷 Add Photo / Video<br /><span className="text-xs font-bold text-white/65">Document before/after progress.</span></button>
+        <button type="button" onClick={() => setScreen("resources")} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left font-black text-white hover:bg-white/16">🌿 Open Learning Resources<br /><span className="text-xs font-bold text-white/65">Miracle-Gro, soil, plant health, safety.</span></button>
+        <button type="button" onClick={saveProgress} className="rounded-2xl border border-emerald-200/30 bg-emerald-300 p-4 text-left font-black text-black hover:bg-emerald-200">✅ Save Today’s Progress<br /><span className="text-xs font-bold text-black/65">Stores checklist + reflection.</span></button>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
+        <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/65">Reflection Response Area</div>
+        <div className="mt-2 text-sm font-black leading-6 text-white/82">{todayPlan.reflection}</div>
+        <textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder="Type your answer here. Youth can write one sentence or more." className="mt-3 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white outline-none placeholder:text-white/40 focus:border-emerald-200" />
+        {savedMessage && <div className="mt-3 rounded-xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-black text-emerald-50">{savedMessage}</div>}
+      </div>
+    </Card>
+  );
+}
+
+function MiracleGroYouthResourceCard() {
+  const ingredients = [
+    ["Nitrogen", "Helps leaves and green growth. Too much can push leaves over fruit or roots."],
+    ["Phosphorus", "Supports roots, flowers, and early plant development."],
+    ["Potassium", "Supports overall plant strength, water movement, and stress tolerance."],
+    ["Micronutrients", "Small amounts of minerals such as iron, manganese, zinc, copper, boron, and molybdenum may be included depending on the formula."],
+    ["Salts / soluble fertilizer", "Many commercial fertilizers dissolve quickly. Youth should understand label directions and why overuse can hurt plants or soil life."],
+  ];
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/75">Youth Resource • What is in Miracle-Gro?</div>
+      <h2 className="mt-2 text-3xl font-black">Fertilizer is not magic. It is ingredients.</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/80">Youth should compare quick commercial fertilizer with compost, mulch, healthy soil, water, sunlight, and observation. The goal is not to advertise a product; the goal is to understand what plants are being fed and why directions matter.</p>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {ingredients.map(([name, body]) => (
+          <details key={name} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <summary className="cursor-pointer text-base font-black">{name}</summary>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/76">{body}</p>
+          </details>
+        ))}
+      </div>
+      <div className="mt-4 rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black leading-6 text-amber-50">Supervisor rule: youth do not apply fertilizer unless a supervisor gives clear directions. Read labels, measure carefully, protect skin/eyes, and never mix unknown materials.</div>
+    </Card>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -8025,6 +8158,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   return (
     <div className="grid gap-4">
       <YouthProgressiveDiscoveryDashboard setScreen={setScreen} activeUser={activeUser} todayPlan={todayPlan} currentWeek={currentWeek} />
+      <YouthActivityWorkflowCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} activeUser={activeUser} />
+      <MiracleGroYouthResourceCard />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Open Today’s Work details</summary>
@@ -8166,7 +8301,7 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
           <p className="mt-2 text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
           <div className="mt-4 grid gap-2 md:grid-cols-2">
             {(todayPlan.work || []).slice(0, 6).map((item) => (
-              <div key={item} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">☐ {item}</div>
+              <button key={item} type="button" onClick={() => setScreen("youth")} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-left text-sm font-bold text-white/84 hover:bg-white/12">☐ {item}</button>
             ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -9765,11 +9900,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
       setMessage(`Today’s Work check-in saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.`);
-      window.setTimeout(() => setScreen("youth"), 650);
+      window.setTimeout(() => { setScreen("youth"); scrollToTop(); }, 650);
     } catch (error) {
       console.error("Today’s Work check-in save issue:", error);
       setMessage(`Today’s Work check-in saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
-      window.setTimeout(() => setScreen("youth"), 650);
+      window.setTimeout(() => { setScreen("youth"); scrollToTop(); }, 650);
     } finally {
       setSaving(false);
     }
