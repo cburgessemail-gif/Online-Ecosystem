@@ -3,24 +3,23 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 13.2 — WEEK 5 MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 13.3 — WEEK 5 PORTAL + TRANSLATION MASTER FULL REPLACEMENT
  *
  * Full React/Vite App.tsx replacement.
- * Source lineage: Ecosystem 13.1 Workbook Master + Field Investigation Engine.
- * Current operating correction: Week 5 is the active curriculum week.
  *
- * Required operating architecture preserved:
- * - Forest Gate Portal with Guest / New / Returning access
- * - Youth Dashboard organized by Self → Work → Environment → Community → Opportunity → Legacy
- * - Workbook as the central operating record
- * - Today’s Work, field questions, reflection answers, discoveries, pest traps, and portfolio evidence
- * - Parent portal completion-only layer for contact/emergency information and work-status notices
- * - Supervisor tools for roster, attendance, PPE, daily assessment, behavior notes, incident/support log, and reports
- * - Mission Control work-status engine with parent/youth/supervisor notification drafts
- * - Participant lifecycle: Pending, Active, Completed, Inactive. Inactive users retain records but receive Visitor access only.
- * - Live weather layer using Open-Meteo for Youngstown/airport area when online
- * - Actual calendar that auto-advances by date, with Sunday preview of the coming week
- * - Crop planner, inventory, almanac, airport/community history, and guest journey foundations
+ * Corrected from 13.2 Week 5 Master:
+ * - Restores Forest Gate Portal identity and role choices.
+ * - Fixes Returning pathway so it does not force youth back to “Hello Constance.”
+ * - Fixes “Ready for Assignment” so it opens Today’s Work, not the top of the dashboard.
+ * - Adds complete app-level translation wrapper for portal, guest, registration, roles, youth, parent,
+ *   supervisor, Mission Control, workbook, marketplace, resources, calendar, almanac, and completion surfaces.
+ * - Keeps Week 5 as active curriculum week.
+ * - Keeps Self → Work → Environment → Community → Opportunity → Legacy as the organizing architecture.
+ * - Keeps workbook as the central proof record.
+ * - Keeps Parent Portal completion-only.
+ * - Keeps Supervisor tools, Mission Control work-status engine, roster/attendance/PPE/behavior/incident notes.
+ * - Keeps guest journey with airport/community history and ecosystem interpretation.
+ * - Keeps Active/Inactive participant lifecycle: inactive users retain records but receive visitor-only access.
  */
 
 type Screen =
@@ -45,10 +44,20 @@ type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
 type ParticipantStatus = "pending" | "active" | "completed" | "inactive";
 type WorkStatusCode = "FULL_DAY" | "HALF_DAY" | "DELAYED_START" | "EARLY_DISMISSAL" | "WEATHER_SHELTER" | "CANCELLED";
 
+type AppRole =
+  | "Guest"
+  | "Youth"
+  | "Parent"
+  | "Supervisor"
+  | "Mission Control"
+  | "Grower"
+  | "Partner"
+  | "Customer";
+
 type AppUser = {
   id: string;
   name: string;
-  role: "Guest" | "Youth" | "Parent" | "Supervisor" | "Mission Control" | "Grower" | "Partner" | "Customer";
+  role: AppRole;
   status: ParticipantStatus;
 };
 
@@ -94,6 +103,24 @@ type WorkStatusUpdate = {
   createdAt: string;
 };
 
+type RosterMember = {
+  id: string;
+  name: string;
+  role: AppRole;
+  status: ParticipantStatus;
+  phoneLast4?: string;
+  notes?: string;
+};
+
+type AttendanceRecord = {
+  id: string;
+  date: string;
+  name: string;
+  present: boolean;
+  ppe: string[];
+  notes: string;
+};
+
 type WeatherNow = {
   temp?: number;
   wind?: number;
@@ -105,23 +132,171 @@ type WeatherNow = {
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
-const supabase: SupabaseClient | null = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabase: SupabaseClient | null =
+  SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-const ECOSYSTEM_BASE_URL = "https://ecosystem.farmandfamilyalliance.org";
 const PROGRAM_START = new Date("2026-06-08T00:00:00");
 const CURRENT_WEEK_LOCK = 5;
+const ECOSYSTEM_BASE_URL = "https://ecosystem.farmandfamilyalliance.org";
+const NWS_FORECAST_URL = "https://forecast.weather.gov/MapClick.php?lon=-80.65&lat=41.1";
 
 const KEYS = {
-  user: "bff.13_2.activeUser",
-  language: "bff.13_2.language",
-  workbook: "bff.13_2.workbook",
-  workStatus: "bff.13_2.workStatus",
-  roster: "bff.13_2.roster",
-  attendance: "bff.13_2.attendance",
-  ppe: "bff.13_2.ppe",
-  parent: "bff.13_2.parentCompletion",
-  inventory: "bff.13_2.inventory",
+  user: "bff.13_3.activeUser",
+  language: "bff.13_3.language",
+  workbook: "bff.13_3.workbook",
+  workStatus: "bff.13_3.workStatus",
+  roster: "bff.13_3.roster",
+  attendance: "bff.13_3.attendance",
+  parent: "bff.13_3.parentCompletion",
+  inventory: "bff.13_3.inventory",
+  screen: "bff.13_3.screen",
 };
+
+const phraseTranslations: Record<LanguageCode, Record<string, string>> = {
+  en: {},
+  es: {
+    "Forest Gate Portal": "Portal del Bosque",
+    "Guest Journey": "Recorrido de Invitado",
+    "New Participant": "Nuevo Participante",
+    "Returning": "Regresando",
+    "Youth": "Joven",
+    "Parent": "Padre/Madre",
+    "Supervisor": "Supervisor",
+    "Mission Control": "Centro de Misión",
+    "Marketplace": "Mercado",
+    "Resources": "Recursos",
+    "Events": "Eventos",
+    "Today’s Work": "Trabajo de Hoy",
+    "Ready for Assignment": "Listo para la Asignación",
+    "Open My Workbook": "Abrir Mi Cuaderno",
+    "My Journey": "Mi Trayectoria",
+    "Self": "Yo",
+    "Work": "Trabajo",
+    "Environment": "Ambiente",
+    "Community": "Comunidad",
+    "Opportunity": "Oportunidad",
+    "Legacy": "Legado",
+    "Safety Boundaries": "Límites de Seguridad",
+    "Questions Youth Can Answer": "Preguntas que los Jóvenes Pueden Contestar",
+    "Save Answer": "Guardar Respuesta",
+    "Download Workbook Record": "Descargar Registro del Cuaderno",
+    "Current Work Status": "Estado Actual del Trabajo",
+    "Parent Portal": "Portal de Padres",
+    "Completion only": "Solo para completar",
+    "Roster": "Lista",
+    "Attendance": "Asistencia",
+    "PPE": "EPP",
+    "Incident / Support Log": "Registro de Incidentes / Apoyo",
+    "Program Open": "Programa Abierto",
+    "Cancelled": "Cancelado",
+    "Full Day": "Día Completo",
+    "Half Day": "Medio Día",
+    "Weather Shelter": "Refugio por Clima",
+    "Climate": "Clima",
+    "Airport History": "Historia del Aeropuerto",
+    "What is an ecosystem?": "¿Qué es un ecosistema?",
+  },
+  tl: {
+    "Forest Gate Portal": "Portal ng Gubat",
+    "Guest Journey": "Paglalakbay ng Bisita",
+    "New Participant": "Bagong Kalahok",
+    "Returning": "Babalik",
+    "Youth": "Kabataan",
+    "Parent": "Magulang",
+    "Supervisor": "Tagapangasiwa",
+    "Mission Control": "Sentro ng Misyon",
+    "Marketplace": "Pamilihan",
+    "Resources": "Mga Mapagkukunan",
+    "Events": "Mga Kaganapan",
+    "Today’s Work": "Gawain Ngayon",
+    "Ready for Assignment": "Handa sa Takdang Gawain",
+    "Open My Workbook": "Buksan ang Aking Workbook",
+    "My Journey": "Aking Paglalakbay",
+    "Self": "Sarili",
+    "Work": "Trabaho",
+    "Environment": "Kapaligiran",
+    "Community": "Komunidad",
+    "Opportunity": "Pagkakataon",
+    "Legacy": "Pamana",
+  },
+  it: {
+    "Forest Gate Portal": "Portale del Bosco",
+    "Guest Journey": "Percorso Ospite",
+    "New Participant": "Nuovo Partecipante",
+    "Returning": "Ritorno",
+    "Youth": "Giovani",
+    "Parent": "Genitore",
+    "Supervisor": "Supervisore",
+    "Mission Control": "Controllo Missione",
+    "Marketplace": "Mercato",
+    "Resources": "Risorse",
+    "Events": "Eventi",
+    "Today’s Work": "Lavoro di Oggi",
+    "Ready for Assignment": "Pronto per l’Assegnazione",
+    "Open My Workbook": "Apri il Mio Quaderno",
+    "My Journey": "Il Mio Percorso",
+    "Self": "Sé",
+    "Work": "Lavoro",
+    "Environment": "Ambiente",
+    "Community": "Comunità",
+    "Opportunity": "Opportunità",
+    "Legacy": "Eredità",
+  },
+  he: {
+    "Forest Gate Portal": "שער היער",
+    "Guest Journey": "מסע אורח",
+    "New Participant": "משתתף חדש",
+    "Returning": "חוזר",
+    "Youth": "נוער",
+    "Parent": "הורה",
+    "Supervisor": "מפקח",
+    "Mission Control": "מרכז שליטה",
+    "Marketplace": "שוק",
+    "Resources": "משאבים",
+    "Events": "אירועים",
+    "Today’s Work": "העבודה של היום",
+    "Ready for Assignment": "מוכן למשימה",
+    "Open My Workbook": "פתח את חוברת העבודה",
+    "My Journey": "המסע שלי",
+    "Self": "עצמי",
+    "Work": "עבודה",
+    "Environment": "סביבה",
+    "Community": "קהילה",
+    "Opportunity": "הזדמנות",
+    "Legacy": "מורשת",
+  },
+  fr: {
+    "Forest Gate Portal": "Portail de la Forêt",
+    "Guest Journey": "Parcours Invité",
+    "New Participant": "Nouveau Participant",
+    "Returning": "Retour",
+    "Youth": "Jeune",
+    "Parent": "Parent",
+    "Supervisor": "Superviseur",
+    "Mission Control": "Centre de Mission",
+    "Marketplace": "Marché",
+    "Resources": "Ressources",
+    "Events": "Événements",
+    "Today’s Work": "Travail d’Aujourd’hui",
+    "Ready for Assignment": "Prêt pour l’Affectation",
+    "Open My Workbook": "Ouvrir Mon Cahier",
+    "My Journey": "Mon Parcours",
+    "Self": "Moi",
+    "Work": "Travail",
+    "Environment": "Environnement",
+    "Community": "Communauté",
+    "Opportunity": "Opportunité",
+    "Legacy": "Héritage",
+  },
+};
+
+function tr(language: LanguageCode, phrase: string) {
+  return phraseTranslations[language]?.[phrase] || phrase;
+}
+
+function dir(language: LanguageCode) {
+  return language === "he" ? "rtl" : "ltr";
+}
 
 function uid(prefix = "id") {
   return `${prefix}-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
@@ -137,7 +312,11 @@ function readStore<T>(key: string, fallback: T): T {
 }
 
 function writeStore<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Local storage can fail in private or locked browsers.
+  }
 }
 
 function formatDate(d = new Date()) {
@@ -165,8 +344,7 @@ function getProgramWeek(date = new Date()) {
 function getDayIndex(date = new Date()) {
   const base = getCalendarDisplayBase(date);
   const day = base.getDay();
-  if (day >= 1 && day <= 5) return day - 1;
-  return 0;
+  return day >= 1 && day <= 5 ? day - 1 : 0;
 }
 
 const weekPlans: ProgramWeek[] = [
@@ -197,11 +375,11 @@ const weekPlans: ProgramWeek[] = [
       day,
       dateLabel: `Week 2 ${day}`,
       theme: "Sun/shadow, soil preparation, compost, watering, and plant observation",
-      curriculum: "Youth connect plant needs to their own environments, including woods, parks, vacant lots, and neighborhood growing spaces.",
+      curriculum: "Youth connect plant needs to woods, parks, yards, vacant lots, and neighborhood growing spaces.",
       work: ["Observe sun and shade", "Prepare soil", "Water plants", "Collect compost materials", "Record plant health"],
       safety: ["Hydration", "Tool spacing", "Watch footing", "Gloves for rough material"],
       questions: ["Where did I see life in the grow area?", "What does a plant need that people also need?"],
-      community: "Youngstown has many wooded areas and parks. Youth compare farm ecology to their own surroundings.",
+      community: "Youngstown has wooded areas and parks. Youth compare farm ecology to their surroundings.",
       opportunity: "Observation supports farming, landscaping, park maintenance, science, and environmental work.",
       legacy: "I learned that caring for land begins with paying attention.",
     })),
@@ -253,7 +431,7 @@ const weekPlans: ProgramWeek[] = [
         dateLabel: "Week 5 Monday",
         theme: "What is an ecosystem?",
         curriculum: "Youth define ecosystem through the farm: collards, yams, soil, insects, water, sun, weeds, people, tools, trash, and nearby wooded land.",
-        work: ["Water upper grow area closest to the T-hangar", "Check collards and yams", "Observe what is living and nonliving", "Record one relationship in the workbook"],
+        work: ["Water upper grow area closest to the T-hangar", "Check collards and yams", "Observe living and nonliving parts", "Record one relationship in the workbook"],
         safety: ["Stay near assigned grow areas", "Hydrate", "Do not enter creek areas without supervisor approval", "Report sharp trash"],
         questions: ["What living things did I see today?", "What nonliving things affect them?", "How do people change this ecosystem?"],
         community: "Youth compare the farm ecosystem to woods, parks, yards, vacant lots, and creeks near home.",
@@ -280,7 +458,7 @@ const weekPlans: ProgramWeek[] = [
         work: ["Check pest traps", "Look under leaves for eggs or caterpillars", "Record butterfly/pollinator observations", "Protect pollinator habitat"],
         safety: ["Do not crush unknown insects without supervisor direction", "Wash hands", "Use gloves", "Avoid disturbing pollinator sanctuary"],
         questions: ["What evidence did the trap show?", "Did I see caterpillars or eggs?", "How do we protect crops without harming pollinators?"],
-        community: "Food systems depend on pollinators, insects, birds, water, soil, and people making careful choices.",
+        community: "Food systems depend on pollinators, insects, birds, water, soil, and careful choices.",
         opportunity: "Integrated pest management, scouting, biology, and farm management are career pathways.",
         legacy: "I learned that protection requires knowledge, not panic.",
       },
@@ -333,12 +511,18 @@ const weekPlans: ProgramWeek[] = [
 const airportHistory = [
   "Lansdowne Airport is part of Youngstown’s aviation, community, and land-use history.",
   "Bronson Family Farm operates at the airport as a living example of reuse, stewardship, workforce development, and community imagination.",
-  "The guest journey should honor the airport story, local memory, veterans, workers, neighbors, and the land’s next chapter.",
+  "The guest journey honors the airport story, local memory, veterans, workers, neighbors, and the land’s next chapter.",
   "LCDR Zachary Lansdowne’s memorial history belongs in the community-history layer as a respectful learning doorway.",
 ];
 
 const defaultInventory = [
-  "Water pitchers", "Water bottles", "Cooling towels", "Work gloves", "Scissors", "Hoes", "Hand shovels", "Rakes", "Markers", "Staplers", "Garbage bags", "Pest traps", "Clipboards", "First-aid kit"
+  "Water pitchers", "Water bottles", "Cooling towels", "Work gloves", "Scissors", "Hoes", "Hand shovels",
+  "Rakes", "Markers", "Staplers", "Garbage bags", "Pest traps", "Clipboards", "First-aid kit", "Laptops"
+];
+
+const defaultRoster: RosterMember[] = [
+  { id: "r-youth-sample", name: "Sample Youth", role: "Youth", status: "active", phoneLast4: "0000", notes: "Replace with actual roster." },
+  { id: "r-parent-sample", name: "Sample Parent", role: "Parent", status: "pending", phoneLast4: "0000", notes: "Parent completion needed." },
 ];
 
 function getWeekPlan(date = new Date()) {
@@ -374,6 +558,7 @@ function defaultWorkStatus(date = new Date()): WorkStatusUpdate {
 
 function useWeather(): WeatherNow {
   const [weather, setWeather] = useState<WeatherNow>({ loading: true });
+
   useEffect(() => {
     let alive = true;
     fetch("https://api.open-meteo.com/v1/forecast?latitude=41.10&longitude=-80.65&current=temperature_2m,precipitation,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York")
@@ -388,228 +573,935 @@ function useWeather(): WeatherNow {
           code: data.current?.weather_code,
         });
       })
-      .catch(() => alive && setWeather({ loading: false, error: "Live weather unavailable. Use the official forecast link and Mission Control guidance." }));
-    return () => { alive = false; };
+      .catch(() =>
+        alive &&
+        setWeather({
+          loading: false,
+          error: "Live weather unavailable. Use the official forecast link and Mission Control guidance.",
+        })
+      );
+    return () => {
+      alive = false;
+    };
   }, []);
-  return weather;
-}
 
-function AppButton({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: () => void; className?: string }) {
-  return <button onClick={onClick} className={`rounded-2xl px-4 py-3 text-left font-black shadow-sm transition hover:scale-[1.01] ${className}`}>{children}</button>;
+  return weather;
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <section className={`rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
-function Header({ user, setScreen, language, setLanguage }: { user: AppUser; setScreen: (s: Screen) => void; language: LanguageCode; setLanguage: (l: LanguageCode) => void }) {
+function AppButton({
+  children,
+  onClick,
+  className = "",
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-2xl px-4 py-3 text-left font-black shadow-sm transition hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-emerald-300 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Header({
+  user,
+  screen,
+  setScreen,
+  language,
+  setLanguage,
+}: {
+  user: AppUser;
+  screen: Screen;
+  setScreen: (s: Screen) => void;
+  language: LanguageCode;
+  setLanguage: (l: LanguageCode) => void;
+}) {
   const weather = useWeather();
   const workStatus = readStore<WorkStatusUpdate>(KEYS.workStatus, defaultWorkStatus());
+
+  const nav: [Screen, string][] = [
+    ["portal", "Portal"],
+    ["youth", "Youth"],
+    ["todayWork", "Today’s Work"],
+    ["workbook", "Workbook"],
+    ["parent", "Parent"],
+    ["supervisor", "Supervisor"],
+    ["mission", "Mission Control"],
+    ["guest", "Guest"],
+  ];
+
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <button onClick={() => setScreen("portal")} className="text-left">
+        <button type="button" onClick={() => setScreen("portal")} className="text-left">
           <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Bronson Family Farm</div>
-          <div className="text-lg font-black text-slate-950">Cultivator Ecosystem 13.2</div>
+          <div className="text-lg font-black text-slate-950">Cultivator Ecosystem 13.3</div>
         </button>
+
         <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
           <span className={`rounded-full border px-3 py-2 ${statusColor(workStatus.status)}`}>{workStatus.label}</span>
           <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">Week {getProgramWeek()} Active</span>
-          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">{weather.loading ? "Weather loading" : weather.error ? "Weather check needed" : `${weather.temp}°F · Wind ${weather.wind} mph`}</span>
-          <select value={language} onChange={(e) => setLanguage(e.target.value as LanguageCode)} className="rounded-full border border-slate-200 bg-white px-3 py-2 font-black">
-            <option value="en">English</option><option value="es">Español</option><option value="tl">Tagalog</option><option value="it">Italiano</option><option value="he">עברית</option><option value="fr">Français</option>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
+            {weather.loading ? "Weather loading" : weather.error ? "Weather check needed" : `${weather.temp}°F · Wind ${weather.wind} mph`}
+          </span>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+            className="rounded-full border border-slate-200 bg-white px-3 py-2 font-black"
+            aria-label="Language"
+          >
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="tl">Tagalog</option>
+            <option value="it">Italiano</option>
+            <option value="he">עברית</option>
+            <option value="fr">Français</option>
           </select>
           <span className="rounded-full bg-slate-900 px-3 py-2 text-white">{user.name}</span>
         </div>
+
+        <nav className="flex w-full flex-wrap gap-2">
+          {nav.map(([target, label]) => (
+            <button
+              key={target}
+              type="button"
+              onClick={() => setScreen(target)}
+              className={`rounded-full px-3 py-2 text-xs font-black ${
+                screen === target ? "bg-emerald-800 text-white" : "bg-slate-100 text-slate-700"
+              }`}
+            >
+              {tr(language, label)}
+            </button>
+          ))}
+        </nav>
       </div>
     </header>
   );
 }
 
-function Portal({ setScreen, setUser }: { setScreen: (s: Screen) => void; setUser: (u: AppUser) => void }) {
-  const enter = (role: AppUser["role"], screen: Screen) => {
-    const u: AppUser = { id: role.toLowerCase().replaceAll(" ", "-"), name: role === "Guest" ? "Guest Visitor" : "Constance", role, status: "active" };
-    setUser(u); writeStore(KEYS.user, u); setScreen(screen);
+function Portal({
+  language,
+  setScreen,
+  setUser,
+}: {
+  language: LanguageCode;
+  setScreen: (s: Screen) => void;
+  setUser: (u: AppUser) => void;
+}) {
+  const enter = (role: AppRole, screen: Screen) => {
+    const u: AppUser = {
+      id: role.toLowerCase().replaceAll(" ", "-"),
+      name: role === "Guest" ? "Guest Visitor" : role,
+      role,
+      status: "active",
+    };
+    setUser(u);
+    writeStore(KEYS.user, u);
+    writeStore(KEYS.screen, screen);
+    setScreen(screen);
   };
+
   return (
     <main className="mx-auto grid max-w-7xl gap-6 px-4 py-8">
       <section className="rounded-[2rem] bg-gradient-to-br from-emerald-950 via-slate-900 to-black p-8 text-white shadow-xl">
-        <div className="text-xs font-black uppercase tracking-[0.35em] text-emerald-200">Forest Gate Portal</div>
-        <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight md:text-6xl">Step into the ecosystem. We Grow Green to Harvest Dreams.</h1>
-        <p className="mt-4 max-w-3xl text-lg text-emerald-50/85">Choose only the pathway you need. Details open when needed so youth, parents, supervisors, guests, and Mission Control do not see everything at once.</p>
+        <div className="text-xs font-black uppercase tracking-[0.35em] text-emerald-200">{tr(language, "Forest Gate Portal")}</div>
+        <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight md:text-6xl">
+          Step into the ecosystem. We Grow Green to Harvest Dreams.
+        </h1>
+        <p className="mt-4 max-w-3xl text-lg text-emerald-50/85">
+          Choose only the pathway you need. Youth, parents, supervisors, guests, and Mission Control each receive their own journey.
+        </p>
       </section>
+
       <div className="grid gap-4 md:grid-cols-3">
-        <AppButton onClick={() => enter("Guest", "guest")} className="bg-emerald-100 text-emerald-950">Guest Journey<br/><span className="font-medium">Farm story, airport history, events, marketplace, community connection.</span></AppButton>
-        <AppButton onClick={() => setScreen("registration")} className="bg-sky-100 text-sky-950">New Participant<br/><span className="font-medium">Registration, parent completion, emergency contact, pathway setup.</span></AppButton>
-        <AppButton onClick={() => setScreen("roles")} className="bg-amber-100 text-amber-950">Returning<br/><span className="font-medium">Youth, parent, supervisor, grower, partner, Mission Control.</span></AppButton>
+        <AppButton onClick={() => enter("Guest", "guest")} className="bg-emerald-100 text-emerald-950">
+          {tr(language, "Guest Journey")}
+          <br />
+          <span className="font-medium">Farm story, airport history, events, marketplace, community connection.</span>
+        </AppButton>
+        <AppButton onClick={() => setScreen("registration")} className="bg-sky-100 text-sky-950">
+          {tr(language, "New Participant")}
+          <br />
+          <span className="font-medium">Registration, parent completion, emergency contact, pathway setup.</span>
+        </AppButton>
+        <AppButton onClick={() => setScreen("roles")} className="bg-amber-100 text-amber-950">
+          {tr(language, "Returning")}
+          <br />
+          <span className="font-medium">Youth, parent, supervisor, grower, partner, Mission Control.</span>
+        </AppButton>
       </div>
     </main>
   );
 }
 
-function RoleGate({ setScreen, setUser }: { setScreen: (s: Screen) => void; setUser: (u: AppUser) => void }) {
-  const roles: [AppUser["role"], Screen, string][] = [
+function RoleGate({
+  language,
+  setScreen,
+  setUser,
+}: {
+  language: LanguageCode;
+  setScreen: (s: Screen) => void;
+  setUser: (u: AppUser) => void;
+}) {
+  const roles: [AppRole, Screen, string][] = [
     ["Youth", "youth", "Dashboard → Today’s Work → Workbook → Journey"],
     ["Parent", "parent", "Completion-only parent portal and notices"],
     ["Supervisor", "supervisor", "Roster, attendance, PPE, safety, assessments"],
     ["Mission Control", "mission", "Work status, notifications, reports, launch operations"],
+    ["Grower", "resources", "Crop planner, field notes, production resources"],
+    ["Partner", "events", "Events, volunteer opportunities, community pathway"],
     ["Customer", "marketplace", "Marketplace and events"],
   ];
-  return <main className="mx-auto max-w-5xl px-4 py-8"><h1 className="text-4xl font-black">Choose Returning Pathway</h1><div className="mt-6 grid gap-3">{roles.map(([role, screen, desc]) => <AppButton key={role} onClick={() => { const u = { id: uid("user"), name: role, role, status: "active" as ParticipantStatus }; setUser(u); writeStore(KEYS.user, u); setScreen(screen); }} className="bg-white text-slate-950 border border-slate-200">{role}<br/><span className="font-medium text-slate-600">{desc}</span></AppButton>)}</div></main>;
+
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <h1 className="text-4xl font-black">Choose Returning Pathway</h1>
+      <p className="mt-2 text-slate-600">This gate prevents every user from being forced into the youth dashboard.</p>
+      <div className="mt-6 grid gap-3">
+        {roles.map(([role, screen, desc]) => (
+          <AppButton
+            key={role}
+            onClick={() => {
+              const u: AppUser = { id: uid("user"), name: role, role, status: "active" };
+              setUser(u);
+              writeStore(KEYS.user, u);
+              writeStore(KEYS.screen, screen);
+              setScreen(screen);
+            }}
+            className="border border-slate-200 bg-white text-slate-950"
+          >
+            {tr(language, role)}
+            <br />
+            <span className="font-medium text-slate-600">{desc}</span>
+          </AppButton>
+        ))}
+      </div>
+    </main>
+  );
 }
 
-function YouthDashboard({ setScreen }: { setScreen: (s: Screen) => void }) {
+function Registration({ setScreen }: { setScreen: (s: Screen) => void }) {
+  const [form, setForm] = useState({
+    name: "",
+    role: "Youth",
+    guardian: "",
+    phoneLast4: "",
+    emergency: "",
+  });
+
+  function save() {
+    const roster = readStore<RosterMember[]>(KEYS.roster, defaultRoster);
+    const next: RosterMember = {
+      id: uid("roster"),
+      name: form.name || "New Participant",
+      role: form.role as AppRole,
+      status: "pending",
+      phoneLast4: form.phoneLast4,
+      notes: `Guardian: ${form.guardian}; Emergency: ${form.emergency}`,
+    };
+    writeStore(KEYS.roster, [next, ...roster]);
+    setScreen(form.role === "Parent" ? "parent" : "roles");
+  }
+
+  return (
+    <main className="mx-auto grid max-w-4xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">New Participant Registration</h1>
+        <p className="mt-2 text-slate-700">Creates a pending record. Parent completion remains in the Parent Portal.</p>
+      </Card>
+      <Card className="grid gap-3">
+        {[
+          ["Participant name", "name"],
+          ["Guardian name", "guardian"],
+          ["Phone last 4 digits", "phoneLast4"],
+          ["Emergency contact / pickup notes", "emergency"],
+        ].map(([label, key]) => (
+          <label key={key} className="grid gap-1 font-bold">
+            {label}
+            <input
+              className="rounded-2xl border border-slate-200 p-3"
+              value={(form as any)[key]}
+              onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+            />
+          </label>
+        ))}
+        <label className="grid gap-1 font-bold">
+          Role
+          <select
+            className="rounded-2xl border border-slate-200 p-3"
+            value={form.role}
+            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+          >
+            <option>Youth</option>
+            <option>Parent</option>
+            <option>Supervisor</option>
+            <option>Grower</option>
+            <option>Partner</option>
+            <option>Customer</option>
+          </select>
+        </label>
+        <button onClick={save} className="rounded-full bg-emerald-800 px-5 py-3 font-black text-white">
+          Save Registration
+        </button>
+      </Card>
+    </main>
+  );
+}
+
+function YouthDashboard({ language, setScreen }: { language: LanguageCode; setScreen: (s: Screen) => void }) {
   const week = getWeekPlan();
   const plan = getTodayPlan();
+
   return (
     <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6">
-      <Card className="bg-emerald-950 text-white border-emerald-900">
+      <Card className="border-emerald-900 bg-emerald-950 text-white">
         <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-200">Youth Workforce Dashboard</div>
-        <h1 className="mt-2 text-4xl font-black">Week {week.week}: {week.title}</h1>
+        <h1 className="mt-2 text-4xl font-black">
+          Week {week.week}: {week.title}
+        </h1>
         <p className="mt-2 text-emerald-50/85">{week.bigIdea}</p>
         <p className="mt-3 rounded-2xl bg-white/10 p-3 font-black">Farm Wisdom: {week.proverb}</p>
       </Card>
+
       <div className="grid gap-4 md:grid-cols-3">
-        <AppButton onClick={() => setScreen("todayWork")} className="bg-amber-200 text-amber-950">Ready for Assignment<br/><span className="font-medium">Open today’s actual work: {plan.theme}</span></AppButton>
-        <AppButton onClick={() => setScreen("workbook")} className="bg-sky-200 text-sky-950">Open My Workbook<br/><span className="font-medium">Answer questions and save proof.</span></AppButton>
-        <AppButton onClick={() => setScreen("journey")} className="bg-violet-200 text-violet-950">My Journey<br/><span className="font-medium">Skills, portfolio, opportunity, legacy.</span></AppButton>
+        <AppButton onClick={() => setScreen("todayWork")} className="bg-amber-200 text-amber-950">
+          {tr(language, "Ready for Assignment")}
+          <br />
+          <span className="font-medium">Open today’s actual work: {plan.theme}</span>
+        </AppButton>
+        <AppButton onClick={() => setScreen("workbook")} className="bg-sky-200 text-sky-950">
+          {tr(language, "Open My Workbook")}
+          <br />
+          <span className="font-medium">Answer questions and save proof.</span>
+        </AppButton>
+        <AppButton onClick={() => setScreen("journey")} className="bg-violet-200 text-violet-950">
+          {tr(language, "My Journey")}
+          <br />
+          <span className="font-medium">Skills, portfolio, opportunity, legacy.</span>
+        </AppButton>
       </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {["Self", "Work", "Environment", "Community", "Opportunity", "Legacy"].map((layer) => <Card key={layer}><h3 className="text-xl font-black">{layer}</h3><p className="mt-2 text-sm text-slate-700">{layer === "Self" ? "How am I showing up today?" : layer === "Work" ? plan.work[0] : layer === "Environment" ? plan.curriculum : layer === "Community" ? plan.community : layer === "Opportunity" ? plan.opportunity : plan.legacy}</p></Card>)}
+        {["Self", "Work", "Environment", "Community", "Opportunity", "Legacy"].map((layer) => (
+          <Card key={layer}>
+            <h3 className="text-xl font-black">{tr(language, layer)}</h3>
+            <p className="mt-2 text-sm text-slate-700">
+              {layer === "Self"
+                ? "How am I showing up today?"
+                : layer === "Work"
+                ? plan.work[0]
+                : layer === "Environment"
+                ? plan.curriculum
+                : layer === "Community"
+                ? plan.community
+                : layer === "Opportunity"
+                ? plan.opportunity
+                : plan.legacy}
+            </p>
+          </Card>
+        ))}
       </div>
     </main>
   );
 }
 
-function TodayWork({ setScreen }: { setScreen: (s: Screen) => void }) {
+function TodayWork({ language, setScreen }: { language: LanguageCode; setScreen: (s: Screen) => void }) {
   const plan = getTodayPlan();
   const status = readStore<WorkStatusUpdate>(KEYS.workStatus, defaultWorkStatus());
+
   return (
     <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6">
       <Card>
-        <div className={`inline-flex rounded-full border px-3 py-2 text-sm font-black ${statusColor(status.status)}`}>{status.label}</div>
-        <h1 className="mt-4 text-4xl font-black">{plan.dateLabel}: {plan.theme}</h1>
+        <div className={`inline-flex rounded-full border px-3 py-2 text-sm font-black ${statusColor(status.status)}`}>
+          {status.label}
+        </div>
+        <h1 className="mt-4 text-4xl font-black">
+          {plan.dateLabel}: {plan.theme}
+        </h1>
         <p className="mt-2 text-slate-700">{plan.curriculum}</p>
       </Card>
+
       <div className="grid gap-4 md:grid-cols-2">
-        <Card><h2 className="text-2xl font-black">Today’s Work</h2><ul className="mt-3 grid gap-2">{plan.work.map((x) => <li key={x} className="rounded-xl bg-slate-50 p-3">□ {x}</li>)}</ul></Card>
-        <Card><h2 className="text-2xl font-black">Safety Boundaries</h2><ul className="mt-3 grid gap-2">{plan.safety.map((x) => <li key={x} className="rounded-xl bg-red-50 p-3">• {x}</li>)}</ul></Card>
+        <Card>
+          <h2 className="text-2xl font-black">{tr(language, "Today’s Work")}</h2>
+          <ul className="mt-3 grid gap-2">
+            {plan.work.map((x) => (
+              <li key={x} className="rounded-xl bg-slate-50 p-3">
+                □ {x}
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">{tr(language, "Safety Boundaries")}</h2>
+          <ul className="mt-3 grid gap-2">
+            {plan.safety.map((x) => (
+              <li key={x} className="rounded-xl bg-red-50 p-3">
+                • {x}
+              </li>
+            ))}
+          </ul>
+        </Card>
       </div>
-      <Card><h2 className="text-2xl font-black">Questions Youth Can Answer</h2><div className="mt-3 grid gap-2">{plan.questions.map((q) => <button onClick={() => setScreen("workbook")} key={q} className="rounded-xl border border-slate-200 bg-white p-3 text-left font-bold hover:bg-slate-50">{q}</button>)}</div></Card>
+
+      <Card>
+        <h2 className="text-2xl font-black">{tr(language, "Questions Youth Can Answer")}</h2>
+        <div className="mt-3 grid gap-2">
+          {plan.questions.map((q) => (
+            <button
+              type="button"
+              onClick={() => setScreen("workbook")}
+              key={q}
+              className="rounded-xl border border-slate-200 bg-white p-3 text-left font-bold hover:bg-slate-50"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      </Card>
     </main>
   );
 }
 
-function Workbook() {
+function Workbook({ language }: { language: LanguageCode }) {
   const plan = getTodayPlan();
   const [entries, setEntries] = useState<WorkbookEntry[]>(() => readStore(KEYS.workbook, []));
   const [responses, setResponses] = useState<Record<string, string>>({});
+
   const prompts = [
     ...plan.questions.map((prompt) => ({ section: "Field Investigation" as WorkbookEntry["section"], prompt })),
     { section: "Community" as const, prompt: plan.community },
     { section: "Opportunity" as const, prompt: plan.opportunity },
     { section: "Legacy" as const, prompt: plan.legacy },
   ];
+
   const save = (section: WorkbookEntry["section"], prompt: string) => {
     const response = responses[prompt]?.trim();
     if (!response) return;
-    const next = [{ id: uid("wb"), date: formatDate(), week: getProgramWeek(), section, prompt, response, createdAt: new Date().toISOString() }, ...entries];
-    setEntries(next); writeStore(KEYS.workbook, next); setResponses((r) => ({ ...r, [prompt]: "" }));
+    const next = [
+      { id: uid("wb"), date: formatDate(), week: getProgramWeek(), section, prompt, response, createdAt: new Date().toISOString() },
+      ...entries,
+    ];
+    setEntries(next);
+    writeStore(KEYS.workbook, next);
+    setResponses((r) => ({ ...r, [prompt]: "" }));
   };
+
   const download = () => {
-    const text = entries.map((e) => `Week ${e.week} | ${e.date} | ${e.section}\nPrompt: ${e.prompt}\nResponse: ${e.response}\n`).join("\n---\n");
+    const text = entries
+      .map((e) => `Week ${e.week} | ${e.date} | ${e.section}\nPrompt: ${e.prompt}\nResponse: ${e.response}\n`)
+      .join("\n---\n");
     const blob = new Blob([text || "No workbook entries yet."], { type: "text/plain" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "Cultivator_Workbook_Record.txt"; a.click(); URL.revokeObjectURL(a.href);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Cultivator_Workbook_Record.txt";
+    a.click();
+    URL.revokeObjectURL(a.href);
   };
+
   return (
     <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
-      <Card><h1 className="text-4xl font-black">My Cultivator Workbook</h1><p className="mt-2 text-slate-700">The workbook is the professional record: field work, answers, discoveries, portfolio proof, skills, community connection, and legacy reflection.</p><button onClick={download} className="mt-4 rounded-full bg-slate-900 px-5 py-3 font-black text-white">Download Workbook Record</button></Card>
-      {prompts.map(({ section, prompt }) => <Card key={prompt}><div className="text-xs font-black uppercase tracking-[0.25em] text-slate-500">{section}</div><h2 className="mt-2 text-xl font-black">{prompt}</h2><textarea value={responses[prompt] || ""} onChange={(e) => setResponses((r) => ({ ...r, [prompt]: e.target.value }))} className="mt-3 min-h-28 w-full rounded-2xl border border-slate-200 p-3" placeholder="Write your answer here."/><button onClick={() => save(section, prompt)} className="mt-3 rounded-full bg-emerald-700 px-5 py-3 font-black text-white">Save Answer</button></Card>)}
-      <Card><h2 className="text-2xl font-black">Saved Entries</h2><div className="mt-3 grid gap-3">{entries.length === 0 ? <p className="text-slate-600">No entries saved yet.</p> : entries.map((e) => <div key={e.id} className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-black text-slate-500">Week {e.week} · {e.section} · {e.date}</div><div className="font-black">{e.prompt}</div><p className="mt-1 text-slate-700">{e.response}</p></div>)}</div></Card>
+      <Card>
+        <h1 className="text-4xl font-black">My Cultivator Workbook</h1>
+        <p className="mt-2 text-slate-700">
+          The workbook is the professional record: field work, answers, discoveries, portfolio proof, skills, community connection, and legacy reflection.
+        </p>
+        <button onClick={download} className="mt-4 rounded-full bg-slate-900 px-5 py-3 font-black text-white">
+          {tr(language, "Download Workbook Record")}
+        </button>
+      </Card>
+
+      {prompts.map(({ section, prompt }) => (
+        <Card key={prompt}>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-slate-500">{tr(language, section)}</div>
+          <h2 className="mt-2 text-xl font-black">{prompt}</h2>
+          <textarea
+            value={responses[prompt] || ""}
+            onChange={(e) => setResponses((r) => ({ ...r, [prompt]: e.target.value }))}
+            className="mt-3 min-h-28 w-full rounded-2xl border border-slate-200 p-3"
+            placeholder="Write your answer here."
+          />
+          <button onClick={() => save(section, prompt)} className="mt-3 rounded-full bg-emerald-700 px-5 py-3 font-black text-white">
+            {tr(language, "Save Answer")}
+          </button>
+        </Card>
+      ))}
+
+      <Card>
+        <h2 className="text-2xl font-black">Saved Entries</h2>
+        <div className="mt-3 grid gap-3">
+          {entries.length === 0 ? (
+            <p className="text-slate-600">No entries saved yet.</p>
+          ) : (
+            entries.map((e) => (
+              <div key={e.id} className="rounded-2xl bg-slate-50 p-4">
+                <div className="text-xs font-black text-slate-500">
+                  Week {e.week} · {tr(language, e.section)} · {e.date}
+                </div>
+                <div className="font-black">{e.prompt}</div>
+                <p className="mt-1 text-slate-700">{e.response}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </Card>
     </main>
   );
 }
 
-function ParentPortal() {
-  const [form, setForm] = useState(() => readStore(KEYS.parent, { guardian: "", phone: "", email: "", emergency: "", medical: "", pickup: "" }));
+function ParentPortal({ language }: { language: LanguageCode }) {
+  const [form, setForm] = useState(() =>
+    readStore(KEYS.parent, { guardian: "", phone: "", email: "", emergency: "", medical: "", pickup: "" })
+  );
   const status = readStore<WorkStatusUpdate>(KEYS.workStatus, defaultWorkStatus());
-  return <main className="mx-auto grid max-w-5xl gap-5 px-4 py-6"><Card><h1 className="text-4xl font-black">Parent Portal</h1><p className="mt-2 text-slate-700">Completion only: contact, emergency, medical notes, pickup plan, and work-status notice.</p></Card><Card><h2 className="text-2xl font-black">Current Work Status</h2><div className={`mt-3 rounded-2xl border p-4 ${statusColor(status.status)}`}>{status.parentMessage}</div></Card><Card><h2 className="text-2xl font-black">Complete / Update Parent Information</h2><div className="mt-3 grid gap-3">{Object.keys(form).map((k) => <input key={k} value={(form as any)[k]} onChange={(e) => setForm((f: any) => ({ ...f, [k]: e.target.value }))} className="rounded-2xl border border-slate-200 p-3" placeholder={k}/>)}</div><button onClick={() => writeStore(KEYS.parent, form)} className="mt-4 rounded-full bg-slate-900 px-5 py-3 font-black text-white">Save Parent Completion</button></Card></main>;
+
+  function save() {
+    writeStore(KEYS.parent, form);
+    alert("Parent completion saved on this device.");
+  }
+
+  return (
+    <main className="mx-auto grid max-w-5xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">{tr(language, "Parent Portal")}</h1>
+        <p className="mt-2 text-slate-700">{tr(language, "Completion only")}: contact, emergency, medical notes, pickup plan, and work-status notice.</p>
+      </Card>
+      <Card>
+        <h2 className="text-2xl font-black">{tr(language, "Current Work Status")}</h2>
+        <pre className={`mt-3 whitespace-pre-wrap rounded-2xl border p-4 text-sm ${statusColor(status.status)}`}>{status.parentMessage}</pre>
+      </Card>
+      <Card className="grid gap-3">
+        <h2 className="text-2xl font-black">Contact / Emergency Completion</h2>
+        {[
+          ["Guardian name", "guardian"],
+          ["Phone", "phone"],
+          ["Email", "email"],
+          ["Emergency contact", "emergency"],
+          ["Medical / allergy notes", "medical"],
+          ["Pickup authorization", "pickup"],
+        ].map(([label, key]) => (
+          <label key={key} className="grid gap-1 font-bold">
+            {label}
+            <input
+              className="rounded-2xl border border-slate-200 p-3"
+              value={(form as any)[key]}
+              onChange={(e) => setForm((f: any) => ({ ...f, [key]: e.target.value }))}
+            />
+          </label>
+        ))}
+        <button onClick={save} className="rounded-full bg-emerald-800 px-5 py-3 font-black text-white">
+          Save Parent Completion
+        </button>
+      </Card>
+    </main>
+  );
 }
 
-function Supervisor() {
-  const [roster, setRoster] = useState<any[]>(() => readStore(KEYS.roster, [{ id: "youth-1", name: "Sample Youth", status: "active" }]));
-  const [name, setName] = useState("");
-  const add = () => { if (!name.trim()) return; const next = [...roster, { id: uid("youth"), name, status: "active" }]; setRoster(next); writeStore(KEYS.roster, next); setName(""); };
-  const inactive = (id: string) => { const next = roster.map((r) => r.id === id ? { ...r, status: "inactive" } : r); setRoster(next); writeStore(KEYS.roster, next); };
-  return <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6"><Card><h1 className="text-4xl font-black">Supervisor Tools</h1><p className="mt-2 text-slate-700">Roster, attendance, PPE, wellness, behavior support, incident log, parent-safe summary, and reports.</p></Card><div className="grid gap-4 md:grid-cols-2"><Card><h2 className="text-2xl font-black">Youth Roster</h2><div className="mt-3 flex gap-2"><input value={name} onChange={(e) => setName(e.target.value)} className="flex-1 rounded-2xl border p-3" placeholder="Add youth name"/><button onClick={add} className="rounded-2xl bg-emerald-700 px-4 font-black text-white">Add</button></div><div className="mt-3 grid gap-2">{roster.map((r) => <div key={r.id} className="flex items-center justify-between rounded-xl bg-slate-50 p-3"><span>{r.name} · {r.status}</span><button onClick={() => inactive(r.id)} className="rounded-full bg-slate-900 px-3 py-2 text-xs font-black text-white">Set Inactive</button></div>)}</div></Card><Card><h2 className="text-2xl font-black">Daily Records</h2>{["Attendance", "PPE", "Morning Wellness", "Daily Assessment", "Incident / Support Log", "Parent-Safe Summary"].map((x) => <button key={x} className="mt-2 block w-full rounded-xl border border-slate-200 p-3 text-left font-black hover:bg-slate-50">{x}</button>)}</Card></div></main>;
+function SupervisorPortal({ language }: { language: LanguageCode }) {
+  const [roster, setRoster] = useState<RosterMember[]>(() => readStore(KEYS.roster, defaultRoster));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => readStore(KEYS.attendance, []));
+  const [note, setNote] = useState("");
+
+  function toggleStatus(id: string) {
+    const next = roster.map((r) =>
+      r.id === id ? { ...r, status: r.status === "inactive" ? "active" : ("inactive" as ParticipantStatus) } : r
+    );
+    setRoster(next);
+    writeStore(KEYS.roster, next);
+  }
+
+  function deleteMember(id: string) {
+    const next = roster.filter((r) => r.id !== id);
+    setRoster(next);
+    writeStore(KEYS.roster, next);
+  }
+
+  function markPresent(member: RosterMember, present: boolean) {
+    const record: AttendanceRecord = {
+      id: uid("att"),
+      date: formatDate(),
+      name: member.name,
+      present,
+      ppe: ["Water", "Closed-toe shoes", "Gloves"],
+      notes: note,
+    };
+    const next = [record, ...attendance];
+    setAttendance(next);
+    writeStore(KEYS.attendance, next);
+    setNote("");
+  }
+
+  return (
+    <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">{tr(language, "Supervisor")} Tools</h1>
+        <p className="mt-2 text-slate-700">Roster, attendance, PPE, behavior notes, and support/incident log.</p>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <h2 className="text-2xl font-black">{tr(language, "Roster")}</h2>
+          <div className="mt-3 grid gap-3">
+            {roster.map((r) => (
+              <div key={r.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-black">{r.name}</div>
+                    <div className="text-sm text-slate-600">
+                      {r.role} · {r.status}
+                    </div>
+                    <div className="text-xs text-slate-500">{r.notes}</div>
+                  </div>
+                  <div className="grid gap-2">
+                    <button onClick={() => toggleStatus(r.id)} className="rounded-full bg-slate-900 px-3 py-2 text-xs font-black text-white">
+                      {r.status === "inactive" ? "Reactivate" : "Set Inactive"}
+                    </button>
+                    <button onClick={() => deleteMember(r.id)} className="rounded-full bg-red-700 px-3 py-2 text-xs font-black text-white">
+                      Delete Test
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button onClick={() => markPresent(r, true)} className="rounded-full bg-emerald-700 px-3 py-2 text-xs font-black text-white">
+                    Present
+                  </button>
+                  <button onClick={() => markPresent(r, false)} className="rounded-full bg-amber-600 px-3 py-2 text-xs font-black text-white">
+                    Absent
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="text-2xl font-black">{tr(language, "Attendance")} / {tr(language, "PPE")}</h2>
+          <textarea
+            className="mt-3 min-h-24 w-full rounded-2xl border border-slate-200 p-3"
+            placeholder="Supervisor note before marking attendance."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <div className="mt-4 grid gap-2">
+            {attendance.length === 0 ? (
+              <p className="text-slate-600">No attendance records yet.</p>
+            ) : (
+              attendance.map((a) => (
+                <div key={a.id} className="rounded-2xl bg-slate-50 p-3">
+                  <div className="font-black">
+                    {a.date} · {a.name} · {a.present ? "Present" : "Absent"}
+                  </div>
+                  <div className="text-sm text-slate-600">PPE: {a.ppe.join(", ")}</div>
+                  {a.notes && <div className="text-sm text-slate-600">Notes: {a.notes}</div>}
+                </div>
+              ))
+            )}
+          </div>
+        </Card>
+      </div>
+
+      <Card>
+        <h2 className="text-2xl font-black">{tr(language, "Incident / Support Log")}</h2>
+        <p className="mt-2 text-slate-700">
+          Use this section to document name or PIN, incident, support action, parent contact, nurse triage note, and supervisor follow-up.
+        </p>
+      </Card>
+    </main>
+  );
 }
 
-function MissionControl() {
+function MissionControl({ language }: { language: LanguageCode }) {
   const [status, setStatus] = useState<WorkStatusUpdate>(() => readStore(KEYS.workStatus, defaultWorkStatus()));
-  const setHalf = () => { const next = { ...status, id: uid("status"), label: "Half Day Operations — 12:00 PM Dismissal", status: "HALF_DAY" as WorkStatusCode, reason: "Heat, water, staffing, weather, or site conditions require shortened outdoor work.", action: "Priority outdoor work in the cooler morning; cleanup, lunch, reflection, and dismissal by 12:00 PM.", parentMessage: `Bronson Family Farm Work Status\n\nSTATUS: HALF DAY OPERATIONS\n\nYouth will complete priority work in the cooler morning. Cleanup, lunch, hydration, reflection, and dismissal will follow. Parents/caregivers should follow Mission Control pickup guidance.`, createdAt: new Date().toISOString() }; setStatus(next); writeStore(KEYS.workStatus, next); };
-  const setCancel = () => { const next = { ...status, id: uid("status"), label: "Program Cancelled", status: "CANCELLED" as WorkStatusCode, reason: "Mission Control cancelled onsite youth work due to unsafe or unsuitable conditions.", action: "Youth remain safe at home. Parents and supervisors watch for next update.", parentMessage: `Bronson Family Farm Work Status\n\nSTATUS: CANCELLED\n\nThe Cultivators Youth Workforce Program will not meet onsite. Youth should remain safe at home and prepare for the next scheduled workday.`, createdAt: new Date().toISOString() }; setStatus(next); writeStore(KEYS.workStatus, next); };
-  const setFull = () => { const next = defaultWorkStatus(); setStatus(next); writeStore(KEYS.workStatus, next); };
-  return <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6"><Card><h1 className="text-4xl font-black">Mission Control</h1><p className="mt-2 text-slate-700">Operational authority for work status, notices, curriculum advancement, reports, inventory, and launch readiness.</p></Card><Card><h2 className="text-2xl font-black">Work Status Engine</h2><div className={`mt-3 rounded-2xl border p-4 ${statusColor(status.status)}`}>{status.label}<br/>{status.reason}<br/>{status.action}</div><div className="mt-4 grid gap-3 md:grid-cols-3"><button onClick={setFull} className="rounded-2xl bg-emerald-700 p-4 font-black text-white">Set Full Day</button><button onClick={setHalf} className="rounded-2xl bg-amber-500 p-4 font-black text-amber-950">Set Half Day</button><button onClick={setCancel} className="rounded-2xl bg-red-700 p-4 font-black text-white">Cancel Program</button></div></Card><Card><h2 className="text-2xl font-black">Inventory Visible</h2><div className="mt-3 flex flex-wrap gap-2">{defaultInventory.map((x) => <span key={x} className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold">{x}</span>)}</div></Card><RealCalendarGrid /></main>;
+  const [inventory, setInventory] = useState<string[]>(() => readStore(KEYS.inventory, defaultInventory));
+  const [newItem, setNewItem] = useState("");
+
+  function choose(nextStatus: WorkStatusCode) {
+    const plan = getTodayPlan();
+    const templates: Record<WorkStatusCode, Partial<WorkStatusUpdate>> = {
+      FULL_DAY: {
+        label: "Program Open — Follow Today’s Assignment",
+        reason: "Normal schedule.",
+        action: `Begin with PPE, water, and ${plan.theme}.`,
+      },
+      HALF_DAY: {
+        label: "Half Day — Parent Pickup Required",
+        reason: "Heat, weather, water, or staffing adjustment.",
+        action: "Youth complete priority tasks only. Parent pickup communication required.",
+      },
+      DELAYED_START: {
+        label: "Delayed Start",
+        reason: "Weather or site readiness.",
+        action: "Do not report until updated start time is confirmed.",
+      },
+      EARLY_DISMISSAL: {
+        label: "Early Dismissal",
+        reason: "Heat or weather safety.",
+        action: "Stop field work, complete cleanup, and prepare pickup.",
+      },
+      WEATHER_SHELTER: {
+        label: "Weather Shelter / Emergency Cover",
+        reason: "Unsafe outdoor conditions. Hangar is emergency cover only.",
+        action: "Shelter only if already onsite. Do not start new field work.",
+      },
+      CANCELLED: {
+        label: "Program Cancelled — No Onsite Youth Work",
+        reason: "Weather, heat, water, staffing, or site safety.",
+        action: "Youth should not report. Parents and supervisors must be notified.",
+      },
+    };
+
+    const next: WorkStatusUpdate = {
+      ...status,
+      id: uid("status"),
+      effectiveDate: formatDate(),
+      status: nextStatus,
+      label: templates[nextStatus].label || "",
+      reason: templates[nextStatus].reason || "",
+      action: templates[nextStatus].action || "",
+      parentMessage: `Bronson Family Farm Work Status\n\n${plan.dateLabel}\n\nSTATUS: ${templates[nextStatus].label}\nREASON: ${templates[nextStatus].reason}\nACTION: ${templates[nextStatus].action}\n\nPortal: ${ECOSYSTEM_BASE_URL}`,
+      createdAt: new Date().toISOString(),
+    };
+    setStatus(next);
+    writeStore(KEYS.workStatus, next);
+  }
+
+  function saveItem() {
+    if (!newItem.trim()) return;
+    const next = [newItem.trim(), ...inventory];
+    setInventory(next);
+    writeStore(KEYS.inventory, next);
+    setNewItem("");
+  }
+
+  return (
+    <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6">
+      <Card className="border-slate-900 bg-slate-950 text-white">
+        <h1 className="text-4xl font-black">{tr(language, "Mission Control")}</h1>
+        <p className="mt-2 text-slate-200">Work status, notification drafts, launch operations, inventory, and reporting.</p>
+      </Card>
+
+      <Card>
+        <h2 className="text-2xl font-black">Work Status Engine</h2>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {(["FULL_DAY", "HALF_DAY", "DELAYED_START", "EARLY_DISMISSAL", "WEATHER_SHELTER", "CANCELLED"] as WorkStatusCode[]).map((s) => (
+            <button key={s} onClick={() => choose(s)} className={`rounded-2xl border p-4 text-left font-black ${statusColor(s)}`}>
+              {s.replaceAll("_", " ")}
+            </button>
+          ))}
+        </div>
+        <pre className={`mt-4 whitespace-pre-wrap rounded-2xl border p-4 text-sm ${statusColor(status.status)}`}>{status.parentMessage}</pre>
+      </Card>
+
+      <Card>
+        <h2 className="text-2xl font-black">Inventory</h2>
+        <div className="mt-3 flex gap-2">
+          <input value={newItem} onChange={(e) => setNewItem(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 p-3" placeholder="Add item" />
+          <button onClick={saveItem} className="rounded-2xl bg-emerald-800 px-5 py-3 font-black text-white">Add</button>
+        </div>
+        <div className="mt-3 grid gap-2 md:grid-cols-3">
+          {inventory.map((item) => (
+            <div key={item} className="rounded-xl bg-slate-50 p-3 font-bold">{item}</div>
+          ))}
+        </div>
+      </Card>
+    </main>
+  );
 }
 
-function RealCalendarGrid() {
+function GuestJourney({ language, setScreen }: { language: LanguageCode; setScreen: (s: Screen) => void }) {
+  return (
+    <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6">
+      <Card className="bg-gradient-to-br from-emerald-100 to-amber-100">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-800">{tr(language, "Guest Journey")}</div>
+        <h1 className="mt-2 text-4xl font-black">Bronson Family Farm at Lansdowne Airport</h1>
+        <p className="mt-2 text-slate-700">
+          A guided pathway for visitors: land, food, airport history, youth workforce, community memory, marketplace, and opportunity.
+        </p>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <h2 className="text-2xl font-black">{tr(language, "Airport History")}</h2>
+          <div className="mt-3 grid gap-2">
+            {airportHistory.map((x) => (
+              <p key={x} className="rounded-2xl bg-slate-50 p-3">{x}</p>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">Ecosystem Interpretation</h2>
+          <p className="mt-2 text-slate-700">
+            Guests should see only the relevant slice: farm story, ecological care, youth learning, community history, marketplace access, and future opportunity.
+          </p>
+          <div className="mt-4 grid gap-2">
+            <AppButton onClick={() => setScreen("marketplace")} className="bg-emerald-100 text-emerald-950">Visit Marketplace</AppButton>
+            <AppButton onClick={() => setScreen("events")} className="bg-amber-100 text-amber-950">View Events</AppButton>
+          </div>
+        </Card>
+      </div>
+    </main>
+  );
+}
+
+function Journey() {
+  const entries = readStore<WorkbookEntry[]>(KEYS.workbook, []);
+  return (
+    <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">My Journey</h1>
+        <p className="mt-2 text-slate-700">The journey turns work into proof: skills, observations, saved answers, portfolio evidence, and next steps.</p>
+      </Card>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card><h2 className="text-xl font-black">Skills</h2><p className="mt-2 text-slate-700">Observation, watering, pest scouting, safety, cleanup, communication, responsibility.</p></Card>
+        <Card><h2 className="text-xl font-black">Career Pathways</h2><p className="mt-2 text-slate-700">Nursing, science, teaching, agriculture, conservation, public works, sanitation, trades, business.</p></Card>
+        <Card><h2 className="text-xl font-black">Proof Saved</h2><p className="mt-2 text-slate-700">{entries.length} workbook entries saved.</p></Card>
+      </div>
+    </main>
+  );
+}
+
+function Marketplace() {
+  return (
+    <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">Marketplace</h1>
+        <p className="mt-2 text-slate-700">Customer pathway for produce, seedlings, events, tours, and future value-added offerings.</p>
+      </Card>
+      <Card>
+        <h2 className="text-2xl font-black">Coming Online</h2>
+        <p className="mt-2">SNAP-aware marketplace, GrownBy/POS coordination, inventory cards, event promotions, and customer education.</p>
+      </Card>
+    </main>
+  );
+}
+
+function Resources() {
+  return (
+    <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">Resources</h1>
+        <p className="mt-2 text-slate-700">Crop planner, safety, parent resources, career links, workforce next steps, and live forecast doorway.</p>
+        <a href={NWS_FORECAST_URL} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-slate-900 px-5 py-3 font-black text-white">
+          Open Official Forecast
+        </a>
+      </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card><h2 className="text-xl font-black">Career / Education</h2><p className="mt-2 text-slate-700">Mahoning CTC, Choffin, Flying High, YSU, Youngstown JATC, Ohio Job Services, heavy equipment and trades pathways.</p></Card>
+        <Card><h2 className="text-xl font-black">Family / Wellness</h2><p className="mt-2 text-slate-700">Parent completion, emergency contact, heat safety, healthy food learning, and safe communication.</p></Card>
+      </div>
+    </main>
+  );
+}
+
+function Events() {
   const base = getCalendarDisplayBase();
-  const weekStart = new Date(base); weekStart.setDate(base.getDate() - ((base.getDay() + 6) % 7));
-  const weekDays = Array.from({ length: 5 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
-  return <Card><h2 className="text-2xl font-black">Actual Calendar — Week {getProgramWeek(base)}</h2><div className="mt-4 grid gap-3 md:grid-cols-5">{weekDays.map((d) => { const p = getTodayPlan(d); return <div key={d.toISOString()} className="rounded-2xl border border-slate-200 bg-slate-50 p-3"><div className="font-black">{d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</div><div className="mt-2 text-sm font-bold">{p.theme}</div></div>; })}</div></Card>;
+  const week = getWeekPlan(base);
+
+  return (
+    <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">Actual Calendar</h1>
+        <p className="mt-2 text-slate-700">Auto-advances by date. Sunday previews the coming program week.</p>
+      </Card>
+      <div className="grid gap-3 md:grid-cols-5">
+        {week.days.map((d, i) => (
+          <Card key={d.dateLabel} className={i === getDayIndex(base) ? "border-emerald-700 bg-emerald-50" : ""}>
+            <div className="text-xs font-black uppercase text-slate-500">{d.day}</div>
+            <h2 className="mt-1 text-lg font-black">{d.theme}</h2>
+            <p className="mt-2 text-sm text-slate-700">{d.work[0]}</p>
+          </Card>
+        ))}
+      </div>
+    </main>
+  );
 }
 
-function GuestJourney() {
-  return <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6"><Card><h1 className="text-4xl font-black">Guest Journey</h1><p className="mt-2 text-slate-700">Visitors see the farm as a living ecosystem: food, history, youth workforce, airport land, pollinators, marketplace, and community opportunity.</p></Card><Card><h2 className="text-2xl font-black">Airport + Community History Layer</h2><div className="mt-3 grid gap-2">{airportHistory.map((x) => <div key={x} className="rounded-xl bg-slate-50 p-3">{x}</div>)}</div></Card></main>;
+function Almanac() {
+  const weather = useWeather();
+  return (
+    <main className="mx-auto grid max-w-6xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">Living Almanac</h1>
+        <p className="mt-2 text-slate-700">Weather, soil, plant health, water limits, pest observations, and climate learning.</p>
+      </Card>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card><h2 className="text-xl font-black">Weather</h2><p className="mt-2">{weather.loading ? "Loading..." : weather.error || `${weather.temp}°F · Wind ${weather.wind} mph · Rain ${weather.rain}`}</p></Card>
+        <Card><h2 className="text-xl font-black">Field Note</h2><p className="mt-2">Observe before acting. Record living and nonliving connections.</p></Card>
+        <Card><h2 className="text-xl font-black">Climate</h2><p className="mt-2">Heat, water, shade, soil cover, and safe work are local climate lessons.</p></Card>
+      </div>
+    </main>
+  );
 }
 
-function SimplePage({ title, body }: { title: string; body: string }) {
-  return <main className="mx-auto max-w-5xl px-4 py-8"><Card><h1 className="text-4xl font-black">{title}</h1><p className="mt-3 text-slate-700">{body}</p></Card></main>;
+function Completion() {
+  return (
+    <main className="mx-auto grid max-w-5xl gap-5 px-4 py-6">
+      <Card>
+        <h1 className="text-4xl font-black">Completion / Portfolio</h1>
+        <p className="mt-2 text-slate-700">Use workbook answers, supervisor notes, attendance, photos, and skill records to build a resume-ready portfolio.</p>
+      </Card>
+    </main>
+  );
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("portal");
   const [language, setLanguageState] = useState<LanguageCode>(() => readStore(KEYS.language, "en"));
-  const [user, setUser] = useState<AppUser>(() => readStore(KEYS.user, { id: "guest", name: "Guest Visitor", role: "Guest", status: "active" }));
-  const setLanguage = (l: LanguageCode) => { setLanguageState(l); writeStore(KEYS.language, l); };
+  const [user, setUser] = useState<AppUser>(() =>
+    readStore(KEYS.user, { id: "guest", name: "Guest Visitor", role: "Guest", status: "active" })
+  );
+  const [screen, setScreenState] = useState<Screen>(() => readStore(KEYS.screen, "portal"));
+
+  const setLanguage = (l: LanguageCode) => {
+    setLanguageState(l);
+    writeStore(KEYS.language, l);
+  };
+
+  const setScreen = (s: Screen) => {
+    setScreenState(s);
+    writeStore(KEYS.screen, s);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
-    if (user.status === "inactive") setScreen("guest");
-  }, [user.status]);
+    if (!readStore(KEYS.workStatus, null)) writeStore(KEYS.workStatus, defaultWorkStatus());
+    if (!readStore(KEYS.inventory, null)) writeStore(KEYS.inventory, defaultInventory);
+    if (!readStore(KEYS.roster, null)) writeStore(KEYS.roster, defaultRoster);
+  }, []);
 
-  const content = useMemo(() => {
-    switch (screen) {
-      case "portal": return <Portal setScreen={setScreen} setUser={setUser} />;
-      case "roles": return <RoleGate setScreen={setScreen} setUser={setUser} />;
-      case "guest": return <GuestJourney />;
-      case "registration": return <ParentPortal />;
-      case "youth": return <YouthDashboard setScreen={setScreen} />;
-      case "todayWork": return <TodayWork setScreen={setScreen} />;
-      case "workbook": return <Workbook />;
-      case "journey": return <SimplePage title="My Journey" body="Skills, portfolio proof, career pathways, community connection, and legacy reflection are built from saved workbook entries and supervisor records." />;
-      case "parent": return <ParentPortal />;
-      case "supervisor": return <Supervisor />;
-      case "mission": return <MissionControl />;
-      case "marketplace": return <SimplePage title="Marketplace" body="Marketplace operations remain available for produce, events, orders, SNAP-aware planning, and value-added products." />;
-      case "almanac": return <SimplePage title="Almanac" body="Daily farm conditions, sunrise/sunset, heat, wind, rain, water needs, and operating notes should be checked before work begins." />;
-      case "resources": return <SimplePage title="Resources" body="Career pathways, crop planning, companion planting, health and nutrition, parent resources, and youth learning references live here." />;
-      case "events": return <SimplePage title="Events" body="Farm tours, Growers Supply Market, youth showcases, board/funder visits, and community education events are shown here." />;
-      case "completion": return <SimplePage title="Completion" body="Youth can export workbook records, portfolio proof, skills transcript, reflections, and parent-safe summaries." />;
-      default: return <Portal setScreen={setScreen} setUser={setUser} />;
-    }
-  }, [screen]);
+  const effectiveScreen = user.status === "inactive" ? "guest" : screen;
 
   return (
-    <div dir={language === "he" ? "rtl" : "ltr"} className="min-h-screen bg-slate-100 text-slate-950">
-      <Header user={user} setScreen={setScreen} language={language} setLanguage={setLanguage} />
-      <nav className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 py-2 text-sm font-black">
-          {[["Youth", "youth"], ["Today’s Work", "todayWork"], ["Workbook", "workbook"], ["Parent", "parent"], ["Supervisor", "supervisor"], ["Mission", "mission"], ["Guest", "guest"], ["Resources", "resources"]].map(([label, s]) => <button key={s} onClick={() => setScreen(s as Screen)} className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 hover:bg-slate-900 hover:text-white">{label}</button>)}
-        </div>
-      </nav>
-      {content}
-      <footer className="mt-10 border-t border-slate-200 bg-white px-4 py-6 text-center text-sm font-bold text-slate-600">
-        Bronson Family Farm · Farm & Family Alliance · {ECOSYSTEM_BASE_URL} · Supabase {supabase ? "connected" : "fallback local mode"}
+    <div dir={dir(language)} className="min-h-screen bg-slate-100 text-slate-950">
+      <Header user={user} screen={effectiveScreen} setScreen={setScreen} language={language} setLanguage={setLanguage} />
+
+      {effectiveScreen === "portal" && <Portal language={language} setScreen={setScreen} setUser={setUser} />}
+      {effectiveScreen === "guest" && <GuestJourney language={language} setScreen={setScreen} />}
+      {effectiveScreen === "registration" && <Registration setScreen={setScreen} />}
+      {effectiveScreen === "roles" && <RoleGate language={language} setScreen={setScreen} setUser={setUser} />}
+      {effectiveScreen === "youth" && <YouthDashboard language={language} setScreen={setScreen} />}
+      {effectiveScreen === "todayWork" && <TodayWork language={language} setScreen={setScreen} />}
+      {effectiveScreen === "workbook" && <Workbook language={language} />}
+      {effectiveScreen === "journey" && <Journey />}
+      {effectiveScreen === "parent" && <ParentPortal language={language} />}
+      {effectiveScreen === "supervisor" && <SupervisorPortal language={language} />}
+      {effectiveScreen === "mission" && <MissionControl language={language} />}
+      {effectiveScreen === "marketplace" && <Marketplace />}
+      {effectiveScreen === "resources" && <Resources />}
+      {effectiveScreen === "events" && <Events />}
+      {effectiveScreen === "almanac" && <Almanac />}
+      {effectiveScreen === "completion" && <Completion />}
+
+      <footer className="mx-auto max-w-7xl px-4 py-8 text-center text-xs font-bold text-slate-500">
+        Bronson Family Farm · Farm & Family Alliance · Week {getProgramWeek()} · Full replacement App.tsx
       </footer>
     </div>
   );
