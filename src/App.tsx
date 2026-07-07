@@ -10500,11 +10500,23 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   );
 
   const MiniSlider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
-    <label className="rounded-xl border border-white/10 bg-white/10 p-2">
-      <div className="flex justify-between text-[11px] font-black"><span>{label}</span><span>{value}/5</span></div>
-      {value === 0 && <div className="mt-1 text-[10px] font-black uppercase tracking-[0.12em] text-amber-100">Required — choose 1 to 5</div>}
-      <input className="mt-1 w-full" type="range" min={0} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
-    </label>
+    <div className={`rounded-xl border p-2 ${value > 0 ? "border-emerald-200/35 bg-emerald-300/12" : "border-amber-300/45 bg-amber-300/14"}`}>
+      <div className="flex justify-between text-[11px] font-black"><span>{label}</span><span>{value > 0 ? `${value}/5` : "Required"}</span></div>
+      {value === 0 && <div className="mt-1 text-[10px] font-black uppercase tracking-[0.12em] text-amber-100">Tap one number</div>}
+      <div className="mt-2 grid grid-cols-5 gap-1" role="group" aria-label={`${label} rating required`}>
+        {[1, 2, 3, 4, 5].map((rating) => (
+          <button
+            key={rating}
+            type="button"
+            onClick={() => setValue(rating)}
+            className={`rounded-lg px-2 py-2 text-sm font-black ${value === rating ? "bg-emerald-300 text-black" : "bg-black/35 text-white"}`}
+            aria-pressed={value === rating}
+          >
+            {rating}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 
   return (
@@ -10581,8 +10593,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Gloves" checked={workGloves} setChecked={setWorkGloves} />
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
-          <button type="button" onClick={save} disabled={saving || !readyToSave} className="mt-3 w-full rounded-full bg-emerald-300 px-5 py-3 text-base font-black text-black disabled:cursor-not-allowed disabled:opacity-50">
-            {saving ? "Saving..." : readyToSave ? "Begin Today's Mission ✓ Ready to Save" : "Complete Required Items Above"}
+          <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
+            {saving ? "Saving..." : readyToSave ? "Begin Today's Mission ✓ Save" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
           </button>
         </section>
 
@@ -10605,6 +10617,9 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <MiniSlider label="Belonging" value={belonging} setValue={setBelonging} />
             <MiniSlider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
           </div>
+          <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
+            {saving ? "Saving..." : readyToSave ? "Save Check-In + Begin Today's Mission" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
+          </button>
         </section>
       </div>
 
@@ -10620,6 +10635,10 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div>Wellness Completed: {allRequiredWellness ? "✅" : "❌"}</div>
           <div>{readyToSave ? "Ready to Save" : `${remainingRequiredItems.length} required item${remainingRequiredItems.length === 1 ? "" : "s"} remaining`}</div>
         </div>
+        {!readyToSave && <div className="mt-2 text-sm font-bold text-amber-50">Still required: {remainingRequiredItems.join(", ")}</div>}
+        <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
+          {saving ? "Saving..." : readyToSave ? "Save Check-In + Begin Today's Mission" : "Show What Is Still Required"}
+        </button>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
