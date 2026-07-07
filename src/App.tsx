@@ -10349,13 +10349,13 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const [youth, setYouth] = useState<YouthRegistration[]>(() => safeRead<YouthRegistration[]>(YOUTH_KEY, []));
   const [participantId, setParticipantId] = useState(activeUser?.participant_id || "");
   const [mood, setMood] = useState("");
-  const [energy, setEnergy] = useState("Medium");
-  const [sleep, setSleep] = useState("Okay");
-  const [breakfast, setBreakfast] = useState("Yes");
-  const [attitude, setAttitude] = useState("Ready to Learn");
-  const [hope, setHope] = useState(3);
-  const [belonging, setBelonging] = useState(3);
-  const [trustedAdult, setTrustedAdult] = useState(3);
+  const [energy, setEnergy] = useState("");
+  const [sleep, setSleep] = useState("");
+  const [breakfast, setBreakfast] = useState("");
+  const [attitude, setAttitude] = useState("");
+  const [hope, setHope] = useState(0);
+  const [belonging, setBelonging] = useState(0);
+  const [trustedAdult, setTrustedAdult] = useState(0);
   const [closedToeShoes, setClosedToeShoes] = useState(false);
   const [waterBottle, setWaterBottle] = useState(false);
   const [workGloves, setWorkGloves] = useState(false);
@@ -10409,18 +10409,33 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const checkinTime = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   const allRequiredPPE = closedToeShoes && waterBottle && workGloves && appropriateClothing;
   const moodSelected = mood.trim().length > 0;
-  const readyToSave = allRequiredPPE && moodSelected;
+  const energySelected = energy.trim().length > 0;
+  const sleepSelected = sleep.trim().length > 0;
+  const foodSelected = breakfast.trim().length > 0;
+  const attitudeSelected = attitude.trim().length > 0;
+  const hopeAnswered = hope > 0;
+  const belongingAnswered = belonging > 0;
+  const trustedAdultAnswered = trustedAdult > 0;
+  const allRequiredWellness = moodSelected && energySelected && sleepSelected && foodSelected && attitudeSelected && hopeAnswered && belongingAnswered && trustedAdultAnswered;
+  const readyToSave = allRequiredPPE && allRequiredWellness;
   const remainingRequiredItems = [
     !allRequiredPPE ? "PPE check" : "",
-    !moodSelected ? "Mood / readiness" : "",
+    !moodSelected ? "Mood" : "",
+    !energySelected ? "Energy" : "",
+    !sleepSelected ? "Sleep" : "",
+    !foodSelected ? "Food" : "",
+    !attitudeSelected ? "Attitude" : "",
+    !hopeAnswered ? "Hope rating" : "",
+    !belongingAnswered ? "Belonging rating" : "",
+    !trustedAdultAnswered ? "Trusted adult rating" : "",
   ].filter(Boolean);
   const readinessStatus = readyToSave ? "Ready for assignment" : "Required items missing";
-  const safetyFlag = hope <= 1 || trustedAdult <= 1 || !allRequiredPPE || /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(support);
+  const safetyFlag = (hope > 0 && hope <= 1) || (trustedAdult > 0 && trustedAdult <= 1) || !allRequiredPPE || /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(support);
 
   const save = async () => {
     if (saving) return;
     if (!readyToSave) {
-      setMessage(`Required to save: ${remainingRequiredItems.join(" and ")}. Complete the required items before beginning today's mission.`);
+      setMessage(`Required to save today: ${remainingRequiredItems.join(", ")}. These fields start blank each day and must be answered before today's mission opens.`);
       return;
     }
     setSaving(true);
@@ -10487,7 +10502,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const MiniSlider = ({ label, value, setValue }: { label: string; value: number; setValue: (n: number) => void }) => (
     <label className="rounded-xl border border-white/10 bg-white/10 p-2">
       <div className="flex justify-between text-[11px] font-black"><span>{label}</span><span>{value}/5</span></div>
-      <input className="mt-1 w-full" type="range" min={1} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+      {value === 0 && <div className="mt-1 text-[10px] font-black uppercase tracking-[0.12em] text-amber-100">Required — choose 1 to 5</div>}
+      <input className="mt-1 w-full" type="range" min={0} max={5} value={value} onChange={(e) => setValue(Number(e.target.value))} />
     </label>
   );
 
@@ -10574,15 +10590,15 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-100/75">Readiness + Support</div>
           <div className={`mt-3 rounded-2xl border p-3 text-sm font-black ${moodSelected ? "border-emerald-200/30 bg-emerald-300/12 text-emerald-50" : "border-amber-300/40 bg-amber-300/14 text-amber-50"}`}>
             <div className="text-[10px] uppercase tracking-[0.22em] opacity-80">Required to Save</div>
-            <div className="mt-1">Mood / Readiness Selected: {moodSelected ? "✅" : "❌"}</div>
-            {!moodSelected && <div className="mt-1 text-xs leading-5 opacity-90">Select how you feel today before saving. This resets every day.</div>}
+            <div className="mt-1">Daily Wellness Completed: {allRequiredWellness ? "✅" : "❌"}</div>
+            {!allRequiredWellness && <div className="mt-1 text-xs leading-5 opacity-90">Mood, energy, sleep, food, attitude, hope, belonging, and trusted-adult ratings start blank each day and must be answered before saving.</div>}
           </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-5">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
-            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["High", "Medium", "Low", "Very low"]} />
-            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["Good", "Okay", "Poor", "No sleep"]} />
-            <SelectField label="Food" value={breakfast} onChange={setBreakfast} options={["Yes", "No", "Not enough", "Prefer not to say"]} />
-            <SelectField label="Attitude" value={attitude} onChange={setAttitude} options={["Ready to Learn", "Ready to Work", "Need Support", "Not Ready Yet"]} />
+            <SelectField label="Energy" value={energy} onChange={setEnergy} options={["", "High", "Medium", "Low", "Very low"]} />
+            <SelectField label="Sleep" value={sleep} onChange={setSleep} options={["", "Good", "Okay", "Poor", "No sleep"]} />
+            <SelectField label="Food" value={breakfast} onChange={setBreakfast} options={["", "Yes", "No", "Not enough", "Prefer not to say"]} />
+            <SelectField label="Attitude" value={attitude} onChange={setAttitude} options={["", "Ready to Learn", "Ready to Work", "Need Support", "Not Ready Yet"]} />
           </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-3">
             <MiniSlider label="Hope" value={hope} setValue={setHope} />
@@ -10601,7 +10617,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <div className="text-[10px] font-black uppercase tracking-[0.24em] text-white/70">Daily Readiness Status • Required to Save</div>
         <div className="mt-2 grid gap-2 text-sm font-black sm:grid-cols-3">
           <div>PPE Completed: {allRequiredPPE ? "✅" : "❌"}</div>
-          <div>Mood Selected: {moodSelected ? "✅" : "❌"}</div>
+          <div>Wellness Completed: {allRequiredWellness ? "✅" : "❌"}</div>
           <div>{readyToSave ? "Ready to Save" : `${remainingRequiredItems.length} required item${remainingRequiredItems.length === 1 ? "" : "s"} remaining`}</div>
         </div>
       </div>
