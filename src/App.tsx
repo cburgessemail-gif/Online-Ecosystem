@@ -10418,6 +10418,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
   const trustedAdultAnswered = trustedAdult > 0;
   const allRequiredWellness = moodSelected && energySelected && sleepSelected && foodSelected && attitudeSelected && hopeAnswered && belongingAnswered && trustedAdultAnswered;
   const readyToSave = allRequiredPPE && allRequiredWellness;
+  const todayISODate = toLocalISODate(currentTime);
+  const todayAttendanceRows = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []).filter((row) => row.participant_id === selectedYouth.participant_id && row.date === todayISODate);
+  const todayWellnessRows = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []).filter((row) => row.profile_id === profileId && row.created_at?.slice(0, 10) === todayISODate);
+  const latestTodayAttendance = [...todayAttendanceRows].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))[0];
+  const latestTodayWellness = [...todayWellnessRows].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))[0];
+  const alreadySavedToday = Boolean(latestTodayAttendance?.ppe_status === "complete" && latestTodayWellness);
   const remainingRequiredItems = [
     !allRequiredPPE ? "PPE check" : "",
     !moodSelected ? "Mood" : "",
@@ -10429,8 +10435,43 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
     !belongingAnswered ? "Belonging rating" : "",
     !trustedAdultAnswered ? "Trusted adult rating" : "",
   ].filter(Boolean);
-  const readinessStatus = readyToSave ? "Ready for assignment" : "Required items missing";
+  const readinessStatus = readyToSave ? (alreadySavedToday ? "Saved today — ready to continue" : "Ready for assignment") : "Required items missing";
   const safetyFlag = (hope > 0 && hope <= 1) || (trustedAdult > 0 && trustedAdult <= 1) || !allRequiredPPE || /suicide|kill myself|hurt myself|overdose|drugs|unsafe|abuse|homeless|depressed|depression/i.test(support);
+
+  useEffect(() => {
+    if (!selectedYouth?.participant_id || !profileId) return;
+    const today = toLocalISODate(new Date());
+    const savedAttendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, [])
+      .filter((row) => row.participant_id === selectedYouth.participant_id && row.date === today)
+      .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))[0];
+    const savedWellness = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, [])
+      .filter((row) => row.profile_id === profileId && row.created_at?.slice(0, 10) === today)
+      .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))[0];
+
+    // Daily fields begin blank each new date, but once youth complete today's check-in,
+    // their saved answers must repopulate so they are not forced to start over.
+    if (savedAttendance?.ppe_status === "complete") {
+      setClosedToeShoes(true);
+      setWaterBottle(true);
+      setWorkGloves(true);
+      setAppropriateClothing(true);
+    }
+
+    if (savedWellness) {
+      setMood(savedWellness.mood || "");
+      setEnergy(savedWellness.energy || "");
+      setSleep(savedWellness.sleep || "");
+      setBreakfast(savedWellness.breakfast || "");
+      setHope(savedWellness.hope_score || 0);
+      setBelonging(savedWellness.belonging_score || 0);
+      setTrustedAdult(savedWellness.trusted_adult_score || 0);
+      const supportText = savedWellness.support_needed || "";
+      const attitudeMatch = supportText.match(/Attitude:\s*([^|]+)/i);
+      if (attitudeMatch?.[1]) setAttitude(attitudeMatch[1].trim());
+      const goalMatch = supportText.match(/Goal:\s*([^|]+)/i);
+      if (goalMatch?.[1]) setDailyGoal(goalMatch[1].trim());
+    }
+  }, [selectedYouth?.participant_id, profileId]);
 
   const save = async () => {
     if (saving) return;
@@ -10585,7 +10626,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className={`mt-3 rounded-2xl border p-3 text-sm font-black ${allRequiredPPE ? "border-emerald-200/30 bg-emerald-300/12 text-emerald-50" : "border-amber-300/40 bg-amber-300/14 text-amber-50"}`}>
             <div className="text-[10px] uppercase tracking-[0.22em] opacity-80">Required to Save</div>
             <div className="mt-1">PPE Completed: {allRequiredPPE ? "✅" : "❌"}</div>
-            {!allRequiredPPE && <div className="mt-1 text-xs leading-5 opacity-90">Complete boots/shoes, water, gloves, and outdoor clothing before saving.</div>}
+            {!allRequiredPPE && <div className="mt-1 text-xs leading-5 opacity-90">Complete boots/shoes, water, gloves, and outdoor clothing before saving. Once saved today, PPE stays saved for today.</div>}
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <Toggle label="Boots / Shoes" checked={closedToeShoes} setChecked={setClosedToeShoes} />
@@ -10594,7 +10635,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
           <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-            {saving ? "Saving..." : readyToSave ? "Begin Today's Mission ✓ Save" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
+            {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Begin Today's Mission ✓ Save" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
           </button>
         </section>
 
@@ -10603,7 +10644,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
           <div className={`mt-3 rounded-2xl border p-3 text-sm font-black ${moodSelected ? "border-emerald-200/30 bg-emerald-300/12 text-emerald-50" : "border-amber-300/40 bg-amber-300/14 text-amber-50"}`}>
             <div className="text-[10px] uppercase tracking-[0.22em] opacity-80">Required to Save</div>
             <div className="mt-1">Daily Wellness Completed: {allRequiredWellness ? "✅" : "❌"}</div>
-            {!allRequiredWellness && <div className="mt-1 text-xs leading-5 opacity-90">Mood, energy, sleep, food, attitude, hope, belonging, and trusted-adult ratings start blank each day and must be answered before saving.</div>}
+            {!allRequiredWellness && <div className="mt-1 text-xs leading-5 opacity-90">Mood, energy, sleep, food, attitude, hope, belonging, and trusted-adult ratings start blank each new day. Once saved today, they stay saved so youth do not start over.</div>}
           </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-5">
             <SelectField label="Mood" value={mood} onChange={setMood} options={["", "Great", "Good", "Okay", "Tired", "Sad", "Angry", "Worried", "Overwhelmed"]} />
@@ -10618,7 +10659,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <MiniSlider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
           </div>
           <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-            {saving ? "Saving..." : readyToSave ? "Save Check-In + Begin Today's Mission" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
+            {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Save Check-In + Begin Today's Mission" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
           </button>
         </section>
       </div>
@@ -10633,11 +10674,11 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         <div className="mt-2 grid gap-2 text-sm font-black sm:grid-cols-3">
           <div>PPE Completed: {allRequiredPPE ? "✅" : "❌"}</div>
           <div>Wellness Completed: {allRequiredWellness ? "✅" : "❌"}</div>
-          <div>{readyToSave ? "Ready to Save" : `${remainingRequiredItems.length} required item${remainingRequiredItems.length === 1 ? "" : "s"} remaining`}</div>
+          <div>{alreadySavedToday ? "Saved today ✓" : readyToSave ? "Ready to Save" : `${remainingRequiredItems.length} required item${remainingRequiredItems.length === 1 ? "" : "s"} remaining`}</div>
         </div>
         {!readyToSave && <div className="mt-2 text-sm font-bold text-amber-50">Still required: {remainingRequiredItems.join(", ")}</div>}
         <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-          {saving ? "Saving..." : readyToSave ? "Save Check-In + Begin Today's Mission" : "Show What Is Still Required"}
+          {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Save Check-In + Begin Today's Mission" : "Show What Is Still Required"}
         </button>
       </div>
 
