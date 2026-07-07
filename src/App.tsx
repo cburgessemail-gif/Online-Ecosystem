@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 13.1 - WORKBOOK MASTER FULL REPLACEMENT + FIELD INVESTIGATION ENGINE
+ * CULTIVATOR ECOSYSTEM 14.1 - YOUTH PROGRESS + RESUME MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -57,6 +57,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 12.0: July 2 auto-advance lock: Thursday 7/2 renders Week 4 Thursday Production Area Maintenance & Plant Health, with July 1 assignments archived after midnight.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
  * - Ecosystem 13.1: Makes the youth workbook the central operating system. Field work, forest discoveries, pest traps, questions, reflections, journey, and portfolio evidence flow into one downloadable workbook record.
+ * - Ecosystem 14.1: Fixes youth restart/progression failure. Responses auto-save, completion flags are recorded, next-step cards appear, and youth can resume where they left off.
  */
 
 type Screen =
@@ -397,6 +398,7 @@ const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
 const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
 const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
+const YOUTH_RESUME_KEY = "bff.launch.youthResumeState.v14_1";
 const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
 const PARENT_NOTIFICATION_KEY = "bff.launch.parentNotifications";
 const BROADCAST_MESSAGE_KEY = "bff.launch.broadcastMessages";
@@ -3808,6 +3810,55 @@ function recordCompletion(pathway: string, user?: EcosystemUser | null) {
   safeWrite(COMPLETION_KEY, [row, ...rows].slice(0, 250));
 }
 
+type YouthResumeStage = "today-work" | "learning" | "media" | "reflection" | "complete";
+
+type YouthResumeState = {
+  participant_id: string;
+  user_name: string;
+  date: string;
+  stage: YouthResumeStage;
+  message: string;
+  completed_work: number;
+  total_work: number;
+  learning_answers: number;
+  updated_at: string;
+};
+
+function resumeKeyFor(activeUser?: EcosystemUser | null) {
+  return `${YOUTH_RESUME_KEY}.${todayISO()}.${launchParticipantId(activeUser)}`;
+}
+
+function saveYouthResumeState(activeUser: EcosystemUser | null | undefined, patch: Partial<YouthResumeState>) {
+  const key = resumeKeyFor(activeUser);
+  const existing = safeRead<YouthResumeState | null>(key, null);
+  const next: YouthResumeState = {
+    participant_id: launchParticipantId(activeUser),
+    user_name: launchParticipantName(activeUser),
+    date: todayISO(),
+    stage: patch.stage || existing?.stage || "today-work",
+    message: patch.message || existing?.message || "Start with today’s work.",
+    completed_work: patch.completed_work ?? existing?.completed_work ?? 0,
+    total_work: patch.total_work ?? existing?.total_work ?? 0,
+    learning_answers: patch.learning_answers ?? existing?.learning_answers ?? 0,
+    updated_at: new Date().toISOString(),
+  };
+  safeWrite(key, next);
+  return next;
+}
+
+function readYouthResumeState(activeUser?: EcosystemUser | null) {
+  return safeRead<YouthResumeState | null>(resumeKeyFor(activeUser), null);
+}
+
+function recordCompletionOnce(pathway: string, user?: EcosystemUser | null) {
+  const rows = safeRead<CompletionRecord[]>(COMPLETION_KEY, []);
+  const userId = user?.id || launchParticipantId(user);
+  const today = todayISO();
+  const alreadyDone = rows.some((row) => row.pathway === pathway && (row.user_id === userId || row.user_id === user?.id) && row.completed_at.slice(0, 10) === today);
+  if (alreadyDone) return;
+  recordCompletion(pathway, user);
+}
+
 function supabaseTableCandidates(table: string) {
   const aliases: Record<string, string[]> = {
     attendance: ["attendance_records", "attendance"],
@@ -4235,14 +4286,46 @@ function CurriculumEvidenceCaptureCard() {
   );
 }
 
-function CurriculumReflectionCard() {
+function CurriculumReflectionCard({ activeUser }: { activeUser?: EcosystemUser | null }) {
+  const question = "What did you prepare today that will help the farm tomorrow?";
+  const participantId = launchParticipantId(activeUser);
+  const saved = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === participantId && row.category === "End-of-Day Reflection" && row.question === question);
+  const [reflection, setReflection] = useState(saved?.response || "");
+  const [message, setMessage] = useState(saved ? "Saved ✓ Resume available" : "");
+
+  async function saveReflection() {
+    const clean = reflection.trim();
+    if (!clean) {
+      setMessage("Write one sentence before saving.");
+      return;
+    }
+    const current = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const row: CultivatorDiscovery = {
+      id: saved?.id || uuid(),
+      participant_id: participantId,
+      user_name: launchParticipantName(activeUser),
+      date: todayISO(),
+      category: "End-of-Day Reflection",
+      question,
+      response: clean,
+      source: "Reflection",
+      created_at: saved?.created_at || new Date().toISOString(),
+    };
+    const nextRows = [row, ...current.filter((item) => item.id !== row.id)].slice(0, 500);
+    safeWrite(DISCOVERY_KEY, nextRows);
+    recordCompletionOnce("daily-reflection-complete", activeUser);
+    saveYouthResumeState(activeUser, { stage: "complete", message: "Reflection saved. Day complete ✓" });
+    setMessage("Saved ✓ Reflection added to My Journey. Day complete.");
+  }
+
   return (
     <section className="mt-6 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">End-of-Day Reflection</div>
       <h2 className="mt-2 text-3xl font-black">Connect Today's Work to the Future</h2>
-      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">What did you prepare today that will help the farm tomorrow?</p>
-      <textarea placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
-      <button type="button" className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
+      <p className="mt-4 rounded-2xl bg-black/25 p-4 text-lg font-black">{question}</p>
+      <textarea value={reflection} onChange={(event) => setReflection(event.target.value)} placeholder="Write or dictate your answer here..." className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white" />
+      <button type="button" onClick={saveReflection} className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save Reflection to My Journey</button>
+      {message && <div className="mt-3 rounded-xl border border-purple-200/25 bg-black/25 p-3 text-sm font-black text-purple-50">{message}</div>}
     </section>
   );
 }
@@ -7710,8 +7793,15 @@ function InteractiveLearningCard({
       created_at: new Date().toISOString(),
     };
     const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
+    const learningAnswers = todayDiscoveries(activeUser).length + 1;
+    saveYouthResumeState(activeUser, {
+      stage: "learning",
+      learning_answers: learningAnswers,
+      message: "Answer saved ✓ Choose another question or continue to the next step.",
+    });
     setResponse("");
-    setStatus(saveModeMessage("Response", result));
+    setOpen(false);
+    setStatus(`${saveModeMessage("Response", result)} Continue to the next question.`);
     onSaved();
   }
 
@@ -7762,13 +7852,22 @@ function InteractiveLearningCard({
   );
 }
 
-function WorkCompletionChecklist({ items, activeUser }: { items: string[]; activeUser?: EcosystemUser | null }) {
+function WorkCompletionChecklist({ items, activeUser, onProgress }: { items: string[]; activeUser?: EcosystemUser | null; onProgress?: (completed: number, total: number, percent: number) => void }) {
   const [rows, setRows] = useState<WorkCompletionRecord[]>(() => todaysWorkCompletionRows(activeUser));
   const participantId = launchParticipantId(activeUser);
   const completedItems = new Set(rows.filter((row) => row.completed).map((row) => row.item));
   const total = Math.max(items.length, 1);
   const completed = items.filter((item) => completedItems.has(item)).length;
   const percent = Math.round((completed / total) * 100);
+
+  useEffect(() => {
+    const freshRows = todaysWorkCompletionRows(activeUser);
+    setRows(freshRows);
+  }, [participantId]);
+
+  useEffect(() => {
+    onProgress?.(completed, items.length, percent);
+  }, [completed, items.length, percent]);
 
   function toggleItem(item: string) {
     const currentRows = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []);
@@ -7789,7 +7888,21 @@ function WorkCompletionChecklist({ items, activeUser }: { items: string[]; activ
       nextRows = [row, ...currentRows];
     }
     safeWrite(WORK_COMPLETION_KEY, nextRows.slice(0, 500));
-    setRows(nextRows.filter((row) => row.date === todayISO() && row.participant_id === participantId));
+    const todayRows = nextRows.filter((row) => row.date === todayISO() && row.participant_id === participantId);
+    const nextCompletedItems = new Set(todayRows.filter((row) => row.completed).map((row) => row.item));
+    const nextCompleted = items.filter((workItem) => nextCompletedItems.has(workItem)).length;
+    const nextPercent = Math.round((nextCompleted / total) * 100);
+    setRows(todayRows);
+    saveYouthResumeState(activeUser, {
+      stage: nextCompleted >= items.length ? "reflection" : "today-work",
+      completed_work: nextCompleted,
+      total_work: items.length,
+      message: nextCompleted >= items.length ? "Today’s work is complete ✓ Continue to reflection or share a photo." : `Saved ✓ ${nextCompleted} of ${items.length} work items complete.`,
+    });
+    if (nextCompleted >= items.length && items.length > 0) {
+      recordCompletionOnce("today-work-complete", activeUser);
+    }
+    onProgress?.(nextCompleted, items.length, nextPercent);
   }
 
   return (
@@ -7823,7 +7936,25 @@ function WorkCompletionChecklist({ items, activeUser }: { items: string[]; activ
 function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser?: EcosystemUser | null }) {
   const todayPlan = getCurrentYouthPlan();
   const [discoveries, setDiscoveries] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
-  const refreshDiscoveries = () => setDiscoveries(todayDiscoveries(activeUser));
+  const [resumeState, setResumeState] = useState<YouthResumeState | null>(() => readYouthResumeState(activeUser));
+  const [workProgress, setWorkProgress] = useState(() => {
+    const items = getCurrentYouthPlan().work.slice(0, 8);
+    const rows = todaysWorkCompletionRows(activeUser);
+    const completedSet = new Set(rows.filter((row) => row.completed).map((row) => row.item));
+    const completed = items.filter((item) => completedSet.has(item)).length;
+    return { completed, total: items.length, percent: items.length ? Math.round((completed / items.length) * 100) : 0 };
+  });
+  const refreshDiscoveries = () => {
+    const nextDiscoveries = todayDiscoveries(activeUser);
+    setDiscoveries(nextDiscoveries);
+    setResumeState(saveYouthResumeState(activeUser, { learning_answers: nextDiscoveries.length, message: "Response saved ✓ Continue to the next question or next step." }));
+  };
+  const updateWorkProgress = (completed: number, total: number, percent: number) => {
+    setWorkProgress({ completed, total, percent });
+    setResumeState(readYouthResumeState(activeUser));
+  };
+  const workComplete = workProgress.total > 0 && workProgress.completed >= workProgress.total;
+  const learningStarted = discoveries.length > 0;
   const todayResources = [
     { title: "What Changed?", body: "Notice something today that is different than yesterday.", question: "What changed that most people would miss?", icon: "👀" },
     { title: "Forest → Farm Connection", body: "Yesterday's forest walk should help us understand today's farm work.", question: "What can the farm learn from the forest?", icon: "🌲" },
@@ -7842,6 +7973,17 @@ function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen
       <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-700">Launch Mode • Start Here</div>
       <h2 className="mt-2 text-3xl font-black">Today’s Work</h2>
       <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Youth can work, learn, answer questions, take photos, reflect, and get help without hunting.</p>
+
+      <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+        <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Resume Where I Left Off</div>
+        <div className="mt-1 text-lg font-black text-slate-950">{resumeState?.message || "Start with today’s work. The ecosystem saves each step."}</div>
+        <div className="mt-2 text-sm font-bold text-slate-700">Work: {workProgress.completed}/{workProgress.total} complete • Learning answers saved: {discoveries.length}</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {!workComplete && <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white">Continue Today’s Work</button>}
+          {workComplete && !learningStarted && <button type="button" onClick={() => setScreen("resources")} className="rounded-full bg-blue-700 px-4 py-2 text-sm font-black text-white">Continue to Learning</button>}
+          {workComplete && <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-purple-700 px-4 py-2 text-sm font-black text-white">Continue to Reflection</button>}
+        </div>
+      </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
         <button type="button" onClick={() => setScreen("youth")} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left shadow-sm hover:bg-emerald-100">
@@ -7866,9 +8008,19 @@ function LaunchMorningMyDayPanel({ setScreen, activeUser }: { setScreen: (screen
           <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Today’s Work</div>
           <p className="mt-2 text-sm font-bold leading-6 text-slate-700">Tap each item when it is completed.</p>
           <div className="mt-3">
-            <WorkCompletionChecklist items={todayPlan.work.slice(0, 8)} activeUser={activeUser} />
+            <WorkCompletionChecklist items={todayPlan.work.slice(0, 8)} activeUser={activeUser} onProgress={updateWorkProgress} />
           </div>
-          <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold text-slate-700">Start at the Morning Huddle. Bring water, closed-toe shoes, and gloves if needed.</div>
+          {workComplete ? (
+            <div className="mt-3 rounded-xl border border-emerald-300 bg-white p-4 text-sm font-black text-emerald-900">
+              Today’s work is complete ✓ Your next step is reflection or Share My Learning.
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-purple-700 px-4 py-2 text-xs font-black text-white">Continue to Reflection</button>
+                <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-slate-900 px-4 py-2 text-xs font-black text-white">Share a Photo</button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-3 rounded-xl bg-white p-3 text-sm font-bold text-slate-700">Start at the Morning Huddle. Bring water, closed-toe shoes, and gloves if needed.</div>
+          )}
         </div>
         <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">Today’s Learning Questions</div>
@@ -8053,8 +8205,16 @@ function Launch60DailyRhythmCard({ todayPlan, currentWeek, setScreen }: { todayP
 
 
 function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUser }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [completed, setCompleted] = useState<Record<string, boolean>>({});
-  const [reflection, setReflection] = useState("");
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    const participantId = activeUser?.participant_id || activeUser?.id || "youth-device";
+    const todayRows = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []).filter((row) => row.date === todayISO() && row.participant_id === participantId && row.completed);
+    return todayRows.reduce<Record<string, boolean>>((acc, row) => ({ ...acc, [row.item]: true }), {});
+  });
+  const [reflection, setReflection] = useState(() => {
+    const participantId = activeUser?.participant_id || activeUser?.id || "youth-device";
+    const saved = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === participantId && row.category === "Daily Reflection" && row.question === todayPlan.reflection);
+    return saved?.response || "";
+  });
   const [savedMessage, setSavedMessage] = useState("");
   const workItems = todayPlan.work || [];
   const doneCount = workItems.filter((item) => completed[item]).length;
@@ -8069,7 +8229,10 @@ function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUs
       completed: Boolean(completed[item]),
       created_at: now,
     }));
-    safeWrite(WORK_COMPLETION_KEY, [...rows, ...safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, [])].slice(0, 500));
+    const participantId = activeUser?.participant_id || activeUser?.id || "youth-device";
+    const previousRows = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []);
+    const withoutTodayDuplicates = previousRows.filter((row) => !(row.date === now.slice(0, 10) && row.participant_id === participantId && workItems.includes(row.item)));
+    safeWrite(WORK_COMPLETION_KEY, [...rows, ...withoutTodayDuplicates].slice(0, 500));
     if (reflection.trim()) {
       const discovery: CultivatorDiscovery = {
         id: uuid(),
@@ -8084,7 +8247,16 @@ function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUs
       };
       safeWrite(DISCOVERY_KEY, [discovery, ...safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, [])].slice(0, 250));
     }
-    setSavedMessage(`Saved ${doneCount} completed item${doneCount === 1 ? "" : "s"}.`);
+    const allWorkDone = workItems.length > 0 && doneCount >= workItems.length;
+    if (allWorkDone) recordCompletionOnce("today-work-complete", activeUser);
+    if (reflection.trim()) recordCompletionOnce("daily-reflection-complete", activeUser);
+    saveYouthResumeState(activeUser, {
+      stage: allWorkDone && reflection.trim() ? "complete" : allWorkDone ? "reflection" : "today-work",
+      completed_work: doneCount,
+      total_work: workItems.length,
+      message: allWorkDone && reflection.trim() ? "Today’s work and reflection are saved ✓ Day complete." : allWorkDone ? "Today’s work is complete ✓ Finish reflection next." : `Saved ✓ ${doneCount} of ${workItems.length} work items complete.`,
+    });
+    setSavedMessage(allWorkDone && reflection.trim() ? "Saved ✓ Today’s work and reflection are complete." : `Saved ✓ ${doneCount} completed item${doneCount === 1 ? "" : "s"}.`);
   };
 
   return (
@@ -8117,6 +8289,15 @@ function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUs
         <div className="mt-2 text-sm font-black leading-6 text-white/82">{todayPlan.reflection}</div>
         <textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder="Type your answer here. Youth can write one sentence or more." className="mt-3 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white outline-none placeholder:text-white/40 focus:border-emerald-200" />
         {savedMessage && <div className="mt-3 rounded-xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-black text-emerald-50">{savedMessage}</div>}
+        {doneCount >= workItems.length && workItems.length > 0 && (
+          <div className="mt-3 rounded-xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-black text-emerald-50">
+            Today’s assignment is complete ✓
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-white px-4 py-2 text-xs font-black text-slate-950">Share Photo / Video</button>
+              <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-purple-300 px-4 py-2 text-xs font-black text-black">Continue to Reflection</button>
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -8590,7 +8771,7 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
         <div className="mt-4 grid gap-3">
           <InfoToShareLaunch60Card />
           <YouthEvidenceUploadCard activeUser={activeUser} />
-          <CurriculumReflectionCard />
+          <CurriculumReflectionCard activeUser={activeUser} />
           <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
           <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
           <Launch60EndMyDayCard />
