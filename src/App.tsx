@@ -398,6 +398,7 @@ const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
 const DISCOVERY_KEY = "bff.launch.cultivatorDiscoveries";
 const WORK_COMPLETION_KEY = "bff.launch.workCompletions";
+const MISSION_PROGRESS_KEY = "bff.launch.missionProgress.v14_5";
 const YOUTH_RESUME_KEY = "bff.launch.youthResumeState.v14_1";
 const SUPERVISOR_ACCESS_KEY = "bff.launch.supervisorAccessPins";
 const PARENT_NOTIFICATION_KEY = "bff.launch.parentNotifications";
@@ -8490,12 +8491,35 @@ const KNOWLEDGE_DRAWERS_13 = [
 ];
 
 function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
-  const [stopIndex, setStopIndex] = useState(0);
+  const [stopIndex, setStopIndex] = useState(() => {
+    try {
+      const key = `${MISSION_PROGRESS_KEY}.${todayISO()}.${launchParticipantId(activeUser)}`;
+      const savedIndex = Number(localStorage.getItem(key) || "0");
+      return Number.isFinite(savedIndex) ? Math.max(0, Math.min(FIELD_MISSION_STOPS_13.length - 1, savedIndex)) : 0;
+    } catch {
+      return 0;
+    }
+  });
   const [response, setResponse] = useState("");
   const [status, setStatus] = useState("");
   const [saved, setSaved] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
   const [openDrawer, setOpenDrawer] = useState<string | null>(null);
   const stop = FIELD_MISSION_STOPS_13[stopIndex];
+
+  function rememberMissionStep(nextIndex: number) {
+    try {
+      const key = `${MISSION_PROGRESS_KEY}.${todayISO()}.${launchParticipantId(activeUser)}`;
+      localStorage.setItem(key, String(Math.max(0, Math.min(FIELD_MISSION_STOPS_13.length - 1, nextIndex))));
+    } catch {
+      // localStorage may be unavailable in private mode; do not block youth progress.
+    }
+  }
+
+  function goToMissionStep(nextIndex: number) {
+    const bounded = Math.max(0, Math.min(FIELD_MISSION_STOPS_13.length - 1, nextIndex));
+    rememberMissionStep(bounded);
+    setStopIndex(bounded);
+  }
   const progress = Math.round(((stopIndex + 1) / FIELD_MISSION_STOPS_13.length) * 100);
   const previousDisabled = stopIndex === 0;
   const nextLabel = stopIndex === FIELD_MISSION_STOPS_13.length - 1 ? "Complete Day" : "Next";
@@ -8520,18 +8544,53 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
     const result = await insertRow("cultivator_discoveries", DISCOVERY_KEY, row);
     setSaved((rows) => [row, ...rows].slice(0, 60));
     setResponse("");
-    setStatus(saveModeMessage("Workbook + portfolio entry", result));
+    setStatus("Saved ✓ Moving to the next step.");
     return true;
   }
 
-  async function saveAndNext() {
-    if (response.trim()) await saveResponse();
-    setStatus("");
+  async function advanceAfterSave() {
     if (stopIndex < FIELD_MISSION_STOPS_13.length - 1) {
-      setStopIndex((value) => value + 1);
+      goToMissionStep(stopIndex + 1);
+      window.setTimeout(() => setStatus(""), 900);
       return;
     }
+    try {
+      const row = {
+        id: uuid(),
+        participant_id: launchParticipantId(activeUser),
+        user_name: launchParticipantName(activeUser),
+        date: todayISO(),
+        item: "Today's micro-mission completed",
+        completed: true,
+        created_at: new Date().toISOString(),
+      };
+      await insertRow("work_completions", WORK_COMPLETION_KEY, row);
+    } catch {
+      // Completion should never block the youth from reaching the next screen.
+    }
     setScreen("feedback");
+  }
+
+  async function saveAndNext() {
+    const alreadySavedThisStop = saved.some((row) => row.category === stop.title);
+    if (response.trim()) {
+      const ok = await saveResponse();
+      if (!ok) return;
+      await advanceAfterSave();
+      return;
+    }
+    if (!alreadySavedThisStop) {
+      setStatus("Save one answer first so your workbook does not lose your work.");
+      return;
+    }
+    setStatus("Continuing to the next step.");
+    await advanceAfterSave();
+  }
+
+  async function saveOnlyButProceed() {
+    const ok = await saveResponse();
+    if (!ok) return;
+    await advanceAfterSave();
   }
 
   const stopResponses = saved.filter((row) => row.category === stop.title);
@@ -8586,8 +8645,8 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
         <div className="mt-5 grid gap-3">
           <textarea value={response} onChange={(event) => setResponse(event.target.value)} rows={4} placeholder="Write one answer, observation, question, or voice-note summary..." className="w-full rounded-[1.15rem] border border-white/10 bg-white p-4 text-base font-bold text-slate-950 outline-none focus:border-emerald-400" />
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => saveResponse()} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Save</button>
-            <button type="button" disabled={previousDisabled} onClick={() => setStopIndex((value) => Math.max(0, value - 1))} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white disabled:opacity-40">Back</button>
+            <button type="button" onClick={saveOnlyButProceed} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Save + Continue</button>
+            <button type="button" disabled={previousDisabled} onClick={() => goToMissionStep(stopIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white disabled:opacity-40">Back</button>
             <button type="button" onClick={saveAndNext} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">{nextLabel}</button>
             {status && <span className="text-xs font-black text-emerald-50">{status}</span>}
           </div>
