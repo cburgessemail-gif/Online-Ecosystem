@@ -423,8 +423,8 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
 
 export default function App() {
   const [lang, setLang] = useState<Lang>('en');
-  const [role, setRole] = useState<Role>('guest');
-  const [view, setView] = useState<View>('portal');
+  const [role, setRole] = useState<Role>('youth');
+  const [view, setView] = useState<View>('dashboard');
   const [history, setHistory] = useState<View[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<string>('zone5-melons');
   const [resourceSearch, setResourceSearch] = useState('');
@@ -469,13 +469,14 @@ export default function App() {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="text-lg font-black tracking-tight">{t(lang, 'welcome')}</div>
-          <div className="text-sm text-green-100">Master Launch Replacement 14.0 · Week {programDay.week} · {programDay.dateLabel}</div>
+          <div className="text-sm text-green-100">Master Launch Replacement 14.0 · Curriculum opens first · Week {programDay.week} · {programDay.dateLabel}</div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="rounded-xl border border-green-700 bg-white px-3 py-2 text-sm text-green-950">
             {Object.entries(languages).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
           </select>
-          {view !== 'portal' && <button onClick={() => go('dashboard')} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-green-950">{t(lang, 'home')}</button>}
+          {view !== 'dashboard' && <button onClick={() => go('dashboard')} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-green-950">{t(lang, 'home')}</button>}
+          <button onClick={() => go('role')} className="rounded-xl bg-green-800 px-3 py-2 text-sm font-bold">Switch Role</button>
           {history.length > 0 && <button onClick={back} className="rounded-xl bg-green-800 px-3 py-2 text-sm font-bold">{t(lang, 'back')}</button>}
         </div>
       </div>
