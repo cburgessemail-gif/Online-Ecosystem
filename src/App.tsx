@@ -5842,13 +5842,13 @@ function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: Retu
         <div className="rounded-xl border border-white/10 bg-white/10 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Skills Used Today</div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {cultivatorSkillOptions.map((skill) => <span key={skill} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">☐ {skill}</span>)}
+            {cultivatorSkillOptions.map((skill) => <span key={skill} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{skill}</span>)}
           </div>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/10 p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/70">Who Am I Becoming?</div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {cultivatorBecomingOptions.map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">☐ {item}</span>)}
+            {cultivatorBecomingOptions.map((item) => <span key={item} className="rounded-full bg-black/25 px-2 py-1 text-[11px] font-bold">{item}</span>)}
           </div>
         </div>
         <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3">
@@ -7726,7 +7726,7 @@ function ToolStewardshipLaunchCard({ endOfDay = false }: { endOfDay?: boolean })
       <p className="mt-2 text-sm leading-6 text-white/78">A Cultivator cares for tools, resources, people, and opportunities.</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {(endOfDay ? options : tools).map((item) => (
-          <div key={item} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">☐ {item}</div>
+          <div key={item} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">{item}</div>
         ))}
       </div>
     </Card>
@@ -8840,7 +8840,7 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
         <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-100/80">Monday Reopen Ready</div>
         <div className="mt-2 text-2xl font-black">Forest Investigation Continued</div>
         <div className="mt-3 grid gap-2 md:grid-cols-4">
-          {["Where do trees get water?", "Do bones decompose?", "What is forest soil made of?", "What insects are in our pest traps?"].map((question) => <div key={question} className="rounded-xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">☐ {question}</div>)}
+          {["Where do trees get water?", "Do bones decompose?", "What is forest soil made of?", "What insects are in our pest traps?"].map((question) => <button key={question} type="button" className="rounded-xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{question}</button>)}
         </div>
       </div>
 
@@ -8979,7 +8979,7 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
           <p className="mt-2 text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
           <div className="mt-4 grid gap-2 md:grid-cols-2">
             {(todayPlan.work || []).slice(0, 6).map((item) => (
-              <button key={item} type="button" onClick={() => setScreen("youth")} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-left text-sm font-bold text-white/84 hover:bg-white/12">☐ {item}</button>
+              <button key={item} type="button" onClick={() => setScreen("youth")} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-left text-sm font-bold text-white/84 hover:bg-white/12">{item}</button>
             ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -9006,7 +9006,7 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
           <div className="mt-2 text-2xl font-black">{communityConnection.topic}</div>
           <p className="mt-2 text-sm font-bold leading-6 text-white/82">{communityConnection.prompt}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {communityConnection.examples.map((item) => <span key={item} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-white/80">☐ {item}</span>)}
+            {communityConnection.examples.map((item) => <span key={item} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-black text-white/80">{item}</span>)}
           </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black leading-6 text-white/84">Core question: What did this teach me about the place where I live?</div>
         </div>
@@ -9016,7 +9016,7 @@ function YouthProgressiveDiscoveryDashboard({ setScreen, activeUser, todayPlan, 
           <div className="mt-2 text-2xl font-black">Where can this lead?</div>
           <p className="mt-2 text-sm font-bold leading-6 text-white/82">Today’s farm work connects to environmental science, horticulture, urban forestry, conservation, park stewardship, public health, trades, and entrepreneurship.</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {["What skill did I practice?", "Who gets paid to understand this?", "What became better because I helped?", "What will I notice differently now?"].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">☐ {item}</div>)}
+            {["What skill did I practice?", "Who gets paid to understand this?", "What became better because I helped?", "What will I notice differently now?"].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm font-bold text-white/84">{item}</div>)}
           </div>
         </div>
       </div>
@@ -10872,7 +10872,7 @@ function ActiveCurriculumProjectCard({ setScreen, compact = false }: { setScreen
         <div className="rounded-[1.25rem] border border-white/10 bg-amber-300/12 p-4">
           <h3 className="font-black">Completion Evidence</h3>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
-            {activities.flatMap((activity) => activity.evidenceRequired.map((item) => `${activity.icon} ${item}`)).slice(0, 8).map((item) => <li key={item}>☐ {item}</li>)}
+            {activities.flatMap((activity) => activity.evidenceRequired.map((item) => `${activity.icon} ${item}`)).slice(0, 8).map((item) => <li key={item}>• {item}</li>)}
           </ul>
         </div>
       </div>
