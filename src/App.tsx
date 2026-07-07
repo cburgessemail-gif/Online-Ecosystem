@@ -4653,23 +4653,23 @@ function Launch62MyJourneyPanel({ compact = false }: { compact?: boolean }) {
   const currentWeekNumber = getCurrentProgramWeek();
   return (
     <Card className="p-4 md:p-5">
-      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-100/75">My Journey • Permanent Curriculum Record</div>
-      <h2 className="mt-2 text-3xl font-black">The curriculum never disappears</h2>
-      <p className="mt-3 text-sm font-bold leading-6 text-white/75">
-        Current Week opens automatically. Previous weeks stay available. Future weeks are visible as Coming Soon. Photos, reflections, skills, and portfolio evidence remain attached to their original week.
-      </p>
+      <h2 className="text-3xl font-black">My Curriculum</h2>
       <div className={`mt-5 grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-4"}`}>
         {youthCurriculumWeeks.map((week) => {
           const isCurrent = week.week === currentWeekNumber;
           const isPast = week.week < currentWeekNumber;
           return (
             <details key={week.week} className={`rounded-2xl border p-4 ${isCurrent ? "border-emerald-200/40 bg-emerald-300/14" : isPast ? "border-cyan-200/30 bg-cyan-300/10" : "border-white/10 bg-white/10"}`} open={isCurrent && !compact}>
-              <summary className="cursor-pointer font-black">Week {week.week}: {week.title}</summary>
-              <div className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-white/55">{isCurrent ? "Current" : isPast ? "Completed" : "Coming Soon"}</div>
-              <p className="mt-2 text-sm leading-6 text-white/78">{week.focus}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {week.skills.map((skill) => <span key={skill} className="rounded-full bg-black/25 px-3 py-1 text-[11px] font-black">{skill}</span>)}
-              </div>
+              <summary className="cursor-pointer font-black">▶ Week {week.week}: {week.title} {isCurrent && <span className="ml-2 rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-black text-white">Current</span>}</summary>
+              {!compact && (
+                <div className="mt-3 grid gap-2 text-sm font-bold text-white/82">
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">Today's Activities</button>
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Photos</button>
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Reflections</button>
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Skills</button>
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Portfolio</button>
+                </div>
+              )}
             </details>
           );
         })}
@@ -7370,6 +7370,48 @@ function GrowingCenterPanel({ setScreen, compact = false }: { setScreen: (screen
 }
 
 
+
+function ResourceSearchPanel() {
+  const [query, setQuery] = useState("");
+  const clean = query.trim().toLowerCase();
+  const results = useMemo(() => {
+    if (!clean) return [];
+    const registryResults = bronsonActivityRegistry.flatMap((entry) => {
+      const pool = [entry.label, ...entry.knowledge, ...entry.skills, ...entry.careers, ...entry.entrepreneurship, ...entry.resources.map((resource) => `${resource.title} ${resource.note}`)].join(" ");
+      if (!pool.toLowerCase().includes(clean)) return [];
+      return [{ title: entry.label, type: "Activity", body: entry.resources.map((resource) => resource.title).join(" • ") || entry.reflectionPrompt }];
+    });
+    const drawerResults = KNOWLEDGE_DRAWERS_13.flatMap((item) => `${item.title} ${item.body}`.toLowerCase().includes(clean) ? [{ title: item.title, type: "Knowledge", body: item.body }] : []);
+    const companionResults = launch62CompanionCropCards.flatMap((card) => `${card.crop} ${card.companions.join(" ")} ${card.avoid.join(" ")} ${card.nutrition}`.toLowerCase().includes(clean) ? [{ title: card.crop, type: "Companion Planting", body: `Good companions: ${card.companions.join(", ")}. Avoid: ${card.avoid.join(", ")}.` }] : []);
+    return [...drawerResults, ...registryResults, ...companionResults].slice(0, 12);
+  }, [clean]);
+
+  return (
+    <Card className="p-4 md:p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Search</div>
+      <h2 className="mt-2 text-3xl font-black">Find what you need</h2>
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search Miracle-Gro, bees, mulch, potatoes, pest traps, pollinators..."
+        className="mt-4 w-full rounded-2xl border border-white/10 bg-white p-4 text-base font-black text-slate-950 outline-none focus:border-emerald-400"
+      />
+      {clean && (
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {results.map((item) => (
+            <div key={`${item.type}-${item.title}`} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100/70">{item.type}</div>
+              <div className="mt-1 text-lg font-black">{item.title}</div>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/78">{item.body}</p>
+            </div>
+          ))}
+          {results.length === 0 && <div className="rounded-2xl border border-amber-200/25 bg-amber-300/12 p-4 text-sm font-black text-amber-50">No match yet. Try a shorter word or ask a supervisor.</div>}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "guest";
   return (
@@ -7384,6 +7426,7 @@ function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
           <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Share My Learning</button>
         </div>
       </Card>
+      <ResourceSearchPanel />
       <GrowingCenterPanel setScreen={setScreen} />
       <MiracleGroYouthResourceCard />
       <CurriculumWeekViewCard />
@@ -8504,7 +8547,9 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
   const [status, setStatus] = useState("");
   const [saved, setSaved] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
   const [openDrawer, setOpenDrawer] = useState<string | null>(null);
+  const [knowledgeSearch, setKnowledgeSearch] = useState("");
   const stop = FIELD_MISSION_STOPS_13[stopIndex];
+  const visibleKnowledgeDrawers = KNOWLEDGE_DRAWERS_13.filter((item) => `${item.title} ${item.body}`.toLowerCase().includes(knowledgeSearch.trim().toLowerCase()));
 
   function rememberMissionStep(nextIndex: number) {
     try {
@@ -8662,21 +8707,28 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
         )}
       </Card>
 
-      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Open Knowledge Library</summary>
+      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl" open>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Search Knowledge Library</summary>
+        <input
+          value={knowledgeSearch}
+          onChange={(event) => setKnowledgeSearch(event.target.value)}
+          placeholder="Search Miracle-Gro, mulch, compost, pest trap, pollinator..."
+          className="mt-4 w-full rounded-2xl border border-white/10 bg-white p-4 text-base font-black text-slate-950 outline-none focus:border-emerald-400"
+        />
         <div className="mt-4 grid gap-2 md:grid-cols-2">
-          {KNOWLEDGE_DRAWERS_13.map((item) => (
-            <details key={item.title} className="rounded-xl border border-white/10 bg-white/10 p-3">
+          {visibleKnowledgeDrawers.map((item) => (
+            <details key={item.title} className="rounded-xl border border-white/10 bg-white/10 p-3" open={visibleKnowledgeDrawers.length === 1}>
               <summary className="cursor-pointer text-sm font-black">{item.title}</summary>
               <p className="mt-2 text-sm font-bold leading-6 text-white/76">{item.body}</p>
             </details>
           ))}
+          {knowledgeSearch.trim() && visibleKnowledgeDrawers.length === 0 && <div className="rounded-xl border border-amber-200/25 bg-amber-300/12 p-3 text-sm font-black text-amber-50">No match yet. Ask a supervisor or try another word.</div>}
         </div>
       </details>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-        {["Start My Day", "My Workbook", "My Journey", "My Team", "Learn & Explore", "My Portfolio"].map((label) => (
-          <button key={label} type="button" onClick={() => label.includes("Journey") || label.includes("Portfolio") ? setScreen("journey") : label.includes("Learn") ? setScreen("resources") : label.includes("Team") ? setScreen("roles") : setStopIndex(0)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">{label}</button>
+        {["Start My Day", "My Workbook", "Search", "My Journey", "My Team", "Learn & Explore", "My Portfolio"].map((label) => (
+          <button key={label} type="button" onClick={() => label.includes("Journey") || label.includes("Portfolio") ? setScreen("journey") : label.includes("Learn") || label.includes("Search") ? setScreen("resources") : label.includes("Team") ? setScreen("roles") : setStopIndex(0)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">{label}</button>
         ))}
       </div>
     </div>
@@ -12946,9 +12998,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
       </div>
 
       <Card>
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Journey Timeline</div>
-        <h2 className="mt-2 text-3xl font-black">My weeks stay visible</h2>
-        <div className="mt-4"><Launch62MyJourneyPanel compact /></div>
+        <Launch62MyJourneyPanel compact />
       </Card>
 
       <Card>
