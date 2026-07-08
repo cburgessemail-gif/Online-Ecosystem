@@ -62,6 +62,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.0 FIXED: Preserves the full 14.7 operational ecosystem instead of replacing it with a portal-only shell.
  * - Ecosystem 16.0 FIXED: Keeps Youth, Parent, Supervisor, Mission Control/Operations, Visitor/Guest, Grower, Partner, Marketplace, Calendar/Almanac, Search/Resources, Workbook, Journey, Portfolio, Notifications, and Reports layers intact.
  * - Ecosystem 16.0 FIXED: Maintains the approved Youth navigation principle: Today's Work, Workbook, Journey, Curriculum, Calendar, Search.
+ * - Ecosystem 16.1: Refactors curriculum rendering so Week, Day, Today's Work, Resources, Reflection, Workbook, Growth, Journey, Portfolio, and Parent Summary all read from one source of truth.
+ * - Ecosystem 16.1: Adds Week 5 Forest Business & Inventory Discovery and routes completed youth reflections to My Growth before My Journey.
  */
 
 type Screen =
@@ -90,6 +92,7 @@ type Screen =
   | "journey"
   | "launchProject"
   | "feedback"
+  | "growth"
   | "completion";
 
 type LanguageCode = "en" | "es" | "tl" | "it" | "he" | "fr";
@@ -920,11 +923,11 @@ const youthCurriculumWeeks = [
   {
     week: 5,
     title: "Marketplace & Entrepreneurship",
-    focus: "Customer service, pricing, product presentation, GrownBy, SNAP awareness, and farm-based entrepreneurship.",
-    project: "Marketplace and customer experience project",
-    skills: ["Customer Service", "Sales", "Pricing", "Entrepreneurship"],
+    focus: "Forest Business & Inventory Discovery: youth learn how businesses determine value through observation, counting, inventory, assets, investments, production capacity, pricing, and opportunity discovery.",
+    project: "Forest Business & Inventory Discovery — Observation → Inventory → Assets → Investment → Capacity → Pricing → Opportunity",
+    skills: ["Observation", "Inventory Management", "Asset Recognition", "Pricing", "Entrepreneurship", "Opportunity Discovery"],
     badge: "🛒 Marketplace Explorer",
-    status: "Upcoming",
+    status: "Current Week",
   },
   {
     week: 6,
@@ -1181,11 +1184,140 @@ const youthWeekFourDailyPlan = [
   },
 ];
 
+const youthWeekFiveDailyPlan = [
+  {
+    day: "Monday",
+    date: "July 6, 2026",
+    curriculum: "Rain Review, Weeding, Thinning, Pest Traps, and Water Pooling Observation",
+    focus: "Youth recover the week after rain by observing water movement, thinning or relocating plants where directed, checking pest traps, and recording what changed in the grow area.",
+    work: ["No watering required because of recent rain", "Weed and thin plants carefully where directed", "Relocate separated plants only with supervisor direction", "Check pest traps and record what is found", "Observe pooling water in the grow area and forest path", "Document one plant, water, or pest observation"],
+    resources: ["Water pooling observation guide", "Thinning and transplanting card", "Pest trap review log", "Plant stress checklist"],
+    reflection: "What did rain change on the farm, and what did you notice before taking action?",
+  },
+  {
+    day: "Tuesday",
+    date: "July 7, 2026",
+    curriculum: "Production Maintenance, Drainage Awareness, Melon Zone Review, and Potato Check",
+    focus: "Youth continue Week 5 maintenance by checking plant health, improving pathways or mulch where water gathers, reviewing Zone 5 melons, and checking potatoes growing in baskets.",
+    work: ["Continue weeding and thinning where directed", "Check transplanted or separated plants", "Inspect pooling areas and suggest drainage or mulch fixes", "Check potatoes growing in baskets", "Review Zone 5 melon condition", "Record one maintenance decision and why it matters"],
+    resources: ["Drainage and mulch prompt", "Potato basket check card", "Zone 5 melon review", "Maintenance decision log"],
+    reflection: "How does noticing a problem early help a farm save crops, time, or money?",
+  },
+  {
+    day: "Wednesday",
+    date: "July 8, 2026",
+    curriculum: "Forest Business & Inventory Discovery",
+    focus: "Youth use the forest, pollinator habitat, Zone 5 melon trellis, and expansion areas as a living business classroom. They count what is growing, identify assets, discuss purchased cattle fencing as an investment, and connect inventory to pricing and opportunity.",
+    work: [
+      "Forest Inventory Walk",
+      "Count pollinator plants",
+      "Count trees by size",
+      "Count butterflies, caterpillars, eggs, bees, and other wildlife indicators",
+      "Identify food-producing plants or possible food-producing plants",
+      "Observe Zone 5 melon trellis",
+      "Discuss cattle fencing as a purchased investment",
+      "Estimate trellis capacity and melon production potential",
+      "Prepare squash grow area",
+      "Prepare pumpkin grow area",
+      "Plant corn seedlings if time and conditions allow",
+      "Record observations in the workbook"
+    ],
+    resources: ["Forest inventory worksheet", "Pollinator identification guide", "Asset vs investment guide", "Pricing fundamentals", "Melon trellis capacity exercise", "Squash expansion planner", "Pumpkin expansion planner", "Opportunity discovery questions"],
+    reflection: "How do we know what something is worth if we do not know how much we have? What did you count? What asset did you discover? How does the cattle fencing create value? What opportunity did you notice? What are we building for future Cultivators?",
+  },
+  {
+    day: "Thursday",
+    date: "July 9, 2026",
+    curriculum: "Production Expansion, Plant Spacing, and Harvest Potential",
+    focus: "Youth turn Wednesday's inventory thinking into production planning by preparing squash and pumpkin areas, continuing corn planting, reviewing melon trellis capacity, and estimating future harvest potential.",
+    work: ["Prepare squash grow area", "Prepare pumpkin grow area", "Continue corn seedling planting as directed", "Review Wednesday inventory findings", "Estimate how many plants can fit in the prepared areas", "Connect plant count to possible harvest and pricing"],
+    resources: ["Squash and pumpkin spacing guide", "Corn seedling planting card", "Production estimate worksheet", "Pricing after inventory prompt"],
+    reflection: "How much food could this area produce, and what must we count before setting a price?",
+  },
+  {
+    day: "Friday",
+    date: "July 10, 2026",
+    curriculum: "Gate Installation, Weekly Business Reflection, Workbook, and Portfolio Update",
+    focus: "Youth close Week 5 by connecting infrastructure, inventory, pricing, and production expansion to the farm's future opportunity and their own growth.",
+    work: ["Install or support gate work as directed", "Review forest inventory and production estimates", "Update workbook responses", "Add one photo or observation to portfolio", "Complete My Growth reflection", "Preview next week's leadership and community work"],
+    resources: ["Gate installation safety reminder", "Weekly inventory review", "Portfolio evidence checklist", "My Growth prompt", "Leadership preview"],
+    reflection: "What did Week 5 teach you about seeing value, counting resources, and building opportunity before something is sold?",
+  },
+];
+
+const youthWeekSixDailyPlan = [
+  {
+    day: "Monday",
+    date: "Week 6 Monday",
+    curriculum: "Leadership, Responsibility, and Team Roles",
+    focus: "Youth practice leadership by understanding responsibility, communication, teamwork, and how one person's work affects the group.",
+    work: ["Review team responsibilities", "Choose a leadership contribution", "Support younger or newer participants", "Complete a supervisor-directed farm task", "Record one leadership action"],
+    resources: ["Leadership roles card", "Communication prompt", "Responsibility checklist"],
+    reflection: "How did your action help the team today?",
+  },
+  {
+    day: "Tuesday",
+    date: "Week 6 Tuesday",
+    curriculum: "Community Stewardship and Site Care",
+    focus: "Youth connect farm work to community care, site appearance, safety, and pride in shared spaces.",
+    work: ["Improve one work area", "Remove debris where directed", "Check pathways", "Support plant or pollinator care", "Record one community benefit"],
+    resources: ["Community stewardship prompt", "Site care checklist", "Safety observation card"],
+    reflection: "How does caring for this farm connect to caring for a neighborhood or park?",
+  },
+  {
+    day: "Wednesday",
+    date: "Week 6 Wednesday",
+    curriculum: "Peer Support, Communication, and Problem Solving",
+    focus: "Youth learn that leadership includes listening, helping, explaining, and solving problems without creating conflict.",
+    work: ["Practice clear directions", "Help a peer complete a task", "Identify one problem", "Suggest a respectful solution", "Record what worked"],
+    resources: ["Peer support guide", "Problem-solving prompt", "Conflict prevention card"],
+    reflection: "What did you do today that made work easier or safer for someone else?",
+  },
+  {
+    day: "Thursday",
+    date: "Week 6 Thursday",
+    curriculum: "Visitor Readiness and Community Experience",
+    focus: "Youth consider how visitors, families, volunteers, partners, and customers experience the farm.",
+    work: ["Look at the site through a visitor's eyes", "Identify what needs to be clear, safe, or welcoming", "Improve one visitor-facing area", "Practice explaining one farm feature", "Record one improvement idea"],
+    resources: ["Visitor readiness checklist", "Farm feature explanation prompt", "Customer experience card"],
+    reflection: "What would you want a visitor to understand about Bronson Family Farm?",
+  },
+  {
+    day: "Friday",
+    date: "Week 6 Friday",
+    curriculum: "Leadership Weekly Closeout and Community Legacy",
+    focus: "Youth review how leadership, responsibility, and community stewardship showed up through the week.",
+    work: ["Complete weekly leadership reflection", "Update portfolio", "Share one team contribution", "Preview career week", "Celebrate growth"],
+    resources: ["Leadership reflection", "Portfolio update guide", "Career week preview"],
+    reflection: "What kind of leader are you becoming?",
+  },
+];
+
+const youthWeekSevenDailyPlan = [
+  { day: "Monday", date: "Week 7 Monday", curriculum: "Career Exploration and Skills Inventory", focus: "Youth identify skills they have practiced and connect them to real careers.", work: ["Review skills practiced", "Choose careers connected to farm work", "Update resume skills", "Record one career interest"], resources: ["Career pathway cards", "Skills inventory", "Resume skills prompt"], reflection: "Which skill did you practice on the farm that could help you in a job?" },
+  { day: "Tuesday", date: "Week 7 Tuesday", curriculum: "Agriculture, Environment, and Science Careers", focus: "Youth connect observation, plants, pollinators, soil, water, and wildlife to career pathways.", work: ["Identify science and agriculture careers", "Connect one task to a career", "Ask one career question", "Document one pathway"], resources: ["Agriculture careers", "Environmental science careers", "Career question prompt"], reflection: "Which outdoor or science career interested you and why?" },
+  { day: "Wednesday", date: "Week 7 Wednesday", curriculum: "Business, Operations, and Entrepreneurship Careers", focus: "Youth connect inventory, pricing, marketing, customer service, operations, and ownership to careers and businesses.", work: ["Review inventory and pricing lessons", "Identify business roles", "Practice explaining value", "Record one entrepreneurship idea"], resources: ["Business career cards", "Pricing review", "Entrepreneurship prompt"], reflection: "What business role could you imagine yourself learning more about?" },
+  { day: "Thursday", date: "Week 7 Thursday", curriculum: "Resume, Interview, and Professional Story", focus: "Youth practice telling the story of their work in professional language.", work: ["Choose three resume skills", "Write one work example", "Practice one interview answer", "Update portfolio evidence"], resources: ["Resume builder", "Interview prompt", "Portfolio evidence guide"], reflection: "How would you explain your Cultivator work to an employer?" },
+  { day: "Friday", date: "Week 7 Friday", curriculum: "Career Pathway Closeout", focus: "Youth complete career reflections and prepare for capstone week.", work: ["Review career interests", "Complete weekly reflection", "Choose capstone evidence", "Preview final showcase"], resources: ["Career closeout", "Capstone preview", "Portfolio checklist"], reflection: "What opportunity do you see for yourself after this program?" },
+];
+
+const youthWeekEightDailyPlan = [
+  { day: "Monday", date: "Week 8 Monday", curriculum: "Capstone Planning and Portfolio Review", focus: "Youth select what work, growth, skills, and evidence best represents their Cultivator journey.", work: ["Review portfolio", "Choose capstone story", "Select evidence", "Plan presentation"], resources: ["Capstone planner", "Portfolio review", "Presentation outline"], reflection: "What work best shows your growth?" },
+  { day: "Tuesday", date: "Week 8 Tuesday", curriculum: "Capstone Build and Practice", focus: "Youth assemble their capstone, practice explaining their work, and connect skills to opportunity.", work: ["Build capstone presentation", "Practice speaking", "Add skills evidence", "Ask for feedback"], resources: ["Presentation practice", "Feedback guide", "Skills evidence checklist"], reflection: "What do you want people to understand about your work?" },
+  { day: "Wednesday", date: "Week 8 Wednesday", curriculum: "Achievement Showcase Preparation", focus: "Youth prepare final portfolio, journey summary, and parent-safe achievement highlights.", work: ["Finalize portfolio", "Review journey growth", "Prepare achievement statement", "Practice showcase"], resources: ["Showcase checklist", "Achievement statement", "Parent summary guide"], reflection: "How are you different from the person who started this program?" },
+  { day: "Thursday", date: "Week 8 Thursday", curriculum: "Capstone Showcase and Recognition", focus: "Youth present what they learned, built, observed, counted, improved, and became.", work: ["Present capstone", "Receive feedback", "Celebrate achievements", "Record next step"], resources: ["Showcase guide", "Recognition checklist", "Next step prompt"], reflection: "What are you proud of, and what will you carry forward?" },
+  { day: "Friday", date: "Week 8 Friday", curriculum: "Legacy Closeout and Future Pathway", focus: "Youth close the program by naming what they helped build and what future Cultivators can inherit.", work: ["Complete legacy reflection", "Download or review portfolio", "Confirm skills transcript", "Share future goal", "Celebrate completion"], resources: ["Legacy reflection", "Portfolio download guide", "Skills transcript", "Future goal prompt"], reflection: "What did you help build that can help someone tomorrow?" },
+];
+
 const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
   1: youthWeekOneDailyPlan,
   2: youthWeekTwoDailyPlan,
   3: youthWeekThreeDailyPlan,
   4: youthWeekFourDailyPlan,
+  5: youthWeekFiveDailyPlan,
+  6: youthWeekSixDailyPlan,
+  7: youthWeekSevenDailyPlan,
+  8: youthWeekEightDailyPlan,
 };
 
 const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
@@ -1936,6 +2068,12 @@ const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
   "airport-boundary-safety": ["Airport Boundary Awareness", "Workplace Safety", "Following Supervisor Direction"],
   "pepper-supports": ["Crop Support", "Forest Material Selection", "Plant Care", "Tool and Site Safety"],
   "grow-area-manicure": ["Grounds Maintenance", "Hand Tool Safety", "Plant Health Observation", "Community Pride", "Production Readiness"],
+  "forest-inventory-walk": ["Observation", "Inventory Management", "Asset Recognition", "Pricing", "Entrepreneurship", "Opportunity Discovery"],
+  "count-pollinator-plants": ["Observation", "Inventory Management", "Pollinator Awareness"],
+  "observe-zone-5-melon-trellis": ["Asset Recognition", "Production Capacity", "Investment Thinking"],
+  "discuss-cattle-fencing-as-a-purchased-investment": ["Asset Recognition", "Investment Thinking", "Entrepreneurship"],
+  "prepare-squash-grow-area": ["Production Planning", "Plant Spacing", "Agricultural Operations"],
+  "prepare-pumpkin-grow-area": ["Production Planning", "Plant Spacing", "Agricultural Operations"],
   "pollinator-home": ["Pollinator Infrastructure", "Environmental Stewardship", "Observation Skills", "Agricultural Planning"],
   "planting-ground": ["Soil Preparation", "Agricultural Operations", "Teamwork", "Crop Establishment"],
   "gates": ["Facility Maintenance", "Safety Awareness", "Infrastructure Management"],
@@ -3785,6 +3923,7 @@ function screenLabel(screen: Screen) {
     journey: "My Journey",
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
+    growth: "My Growth Today",
     completion: "Achievement Center",
   };
   return labels[screen];
@@ -5101,6 +5240,7 @@ function App() {
       {screen === "journey" && <MyCultivatorJourneyScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "launchProject" && <CoolingCenterProjectModule setScreen={setScreen} activeUser={activeUser} />}
       {screen === "feedback" && <Feedback setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "growth" && <MyGrowthTodayScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "completion" && <CompletionExperience setScreen={setScreen} activeUser={activeUser} />}
     </Shell>
   );
@@ -8342,7 +8482,7 @@ function YouthActivityWorkflowCard({ todayPlan, currentWeek, setScreen, activeUs
             Today’s assignment is complete ✓
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("media")} className="rounded-full bg-white px-4 py-2 text-xs font-black text-slate-950">Share Photo / Video</button>
-              <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-purple-300 px-4 py-2 text-xs font-black text-black">Continue to Reflection</button>
+              <button type="button" onClick={() => setScreen("growth")} className="rounded-full bg-purple-300 px-4 py-2 text-xs font-black text-black">Continue to My Growth</button>
             </div>
           </div>
         )}
@@ -12374,6 +12514,115 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
   );
 }
 
+function curriculumActivitySlug(title: string) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function skillsForCurrentCurriculum(curriculum: CurriculumDay) {
+  const fromActivities = curriculum.activities.flatMap((activity) => CURRICULUM_SKILL_MAP[activity.id] || CURRICULUM_SKILL_MAP[curriculumActivitySlug(activity.title)] || []);
+  const weekSkills = getCurrentYouthWeek().skills || [];
+  return Array.from(new Set([...weekSkills, ...fromActivities, "Reflection", "Communication"])).slice(0, 8);
+}
+
+function progressBar(label: string, value: number) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/25 p-4" key={label}>
+      <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.18em] text-white/65"><span>{label}</span><span>{value}%</span></div>
+      <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-emerald-300" style={{ width: `${value}%` }} /></div>
+    </div>
+  );
+}
+
+function MyGrowthTodayScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const curriculum = getActiveCurriculum(new Date());
+  const todayPlan = getCurrentYouthPlan(new Date());
+  const participantId = activeUser?.participant_id || activeUser?.id || "youth-device";
+  const completions = safeRead<WorkCompletionRecord[]>(WORK_COMPLETION_KEY, []).filter((row) => row.date === todayISO() && row.participant_id === participantId && row.completed);
+  const discoveries = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).filter((row) => row.date === todayISO() && row.participant_id === participantId);
+  const skills = skillsForCurrentCurriculum(curriculum);
+  const observed = completions.length ? completions.map((row) => row.item) : curriculum.activities.map((activity) => activity.title);
+  const legacyAnswer = discoveries.find((row) => /future|legacy|tomorrow|build/i.test(row.question))?.response || discoveries[0]?.response || "Your legacy answer will appear here after it is saved.";
+  const learned = [
+    "Inventory comes before pricing.",
+    "Assets and investments can create future value.",
+    "A farm must know what it has before it decides what to sell or protect.",
+    "Observation helps people see opportunity instead of only seeing scenery.",
+  ];
+
+  const markGrowthComplete = () => {
+    recordCompletionOnce("my-growth-complete", activeUser);
+    saveYouthResumeState(activeUser, {
+      stage: "complete",
+      completed_work: completions.length || curriculum.activities.length,
+      total_work: curriculum.activities.length,
+      message: "My Growth is complete ✓ Continue to My Journey.",
+    });
+    setScreen("journey");
+  };
+
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">After Legacy Reflection</div>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">🌱 My Growth Today</h1>
+        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">How did I become more capable than I was this morning?</p>
+        <div className="mt-5 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-4 text-sm font-black leading-7 text-emerald-50">Week {curriculum.week}: {curriculum.theme} • {curriculum.featuredStory}</div>
+      </Card>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">What I Observed</div>
+          <h2 className="mt-2 text-3xl font-black">I paid attention to what was actually here.</h2>
+          <div className="mt-4 grid gap-2">{observed.slice(0, 8).map((item) => <div key={item} className="rounded-2xl bg-black/25 p-3 text-sm font-black">✓ {item}</div>)}</div>
+        </Card>
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">What I Learned</div>
+          <h2 className="mt-2 text-3xl font-black">Before pricing, count inventory.</h2>
+          <div className="mt-4 grid gap-2">{learned.map((item) => <div key={item} className="rounded-2xl bg-black/25 p-3 text-sm font-black">{item}</div>)}</div>
+        </Card>
+      </div>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">Skills I Practiced</div>
+        <h2 className="mt-2 text-3xl font-black">Skills added to my Cultivator Journey</h2>
+        <div className="mt-4 flex flex-wrap gap-2">{skills.map((skill) => <span key={skill} className="rounded-full bg-purple-300 px-4 py-2 text-sm font-black text-black">{skill}</span>)}</div>
+      </Card>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Before / After</div>
+          <h2 className="mt-2 text-3xl font-black">My thinking changed.</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Before Today</div><p className="mt-2 text-xl font-black">I saw a forest.</p></div>
+            <div className="rounded-2xl bg-emerald-300 p-4 text-black"><div className="text-xs font-black uppercase tracking-[0.18em] text-black/55">After Today</div><p className="mt-2 text-xl font-black">I see inventory, assets, investments, and opportunity.</p></div>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-rose-100/75">Legacy Connection</div>
+          <h2 className="mt-2 text-3xl font-black">What am I helping build for tomorrow?</h2>
+          <blockquote className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4 text-lg font-black leading-8 text-white/86">“{legacyAnswer}”</blockquote>
+        </Card>
+      </div>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Growth Meter</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {progressBar("Observation", 100)}
+          {progressBar("Skills", 84)}
+          {progressBar("Leadership", 68)}
+          {progressBar("Stewardship", 76)}
+          {progressBar("Entrepreneurship", curriculum.week === 5 ? 88 : 72)}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" onClick={markGrowthComplete} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Continue My Journey →</button>
+          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Add Photo / Video</button>
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return to Youth Dashboard</button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState("");
@@ -12435,7 +12684,8 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
       </div>
       <div className="mt-4"><CompactTextArea label="Additional comments" value={comments} onChange={setComments} rows={2} /></div>
       <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Feedback</button>
+        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Progress</button>
+        {activeUser?.role === "Youth Workforce Participant" && <button type="button" onClick={async () => { await save(); setScreen("growth"); }} className="rounded-full bg-purple-300 px-7 py-4 font-black text-black">Complete Day → My Growth</button>}
         <button type="button" onClick={() => setScreen(returnTarget)} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return</button>
       </div>
       {message && <Notice text={message} />}
