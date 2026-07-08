@@ -67,6 +67,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2: Restores approved youth architecture: Today's Work → Workbook → Legacy → My Journey. Growth lives inside My Journey; activities live inside Workbook; no separate Reflection/Growth destination.
  * - Ecosystem 16.2D: Removes youth-facing architecture banner from the final Legacy step; Legacy becomes a clean final question with automatic continuation to My Journey.
  * - Ecosystem 16.2E: Removes Journey language from active work/check-in screens. Youth see Today's Work while doing work; My Journey remains the after-work growth record.
+ * - Ecosystem 16.2F: Continue-to-work buttons bypass the morning check-in once it is saved and open the actual work list.
  */
 
 type Screen =
@@ -3729,6 +3730,27 @@ function money(value: number) {
   return value.toLocaleString(undefined, { style: "currency", currency: "USD" });
 }
 
+
+function hasCompletedTodayWorkCheckIn(activeUser?: EcosystemUser | null) {
+  if (!activeUser || activeUser.role !== "Youth Workforce Participant") return false;
+  const participantId = launchParticipantId(activeUser);
+  const profileId = activeUser.profile_id || activeUser.id || participantId;
+  const today = todayISO();
+  const ppeSaved = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []).some(
+    (row) => row.participant_id === participantId && row.date === today && row.ppe_status === "complete"
+  );
+  const wellnessSaved = safeRead<WellnessCheckIn[]>(WELLNESS_KEY, []).some(
+    (row) => row.profile_id === profileId && row.created_at?.slice(0, 10) === today
+  );
+  return ppeSaved && wellnessSaved;
+}
+
+function openWorkListFromCheckIn(activeUser: EcosystemUser | null, setScreen: (screen: Screen) => void) {
+  try { localStorage.setItem(youthDailyPhaseKey16_2(activeUser), "work"); } catch {}
+  setScreen("youth");
+  scrollToTop();
+}
+
 function safeRead<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
@@ -5344,7 +5366,7 @@ function Shell({
   const [showNurseLine, setShowNurseLine] = useState(false);
   const role = activeUser?.role;
   const dashboardTarget: Screen = role && role !== "Guest" ? routeForRole(role) : "roles";
-  const workTarget: Screen = role === "Youth Workforce Participant" ? "wellness" : dashboardTarget;
+  const workTarget: Screen = role === "Youth Workforce Participant" ? (hasCompletedTodayWorkCheckIn(activeUser) ? "youth" : "wellness") : dashboardTarget;
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
@@ -10909,8 +10931,13 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
   const save = async () => {
     if (saving) return;
+    if (alreadySavedToday) {
+      setMessage("Check-in already saved. Opening the work list.");
+      openWorkListFromCheckIn(activeUser, setScreen);
+      return;
+    }
     if (!readyToSave) {
-      setMessage(`Required to save today: ${remainingRequiredItems.join(", ")}. These fields start blank each day and must be answered before today's mission opens.`);
+      setMessage(`Required to save today: ${remainingRequiredItems.join(", ")}. These fields start blank each day and must be answered before the work list opens.`);
       return;
     }
     setSaving(true);
@@ -10956,12 +10983,12 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         insertRow("attendance_records", ATTENDANCE_KEY, attendanceRow),
         insertRow("wellness_checkins", WELLNESS_KEY, wellnessRow),
       ]);
-      setMessage(`Today’s Work check-in saved. ${selectedYouth.participant_id} is checked in and ready. Opening today's assignment.`);
-      window.setTimeout(() => { setScreen("youth"); scrollToTop(); }, 650);
+      setMessage(`Today’s Work check-in saved. ${selectedYouth.participant_id} is checked in and ready. Opening the work list.`);
+      window.setTimeout(() => { openWorkListFromCheckIn(activeUser, setScreen); }, 650);
     } catch (error) {
       console.error("Today’s Work check-in save issue:", error);
-      setMessage(`Today’s Work check-in saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening today's assignment.`);
-      window.setTimeout(() => { setScreen("youth"); scrollToTop(); }, 650);
+      setMessage(`Today’s Work check-in saved on this device. ${selectedYouth.participant_id} is recorded for this review session. Opening the work list.`);
+      window.setTimeout(() => { openWorkListFromCheckIn(activeUser, setScreen); }, 650);
     } finally {
       setSaving(false);
     }
@@ -11069,7 +11096,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <Toggle label="Outdoor Clothing" checked={appropriateClothing} setChecked={setAppropriateClothing} />
           </div>
           <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-            {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Begin Today's Mission ✓ Save" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
+            {saving ? "Saving..." : alreadySavedToday ? "Continue to Work ✓" : readyToSave ? "Save Check-In + Open Work List" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
           </button>
         </section>
 
@@ -11093,7 +11120,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
             <MiniSlider label="Trusted Adult" value={trustedAdult} setValue={setTrustedAdult} />
           </div>
           <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-            {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Save Check-In + Begin Today's Mission" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
+            {saving ? "Saving..." : alreadySavedToday ? "Continue to Work ✓" : readyToSave ? "Save Check-In + Open Work List" : `Still Required: ${remainingRequiredItems.slice(0, 3).join(", ")}${remainingRequiredItems.length > 3 ? "..." : ""}`}
           </button>
         </section>
       </div>
@@ -11112,7 +11139,7 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
         </div>
         {!readyToSave && <div className="mt-2 text-sm font-bold text-amber-50">Still required: {remainingRequiredItems.join(", ")}</div>}
         <button type="button" onClick={save} disabled={saving} className={`mt-3 w-full rounded-full px-5 py-3 text-base font-black ${readyToSave ? "bg-emerald-300 text-black" : "bg-amber-300 text-black"} disabled:cursor-not-allowed disabled:opacity-60`}>
-          {saving ? "Saving..." : alreadySavedToday ? "Continue Today's Mission ✓" : alreadySavedToday ? "Continue Today's Mission ✓" : readyToSave ? "Save Check-In + Begin Today's Mission" : "Show What Is Still Required"}
+          {saving ? "Saving..." : alreadySavedToday ? "Continue to Work ✓" : alreadySavedToday ? "Continue to Work ✓" : readyToSave ? "Save Check-In + Open Work List" : "Show What Is Still Required"}
         </button>
       </div>
 
