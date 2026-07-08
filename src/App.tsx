@@ -8870,10 +8870,10 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
         </div>
       </details>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-        {["Start My Day", "My Workbook", "Search", "My Journey", "My Team", "Learn & Explore", "My Portfolio"].map((label) => (
-          <button key={label} type="button" onClick={() => label.includes("Journey") || label.includes("Portfolio") ? setScreen("journey") : label.includes("Learn") || label.includes("Search") ? setScreen("resources") : label.includes("Team") ? setScreen("roles") : setStopIndex(0)} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm font-black text-white hover:bg-white/16">{label}</button>
-        ))}
+      <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-white/86">
+        <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Workbook Flow</div>
+        <div className="mt-2 text-lg font-black text-white">Today’s Work → Workbook → Reflection → Legacy → My Growth → My Journey</div>
+        <p className="mt-2 text-sm font-bold leading-6 text-white/72">This area stays focused on today’s learning record. Main navigation remains outside the workbook so youth do not get pulled away from the task.</p>
       </div>
     </div>
   );
