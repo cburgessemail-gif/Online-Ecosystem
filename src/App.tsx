@@ -65,6 +65,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2 LOCK: Curriculum rendering keeps Today's Work free of questions; Workbook contains activity documentation; Legacy contains one closing question; My Journey contains growth, skills, portfolio, opportunity, and career.
  * - Ecosystem 16.1: Adds Week 5 Forest Business & Inventory Discovery and routes completed youth reflections to My Growth before My Journey.
  * - Ecosystem 16.2: Restores approved youth architecture: Today's Work → Workbook → Legacy → My Journey. Growth lives inside My Journey; activities live inside Workbook; no separate Reflection/Growth destination.
+ * - Ecosystem 16.2D: Removes youth-facing architecture banner from the final Legacy step; Legacy becomes a clean final question with automatic continuation to My Journey.
  */
 
 type Screen =
@@ -9125,23 +9126,25 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
   return (
     <div className="grid gap-4">
-      <Card className="p-4 md:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Ecosystem 16.2 • Approved Youth Flow</div>
-            <h1 className="mt-2 text-3xl font-black md:text-5xl">Work → Workbook → Legacy → Journey</h1>
-            <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">Today’s Work shows what to do. Workbook holds activity documentation. Legacy asks one closing question. Growth lives inside My Journey.</p>
+      {phase !== "legacy" && (
+        <Card className="p-4 md:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day}</div>
+              <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : phase === "workbook" ? "Workbook" : "My Journey"}</h1>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See what to do today. Questions stay out of the work screen." : phase === "workbook" ? "Document activities, counts, observations, photos, and evidence one time." : "See today’s growth, skills, experiences, opportunities, and portfolio progress."}</p>
+            </div>
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
           </div>
-          <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
-        </div>
-        <div className="mt-4 grid gap-2 md:grid-cols-4">
-          {["work", "workbook", "legacy", "journey"].map((item) => (
-            <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
-              {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : item === "legacy" ? "Legacy" : "My Journey"}
-            </button>
-          ))}
-        </div>
-      </Card>
+          <div className="mt-4 grid gap-2 md:grid-cols-3">
+            {["work", "workbook", "journey"].map((item) => (
+              <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
+                {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : "My Journey"}
+              </button>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {phase === "work" && (
         <Card className="p-4 md:p-6">
@@ -9180,12 +9183,12 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
       {phase === "legacy" && (
         <Card className="p-4 md:p-6">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Legacy • One Question</div>
-          <h2 className="mt-2 text-3xl font-black md:text-4xl">What are you helping build today that may help someone tomorrow?</h2>
-          <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="One answer. Save. Continue." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Final Question</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">One last reflection before your Journey is updated.</h2>
+          <div className="mt-5 rounded-3xl border border-amber-200/20 bg-amber-200/10 p-4 text-xl font-black leading-8 text-white">What are you helping build today that may help someone tomorrow?</div>
+          <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="One answer. Save. Continue to My Journey." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
           <div className="mt-5 flex flex-wrap gap-2">
-            <button type="button" onClick={saveLegacy} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save Legacy + Continue</button>
-            <button type="button" onClick={() => go("workbook")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">Back to Workbook</button>
+            <button type="button" onClick={saveLegacy} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Continue to My Journey</button>
           </div>
           {message && <Notice text={message} />}
         </Card>
