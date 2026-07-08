@@ -69,6 +69,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2E: Removes Journey language from active work/check-in screens. Youth see Today's Work while doing work; My Journey remains the after-work growth record.
  * - Ecosystem 16.2F: Continue-to-work buttons bypass the morning check-in once it is saved and open the actual work list.
  * - Ecosystem 16.2G: Centralizes youth routing so Today's Work always opens the work list, Workbook stays documentation, Legacy stays one final question, and My Journey opens only the growth record.
+ * - Ecosystem 16.2H: Restores visible My Journey routing while keeping Today's Work routed to work and Workbook routed to documentation.
  */
 
 type Screen =
@@ -5376,9 +5377,7 @@ function Shell({
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
 
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
-    ? [
-        { label: "Calendar", screen: "events" },
-      ]
+    ? []
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
         { label: "Supervisor", screen: "supervisor" },
@@ -5434,6 +5433,13 @@ function Shell({
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               <button type="button" onClick={() => role === "Youth Workforce Participant" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
               <button type="button" onClick={() => role === "Youth Workforce Participant" && workTarget === "youth" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
+              {role === "Youth Workforce Participant" && (
+                <>
+                  <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
+                  <button type="button" onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20">Workbook</button>
+                  <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className="rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30">My Journey</button>
+                </>
+              )}
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -9050,9 +9056,21 @@ function setYouthDailyPhase16_2(activeUser: EcosystemUser | null | undefined, ne
   } catch {}
 }
 
-function openYouthTodayWork16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
-  setYouthDailyPhase16_2(activeUser, "work");
+function openYouthPhase16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void, next: YouthDailyPhase16_2) {
+  setYouthDailyPhase16_2(activeUser, next);
   setScreen("youth");
+}
+
+function openYouthTodayWork16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
+  openYouthPhase16_2(activeUser, setScreen, "work");
+}
+
+function openYouthWorkbook16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
+  openYouthPhase16_2(activeUser, setScreen, "workbook");
+}
+
+function openYouthJourney16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
+  openYouthPhase16_2(activeUser, setScreen, "journey");
 }
 
 function workbookQuestionsForPlan16_2(plan: typeof youthWeekOneDailyPlan[number]) {
@@ -9187,10 +9205,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             </div>
             <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
           </div>
-          <div className="mt-4 grid gap-2 md:grid-cols-2">
-            {["work", "workbook"].map((item) => (
+          <div className="mt-4 grid gap-2 md:grid-cols-3">
+            {["work", "workbook", "journey"].map((item) => (
               <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
-                {item === "work" ? "Today's Work" : "Workbook"}
+                {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : "My Journey"}
               </button>
             ))}
           </div>
