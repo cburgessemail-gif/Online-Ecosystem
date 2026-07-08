@@ -71,6 +71,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2G: Centralizes youth routing so Today's Work always opens the work list, Workbook stays documentation, Legacy stays one final question, and My Journey opens only the growth record.
  * - Ecosystem 16.2H: Restores visible My Journey routing while keeping Today's Work routed to work and Workbook routed to documentation.
  * - Ecosystem 16.2I: Separates My Journey from Today's Work. My Journey is the accomplishments/growth record only; it no longer appears as a work-step tab.
+ * - Ecosystem 16.2J: Fixes header routing. Workbook and My Journey buttons no longer get reset back to Today's Work. Youth dashboard button is removed because Today's Work is the operating dashboard.
  */
 
 type Screen =
@@ -5209,9 +5210,9 @@ function App() {
       setScreenState(activeUser?.lifecycle_status === "inactive" ? "guest" : "roles");
       return;
     }
-    if (target === "youth" && activeUser?.role === "Youth Workforce Participant") {
-      setYouthDailyPhase16_2(activeUser, "work");
-    }
+    // Do not reset the youth daily phase here.
+    // Header buttons set the phase first, then route to the youth screen.
+    // Resetting here caused Workbook and My Journey header buttons to bounce back to Today's Work.
     setMessage("");
     recordJourney(target, activeUser);
     setScreenState(target);
@@ -5432,14 +5433,15 @@ function Shell({
             </button>
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
-              <button type="button" onClick={() => role === "Youth Workforce Participant" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
-              <button type="button" onClick={() => role === "Youth Workforce Participant" && workTarget === "youth" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
-              {role === "Youth Workforce Participant" && (
+              {role === "Youth Workforce Participant" ? (
                 <>
-                  <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
+                  <button type="button" onClick={() => openYouthTodayWork16_2(activeUser, setScreen)} className={screen === "youth" ? "rounded-full border border-emerald-200 bg-emerald-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Today’s Work</button>
                   <button type="button" onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20">Workbook</button>
-                  <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className="rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30">My Journey</button>
+                  <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className={screen === "journey" ? "rounded-full border border-purple-200 bg-purple-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30"}>My Journey</button>
+                  <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
                 </>
+              ) : (
+                <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
               )}
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
