@@ -66,6 +66,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.1: Adds Week 5 Forest Business & Inventory Discovery and routes completed youth reflections to My Growth before My Journey.
  * - Ecosystem 16.2: Restores approved youth architecture: Today's Work → Workbook → Legacy → My Journey. Growth lives inside My Journey; activities live inside Workbook; no separate Reflection/Growth destination.
  * - Ecosystem 16.2D: Removes youth-facing architecture banner from the final Legacy step; Legacy becomes a clean final question with automatic continuation to My Journey.
+ * - Ecosystem 16.2E: Removes Journey language from active work/check-in screens. Youth see Today's Work while doing work; My Journey remains the after-work growth record.
  */
 
 type Screen =
@@ -5349,7 +5350,6 @@ function Shell({
   const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
     ? [
         { label: "Calendar", screen: "events" },
-        { label: "My Journey", screen: "journey" },
       ]
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
@@ -5442,7 +5442,7 @@ function Shell({
               <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🔥 Weather Operations</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>📅 Calendar</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Share My Learning</button>
-              <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>
+              {isStaff && <button type="button" onClick={() => setScreen("feedback")} className={buttonClass("feedback")}>Feedback</button>}
               {isStaff && <button type="button" onClick={() => setScreen("supervisor")} className={buttonClass("supervisor")}>Supervisor</button>}
               {isStaff && <button type="button" onClick={() => setScreen("operations")} className={buttonClass("operations")}>Operations</button>}
             </div>
@@ -10999,8 +10999,8 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.32em] text-emerald-100/75">Youth Morning Readiness Check-In</div>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">Begin Today’s Journey</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Start with purpose, then complete attendance, PPE, daily goal, and support needs.</p>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Begin Today’s Work</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/80">Start with purpose, then complete attendance, PPE, daily goal, and support needs before today’s work opens.</p>
           {activeUser?.needs_supervisor_verification && (
             <div className="mt-3 rounded-2xl border border-amber-300/40 bg-amber-300/14 p-3 text-sm font-bold text-amber-50">
               Supervisor-assisted access is active. This check-in will still save, and staff can verify the youth record later.
@@ -11118,7 +11118,6 @@ function WellnessScreen({ setScreen, activeUser }: { setScreen: (screen: Screen)
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">Back to Today’s Work</button>
-        <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black">My Journey</button>
       </div>
 
       {safetyFlag && <Notice text="Support or readiness flag detected. Approved staff should review before work assignments are issued." />}
