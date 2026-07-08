@@ -70,6 +70,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2F: Continue-to-work buttons bypass the morning check-in once it is saved and open the actual work list.
  * - Ecosystem 16.2G: Centralizes youth routing so Today's Work always opens the work list, Workbook stays documentation, Legacy stays one final question, and My Journey opens only the growth record.
  * - Ecosystem 16.2H: Restores visible My Journey routing while keeping Today's Work routed to work and Workbook routed to documentation.
+ * - Ecosystem 16.2I: Separates My Journey from Today's Work. My Journey is the accomplishments/growth record only; it no longer appears as a work-step tab.
  */
 
 type Screen =
@@ -9103,7 +9104,8 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
   const [phase, setPhase] = useState<YouthDailyPhase16_2>(() => {
     try {
       const saved = localStorage.getItem(youthDailyPhaseKey16_2(activeUser)) as YouthDailyPhase16_2 | null;
-      return saved || "work";
+      // My Journey is not a work step. If yesterday ended in Journey, reopening Today's Work must still show work.
+      return saved && saved !== "journey" ? saved : "work";
     } catch {
       return "work";
     }
@@ -9188,27 +9190,28 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     };
     safeWrite(DISCOVERY_KEY, [row, ...withoutDuplicate].slice(0, 500));
     recordCompletionOnce("legacy-complete", activeUser);
-    saveYouthResumeState(activeUser, { stage: "complete", message: "Legacy saved. Continue to My Journey." });
-    setMessage("Legacy saved ✓ Continue to My Journey.");
-    go("journey");
+    saveYouthResumeState(activeUser, { stage: "complete", message: "Legacy saved. My Journey accomplishments record updated." });
+    setMessage("Legacy saved ✓ Opening My Journey accomplishments.");
+    setYouthDailyPhase16_2(activeUser, "work");
+    setScreen("journey");
   }
 
   return (
     <div className="grid gap-4">
-      {phase !== "legacy" && (
+      {(phase === "work" || phase === "workbook") && (
         <Card className="p-4 md:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day}</div>
-              <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : phase === "workbook" ? "Workbook" : "My Journey"}</h1>
-              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See what to do today. Questions stay out of the work screen." : phase === "workbook" ? "Document activities, counts, observations, photos, and evidence one time." : "See today’s growth, skills, experiences, opportunities, and portfolio progress."}</p>
+              <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : "Workbook"}</h1>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See what to do today. Questions stay out of the work screen." : "Document activities, counts, observations, photos, and evidence one time."}</p>
             </div>
             <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
           </div>
           <div className="mt-4 grid gap-2 md:grid-cols-3">
-            {["work", "workbook", "journey"].map((item) => (
+            {["work", "workbook"].map((item) => (
               <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
-                {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : "My Journey"}
+                {item === "work" ? "Today's Work" : "Workbook"}
               </button>
             ))}
           </div>
@@ -9265,14 +9268,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
       {phase === "journey" && (
         <Card className="p-4 md:p-6">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">My Journey • Growth Lives Here</div>
-          <h2 className="mt-2 text-3xl font-black md:text-4xl">Today's growth is now part of My Journey.</h2>
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {["My Growth", "My Skills", "My Experiences", "Community Connection", "Opportunity Connection", "Career Interest", "Legacy Record", "Portfolio Progress"].map((item) => (
-              <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 font-black text-white">{item}</div>
-            ))}
-          </div>
-          <button type="button" onClick={() => setScreen("journey")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Open My Journey</button>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">My Journey • Accomplishments Record</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">My Journey is separate from today's work.</h2>
+          <p className="mt-3 text-sm font-bold leading-7 text-white/78">Today's Work shows assignments. My Journey shows accomplishments, growth, skills, experiences, opportunities, career interests, legacy record, and portfolio progress.</p>
+          <button type="button" onClick={() => setScreen("journey")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Open My Journey Accomplishments</button>
         </Card>
       )}
     </div>
@@ -13495,13 +13494,13 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey • Personal Growth Center</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Cultivator Journey</h1>
-        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is about me: my growth, skills, reflections, achievements, portfolio evidence, workforce transcript, and future pathways.</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey • Accomplishments Record</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Accomplishments</h1>
+        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is separate from Today's Work. It shows what I have accomplished: my growth, skills, experiences, community connections, opportunities, career interests, legacy record, portfolio evidence, workforce transcript, and future pathways.</p>
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Current Week</div>
-          <h2 className="mt-2 text-3xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-white/80">{currentWeek.focus}</p>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Accomplishment Context</div>
+          <h2 className="mt-2 text-3xl font-black">Skills connected to Week {currentWeek.week}: {currentWeek.title}</h2>
+          <p className="mt-3 text-sm font-bold leading-7 text-white/80">This is not the work list. It shows how today's work builds accomplishments, skills, and opportunity.</p>
           <div className="mt-4 flex flex-wrap gap-2">{currentWeek.skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div>
         </div>
       </Card>
@@ -13537,7 +13536,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
         <h2 className="mt-2 text-3xl font-black">Career, education, and entrepreneurship pathways</h2>
         <p className="mt-3 text-sm font-bold leading-7 text-white/78">Use Explore & Discover for resources. Use Share My Learning to add photos, videos, observations, and Cultivator Moments to this journey.</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("wellness")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Start / Continue Today</button>
+          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button>
           <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Share My Learning</button>
           <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Explore & Discover</button>
         </div>
