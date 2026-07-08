@@ -12624,16 +12624,32 @@ function MyGrowthTodayScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
 }
 
 function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
-  const [rating, setRating] = useState(5);
-  const [comments, setComments] = useState("");
-  const [excited, setExcited] = useState("");
-  const [confused, setConfused] = useState("");
-  const [improve, setImprove] = useState("");
-  const [opportunity, setOpportunity] = useState("");
-  const [recommend, setRecommend] = useState(true);
+  const draftKey = `bff.feedback.autosave.${todayISO()}.${launchParticipantId(activeUser)}`;
+  const savedDraft = safeRead<Partial<FeedbackRecord> & { recommend?: boolean }>(draftKey, {});
+  const [rating, setRating] = useState(savedDraft.rating || 5);
+  const [comments, setComments] = useState(savedDraft.comments || "");
+  const [excited, setExcited] = useState(savedDraft.excited || "");
+  const [confused, setConfused] = useState(savedDraft.confused || "");
+  const [improve, setImprove] = useState(savedDraft.improve || "");
+  const [opportunity, setOpportunity] = useState(savedDraft.opportunity_interest || "");
+  const [recommend, setRecommend] = useState(savedDraft.recommend ?? savedDraft.would_recommend ?? true);
   const [message, setMessage] = useState("");
 
-  const save = async () => {
+  useEffect(() => {
+    safeWrite(draftKey, {
+      rating,
+      comments,
+      would_recommend: recommend,
+      recommend,
+      excited,
+      confused,
+      improve,
+      opportunity_interest: opportunity,
+      updated_at: new Date().toISOString(),
+    });
+  }, [draftKey, rating, comments, recommend, excited, confused, improve, opportunity]);
+
+  const save = async (quiet = false) => {
     const row: FeedbackRecord = {
       id: uuid(),
       profile_id: activeUser?.id,
@@ -12651,15 +12667,24 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
       opportunity_interest: opportunity,
       created_at: new Date().toISOString(),
     };
-    const result = await insertRow("feedback", FEEDBACK_KEY, row);
-    setMessage(saveModeMessage("Feedback/comments", result));
+    await insertRow("feedback", FEEDBACK_KEY, row);
+    recordCompletionOnce("daily-feedback", activeUser);
+    saveYouthResumeState(activeUser, { stage: "complete", message: "Daily feedback saved. Continue to My Growth." });
+    if (!quiet) setMessage("Saved. You will not have to answer these again today.");
+    return row;
+  };
+
+  const completeAndContinue = async () => {
+    await save(true);
+    scrollToTop();
+    setScreen("growth");
   };
 
   const returnTarget = activeUser ? routeForRole(activeUser.role) : "demo";
-  const promptTitle = activeUser?.role === "Parent / Guardian" ? "Parent / Guardian Feedback" : "How was your experience today?";
+  const promptTitle = activeUser?.role === "Parent / Guardian" ? "Parent / Guardian Feedback" : "Final Check-In";
   const promptIntro = activeUser?.role === "Parent / Guardian"
     ? "Tell us what helped your family feel informed, encouraged, and connected."
-    : "Keep it short. Your feedback helps us improve the ecosystem for launch.";
+    : "Your answers auto-save as you type. Press Continue once and move on — no repeating questions.";
 
   return (
     <Card>
@@ -12684,8 +12709,8 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
       </div>
       <div className="mt-4"><CompactTextArea label="Additional comments" value={comments} onChange={setComments} rows={2} /></div>
       <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={save} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Progress</button>
-        {activeUser?.role === "Youth Workforce Participant" && <button type="button" onClick={async () => { await save(); setScreen("growth"); }} className="rounded-full bg-purple-300 px-7 py-4 font-black text-black">Complete Day → My Growth</button>}
+        <button type="button" onClick={() => save()} className="rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Save Progress</button>
+        {activeUser?.role === "Youth Workforce Participant" && <button type="button" onClick={completeAndContinue} className="rounded-full bg-purple-300 px-7 py-4 font-black text-black">Continue → My Growth</button>}
         <button type="button" onClick={() => setScreen(returnTarget)} className="rounded-full border border-white/15 bg-white/10 px-7 py-4 font-black">Return</button>
       </div>
       {message && <Notice text={message} />}
