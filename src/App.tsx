@@ -68,6 +68,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2D: Removes youth-facing architecture banner from the final Legacy step; Legacy becomes a clean final question with automatic continuation to My Journey.
  * - Ecosystem 16.2E: Removes Journey language from active work/check-in screens. Youth see Today's Work while doing work; My Journey remains the after-work growth record.
  * - Ecosystem 16.2F: Continue-to-work buttons bypass the morning check-in once it is saved and open the actual work list.
+ * - Ecosystem 16.2G: Centralizes youth routing so Today's Work always opens the work list, Workbook stays documentation, Legacy stays one final question, and My Journey opens only the growth record.
  */
 
 type Screen =
@@ -3746,8 +3747,7 @@ function hasCompletedTodayWorkCheckIn(activeUser?: EcosystemUser | null) {
 }
 
 function openWorkListFromCheckIn(activeUser: EcosystemUser | null, setScreen: (screen: Screen) => void) {
-  try { localStorage.setItem(youthDailyPhaseKey16_2(activeUser), "work"); } catch {}
-  setScreen("youth");
+  openYouthTodayWork16_2(activeUser, setScreen);
   scrollToTop();
 }
 
@@ -5207,6 +5207,9 @@ function App() {
       setScreenState(activeUser?.lifecycle_status === "inactive" ? "guest" : "roles");
       return;
     }
+    if (target === "youth" && activeUser?.role === "Youth Workforce Participant") {
+      setYouthDailyPhase16_2(activeUser, "work");
+    }
     setMessage("");
     recordJourney(target, activeUser);
     setScreenState(target);
@@ -5232,6 +5235,9 @@ function App() {
     saveParticipantLifecycleRecord(normalizedUser);
     const target = normalizedUser.lifecycle_status === "inactive" || normalizedUser.lifecycle_status === "pending" ? "guest" : routeForRole(role);
     recordJourney(target, normalizedUser);
+    if (role === "Youth Workforce Participant" && target === "youth") {
+      setYouthDailyPhase16_2(normalizedUser, "work");
+    }
     setActiveUser(normalizedUser);
     setScreenState(target);
     scrollToTop();
@@ -5426,8 +5432,8 @@ function Shell({
             </button>
             {screen !== "portal" && (
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
-              <button type="button" onClick={() => setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
-              <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
+              <button type="button" onClick={() => role === "Youth Workforce Participant" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")} className={buttonClass(activeUser ? routeForRole(effectiveRoleForUser(activeUser)) : "portal")}>Dashboard</button>
+              <button type="button" onClick={() => role === "Youth Workforce Participant" && workTarget === "youth" ? openYouthTodayWork16_2(activeUser, setScreen) : setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
               {primaryNav.map((item) => (
                 <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
                   {item.label}
@@ -9036,6 +9042,19 @@ function youthDailyPhaseKey16_2(activeUser?: EcosystemUser | null) {
   return `bff.launch.youthDailyPhase16_2.${todayISO()}.${launchParticipantId(activeUser)}`;
 }
 
+function setYouthDailyPhase16_2(activeUser: EcosystemUser | null | undefined, next: YouthDailyPhase16_2) {
+  const key = youthDailyPhaseKey16_2(activeUser);
+  try {
+    localStorage.setItem(key, next);
+    window.dispatchEvent(new CustomEvent("bff:youthDailyPhase16_2", { detail: { key, next } }));
+  } catch {}
+}
+
+function openYouthTodayWork16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
+  setYouthDailyPhase16_2(activeUser, "work");
+  setScreen("youth");
+}
+
 function workbookQuestionsForPlan16_2(plan: typeof youthWeekOneDailyPlan[number]) {
   const text = `${plan.curriculum} ${plan.focus} ${(plan.work || []).join(" ")}`.toLowerCase();
   if (text.includes("forest business") || text.includes("inventory discovery")) {
@@ -9085,9 +9104,19 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
   });
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    const key = youthDailyPhaseKey16_2(activeUser);
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ key?: string; next?: YouthDailyPhase16_2 }>).detail;
+      if (detail?.key === key && detail.next) setPhase(detail.next);
+    };
+    window.addEventListener("bff:youthDailyPhase16_2", handler as EventListener);
+    return () => window.removeEventListener("bff:youthDailyPhase16_2", handler as EventListener);
+  }, [activeUser?.id, activeUser?.participant_id]);
+
   function go(next: YouthDailyPhase16_2) {
     setPhase(next);
-    try { localStorage.setItem(youthDailyPhaseKey16_2(activeUser), next); } catch {}
+    setYouthDailyPhase16_2(activeUser, next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -9158,10 +9187,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             </div>
             <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
           </div>
-          <div className="mt-4 grid gap-2 md:grid-cols-3">
-            {["work", "workbook", "journey"].map((item) => (
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {["work", "workbook"].map((item) => (
               <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
-                {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : "My Journey"}
+                {item === "work" ? "Today's Work" : "Workbook"}
               </button>
             ))}
           </div>
