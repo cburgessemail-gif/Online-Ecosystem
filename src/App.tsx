@@ -35,7 +35,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Defines OperationsInventoryPanel so inventory is visible and usable instead of referenced only
  * - Removes static Almanac placeholder guidance from the live Almanac layer
  * - Promotes LIVE visual weather, work status, today's goal, my contribution, and one-button work entry to the youth launch dashboard
- * - Launch 8.0: replaces Home/My Day/Start My Day confusion with Dashboard → Today's Work → Share My Learning → My Journey
+ * - Launch 8.0: replaces Home/My Day/Start My Day confusion with Dashboard → Today's Work → Workbook → Legacy → My Journey
  * - Advances active curriculum to Week 3 after Week 2 completion and shows the remaining week at a glance
  * - Adds full Mission Control work-status launch engine for Monday, June 22, 2026 cancellation
  * - Launch 8.0: adds Explore & Discover, Farm Wisdom, Generational Wisdom Archive, Take It Home, and Farm Knowledge Map nodes.
@@ -61,9 +61,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
  * - Ecosystem 16.0 FIXED: Preserves the full 14.7 operational ecosystem instead of replacing it with a portal-only shell.
  * - Ecosystem 16.0 FIXED: Keeps Youth, Parent, Supervisor, Mission Control/Operations, Visitor/Guest, Grower, Partner, Marketplace, Calendar/Almanac, Search/Resources, Workbook, Journey, Portfolio, Notifications, and Reports layers intact.
- * - Ecosystem 16.0 FIXED: Maintains the approved Youth navigation principle: Today's Work, Workbook, Journey, Curriculum, Calendar, Search.
- * - Ecosystem 16.1: Refactors curriculum rendering so Week, Day, Today's Work, Resources, Reflection, Workbook, Growth, Journey, Portfolio, and Parent Summary all read from one source of truth.
+ * - Ecosystem 16.2 LOCK: Youth navigation principle is Dashboard, Today's Work, Calendar, Workbook, My Journey, Sign Out. Daily flow is Work → Workbook → Legacy → Journey.
+ * - Ecosystem 16.2 LOCK: Curriculum rendering keeps Today's Work free of questions; Workbook contains activity documentation; Legacy contains one closing question; My Journey contains growth, skills, portfolio, opportunity, and career.
  * - Ecosystem 16.1: Adds Week 5 Forest Business & Inventory Discovery and routes completed youth reflections to My Growth before My Journey.
+ * - Ecosystem 16.2: Restores approved youth architecture: Today's Work → Workbook → Legacy → My Journey. Growth lives inside My Journey; activities live inside Workbook; no separate Reflection/Growth destination.
  */
 
 type Screen =
@@ -1209,18 +1210,25 @@ const youthWeekFiveDailyPlan = [
     curriculum: "Forest Business & Inventory Discovery",
     focus: "Youth use the forest, pollinator habitat, Zone 5 melon trellis, and expansion areas as a living business classroom. They count what is growing, identify assets, discuss purchased cattle fencing as an investment, and connect inventory to pricing and opportunity.",
     work: [
-      "Forest Inventory Walk",
-      "Count pollinator plants",
-      "Count trees by size",
-      "Count butterflies, caterpillars, eggs, bees, and other wildlife indicators",
-      "Identify food-producing plants or possible food-producing plants",
-      "Observe Zone 5 melon trellis",
-      "Discuss cattle fencing as a purchased investment",
-      "Estimate trellis capacity and melon production potential",
-      "Prepare squash grow area",
-      "Prepare pumpkin grow area",
-      "Plant corn seedlings if time and conditions allow",
-      "Record observations in the workbook"
+      "8:00 AM — Arrival, check-in, PPE, and daily goal",
+      "8:15 AM — Week 5 briefing: inventory before pricing",
+      "8:30 AM — Prepare squash grow area",
+      "9:00 AM — Prepare pumpkin grow area",
+      "9:30 AM — Plant corn seedlings if time and conditions allow",
+      "10:00 AM — Zone 5 melon review and trellis inspection",
+      "10:15 AM — Discuss cattle fencing as a purchased investment",
+      "10:30 AM — Weed and maintain growing areas",
+      "11:00 AM — Document photos, counts, and observations in the workbook",
+      "11:30 AM — Lunch / break",
+      "12:15 PM — Forest entry and safety review",
+      "12:30 PM — Forest Inventory Walk",
+      "1:00 PM — Count pollinator plants",
+      "1:15 PM — Count trees by size",
+      "1:30 PM — Count butterflies, caterpillars, eggs, bees, and other wildlife indicators",
+      "1:45 PM — Identify assets, food-producing plants, and opportunity",
+      "2:00 PM — Complete workbook evidence collection",
+      "2:15 PM — Legacy question",
+      "2:30 PM — My Journey update"
     ],
     resources: ["Forest inventory worksheet", "Pollinator identification guide", "Asset vs investment guide", "Pricing fundamentals", "Melon trellis capacity exercise", "Squash expansion planner", "Pumpkin expansion planner", "Opportunity discovery questions"],
     reflection: "How do we know what something is worth if we do not know how much we have? What did you count? What asset did you discover? How does the cattle fencing create value? What opportunity did you notice? What are we building for future Cultivators?",
@@ -1239,8 +1247,8 @@ const youthWeekFiveDailyPlan = [
     date: "July 10, 2026",
     curriculum: "Gate Installation, Weekly Business Reflection, Workbook, and Portfolio Update",
     focus: "Youth close Week 5 by connecting infrastructure, inventory, pricing, and production expansion to the farm's future opportunity and their own growth.",
-    work: ["Install or support gate work as directed", "Review forest inventory and production estimates", "Update workbook responses", "Add one photo or observation to portfolio", "Complete My Growth reflection", "Preview next week's leadership and community work"],
-    resources: ["Gate installation safety reminder", "Weekly inventory review", "Portfolio evidence checklist", "My Growth prompt", "Leadership preview"],
+    work: ["Install or support gate work as directed", "Review forest inventory and production estimates", "Update workbook responses", "Add one photo or observation to portfolio", "Update My Journey growth section", "Preview next week's leadership and community work"],
+    resources: ["Gate installation safety reminder", "Weekly inventory review", "Portfolio evidence checklist", "My Journey growth prompt", "Leadership preview"],
     reflection: "What did Week 5 teach you about seeing value, counting resources, and building opportunity before something is sold?",
   },
 ];
@@ -3923,7 +3931,7 @@ function screenLabel(screen: Screen) {
     journey: "My Journey",
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
-    growth: "My Growth Today",
+    growth: "My Journey — Growth Section",
     completion: "Achievement Center",
   };
   return labels[screen];
@@ -8757,7 +8765,7 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
     } catch {
       // Completion should never block the youth from reaching the next screen.
     }
-    setScreen("feedback");
+    setScreen("journey");
   }
 
   async function saveAndNext() {
@@ -8872,7 +8880,7 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
 
       <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-white/86">
         <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Workbook Flow</div>
-        <div className="mt-2 text-lg font-black text-white">Today’s Work → Workbook → Reflection → Legacy → My Growth → My Journey</div>
+        <div className="mt-2 text-lg font-black text-white">Today’s Work → Workbook → Legacy → My Journey</div>
         <p className="mt-2 text-sm font-bold leading-6 text-white/72">This area stays focused on today’s learning record. Main navigation remains outside the workbook so youth do not get pulled away from the task.</p>
       </div>
     </div>
@@ -8998,56 +9006,224 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
   );
 }
 
-function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const currentWeek = getCurrentYouthWeek();
-  const todayPlan = getCurrentYouthPlan();
-  const currentWeekPlans = youthDailyPlansByWeek[currentWeek.week] || youthWeekOneDailyPlan;
-  const knowledgePack = getActivityKnowledgePack(todayPlan);
+
+type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
+
+function youthDailyPhaseKey16_2(activeUser?: EcosystemUser | null) {
+  return `bff.launch.youthDailyPhase16_2.${todayISO()}.${launchParticipantId(activeUser)}`;
+}
+
+function workbookQuestionsForPlan16_2(plan: typeof youthWeekOneDailyPlan[number]) {
+  const text = `${plan.curriculum} ${plan.focus} ${(plan.work || []).join(" ")}`.toLowerCase();
+  if (text.includes("forest business") || text.includes("inventory discovery")) {
+    return [
+      "What did you count today?",
+      "What did you observe in the grow area before we went into the forest?",
+      "What surprised you during the forest inventory?",
+      "What asset did you discover?",
+      "How does the purchased cattle fencing create value for the melon trellis?",
+      "What opportunity did you notice for the farm, visitors, food, or future Cultivators?",
+    ];
+  }
+  return [
+    "What did you do today?",
+    "What did you observe, count, measure, photograph, or record?",
+    "What problem did you notice or help solve?",
+    "What skill did you practice while doing the work?",
+  ];
+}
+
+function savedWorkbookAnswers16_2(activeUser: EcosystemUser | null, questions: string[]) {
+  const participantId = launchParticipantId(activeUser);
+  const rows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+  return rows.filter((row) => row.date === todayISO() && row.participant_id === participantId && questions.includes(row.question));
+}
+
+function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  const [phase, setPhase] = useState<YouthDailyPhase16_2>(() => {
+    try {
+      const saved = localStorage.getItem(youthDailyPhaseKey16_2(activeUser)) as YouthDailyPhase16_2 | null;
+      return saved || "work";
+    } catch {
+      return "work";
+    }
+  });
+  const questions = workbookQuestionsForPlan16_2(todayPlan);
+  const savedAnswers = savedWorkbookAnswers16_2(activeUser, questions);
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    return questions.reduce<Record<string, string>>((acc, question) => {
+      acc[question] = savedAnswers.find((row) => row.question === question)?.response || "";
+      return acc;
+    }, {});
+  });
+  const [legacyAnswer, setLegacyAnswer] = useState(() => {
+    const legacyQuestion = "What are you helping build today that may help someone tomorrow?";
+    return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === launchParticipantId(activeUser) && row.question === legacyQuestion)?.response || "";
+  });
+  const [message, setMessage] = useState("");
+
+  function go(next: YouthDailyPhase16_2) {
+    setPhase(next);
+    try { localStorage.setItem(youthDailyPhaseKey16_2(activeUser), next); } catch {}
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function saveWorkbook() {
+    const now = new Date().toISOString();
+    const participantId = launchParticipantId(activeUser);
+    const userName = launchParticipantName(activeUser);
+    const currentRows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const withoutDuplicates = currentRows.filter((row) => !(row.date === todayISO() && row.participant_id === participantId && questions.includes(row.question)));
+    const newRows: CultivatorDiscovery[] = questions
+      .map((question) => ({ question, response: (answers[question] || "").trim() }))
+      .filter((item) => item.response)
+      .map((item) => ({
+        id: uuid(),
+        participant_id: participantId,
+        user_name: userName,
+        date: todayISO(),
+        category: "Workbook Activity Documentation",
+        question: item.question,
+        response: item.response,
+        source: "Today's Work",
+        created_at: now,
+      }));
+    safeWrite(DISCOVERY_KEY, [...newRows, ...withoutDuplicates].slice(0, 500));
+    saveYouthResumeState(activeUser, { stage: "learning", learning_answers: newRows.length, message: "Workbook saved. Continue to Legacy." });
+    setMessage("Workbook saved ✓ You will not have to answer these again today.");
+    go("legacy");
+  }
+
+  function saveLegacy() {
+    const clean = legacyAnswer.trim();
+    if (!clean) {
+      setMessage("Add one legacy answer before continuing.");
+      return;
+    }
+    const question = "What are you helping build today that may help someone tomorrow?";
+    const now = new Date().toISOString();
+    const participantId = launchParticipantId(activeUser);
+    const currentRows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const withoutDuplicate = currentRows.filter((row) => !(row.date === todayISO() && row.participant_id === participantId && row.question === question));
+    const row: CultivatorDiscovery = {
+      id: uuid(),
+      participant_id: participantId,
+      user_name: launchParticipantName(activeUser),
+      date: todayISO(),
+      category: "Legacy",
+      question,
+      response: clean,
+      source: "Today's Work",
+      created_at: now,
+    };
+    safeWrite(DISCOVERY_KEY, [row, ...withoutDuplicate].slice(0, 500));
+    recordCompletionOnce("legacy-complete", activeUser);
+    saveYouthResumeState(activeUser, { stage: "complete", message: "Legacy saved. Continue to My Journey." });
+    setMessage("Legacy saved ✓ Continue to My Journey.");
+    go("journey");
+  }
 
   return (
     <div className="grid gap-4">
-      <YouthMicroMissionEngine13 activeUser={activeUser} setScreen={setScreen} />
-      <YouthWorkbookCenter13_1 activeUser={activeUser} setScreen={setScreen} />
+      <Card className="p-4 md:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Ecosystem 16.2 • Approved Youth Flow</div>
+            <h1 className="mt-2 text-3xl font-black md:text-5xl">Work → Workbook → Legacy → Journey</h1>
+            <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">Today’s Work shows what to do. Workbook holds activity documentation. Legacy asks one closing question. Growth lives inside My Journey.</p>
+          </div>
+          <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
+          {["work", "workbook", "legacy", "journey"].map((item) => (
+            <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
+              {item === "work" ? "Today's Work" : item === "workbook" ? "Workbook" : item === "legacy" ? "Legacy" : "My Journey"}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {phase === "work" && (
+        <Card className="p-4 md:p-6">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Work • No Questions Here</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">{todayPlan.curriculum}</h2>
+          <p className="mt-3 max-w-4xl text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
+          <div className="mt-5 grid gap-2">
+            {(todayPlan.work || []).map((item) => (
+              <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/86">• {item}</div>
+            ))}
+          </div>
+          <button type="button" onClick={() => go("workbook")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Workbook</button>
+        </Card>
+      )}
+
+      {phase === "workbook" && (
+        <Card className="p-4 md:p-6">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook • Activities, Evidence, Counts, Photos</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">Document today's activities one time.</h2>
+          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved. Youth can return without repeating the same questions.</p>
+          <div className="mt-5 grid gap-4">
+            {questions.map((question) => (
+              <label key={question} className="block rounded-2xl border border-white/10 bg-black/25 p-4">
+                <span className="text-sm font-black text-white">{question}</span>
+                <textarea value={answers[question] || ""} onChange={(event) => setAnswers((prev) => ({ ...prev, [question]: event.target.value }))} placeholder="Write, dictate, or summarize the observation here." className="mt-3 min-h-[95px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-emerald-300" />
+              </label>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={saveWorkbook} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Workbook + Continue</button>
+            <button type="button" onClick={() => go("work")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">Back to Work</button>
+          </div>
+          {message && <Notice text={message} />}
+        </Card>
+      )}
+
+      {phase === "legacy" && (
+        <Card className="p-4 md:p-6">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Legacy • One Question</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">What are you helping build today that may help someone tomorrow?</h2>
+          <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="One answer. Save. Continue." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={saveLegacy} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Save Legacy + Continue</button>
+            <button type="button" onClick={() => go("workbook")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">Back to Workbook</button>
+          </div>
+          {message && <Notice text={message} />}
+        </Card>
+      )}
+
+      {phase === "journey" && (
+        <Card className="p-4 md:p-6">
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">My Journey • Growth Lives Here</div>
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">Today's growth is now part of My Journey.</h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {["My Growth", "My Skills", "My Experiences", "Community Connection", "Opportunity Connection", "Career Interest", "Legacy Record", "Portfolio Progress"].map((item) => (
+              <div key={item} className="rounded-2xl border border-white/10 bg-white/10 p-4 font-black text-white">{item}</div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setScreen("journey")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Open My Journey</button>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
+  const currentWeek = getCurrentYouthWeek();
+  const todayPlan = getCurrentYouthPlan();
+
+  return (
+    <div className="grid gap-4">
+      <YouthDailyFlow16_2 todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} activeUser={activeUser} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Supervisor / adult view: full details only when needed</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Supervisor / adult view: supporting details only</summary>
         <div className="mt-4 grid gap-3">
           <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
           <Launch62TodayPlantingMissionPanel />
           <Launch60ActivityGoalCard todayPlan={todayPlan} />
           <YouthTodayWorkCard />
-          <CurriculumEvidenceCaptureCard />
           <MiracleGroYouthResourceCard />
-        </div>
-      </details>
-
-      <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Workbook, portfolio, journey, and weekly view</summary>
-        <div className="mt-4 grid gap-3">
-          <InfoToShareLaunch60Card />
-          <YouthEvidenceUploadCard activeUser={activeUser} />
-          <CurriculumReflectionCard activeUser={activeUser} />
-          <YouthWorkforcePortfolioCard participantId={activeUser?.participant_id || ""} />
-          <YouthResumeSkillsCard participantId={activeUser?.participant_id || ""} />
-          <Launch60EndMyDayCard />
-          <Launch62MyJourneyPanel compact />
-          <CultivatorReflectionLaunchCard knowledgePack={knowledgePack} />
-          <Cultivator90CareerPathwaysCard />
-          <Cultivator90WorkforceTranscriptCard participantId={activeUser?.participant_id || ""} />
-          <Cultivator90LegacyMapCard />
           <CurriculumWeekViewCard compact />
-          <Card className="p-4 md:p-5">
-            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Monday–Friday Curriculum</div>
-            <div className="mt-3 grid gap-2">
-              {currentWeekPlans.map((day) => (
-                <details key={day.day} className="rounded-xl border border-white/10 bg-white/10 p-3">
-                  <summary className="cursor-pointer text-sm font-black">{day.day} • {day.curriculum}</summary>
-                  <p className="mt-2 text-sm leading-6 text-white/78">{day.focus}</p>
-                  <div className="mt-2 text-sm font-bold text-white/82">Reflection: {day.reflection}</div>
-                </details>
-              ))}
-            </div>
-          </Card>
         </div>
       </details>
     </div>
