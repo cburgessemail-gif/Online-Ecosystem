@@ -76,6 +76,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2L: Removes private airport map exposure, establishes South Hangar as the youth staging area, pins Today's Work resources, adds watermelon/cantaloupe inventory counts, removes repeated Today's Work title duplication, and keeps Workbook as Curriculum + Documentation while My Journey remains Growth + Accomplishments only.
  * - Ecosystem 16.3A: Forest Stewardship & Apiary Integration Lock. Friday July 10 becomes forest exploration, natural trellis planning/materials collection, milkweed/pollinator observation, and beehive assembly progress. Monday remains construction day. Today's Work stays assignments/resources/safety only; Workbook stays documentation; My Journey auto-records accomplishments.
  * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
+ * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  */
 
 type Screen =
@@ -426,6 +427,13 @@ const WORK_STATUS_KEY = "bff.launch.workStatus";
 const WORK_STATUS_LOG_KEY = "bff.launch.workStatusLog";
 const CROP_PLAN_KEY = "bff.launch.cropPlanner";
 const ECOSYSTEM_BASE_URL = "https://ecosystem.farmandfamilyalliance.org";
+const GROWNBY_MARKET_URL = import.meta.env.VITE_GROWNBY_MARKET_URL || "https://grownby.app/";
+
+function openGrownByMarketplace() {
+  if (typeof window === "undefined") return;
+  window.open(GROWNBY_MARKET_URL, "_blank", "noopener,noreferrer");
+}
+
 
 type FarmOperationStatus = {
   level: "Open" | "Modified Operations" | "Closed";
@@ -5095,7 +5103,7 @@ function Cultivator90DashboardGrid({ setScreen }: { setScreen: (screen: Screen) 
           <h3 className="text-2xl font-black">{section.title}</h3>
           <p className="mt-2 text-sm font-bold leading-6 text-white/75">{section.detail}</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {section.actions.map(([label, screen]) => <button key={label} type="button" onClick={() => setScreen(screen as Screen)} className="rounded-full border border-white/15 bg-black/30 px-4 py-2 text-xs font-black">{label}</button>)}
+            {section.actions.map(([label, screen]) => <button key={label} type="button" onClick={() => screen === "marketplace" ? openGrownByMarketplace() : setScreen(screen as Screen)} className="rounded-full border border-white/15 bg-black/30 px-4 py-2 text-xs font-black">{label}</button>)}
           </div>
         </div>
       ))}
@@ -5357,7 +5365,7 @@ function App() {
       {screen === "support" && <SupportJourney setScreen={setScreen} />}
       {screen === "caseManager" && <CaseManagerPortal setScreen={setScreen} />}
       {screen === "valueAdded" && <ValueAddedJourney setScreen={setScreen} />}
-      {screen === "marketplace" && <MarketplaceOperations activeUser={activeUser} setScreen={setScreen} />}
+      {screen === "marketplace" && <MarketplaceRedirect setScreen={setScreen} />}
       {screen === "wellness" && <WellnessScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
       {screen === "operations" && <Operations setScreen={setScreen} activeUser={activeUser} />}
@@ -5466,7 +5474,7 @@ function Shell({
   const workTarget: Screen = role === "Youth Workforce Participant" ? (hasCompletedTodayWorkCheckIn(activeUser) ? "youth" : "wellness") : dashboardTarget;
   const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
 
-  const primaryNav: { label: string; screen: Screen }[] = role === "Youth Workforce Participant"
+  const primaryNav: { label: string; screen?: Screen; external?: "grownby" }[] = role === "Youth Workforce Participant"
     ? []
     : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
     ? [
@@ -5481,7 +5489,7 @@ function Shell({
     : role === "Grower"
     ? [
         { label: "Grower", screen: "grower" },
-        { label: "Market", screen: "marketplace" },
+        { label: "Market", external: "grownby" },
       ]
     : role === "Partner"
     ? [
@@ -5490,7 +5498,7 @@ function Shell({
       ]
     : [
         { label: "Explore", screen: "guest" },
-        { label: "Market", screen: "marketplace" },
+        { label: "Market", external: "grownby" },
       ];
 
   const buttonClass = (target: Screen) =>
@@ -5531,11 +5539,20 @@ function Shell({
               ) : (
                 <button type="button" onClick={() => setScreen(workTarget)} className={buttonClass(workTarget)}>{role && role !== "Guest" ? (hasOperationalHeatRestriction() ? "Safe Check-In" : "Today’s Work") : "Choose Role"}</button>
               )}
-              {primaryNav.map((item) => (
-                <button type="button" key={`${item.label}-${item.screen}`} onClick={() => setScreen(item.screen)} className={buttonClass(item.screen)}>
-                  {item.label}
-                </button>
-              ))}
+              {primaryNav.map((item) => {
+                const isExternalMarket = item.external === "grownby";
+                const target = item.screen ?? screen;
+                return (
+                  <button
+                    type="button"
+                    key={`${item.label}-${item.screen ?? item.external}`}
+                    onClick={() => isExternalMarket ? openGrownByMarketplace() : item.screen && setScreen(item.screen)}
+                    className={isExternalMarket ? "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20" : buttonClass(target)}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
 
             </div>
             )}
@@ -6689,7 +6706,7 @@ function JourneyCompletionCard({
               <button
                 key={step.label}
                 type="button"
-                onClick={() => setScreen(step.screen)}
+                onClick={() => step.screen === "marketplace" ? openGrownByMarketplace() : setScreen(step.screen)}
                 className="rounded-2xl border border-white/10 bg-black/28 p-3 text-left text-sm font-black hover:bg-emerald-300 hover:text-black"
               >
                 {step.label}
@@ -6716,7 +6733,7 @@ function JourneyCompletionCard({
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3">
-        <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Continue to Marketplace</button>
+        <button type="button" onClick={openGrownByMarketplace} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Continue to Marketplace</button>
         <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Pathway</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Share Feedback</button>
         <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
@@ -6877,7 +6894,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-4 text-left font-black text-black hover:bg-emerald-200">Attend an Event</button>
-          <button type="button" onClick={() => setScreen("marketplace")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Visit Marketplace</button>
+          <button type="button" onClick={openGrownByMarketplace} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Visit Marketplace</button>
           <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Volunteer / Support</button>
           <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Become a Partner</button>
         </div>
@@ -11732,6 +11749,24 @@ const DEFAULT_MARKET_PRODUCTS: MarketplaceProduct[] = [
 ];
 
 
+function MarketplaceRedirect({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  useEffect(() => {
+    openGrownByMarketplace();
+  }, []);
+
+  return (
+    <Card>
+      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Market</div>
+      <h1 className="mt-3 text-4xl font-black">Opening GrownBy</h1>
+      <p className="mt-3 max-w-3xl text-sm font-bold leading-6 text-white/75">The Market button now opens GrownBy in a new tab so families, visitors, and growers do not lose their place in the ecosystem.</p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="button" onClick={openGrownByMarketplace} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open GrownBy</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Return to Ecosystem</button>
+      </div>
+    </Card>
+  );
+}
+
 function MarketplaceOperations({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
   const [tab, setTab] = useState<"command" | "storefront" | "checkout" | "orders" | "fulfillment" | "catalog">("command");
   const [products, setProducts] = useState<MarketplaceProduct[]>(() => {
@@ -13255,7 +13290,7 @@ function GrowerJourney({ setScreen }: { setScreen: (screen: Screen) => void }) {
         extra={
           <>
             <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Grower Profile</button>
-            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
+            <button type="button" onClick={openGrownByMarketplace} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Marketplace Opportunities</button>
             <button type="button" onClick={() => setScreen("operations")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Grower Operations</button>
           </>
         }
@@ -13333,7 +13368,7 @@ function ValueAddedJourney({ setScreen }: { setScreen: (screen: Screen) => void 
         extra={
           <>
             <button type="button" onClick={() => setScreen("registration")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Create Producer Profile</button>
-            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
+            <button type="button" onClick={openGrownByMarketplace} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Connect to Marketplace</button>
           </>
         }
       />
@@ -13379,7 +13414,7 @@ function SimplePathway({
             <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
             <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
             <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
-            <button type="button" onClick={() => setScreen("marketplace")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
+            <button type="button" onClick={openGrownByMarketplace} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Marketplace</button>
           </div>
         </Card>
         <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_35px_100px_rgba(0,0,0,.48)]">
