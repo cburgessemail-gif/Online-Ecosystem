@@ -75,6 +75,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2K: Locks Workbook vs My Journey separation, removes duplicate Today's Work display inside the youth flow, adds Back to Curriculum Activity inside Workbook, routes Career/Opportunity/Growth to My Journey only, and auto-records workbook accomplishments into My Journey without duplicate youth entry.
  * - Ecosystem 16.2L: Removes private airport map exposure, establishes South Hangar as the youth staging area, pins Today's Work resources, adds watermelon/cantaloupe inventory counts, removes repeated Today's Work title duplication, and keeps Workbook as Curriculum + Documentation while My Journey remains Growth + Accomplishments only.
  * - Ecosystem 16.3A: Forest Stewardship & Apiary Integration Lock. Friday July 10 becomes forest exploration, natural trellis planning/materials collection, milkweed/pollinator observation, and beehive assembly progress. Monday remains construction day. Today's Work stays assignments/resources/safety only; Workbook stays documentation; My Journey auto-records accomplishments.
+ * - Ecosystem 16.8A: Fixes workbook week library, CSU topic cards, and incomplete item cards so they open in-app panels instead of appearing clickable but doing nothing.
  * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  */
@@ -9077,7 +9078,107 @@ const CSU_CURRICULUM_ACCESS_TOPICS_16_8 = [
 
 const WORKBOOK_WEEK_ACCESS_16_8 = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8"];
 
-function CSUBasedCurriculumAccess16_8({ compact = false }: { compact?: boolean }) {
+type WorkbookOpenPanel16_8 =
+  | { kind: "week"; label: string }
+  | { kind: "topic"; label: string }
+  | { kind: "status"; label: string };
+
+function weekNumberFromLabel16_8(label: string) {
+  const match = label.match(/(\d+)/);
+  return match ? Number(match[1]) : 5;
+}
+
+function workbookPlanForWeek16_8(label: string) {
+  const week = weekNumberFromLabel16_8(label);
+  const plans: Record<number, typeof youthWeekOneDailyPlan> = {
+    1: youthWeekOneDailyPlan,
+    2: youthWeekTwoDailyPlan,
+    3: youthWeekThreeDailyPlan,
+    4: youthWeekFourDailyPlan,
+    5: youthWeekFiveDailyPlan,
+    6: youthWeekSixDailyPlan,
+    7: youthWeekSevenDailyPlan,
+    8: youthWeekEightDailyPlan,
+  };
+  return plans[week] || youthWeekFiveDailyPlan;
+}
+
+function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_8; onClose: () => void }) {
+  if (panel.kind === "week") {
+    const plan = workbookPlanForWeek16_8(panel.label);
+    return (
+      <div id="workbook-open-panel-16-8" className="mt-4 rounded-[1.5rem] border border-emerald-200/25 bg-black/30 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-100/75">Opened Workbook Week</div>
+            <h4 className="mt-1 text-2xl font-black text-white">{panel.label}</h4>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/72">Choose a day to review curriculum, resources, documentation prompts, and unfinished work. This is the editable record area.</p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Close</button>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {plan.map((dayPlan) => (
+            <details key={`${panel.label}-${dayPlan.day}`} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <summary className="cursor-pointer text-sm font-black text-white">{dayPlan.day} — {dayPlan.curriculum}</summary>
+              <p className="mt-3 text-sm font-bold leading-6 text-white/75">{dayPlan.focus}</p>
+              <div className="mt-3 grid gap-2">
+                {(dayPlan.work || []).slice(0, 8).map((item) => (
+                  <div key={item} className="rounded-xl bg-black/25 p-3 text-xs font-bold leading-5 text-white/78">• {item}</div>
+                ))}
+              </div>
+              <div className="mt-3 rounded-xl border border-sky-200/20 bg-sky-300/10 p-3 text-xs font-bold leading-5 text-white/78">
+                <span className="font-black text-sky-50">Resources / lesson source:</span> {(dayPlan.resources || []).join(" • ") || "Open curriculum resources."}
+              </div>
+              <div className="mt-3 rounded-xl border border-amber-200/20 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-white/78">
+                <span className="font-black text-amber-50">Reflection / completion prompt:</span> {dayPlan.reflection}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (panel.kind === "topic") {
+    return (
+      <div id="workbook-open-panel-16-8" className="mt-4 rounded-[1.5rem] border border-sky-200/25 bg-black/30 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100/75">Opened CSU-Based Curriculum Topic</div>
+            <h4 className="mt-1 text-2xl font-black text-white">{panel.label}</h4>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/72">This opens the existing CSU-based curriculum foundation as an accessible topic. No new curriculum is added; this makes the lesson source easier to find and revisit.</p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Close</button>
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
+            <div key={`${panel.label}-${week}`} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black text-white/84">{week}<div className="mt-1 text-[11px] font-bold text-white/60">Review where this topic appears.</div></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div id="workbook-open-panel-16-8" className="mt-4 rounded-[1.5rem] border border-amber-200/25 bg-black/30 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-100/75">Opened Incomplete Items</div>
+          <h4 className="mt-1 text-2xl font-black text-white">{panel.label}</h4>
+          <p className="mt-2 text-sm font-bold leading-6 text-white/72">This view lists the places youth can return to complete, replace, edit, or upload missing workbook items.</p>
+        </div>
+        <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Close</button>
+      </div>
+      <div className="mt-4 grid gap-2 md:grid-cols-4">
+        {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
+          <div key={`${panel.label}-${week}`} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black text-white/84">{week}<div className="mt-1 text-[11px] font-bold text-white/60">Check {panel.label.toLowerCase()} items.</div></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CSUBasedCurriculumAccess16_8({ compact = false, onOpen }: { compact?: boolean; onOpen?: (topic: string) => void }) {
   return (
     <div className={`rounded-[1.5rem] border border-sky-200/25 bg-sky-300/10 ${compact ? "p-4" : "p-5"}`}>
       <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">CSU-Based Curriculum Access</div>
@@ -9087,14 +9188,14 @@ function CSUBasedCurriculumAccess16_8({ compact = false }: { compact?: boolean }
       </p>
       <div className="mt-4 grid gap-2 md:grid-cols-3">
         {CSU_CURRICULUM_ACCESS_TOPICS_16_8.map((topic) => (
-          <div key={topic} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">{topic}</div>
+          <button key={topic} type="button" onClick={() => onOpen?.(topic)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{topic}<div className="mt-1 text-[11px] font-bold text-white/55">Open topic</div></button>
         ))}
       </div>
     </div>
   );
 }
 
-function WorkbookWeekAccess16_8() {
+function WorkbookWeekAccess16_8({ onOpen }: { onOpen?: (week: string) => void }) {
   return (
     <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Editable Week Library</div>
@@ -9104,7 +9205,7 @@ function WorkbookWeekAccess16_8() {
       </p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
         {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
-          <button key={week} type="button" className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/86 hover:bg-white/12">
+          <button key={week} type="button" onClick={() => onOpen?.(week)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/86 hover:bg-white/12">
             {week}<div className="mt-1 text-[11px] font-bold text-white/60">Open / edit / complete</div>
           </button>
         ))}
@@ -9113,14 +9214,14 @@ function WorkbookWeekAccess16_8() {
   );
 }
 
-function WorkbookRecoveryCenter16_8() {
+function WorkbookRecoveryCenter16_8({ onOpen }: { onOpen?: (status: string) => void }) {
   const items = ["Missing reflection", "Missing upload", "Missing documentation", "Needs review", "Not started"];
   return (
     <div className="rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/80">Incomplete Items Center</div>
       <h3 className="mt-2 text-2xl font-black">Find what still needs work.</h3>
       <div className="mt-4 grid gap-2 md:grid-cols-5">
-        {items.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">{item}</div>)}
+        {items.map((item) => <button key={item} type="button" onClick={() => onOpen?.(item)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{item}<div className="mt-1 text-[11px] font-bold text-white/55">Open list</div></button>)}
       </div>
     </div>
   );
@@ -9364,6 +9465,12 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === launchParticipantId(activeUser) && row.question === legacyQuestion)?.response || "";
   });
   const [message, setMessage] = useState("");
+  const [workbookOpenPanel16_8, setWorkbookOpenPanel16_8] = useState<WorkbookOpenPanel16_8 | null>(null);
+
+  function openWorkbookPanel16_8(panel: WorkbookOpenPanel16_8) {
+    setWorkbookOpenPanel16_8(panel);
+    window.setTimeout(() => document.getElementById("workbook-open-panel-16-8")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
+  }
 
   useEffect(() => {
     const key = youthDailyPhaseKey16_2(activeUser);
@@ -9474,9 +9581,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
           <h2 className="mt-2 text-3xl font-black md:text-4xl">Document today's activities one time.</h2>
           <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved and remain editable. Youth can return to any week to add, delete, change, replace, or complete unfinished work. Career, opportunity, accomplishments, and growth stay in My Journey, not here.</p>
           <div className="mt-4 grid gap-4">
-            <CSUBasedCurriculumAccess16_8 compact />
-            <WorkbookWeekAccess16_8 />
-            <WorkbookRecoveryCenter16_8 />
+            <CSUBasedCurriculumAccess16_8 compact onOpen={(topic) => openWorkbookPanel16_8({ kind: "topic", label: topic })} />
+            <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
+            <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
+            {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} />}
           </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
             <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links + Daily Lesson Source</div>
