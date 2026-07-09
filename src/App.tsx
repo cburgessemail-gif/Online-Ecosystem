@@ -74,6 +74,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2J: Fixes header routing. Workbook and My Journey buttons no longer get reset back to Today's Work. Youth dashboard button is removed because Today's Work is the operating dashboard.
  * - Ecosystem 16.2K: Locks Workbook vs My Journey separation, removes duplicate Today's Work display inside the youth flow, adds Back to Curriculum Activity inside Workbook, routes Career/Opportunity/Growth to My Journey only, and auto-records workbook accomplishments into My Journey without duplicate youth entry.
  * - Ecosystem 16.2L: Removes private airport map exposure, establishes South Hangar as the youth staging area, pins Today's Work resources, adds watermelon/cantaloupe inventory counts, removes repeated Today's Work title duplication, and keeps Workbook as Curriculum + Documentation while My Journey remains Growth + Accomplishments only.
+ * - Ecosystem 16.3A: Forest Stewardship & Apiary Integration Lock. Friday July 10 becomes forest exploration, natural trellis planning/materials collection, milkweed/pollinator observation, and beehive assembly progress. Monday remains construction day. Today's Work stays assignments/resources/safety only; Workbook stays documentation; My Journey auto-records accomplishments.
  */
 
 type Screen =
@@ -1265,11 +1266,23 @@ const youthWeekFiveDailyPlan = [
   {
     day: "Friday",
     date: "July 10, 2026",
-    curriculum: "Gate Installation, Weekly Business Reflection, Workbook, and Portfolio Update",
-    focus: "Youth close Week 5 by connecting infrastructure, inventory, pricing, and production expansion to the farm's future opportunity and their own growth.",
-    work: ["Install or support gate work as directed", "Review forest inventory and production estimates", "Update workbook responses", "Add one photo or observation to portfolio", "Update My Journey growth section", "Preview next week's leadership and community work"],
-    resources: ["Gate installation safety reminder", "Weekly inventory review", "Portfolio evidence checklist", "My Journey growth prompt", "Leadership preview"],
-    reflection: "What did Week 5 teach you about seeing value, counting resources, and building opportunity before something is sold?",
+    curriculum: "Forest Stewardship, Trellis Planning, and Apiary Development",
+    focus: "Youth spend the day in the forest to observe the ecosystem, study both natural trellis videos, choose the branch types and trellis designs they want for Monday, collect only fallen materials, observe milkweed and pollinator habitat, and begin putting the beehive together.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and daily briefing",
+      "Watch both natural trellis design videos before entering the forest",
+      "Decide which branch types are needed: straight, forked, long, strong, or flexible",
+      "Choose which trellis design may work best for beans, tomatoes, or other climbing plants",
+      "Enter the forest only with the supervisor-approved group and remain together",
+      "Observe wildlife: bees, butterflies, milkweed, seed pods, caterpillars, salamanders, toads, birds, deer sign, and animal tracks",
+      "Collect only naturally fallen branches, dead wood, or dropped limbs — do not cut living trees",
+      "Stage collected trellis materials for Monday's construction day",
+      "Begin putting together the beehive: identify hive parts, install frames, check alignment, and verify stability",
+      "Photograph forest discoveries, collected materials, milkweed, and beehive assembly progress",
+      "Return to the South Hangar Staging Area if unsure, separated, or redirected"
+    ],
+    resources: ["Natural Trellis Design Video #1", "Natural Trellis Design Video #2", "Apiary Assembly Guide", "Beehive Assembly Video", "Beehive Diagram", "Honey Bee Basics", "Pollinator Habitat", "Milkweed & Monarchs", "South Hangar Staging Reminder", "Site Safety Guide"],
+    reflection: "How did forests, pollinators, natural materials, and beehive assembly connect to the farm's future?",
   },
 ];
 
@@ -1277,11 +1290,11 @@ const youthWeekSixDailyPlan = [
   {
     day: "Monday",
     date: "Week 6 Monday",
-    curriculum: "Leadership, Responsibility, and Team Roles",
-    focus: "Youth practice leadership by understanding responsibility, communication, teamwork, and how one person's work affects the group.",
-    work: ["Review team responsibilities", "Choose a leadership contribution", "Support younger or newer participants", "Complete a supervisor-directed farm task", "Record one leadership action"],
-    resources: ["Leadership roles card", "Communication prompt", "Responsibility checklist"],
-    reflection: "How did your action help the team today?",
+    curriculum: "Natural Plant Support System Construction Day",
+    focus: "Youth use Friday's collected forest materials to select a trellis design, sort branches, build natural supports, install tomato supports, install bean trellises as needed, and continue apiary development if necessary.",
+    work: ["Sort Friday's collected fallen branches and dead wood", "Select the trellis design that best fits the crop", "Build natural plant supports", "Install tomato supports where directed", "Install bean trellises as needed", "Continue beehive or apiary work if necessary", "Document before/after construction progress"],
+    resources: ["Friday materials staging note", "Natural Trellis Design Video #2", "Tomato Support Guide", "Bean Trellis Guide", "Tool Safety Basics", "Apiary Assembly Guide"],
+    reflection: "How did Friday's forest materials become useful farm infrastructure today?",
   },
   {
     day: "Tuesday",
@@ -2176,6 +2189,10 @@ function getActiveCurriculum(date = new Date()): CurriculumDay {
 }
 
 function buildParentSummary(curriculum: CurriculumDay = getActiveCurriculum()) {
+  const activePlan = getCurrentYouthPlan();
+  if (`${activePlan.curriculum} ${activePlan.focus}`.toLowerCase().includes("forest stewardship")) {
+    return "This week youth explored the forest ecosystem, observed wildlife, investigated pollinator habitat and milkweed, collected natural fallen materials for Monday's trellis construction, supported apiary development, prepared infrastructure projects, and connected environmental stewardship with food production.";
+  }
   const activities = curriculum.activities.map((activity) => activity.title).join(", ");
   return `Today youth worked on ${curriculum.theme.toLowerCase()} through hands-on farm activities: ${activities}. The featured experience was "${curriculum.featuredStory}." Youth connected farm work to their own environment: Youngstown parks, neighborhood woods, vacant lots, water movement, wildlife, plant health, and community stewardship.`;
 }
@@ -4635,21 +4652,21 @@ function LaunchReadinessValidatorCard() {
 
 function YouthTodayWorkCard() {
   const todayProjects = [
-    "Install melon trellis",
-    "Prepare squash grow area",
-    "Prepare pumpkin grow area",
-    "Count watermelon plants",
-    "Count cantaloupe plants",
-    "Collect milkweed seeds safely",
-    "Rebuild beehive",
-    "Establish apiary",
+    "Watch both natural trellis videos",
+    "Explore the forest ecosystem with your group",
+    "Observe wildlife and pollinator habitat",
+    "Locate milkweed and seed pods",
+    "Collect only fallen branches and dead wood",
+    "Stage natural trellis materials for Monday",
+    "Begin putting together the beehive",
+    "Photograph apiary assembly progress",
   ];
   const pinnedResources = [
-    "🐝 Beehive Assembly Video",
+    "🎥 Natural Trellis Design Video #1",
+    "🎥 Natural Trellis Design Video #2",
+    "🐝 Apiary Assembly Guide",
     "📄 Beehive Diagram",
-    "📋 Inventory Count Sheet",
-    "🌱 Melon Trellis Guide",
-    "🌿 Milkweed Seed Collection Guide",
+    "🌿 Milkweed & Monarchs",
   ];
   const safetyItems = [
     "Stay with your crew.",
@@ -4660,7 +4677,7 @@ function YouthTodayWorkCard() {
 
   return (
     <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Week 5 • Thursday</div>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Week 5 • Friday</div>
       <h2 className="mt-2 text-3xl font-black">South Hangar Staging Area</h2>
       <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">Work first. Use the ecosystem for directions, resources, inventory, and safety support.</p>
 
@@ -7417,6 +7434,24 @@ const bronsonActivityRegistry: ActivityRegistryEntry[] = [
     reflectionPrompt: "What did you learn about how water, nutrients, and plants work together?",
   },
   {
+    label: "Forest Stewardship & Natural Trellis Materials",
+    match: /forest|trellis|branch|fallen|dead wood|milkweed|monarch|wildlife|salamander|toad|natural material/i,
+    knowledge: ["Forest ecosystems", "Milkweed", "Pollinator habitat", "Natural materials", "Environmental stewardship", "Responsible collection"],
+    skills: ["Observation", "Material selection", "Safety awareness", "Documentation", "Stewardship", "Planning"],
+    competencies: ["Stewardship", "Critical Thinking", "Farm Infrastructure", "Safety", "Environmental Literacy"],
+    careers: ["Forester", "Park Ranger", "Environmental Scientist", "Landscaper", "Contractor", "Farmer", "Beekeeper"],
+    entrepreneurship: ["Using available resources responsibly", "Reducing material costs", "Building farm infrastructure", "Visitor education", "Pollinator-based value creation"],
+    resources: [
+      { title: "Natural Trellis Design Video #1", type: "Link", note: "Use to compare branch shapes, structure, and trellis-building options before collecting materials." },
+      { title: "Natural Trellis Design Video #2", type: "Link", note: "Preferred design reference for branch trellises and climbing vegetable supports." },
+      { title: "Milkweed & Monarchs", type: "Internal", note: "Connect milkweed, seed pods, caterpillars, butterflies, pollinator habitat, and stewardship." },
+      { title: "Responsible Forest Collection", type: "Internal", note: "Collect only naturally fallen branches, dead wood, or dropped limbs. Do not cut living trees." },
+    ],
+    evidence: ["Forest photo", "Wildlife photo", "Milkweed observation", "Trellis materials photo", "Beehive assembly photo"],
+    resumeStatement: "Practiced environmental stewardship by observing forest ecosystems, identifying natural construction materials, documenting pollinator habitat, and supporting farm infrastructure planning.",
+    reflectionPrompt: "How can people use forest resources responsibly without harming the ecosystem?",
+  },
+  {
     label: "Foraging & Plant Identification",
     match: /forag|wild edible|plant identification|edible plant|trail/i,
     knowledge: ["Wild edible plants", "Plant identification", "Habitat", "Responsible harvesting", "Food safety"],
@@ -9150,6 +9185,16 @@ function openYouthJourney16_2(activeUser: EcosystemUser | null | undefined, setS
 
 function workbookQuestionsForPlan16_2(plan: typeof youthWeekOneDailyPlan[number]) {
   const text = `${plan.curriculum} ${plan.focus} ${(plan.work || []).join(" ")}`.toLowerCase();
+  if (text.includes("forest stewardship") || text.includes("trellis planning") || text.includes("natural trellis")) {
+    return [
+      "What forest photo or wildlife discovery did you document?",
+      "What milkweed or pollinator habitat did you observe?",
+      "What trellis materials did you collect or help stage for Monday?",
+      "Which trellis design or branch type do you think will work best for beans or tomatoes?",
+      "What beehive part did you help identify, align, install, or check?",
+      "How can people use forest resources responsibly without harming the ecosystem?",
+    ];
+  }
   if (text.includes("forest business") || text.includes("inventory discovery")) {
     return [
       "What did you count today?",
@@ -9190,6 +9235,11 @@ function recordJourneyAccomplishments16_2K(activeUser: EcosystemUser | null, pla
   if (planText.includes("potato")) labels.add("Observation: Checked potato basket growth and plant condition.");
   if (planText.includes("pooling") || planText.includes("drainage") || planText.includes("mulch")) labels.add("Problem solving: Noticed pooling water and improved mulch, rows, or paths.");
   if (planText.includes("cocoon") || planText.includes("salamander") || planText.includes("toad") || planText.includes("forest")) labels.add("Environment discovery: Documented wildlife, amphibians, cocoon, or forest ecosystem evidence.");
+  if (planText.includes("trellis") && planText.includes("fallen")) labels.add("Accomplishment: Collected and staged natural construction materials for plant supports.");
+  if (planText.includes("milkweed") || planText.includes("pollinator")) labels.add("Accomplishment: Investigated pollinator habitat and milkweed connections.");
+  if (planText.includes("beehive") || planText.includes("apiary")) labels.add("Accomplishment: Supported apiary development and beehive assembly progress.");
+  if (planText.includes("forest stewardship")) labels.add("Skill: Practiced environmental stewardship by using forest resources responsibly.");
+  if (planText.includes("wildlife")) labels.add("Accomplishment: Observed wildlife habitat as part of farm ecosystem learning.");
 
   const existing = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
   const existingKeys = new Set(existing.map((event) => `${event.user_id || ""}|${String(event.created_at || "").slice(0, 10)}|${event.label}`));
@@ -9225,7 +9275,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     }, {});
   });
   const [legacyAnswer, setLegacyAnswer] = useState(() => {
-    const legacyQuestion = "What are you helping build today that may help someone tomorrow?";
+    const legacyQuestion = "How did your work today help future generations?";
     return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === launchParticipantId(activeUser) && row.question === legacyQuestion)?.response || "";
   });
   const [message, setMessage] = useState("");
@@ -9279,7 +9329,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       setMessage("Add one legacy answer before continuing.");
       return;
     }
-    const question = "What are you helping build today that may help someone tomorrow?";
+    const question = "How did your work today help future generations?";
     const now = new Date().toISOString();
     const participantId = launchParticipantId(activeUser);
     const currentRows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
@@ -9364,7 +9414,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-6">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Final Question</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">One last reflection before your Journey is updated.</h2>
-          <div className="mt-5 rounded-3xl border border-amber-200/20 bg-amber-200/10 p-4 text-xl font-black leading-8 text-white">What are you helping build today that may help someone tomorrow?</div>
+          <div className="mt-5 rounded-3xl border border-amber-200/20 bg-amber-200/10 p-4 text-xl font-black leading-8 text-white">How did your work today help future generations?</div>
           <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="One answer. Save. Continue to My Journey." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
           <div className="mt-5 flex flex-wrap gap-2">
             <button type="button" onClick={saveLegacy} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Continue to My Journey</button>
