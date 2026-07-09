@@ -72,6 +72,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2H: Restores visible My Journey routing while keeping Today's Work routed to work and Workbook routed to documentation.
  * - Ecosystem 16.2I: Separates My Journey from Today's Work. My Journey is the accomplishments/growth record only; it no longer appears as a work-step tab.
  * - Ecosystem 16.2J: Fixes header routing. Workbook and My Journey buttons no longer get reset back to Today's Work. Youth dashboard button is removed because Today's Work is the operating dashboard.
+ * - Ecosystem 16.2K: Locks Workbook vs My Journey separation, removes duplicate Today's Work display inside the youth flow, adds Back to Curriculum Activity inside Workbook, routes Career/Opportunity/Growth to My Journey only, and auto-records workbook accomplishments into My Journey without duplicate youth entry.
  */
 
 type Screen =
@@ -1244,10 +1245,22 @@ const youthWeekFiveDailyPlan = [
     day: "Thursday",
     date: "July 9, 2026",
     curriculum: "Production Expansion, Plant Spacing, and Harvest Potential",
-    focus: "Youth turn Wednesday's inventory thinking into production planning by preparing squash and pumpkin areas, continuing corn planting, reviewing melon trellis capacity, and estimating future harvest potential.",
-    work: ["Prepare squash grow area", "Prepare pumpkin grow area", "Continue corn seedling planting as directed", "Review Wednesday inventory findings", "Estimate how many plants can fit in the prepared areas", "Connect plant count to possible harvest and pricing"],
-    resources: ["Squash and pumpkin spacing guide", "Corn seedling planting card", "Production estimate worksheet", "Pricing after inventory prompt"],
-    reflection: "How much food could this area produce, and what must we count before setting a price?",
+    focus: "Youth turn Wednesday's inventory thinking into production planning by preparing squash and pumpkin areas, continuing corn planting, checking potatoes, improving mulch and drainage where water gathers, documenting wildlife discoveries, and installing or supporting gate work as directed.",
+    work: [
+      "Prepare and clear the squash grow area",
+      "Prepare and clear the pumpkin grow area",
+      "Install or support gate work as directed by the supervisor",
+      "Continue corn seedling planting as conditions allow",
+      "Check potatoes growing in baskets and record plant condition",
+      "Thin or separate plants only with supervisor direction",
+      "Build mulch around rows and paths where water gathers",
+      "Evaluate pooling water in the grow area and forest path",
+      "Document butterfly cocoon observation",
+      "Document forest discovery: toad, two baby salamanders, and six varieties/species observed close together",
+      "Estimate how many plants can fit in prepared areas and connect plant count to future harvest and pricing"
+    ],
+    resources: ["Squash and pumpkin spacing guide", "Corn seedling planting card", "Gate installation safety reminder", "Potato basket check card", "Mulch and drainage prompt", "Forest amphibian observation prompt", "Production estimate worksheet", "Pricing after inventory prompt"],
+    reflection: "How much food could this area produce, what must we count before setting a price, and what did today's wildlife discoveries teach us about the ecosystem?",
   },
   {
     day: "Friday",
@@ -9073,7 +9086,9 @@ function openYouthWorkbook16_2(activeUser: EcosystemUser | null | undefined, set
 }
 
 function openYouthJourney16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
-  openYouthPhase16_2(activeUser, setScreen, "journey");
+  // 16.2K: My Journey is not a work phase. Header/My Journey opens the accomplishments record directly.
+  setYouthDailyPhase16_2(activeUser, "work");
+  setScreen("journey");
 }
 
 function workbookQuestionsForPlan16_2(plan: typeof youthWeekOneDailyPlan[number]) {
@@ -9100,6 +9115,38 @@ function savedWorkbookAnswers16_2(activeUser: EcosystemUser | null, questions: s
   const participantId = launchParticipantId(activeUser);
   const rows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
   return rows.filter((row) => row.date === todayISO() && row.participant_id === participantId && questions.includes(row.question));
+}
+
+function recordJourneyAccomplishments16_2K(activeUser: EcosystemUser | null, plan: typeof youthWeekOneDailyPlan[number], workbookAnswerCount: number) {
+  const participantId = launchParticipantId(activeUser);
+  const now = new Date().toISOString();
+  const today = todayISO();
+  const planText = `${plan.curriculum} ${(plan.work || []).join(" ")}`.toLowerCase();
+  const labels = new Set<string>();
+
+  labels.add(`Workbook documentation saved for ${plan.day}: ${plan.curriculum}`);
+  if (workbookAnswerCount > 0) labels.add(`Documented ${workbookAnswerCount} workbook response${workbookAnswerCount === 1 ? "" : "s"} for today's activity.`);
+  if (planText.includes("squash")) labels.add("Accomplishment: Prepared growing space for squash production.");
+  if (planText.includes("pumpkin")) labels.add("Accomplishment: Prepared growing space for pumpkin production.");
+  if (planText.includes("gate")) labels.add("Accomplishment: Supported gate installation and farm access infrastructure.");
+  if (planText.includes("corn")) labels.add("Skill: Practiced careful corn seedling planting and production planning.");
+  if (planText.includes("potato")) labels.add("Observation: Checked potato basket growth and plant condition.");
+  if (planText.includes("pooling") || planText.includes("drainage") || planText.includes("mulch")) labels.add("Problem solving: Noticed pooling water and improved mulch, rows, or paths.");
+  if (planText.includes("cocoon") || planText.includes("salamander") || planText.includes("toad") || planText.includes("forest")) labels.add("Environment discovery: Documented wildlife, amphibians, cocoon, or forest ecosystem evidence.");
+
+  const existing = safeRead<JourneyEvent[]>(JOURNEY_KEY, []);
+  const existingKeys = new Set(existing.map((event) => `${event.user_id || ""}|${String(event.created_at || "").slice(0, 10)}|${event.label}`));
+  const newEvents: JourneyEvent[] = Array.from(labels)
+    .filter((label) => !existingKeys.has(`${participantId}|${today}|${label}`))
+    .map((label) => ({
+      id: uuid(),
+      user_id: participantId,
+      role: activeUser?.role || "Youth Workforce Participant",
+      screen: "journey",
+      label,
+      created_at: now,
+    }));
+  if (newEvents.length) safeWrite(JOURNEY_KEY, [...newEvents, ...existing].slice(0, 250));
 }
 
 function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
@@ -9163,6 +9210,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         created_at: now,
       }));
     safeWrite(DISCOVERY_KEY, [...newRows, ...withoutDuplicates].slice(0, 500));
+    recordJourneyAccomplishments16_2K(activeUser, todayPlan, newRows.length);
     saveYouthResumeState(activeUser, { stage: "learning", learning_answers: newRows.length, message: "Workbook saved. Continue to Legacy." });
     setMessage("Workbook saved ✓ You will not have to answer these again today.");
     go("legacy");
@@ -9191,6 +9239,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       created_at: now,
     };
     safeWrite(DISCOVERY_KEY, [row, ...withoutDuplicate].slice(0, 500));
+    recordJourneyAccomplishments16_2K(activeUser, todayPlan, 0);
     recordCompletionOnce("legacy-complete", activeUser);
     saveYouthResumeState(activeUser, { stage: "complete", message: "Legacy saved. My Journey accomplishments record updated." });
     setMessage("Legacy saved ✓ Opening My Journey accomplishments.");
@@ -9204,25 +9253,18 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • 16.2K Separation Lock</div>
               <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : "Workbook"}</h1>
-              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See what to do today. Questions stay out of the work screen." : "Document activities, counts, observations, photos, and evidence one time."}</p>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Workbook is the curriculum record: activity responses, photos, counts, discoveries, questions, and resource links."}</p>
             </div>
             <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
-          </div>
-          <div className="mt-4 grid gap-2 md:grid-cols-3">
-            {["work", "workbook"].map((item) => (
-              <button key={item} type="button" onClick={() => go(item as YouthDailyPhase16_2)} className={`rounded-2xl px-4 py-3 text-left text-sm font-black ${phase === item ? "bg-emerald-300 text-black" : "border border-white/10 bg-white/10 text-white"}`}>
-                {item === "work" ? "Today's Work" : "Workbook"}
-              </button>
-            ))}
           </div>
         </Card>
       )}
 
       {phase === "work" && (
         <Card className="p-4 md:p-6">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Today's Work • No Questions Here</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Work List • No Questions Here</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">{todayPlan.curriculum}</h2>
           <p className="mt-3 max-w-4xl text-sm font-bold leading-6 text-white/80">{todayPlan.focus}</p>
           <div className="mt-5 grid gap-2">
@@ -9230,7 +9272,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
               <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/86">• {item}</div>
             ))}
           </div>
-          <button type="button" onClick={() => go("workbook")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Go to Workbook</button>
+          <button type="button" onClick={() => go("workbook")} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Workbook Documentation</button>
         </Card>
       )}
 
@@ -9238,7 +9280,13 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-6">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook • Activities, Evidence, Counts, Photos</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">Document today's activities one time.</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved. Youth can return without repeating the same questions.</p>
+          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved. Youth can return without repeating the same questions. Career, opportunity, accomplishments, and growth stay in My Journey, not here.</p>
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links</div>
+            <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
+              {(todayPlan.resources || []).map((resource) => <li key={resource}>• {resource}</li>)}
+            </ul>
+          </div>
           <div className="mt-5 grid gap-4">
             {questions.map((question) => (
               <label key={question} className="block rounded-2xl border border-white/10 bg-black/25 p-4">
@@ -9249,7 +9297,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             <button type="button" onClick={saveWorkbook} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Workbook + Continue</button>
-            <button type="button" onClick={() => go("work")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">Back to Work</button>
+            <button type="button" onClick={() => go("work")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">← Back to Curriculum Activity</button>
           </div>
           {message && <Notice text={message} />}
         </Card>
@@ -9272,7 +9320,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-6">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">My Journey • Accomplishments Record</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">My Journey is separate from today's work.</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-white/78">Today's Work shows assignments. My Journey shows accomplishments, growth, skills, experiences, opportunities, career interests, legacy record, and portfolio progress.</p>
+          <p className="mt-3 text-sm font-bold leading-7 text-white/78">Today's Work shows assignments. My Journey shows accomplishments, growth, skills, experiences, opportunities, CCP/certification pathways, career interests, legacy record, and portfolio progress.</p>
           <button type="button" onClick={() => setScreen("journey")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Open My Journey Accomplishments</button>
         </Card>
       )}
@@ -9294,7 +9342,6 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
           <Launch60DailyRhythmCard todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} />
           <Launch62TodayPlantingMissionPanel />
           <Launch60ActivityGoalCard todayPlan={todayPlan} />
-          <YouthTodayWorkCard />
           <MiracleGroYouthResourceCard />
           <CurriculumWeekViewCard compact />
         </div>
