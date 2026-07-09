@@ -73,6 +73,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2I: Separates My Journey from Today's Work. My Journey is the accomplishments/growth record only; it no longer appears as a work-step tab.
  * - Ecosystem 16.2J: Fixes header routing. Workbook and My Journey buttons no longer get reset back to Today's Work. Youth dashboard button is removed because Today's Work is the operating dashboard.
  * - Ecosystem 16.2K: Locks Workbook vs My Journey separation, removes duplicate Today's Work display inside the youth flow, adds Back to Curriculum Activity inside Workbook, routes Career/Opportunity/Growth to My Journey only, and auto-records workbook accomplishments into My Journey without duplicate youth entry.
+ * - Ecosystem 16.2L: Removes private airport map exposure, establishes South Hangar as the youth staging area, pins Today's Work resources, adds watermelon/cantaloupe inventory counts, removes repeated Today's Work title duplication, and keeps Workbook as Curriculum + Documentation while My Journey remains Growth + Accomplishments only.
  */
 
 type Screen =
@@ -993,7 +994,7 @@ const youthWeekOneDailyPlan = [
     curriculum: "Farm infrastructure, cooling station purpose, safety zones, and customer needs",
     focus: "Youth connect the fan project to farm operations, worker protection, guest safety, and outdoor heat awareness.",
     work: ["Review cooling station purpose", "Support staging and logistics", "Identify shade / water / safety zones", "Continue production or quality check", "Record lessons learned"],
-    resources: ["Cooling station safety map", "Water and shade checklist", "Infrastructure vocabulary", "Supervisor observation prompts"],
+    resources: ["Cooling station safety orientation", "Water and shade checklist", "Infrastructure vocabulary", "Supervisor observation prompts"],
     reflection: "How does a cooling station help farm workers, volunteers, or visitors?",
   },
   {
@@ -1072,7 +1073,7 @@ const youthWeekThreeDailyPlan = [
     curriculum: "Farm infrastructure, site safety, and goal setting",
     focus: "Youth begin Week 3 by understanding how farm infrastructure protects people, crops, tools, water access, and daily operations.",
     work: ["Review farm infrastructure zones", "Walk the grow area with a supervisor", "Identify fence, water, shade, tool, and path needs", "Set today's team goal", "Choose my contribution"],
-    resources: ["Tool safety basics", "Site map", "Fence and pathway checklist", "Work status and weather card"],
+    resources: ["Tool safety basics", "Site orientation guide", "Fence and pathway checklist", "Work status and weather card"],
     reflection: "What part of the farm infrastructure did you understand better today?",
   },
   {
@@ -1132,13 +1133,13 @@ const youthWeekFourDailyPlan = [
       "Water crops before improvement work begins",
       "Weed Zone 5 melon area carefully so melon vines are protected",
       "Collect rocks only from approved natural areas",
-      "Do not collect rocks from airport driveways, cement or concrete, taxiways, runways, parking areas, roadways, hangar areas, or active airport operational areas",
+      "Do not collect rocks from driveways, cement, concrete, taxiways, runways, parking areas, roadways, hangar areas, or any private operational areas",
       "Deliver rocks directly to Zone 5",
       "Install the thermal rock system around melons as directed by the supervisor",
       "Enter the forest only with permission and collect pepper supports approximately 18 inches long, straight if possible, and strong enough to support pepper plants",
       "Document before-and-after progress"
     ],
-    resources: ["Zone 5 melon safety card", "Thermal mass explainer", "Airport operations boundary reminder", "Pepper support collection guide", "Photo documentation prompt"],
+    resources: ["Zone 5 melon safety card", "Thermal mass explainer", "Private site boundary reminder", "Pepper support collection guide", "Photo documentation prompt"],
     reflection: "Why remove weeds before improving a growing area? How might rocks help melons grow better? Why are supports important for pepper plants? What did you help accomplish today? What are you proud of today?",
   },
   {
@@ -1153,7 +1154,7 @@ const youthWeekFourDailyPlan = [
       "Prepare pest traps according to supervisor instructions",
       "Set pest traps in approved locations and record trap location, type, date, and first observation",
       "Carefully weed Zone 5 melon patch before rocks are placed so melon vines are protected",
-      "Collect rocks only from approved natural areas; do not take rocks from driveways, airport cement/concrete, taxiways, runways, parking areas, roadways, hangars, or active airport operational areas",
+      "Collect rocks only from approved natural areas; do not take rocks from driveways, cement, concrete, taxiways, runways, parking areas, roadways, hangars, or private operational areas",
       "Deliver collected rocks directly to Zone 5 and leave/place them only as directed by the supervisor",
       "Observe plant stress, insect activity, wilting, dry soil, or disease concerns and report them",
       "10:45–11:00 AM cleanup: return tools, clear pathways, secure materials, and complete supervisor inspection",
@@ -1244,23 +1245,22 @@ const youthWeekFiveDailyPlan = [
   {
     day: "Thursday",
     date: "July 9, 2026",
-    curriculum: "Production Expansion, Plant Spacing, and Harvest Potential",
-    focus: "Youth turn Wednesday's inventory thinking into production planning by preparing squash and pumpkin areas, continuing corn planting, checking potatoes, improving mulch and drainage where water gathers, documenting wildlife discoveries, and installing or supporting gate work as directed.",
+    curriculum: "South Hangar Staging, Melon Inventory, Apiary Build, and Production Expansion",
+    focus: "Youth begin from the South Hangar staging area and complete work-first projects: install the melon trellis, prepare squash and pumpkin grow areas, count watermelon and cantaloupe inventory, collect milkweed seeds safely, rebuild the beehive, and establish the apiary.",
     work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and daily briefing",
+      "Install melon trellis as directed by the supervisor",
       "Prepare and clear the squash grow area",
       "Prepare and clear the pumpkin grow area",
-      "Install or support gate work as directed by the supervisor",
-      "Continue corn seedling planting as conditions allow",
-      "Check potatoes growing in baskets and record plant condition",
-      "Thin or separate plants only with supervisor direction",
-      "Build mulch around rows and paths where water gathers",
-      "Evaluate pooling water in the grow area and forest path",
-      "Document butterfly cocoon observation",
-      "Document forest discovery: toad, two baby salamanders, and six varieties/species observed close together",
-      "Estimate how many plants can fit in prepared areas and connect plant count to future harvest and pricing"
+      "Count watermelon inventory: planted, emerged, and missing",
+      "Count cantaloupe inventory: planted, emerged, and missing",
+      "Collect milkweed seeds safely with gloves and supervisor direction",
+      "Rebuild the beehive using the pinned beehive assembly video and diagram only as needed",
+      "Establish the apiary area as directed by the supervisor",
+      "Return to the South Hangar Staging Area if unsure, separated, or redirected"
     ],
-    resources: ["Squash and pumpkin spacing guide", "Corn seedling planting card", "Gate installation safety reminder", "Potato basket check card", "Mulch and drainage prompt", "Forest amphibian observation prompt", "Production estimate worksheet", "Pricing after inventory prompt"],
-    reflection: "How much food could this area produce, what must we count before setting a price, and what did today's wildlife discoveries teach us about the ecosystem?",
+    resources: ["Beehive Assembly Video", "Beehive Diagram", "Inventory Count Sheet", "Melon Trellis Guide", "Milkweed Seed Collection Guide", "South Hangar Staging Reminder", "Site Safety Guide"],
+    reflection: "Why does a work crew need a clear staging area, what did inventory counting tell us about future harvests, and how does rebuilding the beehive help establish the apiary?",
   },
   {
     day: "Friday",
@@ -2054,17 +2054,17 @@ const TODAY_CURRICULUM: CurriculumDay = {
       whyItMatters: "Rocks can hold warmth from the sun and support melon production without using electricity.",
       evidenceRequired: ["Approved collection area note", "Thermal rock placement photo", "Supervisor confirmation"],
       reflectionPrompt: "How might rocks help melons grow better?",
-      resources: ["Thermal mass explainer", "Airport operations boundary reminder"],
+      resources: ["Thermal mass explainer", "Private site boundary reminder"],
     },
     {
       id: "airport-boundary-safety",
       icon: "🛑",
-      title: "Airport Boundary Safety",
-      summary: "Do not collect rocks from airport driveways, cement or concrete, taxiways, runways, parking areas, roadways, hangar areas, or active airport operational areas.",
-      whyItMatters: "Bronson Family Farm operates on a private airport site. Youth safety and airport boundaries must be protected at all times.",
+      title: "Private Site Boundary Safety",
+      summary: "Do not collect rocks from driveways, cement, concrete, taxiways, runways, parking areas, roadways, hangar areas, or any private operational areas.",
+      whyItMatters: "Bronson Family Farm operates on private property. Youth safety and site boundaries must be protected at all times.",
       evidenceRequired: ["Supervisor safety check", "Boundary understood note"],
-      reflectionPrompt: "Why do airport boundaries matter when we work on the farm?",
-      resources: ["Airport operations boundary reminder", "Supervisor direction required"],
+      reflectionPrompt: "Why do private site boundaries matter when we work on the farm?",
+      resources: ["Private site boundary reminder", "Supervisor direction required"],
     },
     {
       id: "pepper-supports",
@@ -2093,7 +2093,7 @@ const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
   "zone-5-water": ["Water Management", "Crop Monitoring", "Plant Health Observation"],
   "zone-5-weed": ["Weed Identification", "Plant Protection", "Agricultural Operations", "Stewardship"],
   "zone-5-thermal-rocks": ["Thermal Mass Awareness", "Crop Support Systems", "Observation Skills", "Safe Material Handling"],
-  "airport-boundary-safety": ["Airport Boundary Awareness", "Workplace Safety", "Following Supervisor Direction"],
+  "airport-boundary-safety": ["Private Site Boundary Awareness", "Workplace Safety", "Following Supervisor Direction"],
   "pepper-supports": ["Crop Support", "Forest Material Selection", "Plant Care", "Tool and Site Safety"],
   "grow-area-manicure": ["Grounds Maintenance", "Hand Tool Safety", "Plant Health Observation", "Community Pride", "Production Readiness"],
   "forest-inventory-walk": ["Observation", "Inventory Management", "Asset Recognition", "Pricing", "Entrepreneurship", "Opportunity Discovery"],
@@ -2659,7 +2659,7 @@ const youthTopicRotationAreas = [
     title: "Infrastructure",
     week: "Week 3",
     description: "Fencing, water systems, shade, work zones, tools, site setup, and safety planning.",
-    resources: ["Tool safety basics", "Site setup checklist", "Cooling station map", "Infrastructure vocabulary"],
+    resources: ["Tool safety basics", "Site setup checklist", "Cooling station orientation", "Infrastructure vocabulary"],
   },
   {
     title: "Apiary & Pollination",
@@ -4634,13 +4634,70 @@ function LaunchReadinessValidatorCard() {
 }
 
 function YouthTodayWorkCard() {
-  const activeCurriculum = getActiveCurriculum();
+  const todayProjects = [
+    "Install melon trellis",
+    "Prepare squash grow area",
+    "Prepare pumpkin grow area",
+    "Count watermelon plants",
+    "Count cantaloupe plants",
+    "Collect milkweed seeds safely",
+    "Rebuild beehive",
+    "Establish apiary",
+  ];
+  const pinnedResources = [
+    "🐝 Beehive Assembly Video",
+    "📄 Beehive Diagram",
+    "📋 Inventory Count Sheet",
+    "🌱 Melon Trellis Guide",
+    "🌿 Milkweed Seed Collection Guide",
+  ];
+  const safetyItems = [
+    "Stay with your crew.",
+    "Remain on approved paths and assigned work areas.",
+    "Report hazards, wildlife concerns, damaged fencing, or tool issues.",
+    "Return to the South Hangar Staging Area if unsure or separated from your group.",
+  ];
+
   return (
     <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Today's Work</div>
-      <h2 className="mt-2 text-3xl font-black">{activeCurriculum.theme}</h2>
-      <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">🌟 Featured Highlight: {activeCurriculum.featuredStory}</p>
-      <div className="mt-5 grid gap-3">{activeCurriculum.activities.map((activity) => <details key={activity.id} className="rounded-2xl border border-white/10 bg-white/10 p-4"><summary className="cursor-pointer text-lg font-black">{activity.icon} {activity.title}</summary><p className="mt-3 text-sm leading-6 text-white/80">{activity.summary}</p><p className="mt-2 text-sm leading-6 text-white/80"><strong>Why it matters:</strong> {activity.whyItMatters}</p></details>)}</div>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Week 5 • Thursday</div>
+      <h2 className="mt-2 text-3xl font-black">South Hangar Staging Area</h2>
+      <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">Work first. Use the ecosystem for directions, resources, inventory, and safety support.</p>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Today&apos;s Projects</div>
+          <div className="mt-3 grid gap-2">
+            {todayProjects.map((item) => <div key={item} className="rounded-xl bg-black/25 px-4 py-3 font-black">🌱 {item}</div>)}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Resources Needed Today</div>
+          <div className="mt-3 grid gap-2">
+            {pinnedResources.map((item) => <button key={item} type="button" className="rounded-xl bg-white px-4 py-3 text-left font-black text-slate-900 shadow-sm">{item}</button>)}
+          </div>
+          <p className="mt-3 text-xs font-bold leading-5 text-white/70">The beehive video is available immediately here. It is support for the work, not a questionnaire.</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Inventory Count</div>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {["Watermelon planted", "Watermelon emerged", "Watermelon missing", "Cantaloupe planted", "Cantaloupe emerged", "Cantaloupe missing"].map((item) => <div key={item} className="rounded-xl bg-black/25 px-4 py-3 font-black">📋 {item}</div>)}
+          </div>
+          <p className="mt-3 text-xs font-bold leading-5 text-white/70">Inventory helps estimate future harvest, production, pricing, and business opportunity.</p>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Site Safety</div>
+          <ul className="mt-3 grid gap-2">
+            {safetyItems.map((item) => <li key={item} className="rounded-xl bg-black/25 px-4 py-3 font-black">🦺 {item}</li>)}
+          </ul>
+          <p className="mt-3 text-xs font-bold leading-5 text-white/70">No private airport map is shown. Youth receive named work areas and supervisor direction only.</p>
+        </div>
+      </div>
     </section>
   );
 }
