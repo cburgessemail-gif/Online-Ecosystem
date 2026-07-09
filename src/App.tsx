@@ -35,14 +35,14 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Defines OperationsInventoryPanel so inventory is visible and usable instead of referenced only
  * - Removes static Almanac placeholder guidance from the live Almanac layer
  * - Promotes LIVE visual weather, work status, today's goal, my contribution, and one-button work entry to the youth launch dashboard
- * - Launch 8.0: replaces Home/My Day/Start My Day confusion with Dashboard → Today's Work → Workbook → Legacy → My Journey
+ * - Launch 8.0: replaces Home/My Day/Start My Day confusion with Today's Work → Workbook → My Journey
  * - Advances active curriculum to Week 3 after Week 2 completion and shows the remaining week at a glance
  * - Adds full Mission Control work-status launch engine for Monday, June 22, 2026 cancellation
  * - Launch 8.0: adds Explore & Discover, Farm Wisdom, Generational Wisdom Archive, Take It Home, and Farm Knowledge Map nodes.
  * - Adds parent/youth/supervisor notification preparation, message log, and one-button cancellation launch
  * - Ecosystem 9.0: organizes the Youth pathway around Identity, Learning, Skills, Opportunity, and Legacy.
- * - Ecosystem 9.0: adds portfolio-in-progress, Cultivator Moments, Learning Tree, growth dashboard, parent growth report, supervisor growth notes, workforce transcript, career pathways, and legacy map foundations.
- * - Ecosystem 10.0: adds the Regenerative Cultivator Theory of Change as the organizing layer for youth, parent, supervisor, portfolio, workbook, workforce transcript, and Mission Control.
+ * - Ecosystem 9.0: adds Journey-record-in-progress, Cultivator Moments, Learning Tree, growth dashboard, parent growth report, supervisor growth notes, workforce transcript, career pathways, and legacy map foundations.
+ * - Ecosystem 10.0: adds the Regenerative Cultivator Theory of Change as the organizing layer for youth, parent, supervisor, Journey record, workbook, workforce transcript, and Mission Control.
  * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
  * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
@@ -56,13 +56,13 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 12.0: Community & Environment Pathway makes the farm a lens for understanding Youngstown, neighborhood woods, parks, water, wildlife, vacant lots, and local history.
  * - Ecosystem 12.0: July 2 auto-advance lock: Thursday 7/2 renders Week 4 Thursday Production Area Maintenance & Plant Health, with July 1 assignments archived after midnight.
  * - Ecosystem 11.5: locks Participant Lifecycle Governance: Pending, Active, Completed, Inactive. No suspensions. No default deletion. Inactive users keep historical records but receive Guest/Visitor access only.
- * - Ecosystem 13.1: Makes the youth workbook the central operating system. Field work, forest discoveries, pest traps, questions, reflections, journey, and portfolio evidence flow into one downloadable workbook record.
+ * - Ecosystem 13.1: Makes the youth workbook the central operating system. Field work, forest discoveries, pest traps, questions, reflections, journey, and journey evidence flow into one downloadable workbook record.
  * - Ecosystem 14.1: Fixes youth restart/progression failure. Responses auto-save, completion flags are recorded, next-step cards appear, and youth can resume where they left off.
 
  * - Ecosystem 16.0 FIXED: Preserves the full 14.7 operational ecosystem instead of replacing it with a portal-only shell.
- * - Ecosystem 16.0 FIXED: Keeps Youth, Parent, Supervisor, Mission Control/Operations, Visitor/Guest, Grower, Partner, Marketplace, Calendar/Almanac, Search/Resources, Workbook, Journey, Portfolio, Notifications, and Reports layers intact.
- * - Ecosystem 16.2 LOCK: Youth navigation principle is Dashboard, Today's Work, Calendar, Workbook, My Journey, Sign Out. Daily flow is Work → Workbook → Legacy → Journey.
- * - Ecosystem 16.2 LOCK: Curriculum rendering keeps Today's Work free of questions; Workbook contains activity documentation; Legacy contains one closing question; My Journey contains growth, skills, portfolio, opportunity, and career.
+ * - Ecosystem 16.0 FIXED: Keeps Youth, Parent, Supervisor, Mission Control/Operations, Visitor/Guest, Grower, Partner, Marketplace, Calendar/Almanac, Search/Resources, Workbook, Journey, Journey Record, Notifications, and Reports layers intact.
+ * - Ecosystem 16.2 LOCK: Youth navigation principle is Today's Work, Workbook, My Journey, Calendar, Sign Out. Daily flow is Work → Workbook → My Journey.
+ * - Ecosystem 16.2 LOCK: Curriculum rendering keeps Today's Work free of questions; Workbook contains activity documentation; Legacy contains one closing question; My Journey contains growth, skills, opportunity, career, and legacy.
  * - Ecosystem 16.1: Adds Week 5 Forest Business & Inventory Discovery and routes completed youth reflections to My Growth before My Journey.
  * - Ecosystem 16.2: Restores approved youth architecture: Today's Work → Workbook → Legacy → My Journey. Growth lives inside My Journey; activities live inside Workbook; no separate Reflection/Growth destination.
  * - Ecosystem 16.2D: Removes youth-facing architecture banner from the final Legacy step; Legacy becomes a clean final question with automatic continuation to My Journey.
@@ -75,6 +75,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.2K: Locks Workbook vs My Journey separation, removes duplicate Today's Work display inside the youth flow, adds Back to Curriculum Activity inside Workbook, routes Career/Opportunity/Growth to My Journey only, and auto-records workbook accomplishments into My Journey without duplicate youth entry.
  * - Ecosystem 16.2L: Removes private airport map exposure, establishes South Hangar as the youth staging area, pins Today's Work resources, adds watermelon/cantaloupe inventory counts, removes repeated Today's Work title duplication, and keeps Workbook as Curriculum + Documentation while My Journey remains Growth + Accomplishments only.
  * - Ecosystem 16.3A: Forest Stewardship & Apiary Integration Lock. Friday July 10 becomes forest exploration, natural trellis planning/materials collection, milkweed/pollinator observation, and beehive assembly progress. Monday remains construction day. Today's Work stays assignments/resources/safety only; Workbook stays documentation; My Journey auto-records accomplishments.
+ * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
  */
 
 type Screen =
@@ -953,7 +954,7 @@ const youthCurriculumWeeks = [
     week: 7,
     title: "Career Exploration",
     focus: "Agriculture, construction, engineering, culinary, tourism, marketing, environmental science, and public safety careers.",
-    project: "Career pathway exploration and portfolio development",
+    project: "Career pathway exploration and Journey record development",
     skills: ["Career Awareness", "Interviewing", "Goal Setting", "Professional Identity"],
     badge: "🧭 Career Pathfinder",
     status: "Upcoming",
@@ -961,9 +962,9 @@ const youthCurriculumWeeks = [
   {
     week: 8,
     title: "Capstone & Achievement",
-    focus: "Final project presentation, portfolio review, supervisor recognition, skills summary, and achievement certificate.",
+    focus: "Final project presentation, Journey record review, supervisor recognition, skills summary, and achievement certificate.",
     project: "Cultivator capstone and achievement showcase",
-    skills: ["Presentation", "Reflection", "Portfolio", "Readiness"],
+    skills: ["Presentation", "Reflection", "Journey Record", "Readiness"],
     badge: "🏆 Cultivator Achievement",
     status: "Upcoming",
   },
@@ -985,7 +986,7 @@ const youthWeekOneDailyPlan = [
     date: "June 9, 2026",
     curriculum: "Production flow, teamwork, measurement, and quality standards",
     focus: "Youth continue production while learning how one team depends on another team in a real work system.",
-    work: ["Review yesterday's count", "Continue assembly / finishing", "Check quality standards", "Track completed fans", "Document evidence for portfolio"],
+    work: ["Review yesterday's count", "Continue assembly / finishing", "Check quality standards", "Track completed fans", "Document evidence for Journey record"],
     resources: ["Quality checklist", "Production count sheet", "Tool safety reminder", "Team communication prompts"],
     reflection: "Which team depended on your work today?",
   },
@@ -1003,15 +1004,15 @@ const youthWeekOneDailyPlan = [
     date: "June 11, 2026",
     curriculum: "Career pathways, customer order completion, presentation, and responsibility",
     focus: "Youth connect their team role to real careers in design, engineering, manufacturing, logistics, construction, agriculture, and operations.",
-    work: ["Finish assigned production tasks", "Prepare customer-ready items", "Identify career skills used", "Update portfolio evidence", "Practice explaining team contribution"],
-    resources: ["Career pathway cards", "Portfolio evidence checklist", "Customer service language", "Presentation prompts"],
+    work: ["Finish assigned production tasks", "Prepare customer-ready items", "Identify career skills used", "Update journey evidence", "Practice explaining team contribution"],
+    resources: ["Career pathway cards", "Journey evidence checklist", "Customer service language", "Presentation prompts"],
     reflection: "What career pathway did you see in today's work?",
   },
   {
     day: "Friday",
     date: "June 12, 2026",
-    curriculum: "Reflection, achievement, supervisor feedback, portfolio evidence, and next-week readiness",
-    focus: "Youth close the week by reviewing what they built, what they learned, and what evidence belongs in their workforce portfolio.",
+    curriculum: "Reflection, achievement, supervisor feedback, journey evidence, and next-week readiness",
+    focus: "Youth close the week by reviewing what they built, what they learned, and what evidence belongs in their workforce Journey record.",
     work: ["Complete weekly reflection", "Review supervisor feedback", "Record achievement evidence", "Prepare for next week's agriculture rotation", "Celebrate team progress"],
     resources: ["Weekly reflection guide", "Achievement badge checklist", "Parent-safe summary prompt", "Next week preview"],
     reflection: "What are you proud of this week, and what do you want to learn next?",
@@ -1328,8 +1329,8 @@ const youthWeekSixDailyPlan = [
     date: "Week 6 Friday",
     curriculum: "Leadership Weekly Closeout and Community Legacy",
     focus: "Youth review how leadership, responsibility, and community stewardship showed up through the week.",
-    work: ["Complete weekly leadership reflection", "Update portfolio", "Share one team contribution", "Preview career week", "Celebrate growth"],
-    resources: ["Leadership reflection", "Portfolio update guide", "Career week preview"],
+    work: ["Complete weekly leadership reflection", "Update Journey record", "Share one team contribution", "Preview career week", "Celebrate growth"],
+    resources: ["Leadership reflection", "Journey update guide", "Career week preview"],
     reflection: "What kind of leader are you becoming?",
   },
 ];
@@ -1338,16 +1339,16 @@ const youthWeekSevenDailyPlan = [
   { day: "Monday", date: "Week 7 Monday", curriculum: "Career Exploration and Skills Inventory", focus: "Youth identify skills they have practiced and connect them to real careers.", work: ["Review skills practiced", "Choose careers connected to farm work", "Update resume skills", "Record one career interest"], resources: ["Career pathway cards", "Skills inventory", "Resume skills prompt"], reflection: "Which skill did you practice on the farm that could help you in a job?" },
   { day: "Tuesday", date: "Week 7 Tuesday", curriculum: "Agriculture, Environment, and Science Careers", focus: "Youth connect observation, plants, pollinators, soil, water, and wildlife to career pathways.", work: ["Identify science and agriculture careers", "Connect one task to a career", "Ask one career question", "Document one pathway"], resources: ["Agriculture careers", "Environmental science careers", "Career question prompt"], reflection: "Which outdoor or science career interested you and why?" },
   { day: "Wednesday", date: "Week 7 Wednesday", curriculum: "Business, Operations, and Entrepreneurship Careers", focus: "Youth connect inventory, pricing, marketing, customer service, operations, and ownership to careers and businesses.", work: ["Review inventory and pricing lessons", "Identify business roles", "Practice explaining value", "Record one entrepreneurship idea"], resources: ["Business career cards", "Pricing review", "Entrepreneurship prompt"], reflection: "What business role could you imagine yourself learning more about?" },
-  { day: "Thursday", date: "Week 7 Thursday", curriculum: "Resume, Interview, and Professional Story", focus: "Youth practice telling the story of their work in professional language.", work: ["Choose three resume skills", "Write one work example", "Practice one interview answer", "Update portfolio evidence"], resources: ["Resume builder", "Interview prompt", "Portfolio evidence guide"], reflection: "How would you explain your Cultivator work to an employer?" },
-  { day: "Friday", date: "Week 7 Friday", curriculum: "Career Pathway Closeout", focus: "Youth complete career reflections and prepare for capstone week.", work: ["Review career interests", "Complete weekly reflection", "Choose capstone evidence", "Preview final showcase"], resources: ["Career closeout", "Capstone preview", "Portfolio checklist"], reflection: "What opportunity do you see for yourself after this program?" },
+  { day: "Thursday", date: "Week 7 Thursday", curriculum: "Resume, Interview, and Professional Story", focus: "Youth practice telling the story of their work in professional language.", work: ["Choose three resume skills", "Write one work example", "Practice one interview answer", "Update journey evidence"], resources: ["Resume builder", "Interview prompt", "Journey evidence guide"], reflection: "How would you explain your Cultivator work to an employer?" },
+  { day: "Friday", date: "Week 7 Friday", curriculum: "Career Pathway Closeout", focus: "Youth complete career reflections and prepare for capstone week.", work: ["Review career interests", "Complete weekly reflection", "Choose capstone evidence", "Preview final showcase"], resources: ["Career closeout", "Capstone preview", "Journey checklist"], reflection: "What opportunity do you see for yourself after this program?" },
 ];
 
 const youthWeekEightDailyPlan = [
-  { day: "Monday", date: "Week 8 Monday", curriculum: "Capstone Planning and Portfolio Review", focus: "Youth select what work, growth, skills, and evidence best represents their Cultivator journey.", work: ["Review portfolio", "Choose capstone story", "Select evidence", "Plan presentation"], resources: ["Capstone planner", "Portfolio review", "Presentation outline"], reflection: "What work best shows your growth?" },
+  { day: "Monday", date: "Week 8 Monday", curriculum: "Capstone Planning and Journey Review", focus: "Youth select what work, growth, skills, and evidence best represents their Cultivator journey.", work: ["Review Journey record", "Choose capstone story", "Select evidence", "Plan presentation"], resources: ["Capstone planner", "Journey review", "Presentation outline"], reflection: "What work best shows your growth?" },
   { day: "Tuesday", date: "Week 8 Tuesday", curriculum: "Capstone Build and Practice", focus: "Youth assemble their capstone, practice explaining their work, and connect skills to opportunity.", work: ["Build capstone presentation", "Practice speaking", "Add skills evidence", "Ask for feedback"], resources: ["Presentation practice", "Feedback guide", "Skills evidence checklist"], reflection: "What do you want people to understand about your work?" },
-  { day: "Wednesday", date: "Week 8 Wednesday", curriculum: "Achievement Showcase Preparation", focus: "Youth prepare final portfolio, journey summary, and parent-safe achievement highlights.", work: ["Finalize portfolio", "Review journey growth", "Prepare achievement statement", "Practice showcase"], resources: ["Showcase checklist", "Achievement statement", "Parent summary guide"], reflection: "How are you different from the person who started this program?" },
+  { day: "Wednesday", date: "Week 8 Wednesday", curriculum: "Achievement Showcase Preparation", focus: "Youth prepare final Journey record, journey summary, and parent-safe achievement highlights.", work: ["Finalize Journey record", "Review journey growth", "Prepare achievement statement", "Practice showcase"], resources: ["Showcase checklist", "Achievement statement", "Parent summary guide"], reflection: "How are you different from the person who started this program?" },
   { day: "Thursday", date: "Week 8 Thursday", curriculum: "Capstone Showcase and Recognition", focus: "Youth present what they learned, built, observed, counted, improved, and became.", work: ["Present capstone", "Receive feedback", "Celebrate achievements", "Record next step"], resources: ["Showcase guide", "Recognition checklist", "Next step prompt"], reflection: "What are you proud of, and what will you carry forward?" },
-  { day: "Friday", date: "Week 8 Friday", curriculum: "Legacy Closeout and Future Pathway", focus: "Youth close the program by naming what they helped build and what future Cultivators can inherit.", work: ["Complete legacy reflection", "Download or review portfolio", "Confirm skills transcript", "Share future goal", "Celebrate completion"], resources: ["Legacy reflection", "Portfolio download guide", "Skills transcript", "Future goal prompt"], reflection: "What did you help build that can help someone tomorrow?" },
+  { day: "Friday", date: "Week 8 Friday", curriculum: "Legacy Closeout and Future Pathway", focus: "Youth close the program by naming what they helped build and what future Cultivators can inherit.", work: ["Complete legacy reflection", "Download or review Journey record", "Confirm skills transcript", "Share future goal", "Celebrate completion"], resources: ["Legacy reflection", "Journey record download guide", "Skills transcript", "Future goal prompt"], reflection: "What did you help build that can help someone tomorrow?" },
 ];
 
 const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
@@ -2129,7 +2130,7 @@ const CURRICULUM_SKILL_MAP: Record<string, string[]> = {
  *
  * Constance's curriculum is the source of truth.
  * Every daily assignment, evidence prompt, parent summary, supervisor team,
- * portfolio entry, resume skill, calendar event, and closeout report must be
+ * Journey record entry, resume skill, calendar event, and closeout report must be
  * generated from the active curriculum. Do not hard-code generic daily activities elsewhere.
  */
 function getCurriculumForWeek(weekNumber: number): CurriculumDay {
@@ -2162,7 +2163,7 @@ function getDailyCurriculumForDate(date = new Date()): CurriculumDay {
     week: weekNumber,
     theme: weekMeta.title,
     // Daily curriculum must advance. This is what the calendar, Start My Day,
-    // workbook, portfolio, parent summary, and supervisor tools should render.
+    // workbook, Journey record, parent summary, and supervisor tools should render.
     featuredStory: `${dayLabel}: ${plan.curriculum}`,
     activities: (plan.work || []).map((item, index) => ({
       id: `week-${weekNumber}-${dayLabel.toLowerCase()}-${index + 1}`.replace(/[^a-z0-9-]/g, "-"),
@@ -2446,7 +2447,7 @@ function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => v
   return (
     <div className="grid gap-2 md:grid-cols-4">
       <OperationalStatusCard icon="🟢" label="Farm Status" value={status.level} detail={status.title} tone={tone} />
-      <OperationalStatusCard icon="🌤" label="Weather" value="Live" detail="Visible on Dashboard" tone="blue" />
+      <OperationalStatusCard icon="🌤" label="Weather" value="Live" detail="Visible on Today's Work" tone="blue" />
       <OperationalStatusCard icon="🚑" label="Nurse Line" value="Visible" detail="Tap from any operational screen" tone="red" />
       <OperationalStatusCard icon="📅" label="Calendar" value="Open" detail="Month / Week / Day views" tone="purple" onClick={() => setScreen("events")} />
     </div>
@@ -2791,7 +2792,7 @@ const launchVideos: LaunchVideo[] = [
     title: "Final Cooling Station Completion Video",
     purpose: "Shows the Contractor Team collecting fans, building the cooling station, and presenting the final farm heat-safety solution.",
     file: "/videos/cooling-station-completion.mp4",
-    fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and portfolio evidence.",
+    fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and journey evidence.",
     tags: ["Completion", "Contractor", "Farm Infrastructure"],
   },
 ];
@@ -2857,7 +2858,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Following Instructions": "Seguir Instrucciones",
     "Farm Worker Heat Safety & Cooling Station Challenge": "Reto de Seguridad Contra el Calor y Estación de Enfriamiento para Trabajadores Agrícolas",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Orientación, seguridad agrícola, PPE, seguridad contra el calor, trabajo en equipo, comunicación y el Reto de Estación de Enfriamiento del 8 de junio.",
-    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
+    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their Journey record and achievements.": "Los jóvenes comienzan cada día registrándose, comprendiendo el trabajo agrícola del día, viendo cómo encaja en el recorrido de 8 semanas de Cultivadores y creando evidencia para su portafolio y logros.",
     "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Los jóvenes diseñarán y construirán una estación de enfriamiento agrícola que ayude a proteger a trabajadores, jóvenes, voluntarios y visitantes del estrés por calor durante la programación de verano al aire libre.",
     "Today's Project": "Proyecto de Hoy",
   },
@@ -2887,7 +2888,7 @@ const launchPhraseTranslations: Record<LanguageCode, Record<string, string>> = {
     "Following Instructions": "Pagsunod sa Panuto",
     "Farm Worker Heat Safety & Cooling Station Challenge": "Hamon sa Kaligtasan sa Init at Cooling Station para sa Manggagawa sa Bukid",
     "Orientation, farm safety, PPE, heat safety, teamwork, communication, and the June 8 Cooling Station Challenge.": "Oryentasyon, kaligtasan sa bukid, PPE, kaligtasan sa init, pagtutulungan, komunikasyon, at ang June 8 Cooling Station Challenge.",
-    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their portfolio and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang portfolio at mga nakamit.",
+    "Youth begin each day by checking in, understanding the day's farm work, seeing where the work fits in the 8-week Cultivator journey, and building evidence for their Journey record and achievements.": "Nagsisimula ang mga kabataan bawat araw sa pag-check in, pag-unawa sa gawain sa bukid, pagtingin kung paano ito bahagi ng 8-linggong Cultivator journey, at pagbuo ng ebidensya para sa kanilang Journey record at mga nakamit.",
     "Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.": "Magdidisenyo at gagawa ang mga kabataan ng cooling station sa bukid upang makatulong na protektahan ang mga manggagawa, kabataan, boluntaryo, at bisita mula sa init habang may summer programming sa labas.",
     "Today's Project": "Proyekto Ngayon",
   },
@@ -3436,19 +3437,19 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
 
 const commonWordTranslations: Partial<Record<LanguageCode, Record<string, string>>> = {
   es: {
-    "Youth Workforce": "Fuerza Laboral Juvenil", "Youth": "Jóvenes", "Parent / Guardian": "Padre / Tutor", "Parent": "Padres", "Supervisor": "Supervisor", "Case Manager": "Administrador de Casos", "Mission Control": "Centro de Control", "Marketplace": "Mercado", "Portfolio": "Portafolio", "Resume": "Currículum", "Achievement": "Logro", "Achievements": "Logros", "Career Pathways": "Rutas Profesionales", "Support": "Apoyo", "Wellness": "Bienestar", "Attendance": "Asistencia", "Safety": "Seguridad", "PPE": "PPE", "Teamwork": "Trabajo en Equipo", "Communication": "Comunicación", "Problem Solving": "Resolución de Problemas", "Responsibility": "Responsabilidad", "Leadership": "Liderazgo", "Reflection": "Reflexión", "Check In": "Registrarse", "Check-in": "Registro", "Project": "Proyecto", "Team": "Equipo", "Skills": "Habilidades", "Badge": "Insignia", "Badges": "Insignias", "Growth": "Crecimiento", "Workforce": "Fuerza Laboral", "Development": "Desarrollo", "Family": "Familia", "Guardian": "Tutor", "Concern": "Preocupación", "Emergency": "Emergencia", "Referral": "Referencia", "Incident": "Incidente", "Report": "Informe", "Reports": "Informes", "Cooling Station": "Estación de Enfriamiento", "Challenge": "Reto", "Design": "Diseño", "Engineering": "Ingeniería", "Manufacturing": "Fabricación", "Logistics": "Logística", "Contractor": "Contratista", "Customer": "Cliente", "Grower": "Productor", "Partner": "Aliado", "Volunteer": "Voluntario", "Guest": "Visitante", "Launch": "Lanzamiento", "Today": "Hoy", "Week": "Semana"
+    "Youth Workforce": "Fuerza Laboral Juvenil", "Youth": "Jóvenes", "Parent / Guardian": "Padre / Tutor", "Parent": "Padres", "Supervisor": "Supervisor", "Case Manager": "Administrador de Casos", "Mission Control": "Centro de Control", "Marketplace": "Mercado", "Journey Record": "Portafolio", "Resume": "Currículum", "Achievement": "Logro", "Achievements": "Logros", "Career Pathways": "Rutas Profesionales", "Support": "Apoyo", "Wellness": "Bienestar", "Attendance": "Asistencia", "Safety": "Seguridad", "PPE": "PPE", "Teamwork": "Trabajo en Equipo", "Communication": "Comunicación", "Problem Solving": "Resolución de Problemas", "Responsibility": "Responsabilidad", "Leadership": "Liderazgo", "Reflection": "Reflexión", "Check In": "Registrarse", "Check-in": "Registro", "Project": "Proyecto", "Team": "Equipo", "Skills": "Habilidades", "Badge": "Insignia", "Badges": "Insignias", "Growth": "Crecimiento", "Workforce": "Fuerza Laboral", "Development": "Desarrollo", "Family": "Familia", "Guardian": "Tutor", "Concern": "Preocupación", "Emergency": "Emergencia", "Referral": "Referencia", "Incident": "Incidente", "Report": "Informe", "Reports": "Informes", "Cooling Station": "Estación de Enfriamiento", "Challenge": "Reto", "Design": "Diseño", "Engineering": "Ingeniería", "Manufacturing": "Fabricación", "Logistics": "Logística", "Contractor": "Contratista", "Customer": "Cliente", "Grower": "Productor", "Partner": "Aliado", "Volunteer": "Voluntario", "Guest": "Visitante", "Launch": "Lanzamiento", "Today": "Hoy", "Week": "Semana"
   },
   tl: {
-    "Youth Workforce": "Youth Workforce", "Youth": "Kabataan", "Parent / Guardian": "Magulang / Guardian", "Parent": "Magulang", "Supervisor": "Supervisor", "Case Manager": "Case Manager", "Mission Control": "Mission Control", "Marketplace": "Merkado", "Portfolio": "Portfolio", "Resume": "Resume", "Achievement": "Nakamit", "Achievements": "Mga Nakamit", "Career Pathways": "Career Pathways", "Support": "Suporta", "Wellness": "Kalusugan", "Attendance": "Attendance", "Safety": "Kaligtasan", "PPE": "PPE", "Teamwork": "Pagtutulungan", "Communication": "Komunikasyon", "Problem Solving": "Paglutas ng Problema", "Responsibility": "Responsibilidad", "Leadership": "Pamumuno", "Reflection": "Reflection", "Check In": "Check In", "Check-in": "Check-in", "Project": "Proyekto", "Team": "Team", "Skills": "Skills", "Badge": "Badge", "Badges": "Badges", "Growth": "Paglago", "Workforce": "Workforce", "Development": "Development", "Family": "Pamilya", "Guardian": "Guardian", "Concern": "Concern", "Emergency": "Emergency", "Referral": "Referral", "Incident": "Incident", "Report": "Ulat", "Reports": "Mga Ulat", "Cooling Station": "Cooling Station", "Challenge": "Challenge", "Design": "Design", "Engineering": "Engineering", "Manufacturing": "Manufacturing", "Logistics": "Logistics", "Contractor": "Contractor", "Customer": "Customer", "Grower": "Grower", "Partner": "Partner", "Volunteer": "Volunteer", "Guest": "Bisita", "Launch": "Launch", "Today": "Ngayon", "Week": "Linggo"
+    "Youth Workforce": "Youth Workforce", "Youth": "Kabataan", "Parent / Guardian": "Magulang / Guardian", "Parent": "Magulang", "Supervisor": "Supervisor", "Case Manager": "Case Manager", "Mission Control": "Mission Control", "Marketplace": "Merkado", "Journey Record": "Journey Record", "Resume": "Resume", "Achievement": "Nakamit", "Achievements": "Mga Nakamit", "Career Pathways": "Career Pathways", "Support": "Suporta", "Wellness": "Kalusugan", "Attendance": "Attendance", "Safety": "Kaligtasan", "PPE": "PPE", "Teamwork": "Pagtutulungan", "Communication": "Komunikasyon", "Problem Solving": "Paglutas ng Problema", "Responsibility": "Responsibilidad", "Leadership": "Pamumuno", "Reflection": "Reflection", "Check In": "Check In", "Check-in": "Check-in", "Project": "Proyekto", "Team": "Team", "Skills": "Skills", "Badge": "Badge", "Badges": "Badges", "Growth": "Paglago", "Workforce": "Workforce", "Development": "Development", "Family": "Pamilya", "Guardian": "Guardian", "Concern": "Concern", "Emergency": "Emergency", "Referral": "Referral", "Incident": "Incident", "Report": "Ulat", "Reports": "Mga Ulat", "Cooling Station": "Cooling Station", "Challenge": "Challenge", "Design": "Design", "Engineering": "Engineering", "Manufacturing": "Manufacturing", "Logistics": "Logistics", "Contractor": "Contractor", "Customer": "Customer", "Grower": "Grower", "Partner": "Partner", "Volunteer": "Volunteer", "Guest": "Bisita", "Launch": "Launch", "Today": "Ngayon", "Week": "Linggo"
   },
   it: {
-    "Youth Workforce": "Forza Lavoro Giovanile", "Youth": "Giovani", "Parent / Guardian": "Genitore / Tutore", "Parent": "Genitori", "Supervisor": "Supervisore", "Case Manager": "Case Manager", "Mission Control": "Centro di Controllo", "Marketplace": "Mercato", "Portfolio": "Portfolio", "Resume": "Curriculum", "Achievement": "Risultato", "Achievements": "Risultati", "Career Pathways": "Percorsi di Carriera", "Support": "Supporto", "Wellness": "Benessere", "Attendance": "Presenze", "Safety": "Sicurezza", "PPE": "DPI", "Teamwork": "Lavoro di Squadra", "Communication": "Comunicazione", "Problem Solving": "Risoluzione dei Problemi", "Responsibility": "Responsabilità", "Leadership": "Leadership", "Reflection": "Riflessione", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Progetto", "Team": "Team", "Skills": "Competenze", "Badge": "Badge", "Badges": "Badge", "Growth": "Crescita", "Workforce": "Forza Lavoro", "Development": "Sviluppo", "Family": "Famiglia", "Guardian": "Tutore", "Concern": "Preoccupazione", "Emergency": "Emergenza", "Referral": "Invio", "Incident": "Incidente", "Report": "Rapporto", "Reports": "Rapporti", "Cooling Station": "Stazione di Raffreddamento", "Challenge": "Sfida", "Design": "Design", "Engineering": "Ingegneria", "Manufacturing": "Produzione", "Logistics": "Logistica", "Contractor": "Appaltatore", "Customer": "Cliente", "Grower": "Coltivatore", "Partner": "Partner", "Volunteer": "Volontario", "Guest": "Ospite", "Launch": "Lancio", "Today": "Oggi", "Week": "Settimana"
+    "Youth Workforce": "Forza Lavoro Giovanile", "Youth": "Giovani", "Parent / Guardian": "Genitore / Tutore", "Parent": "Genitori", "Supervisor": "Supervisore", "Case Manager": "Case Manager", "Mission Control": "Centro di Controllo", "Marketplace": "Mercato", "Journey Record": "Journey Record", "Resume": "Curriculum", "Achievement": "Risultato", "Achievements": "Risultati", "Career Pathways": "Percorsi di Carriera", "Support": "Supporto", "Wellness": "Benessere", "Attendance": "Presenze", "Safety": "Sicurezza", "PPE": "DPI", "Teamwork": "Lavoro di Squadra", "Communication": "Comunicazione", "Problem Solving": "Risoluzione dei Problemi", "Responsibility": "Responsabilità", "Leadership": "Leadership", "Reflection": "Riflessione", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Progetto", "Team": "Team", "Skills": "Competenze", "Badge": "Badge", "Badges": "Badge", "Growth": "Crescita", "Workforce": "Forza Lavoro", "Development": "Sviluppo", "Family": "Famiglia", "Guardian": "Tutore", "Concern": "Preoccupazione", "Emergency": "Emergenza", "Referral": "Invio", "Incident": "Incidente", "Report": "Rapporto", "Reports": "Rapporti", "Cooling Station": "Stazione di Raffreddamento", "Challenge": "Sfida", "Design": "Design", "Engineering": "Ingegneria", "Manufacturing": "Produzione", "Logistics": "Logistica", "Contractor": "Appaltatore", "Customer": "Cliente", "Grower": "Coltivatore", "Partner": "Partner", "Volunteer": "Volontario", "Guest": "Ospite", "Launch": "Lancio", "Today": "Oggi", "Week": "Settimana"
   },
   he: {
-    "Youth Workforce": "כוח עבודה לנוער", "Youth": "נוער", "Parent / Guardian": "הורה / אפוטרופוס", "Parent": "הורה", "Supervisor": "מפקח", "Case Manager": "מנהל מקרה", "Mission Control": "מרכז בקרה", "Marketplace": "שוק", "Portfolio": "תיק עבודות", "Resume": "קורות חיים", "Achievement": "הישג", "Achievements": "הישגים", "Career Pathways": "מסלולי קריירה", "Support": "תמיכה", "Wellness": "רווחה", "Attendance": "נוכחות", "Safety": "בטיחות", "PPE": "ציוד מגן", "Teamwork": "עבודת צוות", "Communication": "תקשורת", "Problem Solving": "פתרון בעיות", "Responsibility": "אחריות", "Leadership": "מנהיגות", "Reflection": "רפלקציה", "Check In": "צ׳ק-אין", "Check-in": "צ׳ק-אין", "Project": "פרויקט", "Team": "צוות", "Skills": "כישורים", "Badge": "תג", "Badges": "תגים", "Growth": "צמיחה", "Workforce": "כוח עבודה", "Development": "פיתוח", "Family": "משפחה", "Guardian": "אפוטרופוס", "Concern": "דאגה", "Emergency": "חירום", "Referral": "הפניה", "Incident": "אירוע", "Report": "דוח", "Reports": "דוחות", "Cooling Station": "תחנת קירור", "Challenge": "אתגר", "Design": "עיצוב", "Engineering": "הנדסה", "Manufacturing": "ייצור", "Logistics": "לוגיסטיקה", "Contractor": "קבלן", "Customer": "לקוח", "Grower": "מגדל", "Partner": "שותף", "Volunteer": "מתנדב", "Guest": "אורח", "Launch": "השקה", "Today": "היום", "Week": "שבוע"
+    "Youth Workforce": "כוח עבודה לנוער", "Youth": "נוער", "Parent / Guardian": "הורה / אפוטרופוס", "Parent": "הורה", "Supervisor": "מפקח", "Case Manager": "מנהל מקרה", "Mission Control": "מרכז בקרה", "Marketplace": "שוק", "Journey Record": "תיק עבודות", "Resume": "קורות חיים", "Achievement": "הישג", "Achievements": "הישגים", "Career Pathways": "מסלולי קריירה", "Support": "תמיכה", "Wellness": "רווחה", "Attendance": "נוכחות", "Safety": "בטיחות", "PPE": "ציוד מגן", "Teamwork": "עבודת צוות", "Communication": "תקשורת", "Problem Solving": "פתרון בעיות", "Responsibility": "אחריות", "Leadership": "מנהיגות", "Reflection": "רפלקציה", "Check In": "צ׳ק-אין", "Check-in": "צ׳ק-אין", "Project": "פרויקט", "Team": "צוות", "Skills": "כישורים", "Badge": "תג", "Badges": "תגים", "Growth": "צמיחה", "Workforce": "כוח עבודה", "Development": "פיתוח", "Family": "משפחה", "Guardian": "אפוטרופוס", "Concern": "דאגה", "Emergency": "חירום", "Referral": "הפניה", "Incident": "אירוע", "Report": "דוח", "Reports": "דוחות", "Cooling Station": "תחנת קירור", "Challenge": "אתגר", "Design": "עיצוב", "Engineering": "הנדסה", "Manufacturing": "ייצור", "Logistics": "לוגיסטיקה", "Contractor": "קבלן", "Customer": "לקוח", "Grower": "מגדל", "Partner": "שותף", "Volunteer": "מתנדב", "Guest": "אורח", "Launch": "השקה", "Today": "היום", "Week": "שבוע"
   },
   fr: {
-    "Youth Workforce": "Jeunesse au Travail", "Youth": "Jeunes", "Parent / Guardian": "Parent / Tuteur", "Parent": "Parent", "Supervisor": "Superviseur", "Case Manager": "Gestionnaire de cas", "Mission Control": "Centre de Mission", "Marketplace": "Marché", "Portfolio": "Portfolio", "Resume": "CV", "Achievement": "Réussite", "Achievements": "Réussites", "Career Pathways": "Parcours Professionnels", "Support": "Soutien", "Wellness": "Bien-être", "Attendance": "Présence", "Safety": "Sécurité", "PPE": "EPI", "Teamwork": "Travail d'Équipe", "Communication": "Communication", "Problem Solving": "Résolution de Problèmes", "Responsibility": "Responsabilité", "Leadership": "Leadership", "Reflection": "Réflexion", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Projet", "Team": "Équipe", "Skills": "Compétences", "Badge": "Badge", "Badges": "Badges", "Growth": "Croissance", "Workforce": "Main-d’œuvre", "Development": "Développement", "Family": "Famille", "Guardian": "Tuteur", "Concern": "Préoccupation", "Emergency": "Urgence", "Referral": "Orientation", "Incident": "Incident", "Report": "Rapport", "Reports": "Rapports", "Cooling Station": "Station de Refroidissement", "Challenge": "Défi", "Design": "Conception", "Engineering": "Ingénierie", "Manufacturing": "Fabrication", "Logistics": "Logistique", "Contractor": "Entrepreneur", "Customer": "Client", "Grower": "Producteur", "Partner": "Partenaire", "Volunteer": "Bénévole", "Guest": "Invité", "Launch": "Lancement", "Today": "Aujourd’hui", "Week": "Semaine"
+    "Youth Workforce": "Jeunesse au Travail", "Youth": "Jeunes", "Parent / Guardian": "Parent / Tuteur", "Parent": "Parent", "Supervisor": "Superviseur", "Case Manager": "Gestionnaire de cas", "Mission Control": "Centre de Mission", "Marketplace": "Marché", "Journey Record": "Journey Record", "Resume": "CV", "Achievement": "Réussite", "Achievements": "Réussites", "Career Pathways": "Parcours Professionnels", "Support": "Soutien", "Wellness": "Bien-être", "Attendance": "Présence", "Safety": "Sécurité", "PPE": "EPI", "Teamwork": "Travail d'Équipe", "Communication": "Communication", "Problem Solving": "Résolution de Problèmes", "Responsibility": "Responsabilité", "Leadership": "Leadership", "Reflection": "Réflexion", "Check In": "Check-in", "Check-in": "Check-in", "Project": "Projet", "Team": "Équipe", "Skills": "Compétences", "Badge": "Badge", "Badges": "Badges", "Growth": "Croissance", "Workforce": "Main-d’œuvre", "Development": "Développement", "Family": "Famille", "Guardian": "Tuteur", "Concern": "Préoccupation", "Emergency": "Urgence", "Referral": "Orientation", "Incident": "Incident", "Report": "Rapport", "Reports": "Rapports", "Cooling Station": "Station de Refroidissement", "Challenge": "Défi", "Design": "Conception", "Engineering": "Ingénierie", "Manufacturing": "Fabrication", "Logistics": "Logistique", "Contractor": "Entrepreneur", "Customer": "Client", "Grower": "Producteur", "Partner": "Partenaire", "Volunteer": "Bénévole", "Guest": "Invité", "Launch": "Lancement", "Today": "Aujourd’hui", "Week": "Semaine"
   }
 };
 
@@ -3605,7 +3606,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Elegir rol',
     'Go to Today’s Work': 'Ir a mi espacio',
-    "Case Manager": "Administrador de Casos", "My Portfolio": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Resume and Portfolio Growth": "Crecimiento de Currículum y Portafolio", "Youth Support Response Framework": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
+    "Case Manager": "Administrador de Casos", "My Journey Record": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Journey Growth Record": "Crecimiento de Currículum y Portafolio", "Youth Support Response Framework": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
   },
   tl: {
     'Forest Gate Portal': 'Forest Gate Portal',
@@ -3632,7 +3633,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Pumili ng Role',
     'Go to Today’s Work': 'Pumunta sa Aking Araw',
-    "Case Manager": "Case Manager", "My Portfolio": "Aking Portfolio", "Resume Builder": "Resume Builder", "Resume and Portfolio Growth": "Paglago ng Resume at Portfolio", "Youth Support Response Framework": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
+    "Case Manager": "Case Manager", "My Journey Record": "Aking Journey Record", "Resume Builder": "Resume Builder", "Journey Growth Record": "Paglago ng Resume at Journey Record", "Youth Support Response Framework": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
   },
   it: {
     'Forest Gate Portal': 'Portale del Cancello Forestale',
@@ -3659,7 +3660,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Scegli ruolo',
     'Go to Today’s Work': 'Vai al mio spazio',
-    "Case Manager": "Case Manager", "My Portfolio": "Il Mio Portfolio", "Resume Builder": "Creatore di Curriculum", "Resume and Portfolio Growth": "Crescita di Curriculum e Portfolio", "Youth Support Response Framework": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
+    "Case Manager": "Case Manager", "My Journey Record": "Il Mio Journey Record", "Resume Builder": "Creatore di Curriculum", "Journey Growth Record": "Crescita di Curriculum e Journey Record", "Youth Support Response Framework": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
   },
   he: {
     'Forest Gate Portal': 'שער היער',
@@ -3686,7 +3687,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'מחר: משימה, תזכורת ציוד מגן, בקבוק מים והצעד הבא.',
     'Choose Role': 'בחר תפקיד',
     'Go to Today’s Work': 'עבור למרחב העבודה',
-    "Case Manager": "מנהל מקרה", "My Portfolio": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Resume and Portfolio Growth": "צמיחת קורות חיים ותיק עבודות", "Youth Support Response Framework": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
+    "Case Manager": "מנהל מקרה", "My Journey Record": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Journey Growth Record": "צמיחת קורות חיים ותיק עבודות", "Youth Support Response Framework": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
   },
   fr: {
     'Forest Gate Portal': 'Portail de la Forêt',
@@ -3713,7 +3714,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Choisir un rôle',
     'Go to Today’s Work': 'Aller à mon espace',
-    "Case Manager": "Gestionnaire de cas", "My Portfolio": "Mon Portfolio", "Resume Builder": "Créateur de CV", "Resume and Portfolio Growth": "Développement du CV et du Portfolio", "Youth Support Response Framework": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
+    "Case Manager": "Gestionnaire de cas", "My Journey Record": "Mon Journey Record", "Resume Builder": "Créateur de CV", "Journey Growth Record": "Développement du CV et du Journey Record", "Youth Support Response Framework": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
   }
 };
 
@@ -4556,7 +4557,7 @@ function MissionControlCurriculumBuilder({ activeUser }: { activeUser?: Ecosyste
     <section className="rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Mission Control • Curriculum Builder</div>
       <h2 className="mt-2 text-3xl font-black">Enter Today's Work One Time</h2>
-      <p className="mt-3 text-sm leading-6 text-white/75">This is the source of truth for youth assignments, parent updates, supervisor teams, evidence, reflections, portfolio records, and reports.</p>
+      <p className="mt-3 text-sm leading-6 text-white/75">This is the source of truth for youth assignments, parent updates, supervisor teams, evidence, reflections, Journey records, and reports.</p>
       <div className="mt-5 rounded-2xl bg-black/25 p-4">
         <div className="text-sm font-black">Week {activeCurriculum.week}</div>
         <div className="mt-1 text-2xl font-black">{activeCurriculum.theme}</div>
@@ -4770,7 +4771,7 @@ function ParentActionCenterCard() {
 
 function YouthWorkforcePortfolioCard({ participantId }: { participantId: string }) {
   const completed = getCompletedAssignmentsForYouth(participantId);
-  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><h2 className="text-3xl font-black">My Workforce Portfolio</h2><div className="mt-4 grid gap-3">{completed.map((record) => <div key={record.id} className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase text-white/60">{record.date}</div><div className="mt-1 text-xl font-black">{record.activity_title}</div><div className="mt-2 text-sm text-white/75">Completed through today's curriculum.</div></div>)}</div></section>;
+  return <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5"><h2 className="text-3xl font-black">My Workforce Journey Record</h2><div className="mt-4 grid gap-3">{completed.map((record) => <div key={record.id} className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase text-white/60">{record.date}</div><div className="mt-1 text-xl font-black">{record.activity_title}</div><div className="mt-2 text-sm text-white/75">Completed through today's curriculum.</div></div>)}</div></section>;
 }
 
 function YouthResumeSkillsCard({ participantId }: { participantId: string }) {
@@ -4932,7 +4933,7 @@ function Launch62MyJourneyPanel({ compact = false }: { compact?: boolean }) {
                   <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Photos</button>
                   <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Reflections</button>
                   <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Skills</button>
-                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Portfolio</button>
+                  <button type="button" className="rounded-xl bg-white/10 p-3 text-left font-black">My Journey Record</button>
                 </div>
               )}
             </details>
@@ -5029,7 +5030,7 @@ function CultivatorTheoryOfChangeCard({ compact = false }: { compact?: boolean }
       <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/80">{CULTIVATOR_THEORY_OF_CHANGE.professionalName}</div>
       <h2 className="mt-2 text-3xl font-black md:text-4xl">{CULTIVATOR_THEORY_OF_CHANGE.belief}</h2>
       <p className="mt-3 text-xl font-black text-emerald-100">{CULTIVATOR_THEORY_OF_CHANGE.tagline}</p>
-      {!compact && <p className="mt-3 max-w-5xl text-sm font-bold leading-6 text-white/78">Through meaningful work, stewardship, learning, critical thinking, entrepreneurship, and community, youth discover possibilities, develop capabilities, cultivate growth, and regenerate the future. This is the organizing layer beneath the workbook, portfolio, parent pathway, supervisor observations, workforce transcript, and Mission Control reports.</p>}
+      {!compact && <p className="mt-3 max-w-5xl text-sm font-bold leading-6 text-white/78">Through meaningful work, stewardship, learning, critical thinking, entrepreneurship, and community, youth discover possibilities, develop capabilities, cultivate growth, and regenerate the future. This is the organizing layer beneath the workbook, Journey record, parent pathway, supervisor observations, workforce transcript, and Mission Control reports.</p>}
       <div className="mt-5"><CultivatorTheoryStageGrid compact={compact} /></div>
     </section>
   );
@@ -5083,7 +5084,7 @@ function Cultivator90DashboardGrid({ setScreen }: { setScreen: (screen: Screen) 
     { title: "🌱 My Journey", detail: "Start My Day, reflections, photos, moments, and story.", actions: [["Start My Day", "wellness"], ["Share My Learning", "media"]] },
     { title: "🛠 My Work", detail: "Today’s assignment, safety, work status, and team activities.", actions: [["Today’s Work", "wellness"], ["Work Status", "operations"]] },
     { title: "📚 My Learning", detail: "School, career, and real-world connections from each project.", actions: [["Explore", "resources"], ["Events", "events"]] },
-    { title: "🎯 My Skills", detail: "Skills passport, badges, resume skills, and workforce transcript.", actions: [["Portfolio", "completion"], ["Reports", "reports"]] },
+    { title: "🎯 My Skills", detail: "Skills passport, badges, resume skills, and workforce transcript.", actions: [["Journey Record", "completion"], ["Reports", "reports"]] },
     { title: "🚀 My Future", detail: "Career pathways, education options, trades, entrepreneurship, and next steps.", actions: [["Pathways", "resources"], ["Marketplace", "marketplace"]] },
     { title: "❤️ My Impact", detail: "Food grown, trees planted, pollinator habitat, airport legacy, and community contribution.", actions: [["Guest Journey", "guest"], ["Story", "media"]] },
   ];
@@ -5119,13 +5120,13 @@ function Cultivator90PortfolioProgressCard({ participantId }: { participantId: s
   const completion = Math.min(100, Math.max(18, (items.reduce((sum, [, value]) => sum + Number(value), 0) * 7)));
   return (
     <section className="rounded-[1.5rem] border border-yellow-200/25 bg-yellow-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-100/75">My Portfolio • Building Automatically</div>
-      <h2 className="mt-2 text-3xl font-black">Your Cultivator Portfolio is in progress.</h2>
-      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Daily work becomes a professional portfolio, workforce transcript, resume, career pathway report, supervisor recommendation, certificate, and Story of a Summer.</p>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-100/75">My Journey Record • Building Automatically</div>
+      <h2 className="mt-2 text-3xl font-black">Your Cultivator Journey record is in progress.</h2>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Daily work becomes a professional Journey record, workforce transcript, resume, career pathway report, supervisor recommendation, certificate, and Story of a Summer.</p>
       <div className="mt-5 grid gap-3 md:grid-cols-3">
         {items.map(([label, value]) => <div key={label} className="rounded-2xl bg-black/25 p-4"><div className="text-xs font-black uppercase tracking-[0.18em] text-white/55">{label}</div><div className="mt-1 text-3xl font-black">{String(value)}</div></div>)}
       </div>
-      <div className="mt-5 rounded-full bg-black/30 p-1"><div className="rounded-full bg-yellow-300 px-4 py-2 text-xs font-black text-black" style={{ width: `${completion}%` }}>Portfolio Completion: {completion}%</div></div>
+      <div className="mt-5 rounded-full bg-black/30 p-1"><div className="rounded-full bg-yellow-300 px-4 py-2 text-xs font-black text-black" style={{ width: `${completion}%` }}>Journey Record Completion: {completion}%</div></div>
     </section>
   );
 }
@@ -5146,7 +5147,7 @@ function Cultivator90MomentCaptureCard({ activeUser }: { activeUser: EcosystemUs
     <section className="rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-5">
       <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">Cultivator Moment</div>
       <h2 className="mt-2 text-3xl font-black">💡 I Noticed Something</h2>
-      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Capture discoveries, questions, achievements, leadership, gratitude, and future interests. These moments become portfolio and parent-report highlights.</p>
+      <p className="mt-3 text-sm font-bold leading-6 text-white/78">Capture discoveries, questions, achievements, leadership, gratitude, and future interests. These moments become Journey record and parent-report highlights.</p>
       <div className="mt-4 flex flex-wrap gap-2">{["Discovery", "Curiosity", "Achievement", "Leadership", "Gratitude", "Future"].map((item) => <button key={item} type="button" onClick={() => setCategory(item)} className={`rounded-full px-4 py-2 text-xs font-black ${category === item ? "bg-purple-300 text-black" : "border border-white/15 bg-black/25"}`}>{item}</button>)}</div>
       <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Example: I noticed bees preferred the purple flowers." className="mt-4 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" />
       <button type="button" onClick={save} className="mt-4 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Save to My Journey</button>
@@ -5256,7 +5257,7 @@ function Supervisor90GrowthNotesCard({ activeUser }: { activeUser: EcosystemUser
     const row = { id: uuid(), supervisor: activeUser?.name || "Supervisor", strength, note: note.trim(), created_at: new Date().toISOString() };
     safeWrite(SUPERVISOR_GROWTH_NOTES_KEY, [row, ...safeRead<any[]>(SUPERVISOR_GROWTH_NOTES_KEY, [])]);
     setNote("");
-    alert("Growth note saved for portfolio and recommendation drafting.");
+    alert("Growth note saved for Journey record and recommendation drafting.");
   };
   return <section className="rounded-[1.5rem] border border-cyan-200/25 bg-cyan-300/10 p-5"><div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Supervisor Growth Notes</div><h2 className="mt-2 text-3xl font-black">Document strengths, potential, and recommendation material.</h2><div className="mt-4 flex flex-wrap gap-2">{["Opportunity Recognition", "Critical Thinking", "Leadership", "Initiative", "Stewardship", "Responsibility", "Accountability", "Maturity", "Communication", "Problem Solving", "Teamwork", "Persistence"].map((item) => <button key={item} type="button" onClick={() => setStrength(item)} className={`rounded-full px-4 py-2 text-xs font-black ${strength === item ? "bg-cyan-300 text-black" : "border border-white/15 bg-black/25"}`}>{item}</button>)}</div><textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Example: Helped another youth understand how to carry tools safely." className="mt-4 min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/45 p-4 text-white placeholder:text-white/45" /><button type="button" onClick={save} className="mt-4 rounded-full bg-cyan-300 px-6 py-3 font-black text-black">Save Growth Note</button></section>;
 }
@@ -5644,7 +5645,7 @@ function FloatingUploadDock({ screen, setScreen }: { screen: Screen; setScreen: 
         className="rounded-full border border-white/20 bg-black/75 px-4 py-2 text-xs font-black text-white shadow-[0_12px_35px_rgba(0,0,0,.35)] backdrop-blur-xl"
         title="Add Observation"
       >
-        📝 Add Observation
+        🔎 I Found Something
       </button>
     </div>
   );
@@ -5976,7 +5977,7 @@ function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) =
   const stages = [
     { title: "Beginning of Day", icon: "🌞", body: "Check in, read the Nurse Line, review weather, heat index, farm status, PPE, water, today’s assignment, and daily inspiration.", actions: ["Attendance", "PPE", "Almanac", "Assignment"] },
     { title: "During Program", icon: "🚜", body: "Do the work, use resources, ask supervisors, tell your Cultivator Story, connect the task to skills, career pathways, and entrepreneurship.", actions: ["Project", "Explore & Discover", "Career", "Evidence"] },
-    { title: "End of Day", icon: "🌙", body: "Reflect, save portfolio evidence, receive supervisor feedback, prepare parent-safe summary, and preview tomorrow’s work.", actions: ["Reflection", "Assessment", "Portfolio", "Tomorrow"] },
+    { title: "End of Day", icon: "🌙", body: "Reflect, save journey evidence, receive supervisor feedback, prepare parent-safe summary, and preview tomorrow’s work.", actions: ["Reflection", "Assessment", "Journey Record", "Tomorrow"] },
   ];
   return (
     <Card>
@@ -6008,7 +6009,7 @@ function EntrepreneurshipValueCard() {
     ["Customer", "Bronson Family Farm and the contractor need a safer cooling area for summer outdoor operations."],
     ["Problem", "Heat stress can harm youth, workers, volunteers, and visitors and can shut down production."],
     ["Solution", "Youth teams produce, finish, document, and stage cooling-fan work that supports the cooling station."],
-    ["Value", "The project protects people, supports operations, creates portfolio evidence, and teaches how work becomes service and economic opportunity."],
+    ["Value", "The project protects people, supports operations, creates journey evidence, and teaches how work becomes service and economic opportunity."],
     ["Opportunity", "Design, engineering, manufacturing, logistics, agriculture, construction, public safety, customer service, and entrepreneurship."],
   ];
   return (
@@ -6190,6 +6191,12 @@ function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | n
         <input className="hidden" type="file" accept="image/*,video/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) saveLocalFile(file); e.currentTarget.value = ""; }} />
       </label>
       {notice && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-bold text-emerald-50">{notice}</div>}
+      <div className="mt-4 grid gap-4">
+        <CSUBasedCurriculumAccess16_8 compact />
+        <WorkbookWeekAccess16_8 />
+        <WorkbookRecoveryCenter16_8 />
+      </div>
+
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {assets.slice(0, 4).map((asset) => (
           <div key={asset.id} className="rounded-2xl border border-white/10 bg-black/28 p-3">
@@ -6368,9 +6375,9 @@ const largerPictureLayers: Record<string, LargerPictureLayer> = {
   "Youth Workforce Pathway": {
     roleTitle: "Youth Workforce Journey",
     identity: "You are a paid contributor to the ecosystem.",
-    today: ["Earn money", "Build workforce skills", "Solve a real business challenge", "Support customers and farm operations", "Create evidence for your portfolio and resume"],
+    today: ["Earn money", "Build workforce skills", "Solve a real business challenge", "Support customers and farm operations", "Create evidence for your Journey record and resume"],
     largerPicture: "In the larger picture, your work strengthens local food systems, workforce development, economic opportunity, and community health.",
-    route: ["Youth Workforce", "Today's Project", "Production Team", "Skills + Earnings", "Portfolio", "Community Impact"],
+    route: ["Youth Workforce", "Today's Project", "Production Team", "Skills + Earnings", "Journey Record", "Community Impact"],
   },
   "Parent / Guardian Portal": {
     roleTitle: "Parent / Guardian Journey",
@@ -8806,7 +8813,7 @@ const FIELD_MISSION_STOPS_13: FieldMissionStop[] = [
   },
   {
     id: "legacy-reflection",
-    mission: "Closing • Workbook + Portfolio",
+    mission: "Closing • Workbook + Journey Record",
     time: "Final stop • 5 minutes",
     icon: "⭐",
     title: "Legacy Reflection",
@@ -9041,6 +9048,67 @@ const WORKBOOK_SECTIONS_13_1 = [
   { key: "Legacy", icon: "⭐", title: "Legacy", subtitle: "What I Am Helping Build", match: ["Legacy Reflection"] },
 ];
 
+
+const CSU_CURRICULUM_ACCESS_TOPICS_16_8 = [
+  "CSU Fastrack Farming foundation",
+  "Soil and compost",
+  "Planting and crop planning",
+  "Pollinators and habitat",
+  "Farm business and inventory",
+  "Field application at Bronson Family Farm",
+];
+
+const WORKBOOK_WEEK_ACCESS_16_8 = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8"];
+
+function CSUBasedCurriculumAccess16_8({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`rounded-[1.5rem] border border-sky-200/25 bg-sky-300/10 ${compact ? "p-4" : "p-5"}`}>
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">CSU-Based Curriculum Access</div>
+      <h3 className="mt-2 text-2xl font-black">Existing CSU foundation, easier to find.</h3>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/78">
+        No new curriculum is added here. The Workbook makes Constance Burgess’s CSU Fastrack Farming foundation more available through the curriculum library, daily lesson source, resources, and search.
+      </p>
+      <div className="mt-4 grid gap-2 md:grid-cols-3">
+        {CSU_CURRICULUM_ACCESS_TOPICS_16_8.map((topic) => (
+          <div key={topic} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">{topic}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WorkbookWeekAccess16_8() {
+  return (
+    <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Editable Week Library</div>
+      <h3 className="mt-2 text-2xl font-black">Every week stays open.</h3>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/78">
+        Youth can return to any week to add, edit, delete, replace, upload, re-upload, or complete unfinished workbook inputs. Attendance, work hours, supervisor evaluations, and incident reports remain official locked records.
+      </p>
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
+        {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
+          <button key={week} type="button" className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/86 hover:bg-white/12">
+            {week}<div className="mt-1 text-[11px] font-bold text-white/60">Open / edit / complete</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WorkbookRecoveryCenter16_8() {
+  const items = ["Missing reflection", "Missing upload", "Missing documentation", "Needs review", "Not started"];
+  return (
+    <div className="rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/80">Incomplete Items Center</div>
+      <h3 className="mt-2 text-2xl font-black">Find what still needs work.</h3>
+      <div className="mt-4 grid gap-2 md:grid-cols-5">
+        {items.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-black text-white/84">{item}</div>)}
+      </div>
+    </div>
+  );
+}
+
 function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
   const [entries, setEntries] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
   const [message, setMessage] = useState("");
@@ -9096,7 +9164,7 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
         <div>
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook 1.0 • Central Record</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">My workbook is being built while I work.</h2>
-          <p className="mt-2 max-w-3xl text-sm font-bold leading-6 text-white/78">Every saved observation becomes part of the workbook, journey, and portfolio. Youth should see one question at a time; the workbook organizes the learning behind the scenes.</p>
+          <p className="mt-2 max-w-3xl text-sm font-bold leading-6 text-white/78">Every saved observation becomes part of the workbook, journey, and Journey record. Youth should see one question at a time; the workbook organizes the learning behind the scenes.</p>
         </div>
         <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-center">
           <div className="text-2xl font-black text-emerald-50">{percent}%</div>
@@ -9142,7 +9210,7 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="button" onClick={refreshWorkbook} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Refresh Workbook</button>
         <button type="button" onClick={downloadWorkbook} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Download Workbook Draft</button>
-        <button type="button" onClick={() => setScreen("journey")} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">Open Portfolio / Journey</button>
+        <button type="button" onClick={() => setScreen("journey")} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">Open My Journey</button>
         {message && <span className="self-center text-xs font-black text-emerald-50">{message}</span>}
       </div>
     </Card>
@@ -9360,9 +9428,9 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • 16.2K Separation Lock</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • 16.8 Workbook / Journey / CSU Access Lock</div>
               <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : "Workbook"}</h1>
-              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Workbook is the curriculum record: activity responses, photos, counts, discoveries, questions, and resource links."}</p>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Workbook is the editable curriculum record: activity responses, photos, counts, discoveries, questions, CSU-based curriculum access, and resource links."}</p>
             </div>
             <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
           </div>
@@ -9385,11 +9453,16 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
       {phase === "workbook" && (
         <Card className="p-4 md:p-6">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook • Activities, Evidence, Counts, Photos</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook • Editable Record • CSU-Based Curriculum Access</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">Document today's activities one time.</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved. Youth can return without repeating the same questions. Career, opportunity, accomplishments, and growth stay in My Journey, not here.</p>
+          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved and remain editable. Youth can return to any week to add, delete, change, replace, or complete unfinished work. Career, opportunity, accomplishments, and growth stay in My Journey, not here.</p>
+          <div className="mt-4 grid gap-4">
+            <CSUBasedCurriculumAccess16_8 compact />
+            <WorkbookWeekAccess16_8 />
+            <WorkbookRecoveryCenter16_8 />
+          </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
-            <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links</div>
+            <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links + Daily Lesson Source</div>
             <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
               {(todayPlan.resources || []).map((resource) => <li key={resource}>• {resource}</li>)}
             </ul>
@@ -9427,7 +9500,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-6">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">My Journey • Accomplishments Record</div>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">My Journey is separate from today's work.</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-white/78">Today's Work shows assignments. My Journey shows accomplishments, growth, skills, experiences, opportunities, CCP/certification pathways, career interests, legacy record, and portfolio progress.</p>
+          <p className="mt-3 text-sm font-bold leading-7 text-white/78">Today's Work shows assignments. My Journey shows accomplishments, growth, skills, experiences, opportunities, CCP/certification pathways, career interests, legacy record, and Journey progress.</p>
           <button type="button" onClick={() => setScreen("journey")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Open My Journey Accomplishments</button>
         </Card>
       )}
@@ -9463,7 +9536,7 @@ const CULTIVATOR_FRAMEWORK_LAYERS = [
   { key: "environment", icon: "🌳", title: "Environment", question: "What am I learning about the place where I live?", detail: "Woods, water, wildlife, soil, trees, pollinators, weather, parks, and vacant lots." },
   { key: "community", icon: "🏘", title: "Community", question: "How does this connect to Youngstown?", detail: "Neighborhood assets, park systems, Lansdowne Airport history, food systems, and community challenges." },
   { key: "opportunity", icon: "🚀", title: "Opportunity", question: "Where can this lead?", detail: "Careers, trades, college, entrepreneurship, certifications, and local workforce pathways." },
-  { key: "legacy", icon: "⭐", title: "Legacy", question: "What difference am I making?", detail: "Portfolio, workbook, achievements, supervisor notes, parent notes, community service, and completion proof." },
+  { key: "legacy", icon: "⭐", title: "Legacy", question: "What difference am I making?", detail: "Workbook, achievements, supervisor notes, parent notes, community service, and completion proof." },
 ];
 
 const YOUNGSTOWN_ENVIRONMENT_PROMPTS = [
@@ -11448,6 +11521,35 @@ function ActiveCurriculumProjectCard({ setScreen, compact = false }: { setScreen
   );
 }
 
+
+function ParentQuickAccess16_8({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const cards = [
+    ["Is my child here?", "Present / check-in status"],
+    ["What are they doing?", "Today’s assignment"],
+    ["How are they progressing?", "Workbook + Journey progress"],
+    ["Do I need to do anything?", "Missing items / messages"],
+  ];
+  return (
+    <div className="mt-5 rounded-[1.75rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Parent Home • Easy Access</div>
+      <h2 className="mt-2 text-3xl font-black">Everything important within one screen.</h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-4">
+        {cards.map(([title, detail]) => (
+          <div key={title} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="text-sm font-black text-white">{title}</div>
+            <div className="mt-1 text-xs font-bold text-white/65">{detail}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {["Home", "My Child", "Progress", "Messages", "Reports"].map((label) => (
+          <button key={label} type="button" onClick={() => label === "Messages" ? setScreen("feedback") : label === "Reports" ? setScreen("reports") : setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white hover:bg-white/18">{label}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const summaries = safeRead<ParentSummary[]>(PARENT_SUMMARY_KEY, []);
   const attendance = safeRead<AttendanceRecord[]>(ATTENDANCE_KEY, []);
@@ -11463,8 +11565,10 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
       <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent / Guardian Portal</div>
       <h1 className="mt-4 text-4xl font-black md:text-6xl">Progress, encouragement, and next steps.</h1>
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
-        Parents see attendance, accomplishments, badges, goals, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
+        Parents see attendance, accomplishments, workbook progress, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
       </p>
+
+      <ParentQuickAccess16_8 setScreen={setScreen} />
 
       <LargerPictureCard layerKey="Parent / Guardian Portal" />
 
@@ -11495,7 +11599,7 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
 
       <div className="mt-6 rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
         <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Child's Workforce Progress</div>
-        <h2 className="mt-2 text-2xl font-black">Resume and Portfolio Growth</h2>
+        <h2 className="mt-2 text-2xl font-black">Journey Growth Record</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-5">
           {["Badges Earned", "Projects Completed", "Skills Demonstrated", "Supervisor Strengths", "Career Interests"].map((item) => (
             <div key={item} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm font-black">{item}</div>
@@ -12091,7 +12195,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Portfolio</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Journey Record</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">Share My Learning</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">This is where youth document photos, videos, field notes, reflections, first-time experiences, and Cultivator Moments.</p>
         {notice && <Notice text={notice} />}
@@ -12634,7 +12738,7 @@ function ParticipantLifecycleGovernancePanel() {
     <div className="rounded-[1.5rem] border-2 border-slate-200 bg-white p-5 text-slate-950 shadow-sm">
       <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-600">Participant Lifecycle Governance</div>
       <h2 className="mt-2 text-3xl font-black">Pending → Active → Completed / Inactive</h2>
-      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">No suspension status. No default deletion. Inactive participants remain in history but lose all privileges except Visitor/Guest access. Completed participants preserve workbook, portfolio, hours, attendance, reflections, and career evidence.</p>
+      <p className="mt-2 text-sm font-bold leading-6 text-slate-700">No suspension status. No default deletion. Inactive participants remain in history but lose all privileges except Visitor/Guest access. Completed participants preserve workbook, Journey record, hours, attendance, reflections, and career evidence.</p>
       <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
         {cards.map(([label, value, detail]) => (
           <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -13652,7 +13756,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
       <Card>
         <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey • Accomplishments Record</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">My Accomplishments</h1>
-        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is separate from Today's Work. It shows what I have accomplished: my growth, skills, experiences, community connections, opportunities, career interests, legacy record, portfolio evidence, workforce transcript, and future pathways.</p>
+        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is separate from Today's Work. It shows what I have accomplished: my growth, skills, experiences, community connections, opportunities, career interests, legacy record, journey evidence, workforce transcript, and future pathways.</p>
         <div className="mt-5 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-5">
           <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Accomplishment Context</div>
           <h2 className="mt-2 text-3xl font-black">Skills connected to Week {currentWeek.week}: {currentWeek.title}</h2>
@@ -13673,7 +13777,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
           <div className="mt-4 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).slice(0, 12).map((skill) => <span key={skill} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">{skill}</span>)}</div>
         </Card>
         <Card className="p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Portfolio Progress</div>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Journey Record Progress</div>
           <h2 className="mt-2 text-2xl font-black">Evidence collected</h2>
           <div className="mt-4 grid gap-2 text-sm font-black">
             <div className="rounded-xl bg-white/10 p-3">Assignments: {completed.length}</div>
