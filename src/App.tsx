@@ -80,7 +80,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  * - Ecosystem 16.8B: Fixes workbook curriculum resource access. Day cards now expose clickable lesson materials, in-app resource panels, and embedded/linked videos including the Fan Construction / Design Video where available.
  * - Ecosystem 16.8D: Removes CSU training as a titled destination. Resources are shown as a direct Resource Library with practical resource groups, uploaded CSU documents/decks, week access, and lesson resource cards.
+ * - Ecosystem 19.1: Restores both natural trellis videos as real embedded resources and makes the two pinned Today's Work video buttons open the videos directly.
  * - Ecosystem 16.8F: Binds resource cards to actual in-app content. Beehive, apiary, honey bee, pollinator, milkweed, trellis, germination, crop planning, seeding/transplanting, and site safety resources no longer open placeholder shells. Week 5 Today's Work surfaces beehive/apiary resources as pinned workday materials.
+ * - Ecosystem 19.0: Cultivator Intelligence Platform. Workbook is the source of truth; Journey, Parent Reports, Supervisor Reports, Portfolio, Workforce Transcript, and the final Mirror are generated from workbook evidence instead of asking youth to repeat answers.
+ * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
 
 type Screen =
@@ -2807,6 +2810,22 @@ const launchVideos: LaunchVideo[] = [
     fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and journey evidence.",
     tags: ["Completion", "Contractor", "Farm Infrastructure"],
   },
+  {
+    title: "Natural Trellis Design Video #1 — Willow Branch Trellis",
+    purpose: "Shows youth how branches can be selected, arranged, secured, and shaped into a natural plant support before materials are collected from the forest.",
+    embedUrl: "https://www.youtube.com/embed/I0H3cvcQ8OY",
+    embedTitle: "DIY Willow Branch Trellis — Garden Answer",
+    fallback: "Natural trellis video #1: branch selection, spacing, stability, fastening, and safe natural-material construction.",
+    tags: ["Natural Trellis", "Trellis Video #1", "Branches", "Forest Materials"],
+  },
+  {
+    title: "Natural Trellis Design Video #2 — Trellis Hacks With Sticks",
+    purpose: "Compares several simple trellis designs made with sticks so youth can choose a support appropriate for beans, tomatoes, squash, pumpkins, or other climbing plants.",
+    embedUrl: "https://www.youtube.com/embed/nHOAPjlzceU",
+    embedTitle: "DIY Trellis Hacks With Sticks",
+    fallback: "Natural trellis video #2: compare multiple stick-trellis designs and identify the branch shapes needed for each design.",
+    tags: ["Natural Trellis", "Trellis Video #2", "Sticks", "Climbing Plants"],
+  },
 ];
 
 
@@ -4675,11 +4694,11 @@ function YouthTodayWorkCard() {
     "Photograph apiary assembly progress",
   ];
   const pinnedResources = [
-    "🎥 Natural Trellis Design Video #1",
-    "🎥 Natural Trellis Design Video #2",
-    "🐝 Apiary Assembly Guide",
-    "📄 Beehive Diagram",
-    "🌿 Milkweed & Monarchs",
+    { label: "🎥 Natural Trellis Design Video #1", url: "https://www.youtube.com/watch?v=I0H3cvcQ8OY" },
+    { label: "🎥 Natural Trellis Design Video #2", url: "https://www.youtube.com/watch?v=nHOAPjlzceU" },
+    { label: "🐝 Apiary Assembly Guide" },
+    { label: "📄 Beehive Diagram" },
+    { label: "🌿 Milkweed & Monarchs" },
   ];
   const safetyItems = [
     "Stay with your crew.",
@@ -4705,7 +4724,16 @@ function YouthTodayWorkCard() {
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <div className="text-xs font-black uppercase tracking-[0.2em] text-white/55">Resources Needed Today</div>
           <div className="mt-3 grid gap-2">
-            {pinnedResources.map((item) => <button key={item} type="button" className="rounded-xl bg-white px-4 py-3 text-left font-black text-slate-900 shadow-sm">{item}</button>)}
+            {pinnedResources.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => item.url ? window.open(item.url, "_blank", "noopener,noreferrer") : undefined}
+                className="rounded-xl bg-white px-4 py-3 text-left font-black text-slate-900 shadow-sm"
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <p className="mt-3 text-xs font-bold leading-5 text-white/70">The beehive video is available immediately here. It is support for the work, not a questionnaire.</p>
         </div>
@@ -9454,7 +9482,8 @@ function workbookLessonResources16_8B(dayPlan: typeof youthWeekOneDailyPlan[numb
   }
 
   if (lessonText.includes("trellis")) {
-    addVideoByTitle("Natural Trellis", "Natural Trellis Design Video");
+    addVideoByTitle("Trellis Video #1", "Natural Trellis Design Video #1");
+    addVideoByTitle("Trellis Video #2", "Natural Trellis Design Video #2");
     resources.push({
       title: "Natural Trellis Planning Guide",
       description: "Choose branch types and trellis designs for beans, tomatoes, and other climbing plants. Collect only naturally fallen branches or dead wood.",
@@ -9750,7 +9779,13 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
         });
       }
     });
-    lines.push("", "Legacy Question: What should future Cultivators know because of what we observed today?");
+    lines.push("", "My Cultivator Mirror");
+    getCultivatorIntelligence19_0(activeUser).slice(0, 12).forEach((item) => {
+      lines.push(`- ${item.skill}: ${item.contribution}`);
+      lines.push(`  Pathway: ${item.pathway}`);
+    });
+    lines.push("", "A Cultivator — A. Aslam, BFF Youth Workforce (2025)", ASLAM_CULTIVATOR_TEXT_19_0);
+    lines.push("", "Your Workbook Is A Mirror", "The answers are already there.", "What Are You Cultivating?");
     return lines.join("\n");
   }, [activeUser, entries]);
 
@@ -9819,6 +9854,10 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
           {["Where do trees get water?", "Do bones decompose?", "What is forest soil made of?", "What insects are in our pest traps?"].map((question) => <button key={question} type="button" className="rounded-xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{question}</button>)}
         </div>
       </div>
+
+      <CultivatorMirror19_0 activeUser={activeUser} />
+      <AslamCultivatorPage19_0 />
+      <WorkbookFinalMirror19_0 />
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="button" onClick={refreshWorkbook} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white">Refresh Workbook</button>
@@ -9937,6 +9976,177 @@ function recordJourneyAccomplishments16_2K(activeUser: EcosystemUser | null, pla
   if (newEvents.length) safeWrite(JOURNEY_KEY, [...newEvents, ...existing].slice(0, 250));
 }
 
+
+const CULTIVATOR_INTELLIGENCE_KEY_19_0 = "bff.launch.cultivatorIntelligence.v19_0";
+
+const ASLAM_CULTIVATOR_TEXT_19_0 = `A cultivator holds significant meaning for me, representing not just a tool for agriculture but a profound symbol of growth, nurturing, and transformation. In my perspective, a cultivator embodies the essence of patience and dedication, as it is used to prepare the soil for planting, ensuring that the environment is conducive for seeds to thrive. This preparatory work is not merely a physical act; it reflects a deeper metaphor for personal development. Just as a farmer meticulously tends to the earth, individuals must first cultivate their inner landscape—addressing fears, aspirations, and potential—before they can truly flourish. This process of self-exploration and growth requires time and effort, much like the careful tending of soil that allows seeds to take root and grow strong.
+
+Moreover, the act of cultivating speaks to the importance of community and collaboration. Just as a farmer relies on the right conditions, tools, and support to yield a bountiful harvest.`;
+
+type CultivatorIntelligenceRecord19_0 = {
+  id: string;
+  participant_id: string;
+  user_name: string;
+  date: string;
+  source_entry_id?: string;
+  observation: string;
+  discovery: string;
+  skill: string;
+  contribution: string;
+  pathway: string;
+  communityImpact: string;
+  legacyImpact: string;
+  created_at: string;
+};
+
+const CULTIVATOR_SYSTEM_LAWS_19_0 = [
+  "Workbook = Source of Truth",
+  "If it exists in the Workbook, youth should never be asked to enter it again.",
+  "The ecosystem helps youth discover what they are becoming."
+];
+
+function inferCultivatorIntelligence19_0(entry: CultivatorDiscovery, plan?: typeof youthWeekOneDailyPlan[number]): Omit<CultivatorIntelligenceRecord19_0, "id" | "participant_id" | "user_name" | "date" | "source_entry_id" | "created_at"> {
+  const text = `${entry.category} ${entry.question} ${entry.response} ${plan?.curriculum || ""} ${plan?.focus || ""} ${(plan?.work || []).join(" ")}`.toLowerCase();
+  if (/(salamander|toad|tadpole|frog|amphibian|wildlife)/.test(text)) return {
+    observation: "Wildlife and habitat evidence documented",
+    discovery: "Healthy ecosystems support amphibians and other living things.",
+    skill: "Environmental observation",
+    contribution: "Documented local biodiversity for the farm record.",
+    pathway: "Environmental Systems / Wildlife Biology / Teaching",
+    communityImpact: "Helps the community understand how water, woods, and wildlife are connected.",
+    legacyImpact: "Ecosystem knowledge is preserved for future Cultivators."
+  };
+  if (/(pollinator|milkweed|butterfly|cocoon|bee|apiary|beehive|hive)/.test(text)) return {
+    observation: "Pollinator system evidence documented",
+    discovery: "Pollinators connect flowers, crops, food, and community health.",
+    skill: "Stewardship and careful documentation",
+    contribution: "Supported pollinator habitat and farm production capacity.",
+    pathway: "Food Systems / Environmental Science / Entrepreneurship",
+    communityImpact: "Pollinator health supports food, visitors, families, and the farm ecosystem.",
+    legacyImpact: "Pollinator habitat can benefit crops and future visitors long after today's work."
+  };
+  if (/(gate|fence|trellis|branch|structure|build|assembly|install|construction)/.test(text)) return {
+    observation: "Site improvement or structure work documented",
+    discovery: "Strong systems require planning, tools, teamwork, and maintenance.",
+    skill: "Building, design, and problem solving",
+    contribution: "Improved farm infrastructure and access for the team.",
+    pathway: "Building Systems / Engineering / Skilled Trades / Architecture",
+    communityImpact: "Better infrastructure helps youth, supervisors, visitors, and farm operations.",
+    legacyImpact: "The improvement can support future workdays and future Cultivators."
+  };
+  if (/(water|pooling|drain|drainage|mulch|trench|rain|creek)/.test(text)) return {
+    observation: "Water movement or drainage evidence documented",
+    discovery: "Water shapes soil, pathways, plant health, and ecosystems.",
+    skill: "Systems thinking and problem solving",
+    contribution: "Helped the farm notice and respond to site conditions.",
+    pathway: "Environmental Systems / Engineering / Conservation",
+    communityImpact: "Understanding water helps neighborhoods, parks, gardens, and food systems.",
+    legacyImpact: "Better drainage awareness protects the land for future use."
+  };
+  if (/(melon|squash|pumpkin|corn|seedling|plant|soil|weed|harvest|crop)/.test(text)) return {
+    observation: "Crop production evidence documented",
+    discovery: "Food production depends on soil, timing, spacing, care, and weather.",
+    skill: "Plant care and farm production",
+    contribution: "Supported food production and growing-area improvement.",
+    pathway: "Food Systems / Agriculture / Nutrition / Agribusiness",
+    communityImpact: "Growing food connects land, families, health, and local markets.",
+    legacyImpact: "Food work can feed people and teach future Cultivators."
+  };
+  return {
+    observation: "Workbook evidence documented",
+    discovery: "Work becomes learning when it is observed and recorded.",
+    skill: "Documentation and responsibility",
+    contribution: "Added to the farm's learning and workforce record.",
+    pathway: "Pathways Exploration",
+    communityImpact: "Shared documentation helps the team, family, supervisors, and program improve.",
+    legacyImpact: "The record can help future Cultivators learn from this experience."
+  };
+}
+
+function recordCultivatorIntelligence19_0(activeUser: EcosystemUser | null, entries: CultivatorDiscovery[], plan?: typeof youthWeekOneDailyPlan[number]) {
+  const participantId = launchParticipantId(activeUser);
+  const existing = safeRead<CultivatorIntelligenceRecord19_0[]>(CULTIVATOR_INTELLIGENCE_KEY_19_0, []);
+  const existingKeys = new Set(existing.map((item) => `${item.participant_id}|${item.source_entry_id || ""}`));
+  const created = entries
+    .filter((entry) => entry.response?.trim())
+    .filter((entry) => !existingKeys.has(`${participantId}|${entry.id}`))
+    .map((entry) => ({
+      id: uuid(),
+      participant_id: participantId,
+      user_name: launchParticipantName(activeUser),
+      date: entry.date,
+      source_entry_id: entry.id,
+      ...inferCultivatorIntelligence19_0(entry, plan),
+      created_at: new Date().toISOString(),
+    }));
+  if (created.length) safeWrite(CULTIVATOR_INTELLIGENCE_KEY_19_0, [...created, ...existing].slice(0, 750));
+}
+
+function getCultivatorIntelligence19_0(activeUser: EcosystemUser | null) {
+  const participantId = launchParticipantId(activeUser);
+  const rows = safeRead<CultivatorIntelligenceRecord19_0[]>(CULTIVATOR_INTELLIGENCE_KEY_19_0, []);
+  return rows.filter((row) => row.participant_id === participantId);
+}
+
+function unique19_0(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean))).slice(0, 8);
+}
+
+function CultivatorMirror19_0({ activeUser, compact = false }: { activeUser: EcosystemUser | null; compact?: boolean }) {
+  const rows = getCultivatorIntelligence19_0(activeUser);
+  const discoveries = unique19_0(rows.map((row) => row.discovery));
+  const skills = unique19_0(rows.map((row) => row.skill));
+  const contributions = unique19_0(rows.map((row) => row.contribution));
+  const pathways = unique19_0(rows.flatMap((row) => row.pathway.split("/").map((item) => item.trim())));
+  const impacts = unique19_0(rows.map((row) => row.communityImpact));
+  const legacy = unique19_0(rows.map((row) => row.legacyImpact));
+  const display = (title: string, items: string[]) => (
+    <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+      <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">{title}</div>
+      <div className="mt-3 grid gap-2">
+        {(items.length ? items : ["This will fill in from saved workbook evidence."]).map((item) => <div key={item} className="rounded-xl bg-white/10 px-3 py-2 text-sm font-bold leading-5 text-white/82">• {item}</div>)}
+      </div>
+    </div>
+  );
+  return (
+    <div className="mt-4 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-4">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Ecosystem 19.0 • Cultivator Mirror</div>
+      <h3 className="mt-2 text-2xl font-black">The workbook becomes the answer.</h3>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/76">The youth does not answer these again. The system reflects them from saved workbook evidence.</p>
+      {!compact && <div className="mt-3 flex flex-wrap gap-2">{CULTIVATOR_SYSTEM_LAWS_19_0.map((law) => <span key={law} className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[11px] font-black text-white/76">{law}</span>)}</div>}
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {display("Strengths / Skills Demonstrated", skills)}
+        {display("Discoveries Made", discoveries)}
+        {display("Contributions Made", contributions)}
+        {display("Pathways Explored", pathways)}
+        {display("Community Impact", impacts)}
+        {display("Legacy Impact", legacy)}
+      </div>
+    </div>
+  );
+}
+
+function AslamCultivatorPage19_0() {
+  return (
+    <div className="mt-4 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Final Workbook Page • A Cultivator</div>
+      <h3 className="mt-2 text-3xl font-black">A Cultivator</h3>
+      <p className="mt-4 whitespace-pre-line rounded-3xl border border-white/10 bg-black/30 p-5 text-sm font-bold leading-7 text-white/84">“{ASLAM_CULTIVATOR_TEXT_19_0}”</p>
+      <div className="mt-3 text-sm font-black text-amber-50">A. Aslam, BFF Youth Workforce (2025)</div>
+    </div>
+  );
+}
+
+function WorkbookFinalMirror19_0() {
+  return (
+    <div className="mt-4 rounded-[1.5rem] border border-purple-200/25 bg-purple-300/10 p-6 text-center">
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/80">Your Workbook Is A Mirror</div>
+      <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-8 text-white/82">Look at the pages before this one. They show what you learned. They show what you built. They show what you discovered. They show how you contributed. They show how you grew. The answers are already there. Your workbook is the mirror.</p>
+      <div className="mt-8 text-4xl font-black md:text-6xl">What Are You Cultivating?</div>
+    </div>
+  );
+}
+
 function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: { todayPlan: typeof youthWeekOneDailyPlan[number]; currentWeek: typeof youthCurriculumWeeks[number]; setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const [phase, setPhase] = useState<YouthDailyPhase16_2>(() => {
     try {
@@ -10005,6 +10215,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       }));
     safeWrite(DISCOVERY_KEY, [...newRows, ...withoutDuplicates].slice(0, 500));
     recordJourneyAccomplishments16_2K(activeUser, todayPlan, newRows.length);
+    recordCultivatorIntelligence19_0(activeUser, newRows, todayPlan);
     saveYouthResumeState(activeUser, { stage: "learning", learning_answers: newRows.length, message: "Workbook saved. Continue to Legacy." });
     setMessage("Workbook saved ✓ You will not have to answer these again today.");
     go("legacy");
@@ -10034,6 +10245,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     };
     safeWrite(DISCOVERY_KEY, [row, ...withoutDuplicate].slice(0, 500));
     recordJourneyAccomplishments16_2K(activeUser, todayPlan, 0);
+    recordCultivatorIntelligence19_0(activeUser, [row], todayPlan);
     recordCompletionOnce("legacy-complete", activeUser);
     saveYouthResumeState(activeUser, { stage: "complete", message: "Legacy saved. My Journey accomplishments record updated." });
     setMessage("Legacy saved ✓ Opening My Journey accomplishments.");
@@ -10086,6 +10298,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             <p className="mt-2 text-xs font-bold leading-5 text-white/68">These are active lesson materials. Open each item to review the CSU-based documentation, guide, video, or daily resource layer.</p>
             <WorkbookLessonResourceCards16_8B dayPlan={todayPlan} />
           </div>
+          <CultivatorMirror19_0 activeUser={activeUser} compact />
           <div className="mt-5 grid gap-4">
             {questions.map((question) => (
               <label key={question} className="block rounded-2xl border border-white/10 bg-black/25 p-4">
