@@ -79,6 +79,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  * - Ecosystem 16.8B: Fixes workbook curriculum resource access. Day cards now expose clickable lesson materials, in-app resource panels, and embedded/linked videos including the Fan Construction / Design Video where available.
+ * - Ecosystem 16.8C: Fixes floating/photo workbook library cards by wiring CSU topic, Week 1-8, and Incomplete Items cards to the same in-app open panel used by Workbook. Daily resource links now open as lesson resource cards instead of plain text only.
  */
 
 type Screen =
@@ -6175,6 +6176,12 @@ function CultivatorReflectionLaunchCard({ knowledgePack }: { knowledgePack: Retu
 function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | null }) {
   const [assets, setAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
   const [notice, setNotice] = useState("");
+  const [workbookOpenPanel16_8, setWorkbookOpenPanel16_8] = useState<WorkbookOpenPanel16_8 | null>(null);
+
+  function openWorkbookPanel16_8(panel: WorkbookOpenPanel16_8) {
+    setWorkbookOpenPanel16_8(panel);
+    window.setTimeout(() => document.getElementById("workbook-open-panel-16-8")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
+  }
   const saveLocalFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -6211,9 +6218,10 @@ function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | n
       </label>
       {notice && <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-3 text-sm font-bold text-emerald-50">{notice}</div>}
       <div className="mt-4 grid gap-4">
-        <CSUBasedCurriculumAccess16_8 compact />
-        <WorkbookWeekAccess16_8 />
-        <WorkbookRecoveryCenter16_8 />
+        <CSUBasedCurriculumAccess16_8 compact onOpen={(topic) => openWorkbookPanel16_8({ kind: "topic", label: topic })} />
+        <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
+        <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
+        {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} />}
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -9735,9 +9743,8 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
           </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
             <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links + Daily Lesson Source</div>
-            <ul className="mt-2 space-y-1 text-sm font-bold text-white/80">
-              {(todayPlan.resources || []).map((resource) => <li key={resource}>• {resource}</li>)}
-            </ul>
+            <p className="mt-2 text-xs font-bold leading-5 text-white/68">These are active lesson materials. Open each item to review the CSU-based documentation, guide, video, or daily resource layer.</p>
+            <WorkbookLessonResourceCards16_8B dayPlan={todayPlan} />
           </div>
           <div className="mt-5 grid gap-4">
             {questions.map((question) => (
