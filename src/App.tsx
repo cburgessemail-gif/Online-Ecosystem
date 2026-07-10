@@ -79,7 +79,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.8: Full replacement architecture lock. Top youth navigation is Today's Work, Workbook, My Journey, Calendar, Sign Out. Portfolio is removed as a separate destination. Workbook is the record, My Journey is growth. Youth can return to every week to add, edit, delete, replace, upload, re-upload, and complete unfinished workbook inputs. CSU-based curriculum is not expanded; existing CSU Fastrack Farming foundation is made easier to find through Workbook, Curriculum Library, resources, and search.
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  * - Ecosystem 16.8B: Fixes workbook curriculum resource access. Day cards now expose clickable lesson materials, in-app resource panels, and embedded/linked videos including the Fan Construction / Design Video where available.
- * - Ecosystem 16.8C: Fixes floating/photo workbook library cards by wiring CSU topic, Week 1-8, and Incomplete Items cards to the same in-app open panel used by Workbook. Daily resource links now open as lesson resource cards instead of plain text only.
+ * - Ecosystem 16.8D: Removes CSU training as a titled destination. Resources are shown as a direct Resource Library with practical resource groups, uploaded CSU documents/decks, week access, and lesson resource cards.
  */
 
 type Screen =
@@ -6221,7 +6221,7 @@ function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | n
         <CSUBasedCurriculumAccess16_8 compact onOpen={(topic) => openWorkbookPanel16_8({ kind: "topic", label: topic })} />
         <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
         <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
-        {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} />}
+        {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} onOpen={openWorkbookPanel16_8} />}
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -9077,12 +9077,50 @@ const WORKBOOK_SECTIONS_13_1 = [
 
 
 const CSU_CURRICULUM_ACCESS_TOPICS_16_8 = [
-  "CSU Fastrack Farming foundation",
-  "Soil and compost",
-  "Planting and crop planning",
-  "Pollinators and habitat",
-  "Farm business and inventory",
-  "Field application at Bronson Family Farm",
+  "Crop planning + recordkeeping",
+  "Seeding + transplanting",
+  "Germination temperatures",
+  "Tomato growing + trellis systems",
+  "Beehive + queen rearing",
+  "Pollinators, habitat + field application",
+];
+
+const CURRICULUM_RESOURCE_FILES_16_8D: WorkbookLessonResource16_8B[] = [
+  {
+    title: "Class #1: Orientation, Crop Planning and Recordkeeping",
+    description: "Use for crop plans, field maps, recordkeeping, yield/profit planning, and farm business thinking.",
+    kind: "document",
+    file: "/resources/DS Class #1 - Intro, Crop Planning, Recordkeeping(1).pptx",
+    actionLabel: "Open deck",
+  },
+  {
+    title: "Class 5: Seeding and Transplanting",
+    description: "Use for direct seeding, transplanting methods, planting tools, and hands-on crop establishment.",
+    kind: "document",
+    file: "/resources/DRAFT Class 5 Seeding & Transplanting(1).pptx",
+    actionLabel: "Open deck",
+  },
+  {
+    title: "Growing Tomatoes / General Trellis",
+    description: "Use for tomatoes, pruning, Florida weave, staking, cages, high tunnel trellis systems, pests, disease, and plant nutrition.",
+    kind: "document",
+    file: "/resources/Draft - (General Trellis) Growing Tomatoes(1).pptx",
+    actionLabel: "Open deck",
+  },
+  {
+    title: "Germination Temperatures and Times by Crop",
+    description: "Use as the quick crop germination chart when youth ask how temperature affects seeds.",
+    kind: "document",
+    file: "/resources/Germination Temperatures and Times by Crop(2).pdf",
+    actionLabel: "Open chart",
+  },
+  {
+    title: "Beehive / Queen Rearing / Ohio Mite Biter Research",
+    description: "Use for honey bees, Varroa mites, grooming behavior, Ohio mite biter stock, grafting, queen cell bars, and queen rearing resources.",
+    kind: "document",
+    file: "/resources/CSU breeding queen(1).pdf",
+    actionLabel: "Open PDF",
+  },
 ];
 
 const WORKBOOK_WEEK_ACCESS_16_8 = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8"];
@@ -9260,7 +9298,7 @@ function WorkbookLessonResourceCards16_8B({ dayPlan }: { dayPlan: typeof youthWe
 }
 
 
-function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_8; onClose: () => void }) {
+function WorkbookOpenPanel16_8({ panel, onClose, onOpen }: { panel: WorkbookOpenPanel16_8; onClose: () => void; onOpen?: (panel: WorkbookOpenPanel16_8) => void }) {
   if (panel.kind === "week") {
     const plan = workbookPlanForWeek16_8(panel.label);
     return (
@@ -9295,19 +9333,39 @@ function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_
   }
 
   if (panel.kind === "topic") {
+    const matchingFiles = CURRICULUM_RESOURCE_FILES_16_8D.filter((resource) => {
+      const text = `${panel.label} ${resource.title} ${resource.description}`.toLowerCase();
+      if (panel.label.toLowerCase().includes("crop")) return text.includes("crop") || text.includes("record");
+      if (panel.label.toLowerCase().includes("seeding")) return text.includes("seed") || text.includes("transplant");
+      if (panel.label.toLowerCase().includes("germination")) return text.includes("germination");
+      if (panel.label.toLowerCase().includes("tomato")) return text.includes("tomato") || text.includes("trellis");
+      if (panel.label.toLowerCase().includes("bee")) return text.includes("bee") || text.includes("queen") || text.includes("mite");
+      return true;
+    });
     return (
       <div id="workbook-open-panel-16-8" className="mt-4 rounded-[1.5rem] border border-sky-200/25 bg-black/30 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100/75">Opened CSU-Based Curriculum Topic</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-100/75">Opened Resource Group</div>
             <h4 className="mt-1 text-2xl font-black text-white">{panel.label}</h4>
-            <p className="mt-2 text-sm font-bold leading-6 text-white/72">This opens the existing CSU-based curriculum foundation as an accessible topic. No new curriculum is added; this makes the lesson source easier to find and revisit.</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/72">Open the resource files, lesson materials, and related week locations. This is resource access only; Constance’s daily curriculum remains the source of the youth workday.</p>
           </div>
           <button type="button" onClick={onClose} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">Close</button>
         </div>
-        <div className="mt-4 grid gap-2 md:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {matchingFiles.map((resource) => (
+            <div key={`${panel.label}-${resource.title}`} className="rounded-2xl border border-white/10 bg-white/10 p-4">
+              <div className="text-sm font-black text-white">{resource.title}</div>
+              <p className="mt-2 text-xs font-bold leading-5 text-white/70">{resource.description}</p>
+              {resource.file && <a href={resource.file} target="_blank" rel="noreferrer" className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-[11px] font-black text-slate-950">{resource.actionLabel || "Open"}</a>}
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
           {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
-            <div key={`${panel.label}-${week}`} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black text-white/84">{week}<div className="mt-1 text-[11px] font-bold text-white/60">Review where this topic appears.</div></div>
+            <button key={`${panel.label}-${week}`} type="button" onClick={() => onOpen?.({ kind: "week", label: week })} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">
+              {week}<div className="mt-1 text-[11px] font-bold text-white/60">Open editable workbook week</div>
+            </button>
           ))}
         </div>
       </div>
@@ -9326,7 +9384,9 @@ function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_
       </div>
       <div className="mt-4 grid gap-2 md:grid-cols-4">
         {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
-          <div key={`${panel.label}-${week}`} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-sm font-black text-white/84">{week}<div className="mt-1 text-[11px] font-bold text-white/60">Check {panel.label.toLowerCase()} items.</div></div>
+          <button key={`${panel.label}-${week}`} type="button" onClick={() => onOpen?.({ kind: "week", label: week })} className="rounded-2xl border border-white/10 bg-white/10 p-3 text-left text-sm font-black text-white/84 hover:bg-white/15">
+            {week}<div className="mt-1 text-[11px] font-bold text-white/60">Open week to check {panel.label.toLowerCase()} items.</div>
+          </button>
         ))}
       </div>
     </div>
@@ -9336,14 +9396,22 @@ function WorkbookOpenPanel16_8({ panel, onClose }: { panel: WorkbookOpenPanel16_
 function CSUBasedCurriculumAccess16_8({ compact = false, onOpen }: { compact?: boolean; onOpen?: (topic: string) => void }) {
   return (
     <div className={`rounded-[1.5rem] border border-sky-200/25 bg-sky-300/10 ${compact ? "p-4" : "p-5"}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">CSU-Based Curriculum Access</div>
-      <h3 className="mt-2 text-2xl font-black">Existing CSU foundation, easier to find.</h3>
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">Curriculum Resource Library</div>
+      <h3 className="mt-2 text-2xl font-black">Open the resources.</h3>
       <p className="mt-2 text-sm font-bold leading-6 text-white/78">
-        No new curriculum is added here. The Workbook makes Constance Burgess’s CSU Fastrack Farming foundation more available through the curriculum library, daily lesson source, resources, and search.
+        These are resource files and lesson supports. They do not replace Constance’s daily curriculum. They give youth and supervisors fast access to crop planning, planting, germination, trellis, tomato, bee, pollinator, and field application materials.
       </p>
       <div className="mt-4 grid gap-2 md:grid-cols-3">
         {CSU_CURRICULUM_ACCESS_TOPICS_16_8.map((topic) => (
-          <button key={topic} type="button" onClick={() => onOpen?.(topic)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{topic}<div className="mt-1 text-[11px] font-bold text-white/55">Open topic</div></button>
+          <button key={topic} type="button" onClick={() => onOpen?.(topic)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/84 hover:bg-white/12">{topic}<div className="mt-1 text-[11px] font-bold text-white/55">Open resources</div></button>
+        ))}
+      </div>
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {CURRICULUM_RESOURCE_FILES_16_8D.map((resource) => (
+          <a key={resource.title} href={resource.file} target="_blank" rel="noreferrer" className="rounded-2xl border border-white/10 bg-white/10 p-3 text-left text-sm font-black text-white/86 hover:bg-white/15">
+            {resource.title}
+            <div className="mt-1 text-[11px] font-bold leading-5 text-white/62">{resource.description}</div>
+          </a>
         ))}
       </div>
     </div>
@@ -9739,7 +9807,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             <CSUBasedCurriculumAccess16_8 compact onOpen={(topic) => openWorkbookPanel16_8({ kind: "topic", label: topic })} />
             <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
             <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
-            {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} />}
+            {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} onOpen={openWorkbookPanel16_8} />}
           </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
             <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links + Daily Lesson Source</div>
