@@ -83,6 +83,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 19.1: Restores both natural trellis videos as real embedded resources and makes the two pinned Today's Work video buttons open the videos directly.
  * - Ecosystem 16.8F: Binds resource cards to actual in-app content. Beehive, apiary, honey bee, pollinator, milkweed, trellis, germination, crop planning, seeding/transplanting, and site safety resources no longer open placeholder shells. Week 5 Today's Work surfaces beehive/apiary resources as pinned workday materials.
  * - Ecosystem 19.0: Cultivator Intelligence Platform. Workbook is the source of truth; Journey, Parent Reports, Supervisor Reports, Portfolio, Workforce Transcript, and the final Mirror are generated from workbook evidence instead of asking youth to repeat answers.
+ * - Ecosystem 19.2: Fixes youth header routing so Today’s Work and Workbook open distinct phases, the correct tab is visibly active, and same-screen phase changes reliably scroll to the selected destination.
+ * - Ecosystem 19.3: Replaces the long Workbook page with a five-destination Workbook Dashboard and separates the categorized Knowledge Library into its own top-level youth destination.
  * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
 
@@ -5501,6 +5503,34 @@ function Shell({
   changeLanguage: (language: LanguageCode) => void;
 }) {
   const [showNurseLine, setShowNurseLine] = useState(false);
+  const [youthHeaderPhase16_2, setYouthHeaderPhase16_2] = useState<YouthDailyPhase16_2>(() => {
+    try {
+      const saved = localStorage.getItem(youthDailyPhaseKey16_2(activeUser)) as YouthDailyPhase16_2 | null;
+      return saved && saved !== "journey" ? saved : "work";
+    } catch {
+      return "work";
+    }
+  });
+
+  useEffect(() => {
+    if (activeUser?.role !== "Youth Workforce Participant") return;
+    const key = youthDailyPhaseKey16_2(activeUser);
+    try {
+      const saved = localStorage.getItem(key) as YouthDailyPhase16_2 | null;
+      setYouthHeaderPhase16_2(saved && saved !== "journey" ? saved : "work");
+    } catch {
+      setYouthHeaderPhase16_2("work");
+    }
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ key?: string; next?: YouthDailyPhase16_2 }>).detail;
+      if (detail?.key === key && detail.next && detail.next !== "journey") {
+        setYouthHeaderPhase16_2(detail.next);
+      }
+    };
+    window.addEventListener("bff:youthDailyPhase16_2", handler as EventListener);
+    return () => window.removeEventListener("bff:youthDailyPhase16_2", handler as EventListener);
+  }, [activeUser?.id, activeUser?.participant_id, activeUser?.role, screen]);
+
   const role = activeUser?.role;
   const dashboardTarget: Screen = role && role !== "Guest" ? routeForRole(role) : "roles";
   const workTarget: Screen = role === "Youth Workforce Participant" ? (hasCompletedTodayWorkCheckIn(activeUser) ? "youth" : "wellness") : dashboardTarget;
@@ -5563,8 +5593,9 @@ function Shell({
             <div className="flex shrink-0 items-center gap-2 overflow-x-auto">
               {role === "Youth Workforce Participant" ? (
                 <>
-                  <button type="button" onClick={() => openYouthTodayWork16_2(activeUser, setScreen)} className={screen === "youth" ? "rounded-full border border-emerald-200 bg-emerald-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Today’s Work</button>
-                  <button type="button" onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20">Workbook</button>
+                  <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "work" ? "page" : undefined} onClick={() => openYouthTodayWork16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "work" ? "rounded-full border border-emerald-200 bg-emerald-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Today’s Work</button>
+                  <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "page" : undefined} onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "rounded-full border border-sky-200 bg-sky-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Workbook</button>
+                  <button type="button" onClick={() => setScreen("resources")} className={screen === "resources" ? "rounded-full border border-amber-200 bg-amber-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-amber-200/35 bg-amber-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-amber-300/30"}>Knowledge Library</button>
                   <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className={screen === "journey" ? "rounded-full border border-purple-200 bg-purple-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30"}>My Journey</button>
                   <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
                 </>
@@ -7770,24 +7801,54 @@ function ResourceSearchPanel() {
   );
 }
 
+type KnowledgeLibraryCategory19_3 = "Environment" | "Food & Growing Systems" | "Pollinator Systems" | "Building & Infrastructure" | "Business & Entrepreneurship" | "Career & Pathways";
+
 function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "guest";
+  const [category, setCategory] = useState<KnowledgeLibraryCategory19_3 | null>(null);
+  const categories: { title: KnowledgeLibraryCategory19_3; icon: string; detail: string }[] = [
+    { title: "Environment", icon: "🌎", detail: "Forests, wildlife, water, biodiversity, salamanders, toads, and tadpoles." },
+    { title: "Food & Growing Systems", icon: "🌱", detail: "Soil, seeds, germination, tomatoes, melons, squash, pumpkins, and corn." },
+    { title: "Pollinator Systems", icon: "🐝", detail: "Honey bees, native bees, apiary work, queen rearing, habitat, and mite research." },
+    { title: "Building & Infrastructure", icon: "🏗", detail: "Natural trellises, gates, fencing, site planning, structures, and tool safety." },
+    { title: "Business & Entrepreneurship", icon: "💼", detail: "Pricing, markets, customers, SNAP, GrownBy, agritourism, and business systems." },
+    { title: "Career & Pathways", icon: "🚀", detail: "Scientists, teachers, engineers, entrepreneurs, skilled trades, and environmental careers." },
+  ];
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌿 Explore & Discover</div>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Growing Center</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">Explore & Discover is the knowledge network for farm learning. Weather, Almanac, and Work Status remain small operational utilities, not the learning library.</p>
+        <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">📚 Knowledge Library</div>
+        <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Choose what you want to learn.</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">The library is organized by knowledge category so youth do not have to scroll through one long list of files and videos.</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Return</button>
+          <button type="button" onClick={() => setScreen(returnScreen)} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Return</button>
           <button type="button" onClick={() => setScreen("events")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Calendar</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black text-white">Open Share My Learning</button>
         </div>
       </Card>
-      <ResourceSearchPanel />
-      <GrowingCenterPanel setScreen={setScreen} />
-      <MiracleGroYouthResourceCard />
-      <CurriculumWeekViewCard />
+      {!category ? (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {categories.map((item) => (
+            <button key={item.title} type="button" onClick={() => setCategory(item.title)} className="rounded-[1.5rem] border border-white/12 bg-black/45 p-5 text-left transition hover:-translate-y-0.5 hover:bg-black/60">
+              <div className="text-4xl">{item.icon}</div>
+              <h2 className="mt-3 text-2xl font-black">{item.title}</h2>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/70">{item.detail}</p>
+              <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-amber-100/80">Open category →</div>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          <Card>
+            <button type="button" onClick={() => setCategory(null)} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">← All Categories</button>
+            <h2 className="mt-4 text-3xl font-black">{category}</h2>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/72">Search and open learning materials connected to this category. Resources stay outside the Workbook.</p>
+          </Card>
+          <ResourceSearchPanel />
+          <GrowingCenterPanel setScreen={setScreen} />
+          {category === "Food & Growing Systems" && <MiracleGroYouthResourceCard />}
+          <CurriculumWeekViewCard />
+        </div>
+      )}
     </div>
   );
 }
@@ -9871,6 +9932,7 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
 
 
 type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
+type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks";
 
 function youthDailyPhaseKey16_2(activeUser?: EcosystemUser | null) {
   return `bff.launch.youthDailyPhase16_2.${todayISO()}.${launchParticipantId(activeUser)}`;
@@ -9885,8 +9947,14 @@ function setYouthDailyPhase16_2(activeUser: EcosystemUser | null | undefined, ne
 }
 
 function openYouthPhase16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void, next: YouthDailyPhase16_2) {
+  // Store immediately, route, then announce again after the youth screen is mounted.
+  // The second announcement makes same-screen header navigation reliable.
   setYouthDailyPhase16_2(activeUser, next);
   setScreen("youth");
+  window.setTimeout(() => {
+    setYouthDailyPhase16_2(activeUser, next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 0);
 }
 
 function openYouthTodayWork16_2(activeUser: EcosystemUser | null | undefined, setScreen: (screen: Screen) => void) {
@@ -10170,6 +10238,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === launchParticipantId(activeUser) && row.question === legacyQuestion)?.response || "";
   });
   const [message, setMessage] = useState("");
+  const [workbookView19_3, setWorkbookView19_3] = useState<WorkbookDashboardView19_3>("dashboard");
   const [workbookOpenPanel16_8, setWorkbookOpenPanel16_8] = useState<WorkbookOpenPanel16_8 | null>(null);
 
   function openWorkbookPanel16_8(panel: WorkbookOpenPanel16_8) {
@@ -10189,7 +10258,13 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
   function go(next: YouthDailyPhase16_2) {
     setPhase(next);
+    if (next === "workbook") setWorkbookView19_3("dashboard");
     setYouthDailyPhase16_2(activeUser, next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openWorkbookView19_3(next: WorkbookDashboardView19_3) {
+    setWorkbookView19_3(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -10283,36 +10358,91 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       )}
 
       {phase === "workbook" && (
-        <Card className="p-4 md:p-6">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Workbook • Editable Record • CSU-Based Curriculum Access</div>
-          <h2 className="mt-2 text-3xl font-black md:text-4xl">Document today's activities one time.</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-white/78">Saved answers stay saved and remain editable. Youth can return to any week to add, delete, change, replace, or complete unfinished work. Career, opportunity, accomplishments, and growth stay in My Journey, not here.</p>
-          <div className="mt-4 grid gap-4">
-            <CSUBasedCurriculumAccess16_8 compact onOpen={(topic) => openWorkbookPanel16_8({ kind: "topic", label: topic })} />
-            <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
-            <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
-            {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} onOpen={openWorkbookPanel16_8} />}
-          </div>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-4">
-            <div className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/70">Resource Links + Daily Lesson Source</div>
-            <p className="mt-2 text-xs font-bold leading-5 text-white/68">These are active lesson materials. Open each item to review the CSU-based documentation, guide, video, or daily resource layer.</p>
-            <WorkbookLessonResourceCards16_8B dayPlan={todayPlan} />
-          </div>
-          <CultivatorMirror19_0 activeUser={activeUser} compact />
-          <div className="mt-5 grid gap-4">
-            {questions.map((question) => (
-              <label key={question} className="block rounded-2xl border border-white/10 bg-black/25 p-4">
-                <span className="text-sm font-black text-white">{question}</span>
-                <textarea value={answers[question] || ""} onChange={(event) => setAnswers((prev) => ({ ...prev, [question]: event.target.value }))} placeholder="Write, dictate, or summarize the observation here." className="mt-3 min-h-[95px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-emerald-300" />
-              </label>
-            ))}
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <button type="button" onClick={saveWorkbook} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Workbook + Continue</button>
-            <button type="button" onClick={() => go("work")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">← Back to Curriculum Activity</button>
-          </div>
-          {message && <Notice text={message} />}
-        </Card>
+        <div className="grid gap-4">
+          <Card className="p-4 md:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-100/80">Workbook Dashboard • Documentation, Not Assignments</div>
+                <h2 className="mt-2 text-3xl font-black md:text-4xl">{workbookView19_3 === "dashboard" ? "Choose where you want to go." : "Workbook"}</h2>
+                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook is divided into short destinations. Knowledge resources are now in the separate Knowledge Library.</p>
+              </div>
+              {workbookView19_3 !== "dashboard" && <button type="button" onClick={() => openWorkbookView19_3("dashboard")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">← Workbook Dashboard</button>}
+            </div>
+          </Card>
+
+          {workbookView19_3 === "dashboard" && (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {[
+                ["record", "📖", "Today’s Record", "Document what happened, what you observed, and what you learned."],
+                ["discoveries", "🔍", "My Discoveries", "Review observations, wildlife findings, questions, and learning moments."],
+                ["media", "📸", "Photos & Videos", "Upload and review evidence without searching through the full workbook."],
+                ["contributions", "🌱", "My Contributions", "See what you helped build, improve, protect, or grow."],
+                ["weeks", "📅", "Previous Weeks", "Open Weeks 1–8, activities, entries, videos, and unfinished documentation."],
+              ].map(([key, icon, title, detail]) => (
+                <button key={key} type="button" onClick={() => openWorkbookView19_3(key as WorkbookDashboardView19_3)} className="rounded-[1.5rem] border border-white/12 bg-black/45 p-5 text-left transition hover:-translate-y-0.5 hover:bg-black/60">
+                  <div className="text-4xl">{icon}</div>
+                  <h3 className="mt-3 text-2xl font-black">{title}</h3>
+                  <p className="mt-2 text-sm font-bold leading-6 text-white/70">{detail}</p>
+                  <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-sky-100/80">Open →</div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {workbookView19_3 === "record" && (
+            <Card className="p-4 md:p-6">
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Today’s Record</div>
+              <h3 className="mt-2 text-3xl font-black">Document today one time.</h3>
+              <p className="mt-3 text-sm font-bold leading-6 text-white/72">Saved answers remain editable and automatically feed My Journey, contributions, pathways, and the final Cultivator Mirror.</p>
+              <div className="mt-5 grid gap-4">
+                {questions.map((question) => (
+                  <label key={question} className="block rounded-2xl border border-white/10 bg-black/25 p-4">
+                    <span className="text-sm font-black text-white">{question}</span>
+                    <textarea value={answers[question] || ""} onChange={(event) => setAnswers((prev) => ({ ...prev, [question]: event.target.value }))} placeholder="Write, dictate, or summarize the observation here." className="mt-3 min-h-[95px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-emerald-300" />
+                  </label>
+                ))}
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <button type="button" onClick={saveWorkbook} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Today’s Record</button>
+                <button type="button" onClick={() => go("work")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 font-black text-white">← Back to Today’s Work</button>
+              </div>
+              {message && <Notice text={message} />}
+            </Card>
+          )}
+
+          {workbookView19_3 === "discoveries" && (
+            <Card className="p-4 md:p-6">
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-100/80">My Discoveries</div>
+              <h3 className="mt-2 text-3xl font-black">What the workbook has captured.</h3>
+              <CultivatorMirror19_0 activeUser={activeUser} compact />
+            </Card>
+          )}
+
+          {workbookView19_3 === "media" && (
+            <Card className="p-4 md:p-6">
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-pink-100/80">Photos & Videos</div>
+              <h3 className="mt-2 text-3xl font-black">Add evidence where it belongs.</h3>
+              <p className="mt-3 text-sm font-bold leading-6 text-white/72">Upload photos and videos here. They remain connected to the youth’s record and do not create a separate assignment.</p>
+              <YouthEvidenceUploadCard activeUser={activeUser} />
+            </Card>
+          )}
+
+          {workbookView19_3 === "contributions" && (
+            <Card className="p-4 md:p-6">
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/80">My Contributions</div>
+              <h3 className="mt-2 text-3xl font-black">What your work helped improve.</h3>
+              <CultivatorMirror19_0 activeUser={activeUser} compact />
+            </Card>
+          )}
+
+          {workbookView19_3 === "weeks" && (
+            <div className="grid gap-4">
+              <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
+              <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
+              {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} onOpen={openWorkbookPanel16_8} />}
+            </div>
+          )}
+        </div>
       )}
 
       {phase === "legacy" && (
