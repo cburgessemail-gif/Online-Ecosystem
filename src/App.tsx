@@ -80,6 +80,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 16.8A: Market/GrownBy routing fix. All Market, Marketplace, Continue to Marketplace, Marketplace Opportunities, Connect to Marketplace, and Go to Marketplace buttons open GrownBy in a new tab instead of routing to the internal placeholder marketplace screen.
  * - Ecosystem 16.8B: Fixes workbook curriculum resource access. Day cards now expose clickable lesson materials, in-app resource panels, and embedded/linked videos including the Fan Construction / Design Video where available.
  * - Ecosystem 16.8D: Removes CSU training as a titled destination. Resources are shown as a direct Resource Library with practical resource groups, uploaded CSU documents/decks, week access, and lesson resource cards.
+ * - Ecosystem 16.8F: Binds resource cards to actual in-app content. Beehive, apiary, honey bee, pollinator, milkweed, trellis, germination, crop planning, seeding/transplanting, and site safety resources no longer open placeholder shells. Week 5 Today's Work surfaces beehive/apiary resources as pinned workday materials.
  */
 
 type Screen =
@@ -9157,7 +9158,234 @@ type WorkbookLessonResource16_8B = {
   embedUrl?: string;
   file?: string;
   actionLabel?: string;
+  content?: string[];
+  steps?: string[];
+  keyPoints?: string[];
 };
+
+
+function workbookResourceContent16_8F(resourceTitle: string) {
+  const title = resourceTitle.toLowerCase();
+
+  if (title.includes("beehive diagram") || title.includes("apiary assembly")) {
+    return {
+      keyPoints: [
+        "Hive parts to identify: bottom board, hive body/deep box, frames, inner cover, outer cover, entrance reducer, and feeder if one is being used.",
+        "Youth should match each physical part to the diagram before assembly begins.",
+        "Frames must sit straight and evenly spaced so bees can build comb correctly.",
+        "The hive should be level, stable, dry, and positioned where supervisors approve."
+      ],
+      steps: [
+        "Lay out every hive part on a clean surface before assembly.",
+        "Confirm the bottom board is facing the correct direction and is stable.",
+        "Place the deep box/hive body squarely on the bottom board.",
+        "Install frames one at a time and check that each frame hangs straight.",
+        "Add the inner cover, then the outer cover.",
+        "Check alignment from the front, side, and top before calling the assembly complete.",
+        "Take one photo of the parts before assembly and one photo after assembly for the workbook."
+      ],
+      content: [
+        "This resource is pinned because Week 5 includes beehive sterilization, rebuilding, apiary assembly, and documentation.",
+        "Youth are not expected to memorize bee science before doing the work. They should use the diagram to identify parts, use the assembly guide to follow the correct order, and ask a supervisor before forcing any part into place."
+      ]
+    };
+  }
+
+  if (title.includes("beehive assembly video")) {
+    return {
+      keyPoints: [
+        "Watch for part order: base first, body/deep box next, frames inside, covers last.",
+        "Pause the video when checking frame placement and alignment.",
+        "The purpose of the video is assembly support, not entertainment."
+      ],
+      steps: [
+        "Watch the first full pass before touching hive parts.",
+        "Replay the frame-installation portion while the group installs frames.",
+        "Compare the completed hive to the video before documenting completion."
+      ],
+      content: [
+        "Use this video beside the physical hive. The youth should be able to say which step they are on and what part comes next."
+      ]
+    };
+  }
+
+  if (title.includes("honey bee basics")) {
+    return {
+      keyPoints: [
+        "Queen: lays eggs and supports colony reproduction.",
+        "Worker bees: clean, feed larvae, build comb, guard the hive, forage, and help regulate hive conditions.",
+        "Drones: male bees whose main role is reproduction.",
+        "Pollination connects bees to food systems, flowers, fruit, seeds, and community agriculture.",
+        "Varroa mites are a serious bee-health concern; CSU materials describe mite biting/grooming behavior and Ohio mite-biter research."
+      ],
+      steps: [
+        "Name one bee role: queen, worker, or drone.",
+        "Connect one bee behavior to farm production.",
+        "Document one thing bees need to stay healthy."
+      ],
+      content: [
+        "Honey bee basics should help youth understand why the hive project matters. The goal is not just to build a box; the goal is to understand the living system the box is meant to support."
+      ]
+    };
+  }
+
+  if (title.includes("queen") || title.includes("mite") || title.includes("ob1")) {
+    return {
+      keyPoints: [
+        "CSU bee research describes Varroa destructor as an ectoparasitic mite and a major stress for colony survival.",
+        "The Ohio Mite Biter 1 material connects grooming/biting behavior with mite resistance.",
+        "The queen-rearing section introduces grafting, cell starters, nurse bees, capped brood, pollen, honey, ventilation, and queen cell bars.",
+        "Youth should treat this as advanced reference material connected to bee health and research careers."
+      ],
+      steps: [
+        "Open the CSU bee research PDF when the group is discussing bee health, queen rearing, or research careers.",
+        "Have youth identify one thing researchers observe and one tool or process researchers use.",
+        "Connect the beehive rebuild to future apiary stewardship."
+      ],
+      content: [
+        "This is not the beehive assembly guide. It is the deeper CSU science resource that shows why bee health, queen quality, mites, and research matter." 
+      ]
+    };
+  }
+
+  if (title.includes("pollinator") || title.includes("milkweed") || title.includes("monarch")) {
+    return {
+      keyPoints: [
+        "Pollinators move pollen and help many plants produce fruits and seeds.",
+        "Milkweed is essential habitat for monarch butterflies because monarch caterpillars depend on milkweed.",
+        "Pollinator habitat should include flowers, host plants, clean edges, limited disturbance, and observation before cutting or clearing.",
+        "Youth should document butterflies, cocoons/chrysalises, bees, moths, beetles, and habitat conditions when found."
+      ],
+      steps: [
+        "Observe first; do not remove a cocoon, chrysalis, caterpillar, or egg.",
+        "Photograph the plant and the insect or cocoon if it can be done safely.",
+        "Record where it was found, what plant it was near, and whether the area should be protected.",
+        "Connect the discovery to pollinator habitat, the butterfly sanctuary, and farm stewardship."
+      ],
+      content: [
+        "This resource supports Week 5 forest and pollinator observations, including the butterfly cocoon discovery. It should help youth understand that habitat protection is part of the work, not separate from the work."
+      ]
+    };
+  }
+
+  if (title.includes("trellis")) {
+    return {
+      keyPoints: [
+        "A natural trellis uses available branches or supports to help climbing or sprawling plants grow upward or stay organized.",
+        "Collect only approved natural material. Do not damage living trees or remove airport materials.",
+        "Trellis design should fit the crop: tomatoes, beans, squash, pumpkins, and melons may need different support decisions.",
+        "A good trellis is stable, safe, not too tall for the area, and easy to inspect."
+      ],
+      steps: [
+        "Identify the crop and why it needs support.",
+        "Choose branch size and support shape.",
+        "Check height, stability, and pathway safety.",
+        "Build a small test section before repeating the design.",
+        "Photograph the design and explain what problem it solves."
+      ],
+      content: [
+        "Use this resource when youth are collecting branches, planning natural supports, preparing squash or pumpkin grow areas, or connecting forest materials to farm design."
+      ]
+    };
+  }
+
+  if (title.includes("germination")) {
+    return {
+      keyPoints: [
+        "Seed germination changes with temperature.",
+        "The germination chart is used to compare crops and decide when seeds are likely to sprout quickly or slowly.",
+        "Youth should connect germination time to planning, watering, weather, and patience."
+      ],
+      steps: [
+        "Choose the crop from the chart.",
+        "Find the current or expected soil temperature range.",
+        "Compare how many days germination may take at cooler versus warmer temperatures.",
+        "Record what that means for planting and observation."
+      ],
+      content: [
+        "This is a quick-reference chart. It belongs near seeding, transplanting, crop planning, and youth questions about why some seeds appear before others."
+      ]
+    };
+  }
+
+  if (title.includes("seeding") || title.includes("transplant")) {
+    return {
+      keyPoints: [
+        "Direct seeding means placing seed directly into the outside bed.",
+        "Transplanting means starting seedlings first and then planting them into the field or bed.",
+        "Planting tools may include hand seeding, Earthway seeders, Jang seeders, paper pot transplanters, and other tools depending on scale.",
+        "Youth should know whether today’s crop is being seeded, transplanted, thinned, or moved."
+      ],
+      steps: [
+        "Confirm the crop and planting method.",
+        "Prepare the bed or row before planting.",
+        "Check spacing and depth.",
+        "Water or mulch only as directed by the day’s conditions.",
+        "Document crop, area, and what was planted or moved."
+      ],
+      content: [
+        "Use this resource for corn seedlings, thinning, moving plants to other locations, and crop establishment."
+      ]
+    };
+  }
+
+  if (title.includes("crop planning") || title.includes("recordkeeping") || title.includes("field application")) {
+    return {
+      keyPoints: [
+        "A crop plan is a roadmap for what will be planted, where it will go, when it will be planted, and how it connects to harvest or sales goals.",
+        "Recordkeeping helps the farm remember what happened and make better decisions next time.",
+        "Field maps help youth connect real work areas to crop families, spacing, yield, and maintenance needs.",
+        "The workbook is part of the farm’s recordkeeping practice."
+      ],
+      steps: [
+        "Record what area was worked.",
+        "Record what crop, material, or problem was handled.",
+        "Record what changed because of the work.",
+        "Record what should happen next."
+      ],
+      content: [
+        "Use this resource when youth ask why documentation matters. The answer is that the workbook is not busywork; it is farm recordkeeping, workforce proof, and planning memory."
+      ]
+    };
+  }
+
+  if (title.includes("safety") || title.includes("south hangar")) {
+    return {
+      keyPoints: [
+        "South Hangar is the youth staging area.",
+        "Stay with the assigned supervisor and remain in approved work areas.",
+        "Use PPE, hydration, shade breaks, and tool safety rules.",
+        "Do not take rocks or materials from the driveway, airport cement, aircraft areas, or unapproved zones.",
+        "Ask before entering the forest, creek area, or any airport-sensitive area."
+      ],
+      steps: [
+        "Check in with supervisor.",
+        "Confirm PPE and water.",
+        "Confirm the approved work zone.",
+        "Report hazards immediately.",
+        "Return tools and document work before leaving."
+      ],
+      content: [
+        "This resource is pinned because youth are working on a private airport site. Safety and boundaries are part of the curriculum."
+      ]
+    };
+  }
+
+  return {
+    keyPoints: [
+      "This card is connected to the day’s work and should support the assignment directly.",
+      "Youth should open it when they need background, steps, vocabulary, or documentation support."
+    ],
+    steps: [
+      "Read the resource summary.",
+      "Use the key points while doing the work.",
+      "Document what changed, what was learned, and what still needs attention."
+    ],
+    content: [
+      "This resource now opens as an in-app lesson card instead of an empty placeholder."
+    ]
+  };
+}
 
 function workbookLessonResources16_8B(dayPlan: typeof youthWeekOneDailyPlan[number]): WorkbookLessonResource16_8B[] {
   const lessonText = `${dayPlan.day} ${dayPlan.curriculum} ${dayPlan.focus} ${(dayPlan.work || []).join(" ")} ${(dayPlan.resources || []).join(" ")}`.toLowerCase();
@@ -9196,12 +9424,33 @@ function workbookLessonResources16_8B(dayPlan: typeof youthWeekOneDailyPlan[numb
 
   if (lessonText.includes("beehive") || lessonText.includes("apiary") || lessonText.includes("bee")) {
     addVideoByTitle("Beehive Assembly", "Beehive Assembly Video");
-    resources.push({
-      title: "Beehive Diagram / Apiary Assembly Guide",
-      description: "Use the pinned beehive assembly video and diagram as needed to identify hive parts, install frames, check alignment, and verify stability.",
-      kind: "guide",
-      actionLabel: "Open guide",
-    });
+    resources.push(
+      {
+        title: "Beehive Diagram",
+        description: "Identify bottom board, deep box, frames, inner cover, outer cover, entrance reducer, and feeder if used.",
+        kind: "guide",
+        actionLabel: "Open diagram",
+      },
+      {
+        title: "Apiary Assembly Guide",
+        description: "Follow the step-by-step assembly order: inspect parts, place base, install box, install frames, add covers, check alignment, document completion.",
+        kind: "guide",
+        actionLabel: "Open guide",
+      },
+      {
+        title: "Honey Bee Basics",
+        description: "Review queen, worker, drone, pollination, colony health, and why the hive project matters.",
+        kind: "lesson",
+        actionLabel: "Open lesson",
+      },
+      {
+        title: "Beehive / Queen Rearing / Ohio Mite Biter Research",
+        description: "Open the CSU bee science reference for Varroa mites, grooming behavior, OB1 stock, queen rearing, and research careers.",
+        kind: "document",
+        file: "/resources/CSU breeding queen(1).pdf",
+        actionLabel: "Open PDF",
+      }
+    );
   }
 
   if (lessonText.includes("trellis")) {
@@ -9285,11 +9534,34 @@ function WorkbookLessonResourceCards16_8B({ dayPlan }: { dayPlan: typeof youthWe
                 {resource.actionLabel || "Open"}
               </a>
             )}
-            {!resource.embedUrl && !resource.file && (
-              <div className="mt-3 rounded-xl border border-white/10 bg-white/10 p-3 text-[11px] font-bold leading-5 text-white/70">
-                {resource.actionLabel || "Open"}: this resource opens as an in-app lesson source so youth can review the material without leaving the workbook.
-              </div>
-            )}
+            {(() => {
+              const boundContent = workbookResourceContent16_8F(resource.title);
+              return (
+                <div className="mt-3 grid gap-3">
+                  {boundContent.keyPoints?.length > 0 && (
+                    <div className="rounded-xl border border-emerald-200/20 bg-emerald-300/10 p-3">
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-50">Key points</div>
+                      <ul className="mt-2 space-y-1 text-[11px] font-bold leading-5 text-white/76">
+                        {boundContent.keyPoints.map((point) => <li key={point}>• {point}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {boundContent.steps?.length > 0 && (
+                    <div className="rounded-xl border border-amber-200/20 bg-amber-300/10 p-3">
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-50">Use it today</div>
+                      <ol className="mt-2 list-decimal space-y-1 pl-4 text-[11px] font-bold leading-5 text-white/76">
+                        {boundContent.steps.map((step) => <li key={step}>{step}</li>)}
+                      </ol>
+                    </div>
+                  )}
+                  {boundContent.content?.map((paragraph) => (
+                    <div key={paragraph} className="rounded-xl border border-white/10 bg-white/10 p-3 text-[11px] font-bold leading-5 text-white/70">
+                      {paragraph}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </details>
         ))}
       </div>
