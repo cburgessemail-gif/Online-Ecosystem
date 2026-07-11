@@ -10517,11 +10517,23 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • Workbook • Week 6 Curriculum</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">
+                {phase === "work"
+                  ? `Week ${currentWeek.week} • ${todayPlan.day} • Today’s Work`
+                  : currentWeek.week === 6
+                    ? "Week 6 Curriculum • July 13–17, 2026"
+                    : `Week ${currentWeek.week} Curriculum`}
+              </div>
               <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : "Workbook"}</h1>
-              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Workbook is the editable curriculum record: activity responses, photos, counts, discoveries, questions, CSU-based curriculum access, and resource links."}</p>
+              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Curriculum Weeks 1–8, required videos, activity documentation, photos, discoveries, and unfinished work are kept here."}</p>
             </div>
-            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">Week {currentWeek.week} • {todayPlan.day}</div>
+            <div className="rounded-2xl border border-emerald-200/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-50">
+              {phase === "work"
+                ? `Week ${currentWeek.week} • ${todayPlan.day}`
+                : currentWeek.week === 6
+                  ? "Week 6 • Jul 13–17"
+                  : `Week ${currentWeek.week} Curriculum`}
+            </div>
           </div>
         </Card>
       )}
@@ -10542,16 +10554,11 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
       {phase === "workbook" && (
         <div className="grid gap-4">
-          <Card className="p-4 md:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-100/80">Workbook Dashboard • Documentation, Not Assignments</div>
-                <h2 className="mt-2 text-3xl font-black md:text-4xl">{workbookView19_3 === "dashboard" ? "Curriculum Weeks 1–8 and Videos" : "Workbook"}</h2>
-                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook contains the curriculum, Weeks 1–8, required videos, activity documentation, photos, discoveries, and unfinished work.</p>
-              </div>
-              {workbookView19_3 !== "dashboard" && <button type="button" onClick={() => openWorkbookView19_3("dashboard")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">← Workbook Dashboard</button>}
+          {workbookView19_3 !== "dashboard" && (
+            <div className="flex justify-end">
+              <button type="button" onClick={() => openWorkbookView19_3("dashboard")} className="rounded-full border border-white/15 bg-black/45 px-4 py-2 text-xs font-black text-white">← Workbook Dashboard</button>
             </div>
-          </Card>
+          )}
 
           {workbookView19_3 === "dashboard" && (
             <div className="grid gap-4">
