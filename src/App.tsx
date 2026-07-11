@@ -95,9 +95,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 23.2 FINAL: Removes the youth-facing Living Farm Encyclopedia, Explore & Discover, academy/category cards, and all youth navigation into the separate knowledge-library screen.
  * - Ecosystem 23.2 FINAL: Workbook is the single curriculum home. Weeks 1–8 and all four natural trellis videos are visible immediately when Workbook opens.
  * - Ecosystem 23.2 FINAL: Current program display is locked to Week 6 beginning Saturday, July 11, 2026.
- * - Ecosystem 23.5 FINAL: Adds the third natural trellis video supplied by Constance (YouTube ID PcRdrHiQjGI) to the Week 6 Workbook video panel and workday resources.
- * - Ecosystem 23.5 FINAL: Adds the fourth trellis video (YouTube ID R_MxMrIFhMc), keeps all videos together in Workbook Week 6, returns youth to the forest for fallen-branch collection, adds germination inspection and replacement seeding, and avoids routine watering unless soil conditions require it.
+ * - Ecosystem 23.6 FINAL: Adds the third natural trellis video supplied by Constance (YouTube ID PcRdrHiQjGI) to the Week 6 Workbook video panel and workday resources.
+ * - Ecosystem 23.6 FINAL: Adds the fourth trellis video (YouTube ID R_MxMrIFhMc), keeps all videos together in Workbook Week 6, returns youth to the forest for fallen-branch collection, adds germination inspection and replacement seeding, and avoids routine watering unless soil conditions require it.
  * - Ecosystem 23.0 FINAL: Week 6 is Regeneration Through Stewardship and is synchronized to the live week/day calendar.
+ * - Ecosystem 23.6 FINAL: Calendar weekend preview now advances on both Saturday and Sunday to the coming Monday–Friday workweek; Week 6 displays July 13–17, 2026. All active trellis instructions reference three videos.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and all four natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Week 6 active work is trellis construction, beehive and pollinator restoration, milkweed habitat restoration, inventory stewardship, collard and corn monitoring, wildlife observation, forest stewardship, discovery investigation, and water/land stewardship.
  * - Ecosystem 23.0A WEEK 6 DISPLAY LOCK: Week rollover occurs at midnight entering Saturday; July 11, 2026 and all live youth screens now resolve to Week 6.
@@ -1305,10 +1306,10 @@ const youthWeekFiveDailyPlan = [
     day: "Friday",
     date: "July 10, 2026",
     curriculum: "Forest Stewardship, Trellis Planning, and Apiary Development",
-    focus: "Youth spend the day in the forest to observe the ecosystem, study all four natural trellis videos, choose the branch types and trellis designs they want for Monday, collect only fallen materials, observe milkweed and pollinator habitat, and begin putting the beehive together.",
+    focus: "Youth spend the day in the forest to observe the ecosystem, study the three natural trellis videos, choose the branch types and trellis designs they want for Monday, collect only fallen materials, observe milkweed and pollinator habitat, and begin putting the beehive together.",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, and daily briefing",
-      "Watch all four natural trellis design videos before entering the forest",
+      "Watch the three natural trellis design videos before entering the forest",
       "Decide which branch types are needed: straight, forked, long, strong, or flexible",
       "Choose which trellis design may work best for beans, tomatoes, or other climbing plants",
       "Enter the forest only with the supervisor-approved group and remain together",
@@ -1332,7 +1333,7 @@ const youthWeekSixDailyPlan = [
     focus: "Youth watch the three trellis videos, return to the forest to collect or choose additional fallen branches, inspect every planted area for germination, and plant a replacement seed wherever an expected crop has not sprouted. Routine watering is not planned unless a supervisor confirms that the soil is dry.",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Watch all four natural trellis videos inside Workbook before material selection",
+      "Watch the three natural trellis videos inside Workbook before material selection",
       "Review the branches already collected and identify what additional shapes, lengths, forks, or strengths may be needed",
       "Enter the forest only with the supervisor-approved group and remain together",
       "Collect only naturally fallen branches, dead wood, or dropped limbs — do not cut living trees",
@@ -2615,7 +2616,9 @@ function CalendarEventPill({ title, kind }: { title: string; kind: string }) {
 
 function getCalendarDisplayBase(date = new Date()) {
   const display = new Date(date);
-  // Weekend preview rule: on Sunday, show the coming program week, not the week that just ended.
+  // Curriculum changes Saturday at midnight. On either weekend day, the calendar
+  // must preview the coming Monday–Friday workweek instead of the week that ended.
+  if (display.getDay() === 6) display.setDate(display.getDate() + 2);
   if (display.getDay() === 0) display.setDate(display.getDate() + 1);
   return display;
 }
@@ -4769,7 +4772,7 @@ function LaunchReadinessValidatorCard() {
 
 function YouthTodayWorkCard() {
   const todayProjects = [
-    "Watch all four natural trellis videos",
+    "Watch the three natural trellis videos",
     "Explore the forest ecosystem with your group",
     "Observe wildlife and pollinator habitat",
     "Locate milkweed and seed pods",
