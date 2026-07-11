@@ -91,9 +91,14 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 22.0: Workbook becomes a Discovery Journal and Living Farm Encyclopedia contribution system organized into Grow Food, Steward Nature, Pollinator, Soil Detective, Harvest & Food, and Farm Business academies.
  * - Ecosystem 22.0: Every activity closes with “What Should Future Cultivators Know?” and saves the answer as knowledge transfer, not a school-style quiz.
  * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
+ * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Week 6 is Regeneration Through Stewardship and is synchronized to the live week/day calendar.
+ * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Week 6 active work is trellis construction, beehive and pollinator restoration, milkweed habitat restoration, inventory stewardship, collard and corn monitoring, wildlife observation, forest stewardship, discovery investigation, and water/land stewardship.
+ * - Ecosystem 23.0A WEEK 6 DISPLAY LOCK: Week rollover occurs at midnight entering Saturday; July 11, 2026 and all live youth screens now resolve to Week 6.
+ * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Milkweed seed envelopes remain open while seeds dry; youth do not seal envelopes or remove adhesive backing.
+ * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Removes youth-facing architecture and workflow diagrams. The organizing framework remains internal and operational.
  * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
@@ -970,12 +975,12 @@ const youthCurriculumWeeks = [
   },
   {
     week: 6,
-    title: "Leadership & Community",
-    focus: "Team leadership, communication, service, visitor support, community impact, and peer responsibility.",
-    project: "Leadership and community service activity",
-    skills: ["Leadership", "Service", "Communication", "Accountability"],
-    badge: "🤝 Community Leader",
-    status: "Upcoming",
+    title: "Regeneration Through Stewardship",
+    focus: "Natural trellis construction, beehive and pollinator restoration, milkweed habitat stewardship, inventory management, crop monitoring, wildlife observation, forest stewardship, and water and land investigation.",
+    project: "Regeneration Through Stewardship — Observe → Investigate → Build → Restore → Record → Pass Knowledge Forward",
+    skills: ["Stewardship", "Construction", "Observation", "Inventory Management", "Habitat Restoration", "Systems Thinking"],
+    badge: "🌿 Regeneration Steward",
+    status: "Current Week",
   },
   {
     week: 7,
@@ -1450,12 +1455,12 @@ function getCurrentProgramWeek(date = new Date()) {
   current.setHours(0, 0, 0, 0);
 
   // Constance's curriculum rule: the new curriculum week becomes visible
-  // at midnight Saturday night / Sunday morning. Week 4 begins Sunday 6/28/2026.
+  // at midnight Friday night / Saturday morning. Week 6 begins Saturday 7/11/2026.
   const weekStarts: Array<[number, string]> = [
-    [8, "2026-07-26T00:00:00"],
-    [7, "2026-07-19T00:00:00"],
-    [6, "2026-07-12T00:00:00"],
-    [5, "2026-07-05T00:00:00"],
+    [8, "2026-07-25T00:00:00"],
+    [7, "2026-07-18T00:00:00"],
+    [6, "2026-07-11T00:00:00"],
+    [5, "2026-07-04T00:00:00"],
     [4, "2026-06-28T00:00:00"],
     [3, "2026-06-21T00:00:00"],
     [2, "2026-06-14T00:00:00"],
@@ -4774,7 +4779,7 @@ function YouthTodayWorkCard() {
 
   return (
     <section className="mt-6 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/10 p-5">
-      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Week 5 • Friday</div>
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Youth View • Week 6 • Current Day</div>
       <h2 className="mt-2 text-3xl font-black">South Hangar Staging Area</h2>
       <p className="mt-3 rounded-2xl bg-black/25 p-4 text-lg font-black">Work first. Use the ecosystem for directions, resources, inventory, and safety support.</p>
 
@@ -9271,7 +9276,12 @@ const CURRICULUM_RESOURCE_FILES_16_8D: WorkbookLessonResource16_8B[] = [
   },
 ];
 
-const WORKBOOK_WEEK_ACCESS_16_8 = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8"];
+const WORKBOOK_WEEK_ACCESS_16_8 = youthCurriculumWeeks.map((week) => ({
+  label: `Week ${week.week}`,
+  title: week.title,
+  focus: week.focus,
+  project: week.project,
+}));
 
 type WorkbookOpenPanel16_8 =
   | { kind: "week"; label: string }
@@ -9838,18 +9848,46 @@ function CSUBasedCurriculumAccess16_8({ compact = false, onOpen }: { compact?: b
   );
 }
 
+function WorkbookTrellisVideos23_1() {
+  const trellisVideos = launchVideos.filter((video) => video.title.toLowerCase().includes("trellis"));
+  return (
+    <div className="rounded-[1.5rem] border border-sky-200/25 bg-sky-300/10 p-5">
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/85">Workbook • Week 6 Curriculum Videos</div>
+      <h3 className="mt-2 text-2xl font-black">Natural Trellis Videos</h3>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/78">Both required trellis videos are kept inside the Workbook. Youth can watch them here before selecting branches, comparing designs, or beginning construction.</p>
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        {trellisVideos.map((video) => (
+          <div key={video.title} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
+            {video.embedUrl ? (
+              <div className="aspect-video w-full bg-black">
+                <iframe className="h-full w-full" src={video.embedUrl} title={video.embedTitle || video.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+              </div>
+            ) : null}
+            <div className="p-4">
+              <div className="text-lg font-black text-white">{video.title}</div>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/72">{video.purpose}</p>
+              {video.embedUrl && <a href={video.embedUrl.replace("/embed/", "/watch?v=")} target="_blank" rel="noreferrer" className="mt-3 inline-flex rounded-full bg-sky-300 px-4 py-2 text-xs font-black text-black">Open Video</a>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WorkbookWeekAccess16_8({ onOpen }: { onOpen?: (week: string) => void }) {
   return (
     <div className="rounded-[1.5rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
-      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Editable Week Library</div>
-      <h3 className="mt-2 text-2xl font-black">Every week stays open.</h3>
-      <p className="mt-2 text-sm font-bold leading-6 text-white/78">
-        Youth can return to any week to add, edit, delete, replace, upload, re-upload, or complete unfinished workbook inputs. Attendance, work hours, supervisor evaluations, and incident reports remain official locked records.
-      </p>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-4">
+      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-100/80">Workbook Curriculum • Weeks 1–8</div>
+      <h3 className="mt-2 text-2xl font-black">Every curriculum week, with its title.</h3>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/78">Open any week to see its curriculum days, lesson materials, videos, responses, uploads, and unfinished documentation.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {WORKBOOK_WEEK_ACCESS_16_8.map((week) => (
-          <button key={week} type="button" onClick={() => onOpen?.(week)} className="rounded-2xl border border-white/10 bg-black/25 p-3 text-left text-sm font-black text-white/86 hover:bg-white/12">
-            {week}<div className="mt-1 text-[11px] font-bold text-white/60">Open / edit / complete</div>
+          <button key={week.label} type="button" onClick={() => onOpen?.(week.label)} className="rounded-2xl border border-white/10 bg-black/25 p-4 text-left text-white/86 hover:bg-white/12">
+            <div className="text-xs font-black uppercase tracking-[0.16em] text-emerald-100/70">{week.label}</div>
+            <div className="mt-2 text-lg font-black text-white">{week.title}</div>
+            <div className="mt-2 text-[11px] font-bold leading-5 text-white/62">{week.project}</div>
+            <div className="mt-3 text-[11px] font-black uppercase tracking-[0.14em] text-emerald-100/75">Open curriculum week →</div>
           </button>
         ))}
       </div>
@@ -10487,6 +10525,8 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
           {workbookView19_3 === "dashboard" && (
             <div className="grid gap-4">
+              <WorkbookTrellisVideos23_1 />
+              <WorkbookWeekAccess16_8 onOpen={(week) => { openWorkbookView19_3("weeks"); openWorkbookPanel16_8({ kind: "week", label: week }); }} />
               <DiscoveryAcademies22_0 />
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {[
@@ -10494,7 +10534,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
                 ["discoveries", "🔍", "My Discoveries", "Review observations, wildlife findings, questions, and learning moments."],
                 ["media", "📸", "Photos & Videos", "Upload and review evidence without searching through the full workbook."],
                 ["contributions", "🌱", "My Contributions", "See what you helped build, improve, protect, or grow."],
-                ["weeks", "📅", "Previous Weeks", "Open Weeks 1–8, activities, entries, videos, and unfinished documentation."],
+                ["weeks", "📅", "Curriculum Weeks 1–8", "Open every week by title, including activities, lesson materials, trellis videos, entries, uploads, and unfinished documentation."],
               ].map(([key, icon, title, detail]) => (
                 <button key={key} type="button" onClick={() => openWorkbookView19_3(key as WorkbookDashboardView19_3)} className="rounded-[1.5rem] border border-white/12 bg-black/45 p-5 text-left transition hover:-translate-y-0.5 hover:bg-black/60">
                   <div className="text-4xl">{icon}</div>
@@ -10555,6 +10595,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
           {workbookView19_3 === "weeks" && (
             <div className="grid gap-4">
+              <WorkbookTrellisVideos23_1 />
               <WorkbookWeekAccess16_8 onOpen={(week) => openWorkbookPanel16_8({ kind: "week", label: week })} />
               <WorkbookRecoveryCenter16_8 onOpen={(status) => openWorkbookPanel16_8({ kind: "status", label: status })} />
               {workbookOpenPanel16_8 && <WorkbookOpenPanel16_8 panel={workbookOpenPanel16_8} onClose={() => setWorkbookOpenPanel16_8(null)} onOpen={openWorkbookPanel16_8} />}
