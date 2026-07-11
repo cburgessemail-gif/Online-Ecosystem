@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 22.0 - EXPLORER TO LEGACY BUILDER MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 23.0 - WEEK 6 REGENERATION THROUGH STEWARDSHIP FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -91,6 +91,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 22.0: Workbook becomes a Discovery Journal and Living Farm Encyclopedia contribution system organized into Grow Food, Steward Nature, Pollinator, Soil Detective, Harvest & Food, and Farm Business academies.
  * - Ecosystem 22.0: Every activity closes with “What Should Future Cultivators Know?” and saves the answer as knowledge transfer, not a school-style quiz.
  * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
+ * - Ecosystem 23.0 FINAL: Week 6 is Regeneration Through Stewardship and is synchronized to the live week/day calendar.
+ * - Ecosystem 23.0 FINAL: Week 6 active work is trellis construction, beehive and pollinator restoration, milkweed habitat restoration, inventory stewardship, collard and corn monitoring, wildlife observation, forest stewardship, discovery investigation, and water/land stewardship.
+ * - Ecosystem 23.0 FINAL: Milkweed seed envelopes remain open while seeds dry; youth do not seal envelopes or remove adhesive backing.
+ * - Ecosystem 23.0 FINAL: Removes youth-facing architecture and workflow diagrams. The organizing framework remains internal and operational.
  * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
 
@@ -1313,48 +1317,101 @@ const youthWeekFiveDailyPlan = [
 const youthWeekSixDailyPlan = [
   {
     day: "Monday",
-    date: "Week 6 Monday",
-    curriculum: "Natural Plant Support System Construction Day",
-    focus: "Youth use Friday's collected forest materials to select a trellis design, sort branches, build natural supports, install tomato supports, install bean trellises as needed, and continue apiary development if necessary.",
-    work: ["Sort Friday's collected fallen branches and dead wood", "Select the trellis design that best fits the crop", "Build natural plant supports", "Install tomato supports where directed", "Install bean trellises as needed", "Continue beehive or apiary work if necessary", "Document before/after construction progress"],
-    resources: ["Friday materials staging note", "Natural Trellis Design Video #2", "Tomato Support Guide", "Bean Trellis Guide", "Tool Safety Basics", "Apiary Assembly Guide"],
-    reflection: "How did Friday's forest materials become useful farm infrastructure today?",
+    date: "July 13, 2026",
+    curriculum: "Trellis Construction & Natural Farm Infrastructure",
+    focus: "Youth turn previously collected fallen branches into useful crop-support infrastructure by evaluating materials, selecting a design, testing stability, and building natural trellises safely.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
+      "Review both natural trellis videos before construction begins",
+      "Sort previously collected fallen branches by length, strength, straightness, flexibility, and possible use",
+      "Count and record uprights, cross members, braces, ties, and unusable pieces before building",
+      "Choose the trellis design that best fits the assigned crop and available materials",
+      "Build and test one prototype section before expanding the structure",
+      "Install natural supports only in supervisor-approved locations",
+      "Check stability, crop clearance, pathway safety, and tool return before closeout",
+      "Photograph the materials, prototype, completed section, and one improvement made during construction"
+    ],
+    resources: ["Natural Trellis Design Video #1", "Natural Trellis Design Video #2", "Natural Material Selection Guide", "Trellis Stability Check", "Tool Safety Basics", "Inventory Count Sheet"],
+    reflection: "How did observation, testing, and teamwork help turn natural materials into useful farm infrastructure? What should future Cultivators know before building the next section?",
   },
   {
     day: "Tuesday",
-    date: "Week 6 Tuesday",
-    curriculum: "Community Stewardship and Site Care",
-    focus: "Youth connect farm work to community care, site appearance, safety, and pride in shared spaces.",
-    work: ["Improve one work area", "Remove debris where directed", "Check pathways", "Support plant or pollinator care", "Record one community benefit"],
-    resources: ["Community stewardship prompt", "Site care checklist", "Safety observation card"],
-    reflection: "How does caring for this farm connect to caring for a neighborhood or park?",
+    date: "July 14, 2026",
+    curriculum: "Beehive Construction, Cleaning & Pollinator Restoration",
+    focus: "Youth continue rebuilding the beehive as a real pollinator-restoration project by inspecting, cleaning, drying, sorting, assembling, and documenting hive components.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
+      "Identify and count the bottom board, hive bodies, frames, inner cover, outer cover, and other components",
+      "Inspect each component for damage, wear, moisture, residue, missing pieces, or repair needs",
+      "Clean or continue sterilizing components only under supervisor direction",
+      "Allow every cleaned component to dry completely before assembly",
+      "Sort components in assembly order and compare them with the pinned beehive diagram and video",
+      "Reassemble the hive carefully, checking frame placement, alignment, stability, and ventilation",
+      "Observe the future apiary area for shade, drainage, access, safety, and pollinator habitat",
+      "Photograph inspection findings, cleaned parts, assembly progress, and the final condition"
+    ],
+    resources: ["Beehive Assembly Video", "Beehive Diagram", "Apiary Assembly Guide", "Honey Bee Basics", "Pollinator Habitat Guide", "Hive Component Inventory"],
+    reflection: "Why must reusable equipment be inspected, cleaned, dried, and inventoried before assembly? How can a restored hive support food production and habitat?",
   },
   {
     day: "Wednesday",
-    date: "Week 6 Wednesday",
-    curriculum: "Peer Support, Communication, and Problem Solving",
-    focus: "Youth learn that leadership includes listening, helping, explaining, and solving problems without creating conflict.",
-    work: ["Practice clear directions", "Help a peer complete a task", "Identify one problem", "Suggest a respectful solution", "Record what worked"],
-    resources: ["Peer support guide", "Problem-solving prompt", "Conflict prevention card"],
-    reflection: "What did you do today that made work easier or safer for someone else?",
+    date: "July 15, 2026",
+    curriculum: "Milkweed Habitat Restoration & Pollinator Stewardship",
+    focus: "Youth collect mature milkweed seed responsibly, protect seed quality during drying, document habitat conditions, and connect milkweed restoration to monarchs, pollinators, biodiversity, and future farm planning.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
+      "Wear gloves and enter only supervisor-approved milkweed collection areas",
+      "Observe pod color, dryness, opening, seed condition, insects, caterpillars, eggs, and surrounding habitat before collection",
+      "Collect only mature seeds or mature pods as directed; leave immature pods and needed habitat in place",
+      "Place seeds in a breathable paper envelope and label the date, location, collector, and observation",
+      "LEAVE THE ENVELOPE OPEN while the seeds dry",
+      "DO NOT seal the envelope, fold the flap inside, or remove the adhesive or protective strip",
+      "Stage open envelopes in the approved dry location where air can circulate",
+      "Count envelopes and collection locations and record pollinator or monarch observations",
+      "Photograph the habitat, mature pod, labeled open envelope, and any approved pollinator discovery"
+    ],
+    resources: ["Milkweed Seed Collection Guide", "Open-Envelope Drying Reminder", "Milkweed & Monarchs", "Pollinator Observation Guide", "Habitat Restoration Record"],
+    reflection: "What did the condition of the milkweed habitat tell you? Why must collected seeds remain in an open paper envelope while drying? What should future Cultivators know about collecting without damaging habitat?",
   },
   {
     day: "Thursday",
-    date: "Week 6 Thursday",
-    curriculum: "Visitor Readiness and Community Experience",
-    focus: "Youth consider how visitors, families, volunteers, partners, and customers experience the farm.",
-    work: ["Look at the site through a visitor's eyes", "Identify what needs to be clear, safe, or welcoming", "Improve one visitor-facing area", "Practice explaining one farm feature", "Record one improvement idea"],
-    resources: ["Visitor readiness checklist", "Farm feature explanation prompt", "Customer experience card"],
-    reflection: "What would you want a visitor to understand about Bronson Family Farm?",
+    date: "July 16, 2026",
+    curriculum: "Crop Census, Inventory Management & Resource Stewardship",
+    focus: "Youth think like farm managers by counting living crops and available resources, comparing estimates with actual observations, identifying shortages or damage, and using evidence to set priorities.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
+      "Count collard rows and sample plant counts to estimate the total living collard population",
+      "Record healthy, questionable, damaged, missing, and pest-affected collard plants",
+      "Measure or compare selected corn plants for height, leaf development, color, moisture, and damage",
+      "Count trellis materials, beehive components, milkweed envelopes, buckets, gloves, hoes, hand shovels, scissors, and measuring tools",
+      "Compare what projects require with what is actually available",
+      "Identify one shortage, surplus, damaged item, or resource that can be reused",
+      "Recommend which need should be addressed first and support the decision with observations",
+      "Photograph crop conditions, inventory groups, counts, and one management concern"
+    ],
+    resources: ["Collard Green Census Sheet", "Corn Monitoring Record", "Farm Inventory Audit", "Resource Priority Guide", "Plant Health Checklist", "Business Cost Connection"],
+    reflection: "What did counting reveal that guessing could not? Which resource or crop concern should receive attention first, and what evidence supports your decision?",
   },
   {
     day: "Friday",
-    date: "Week 6 Friday",
-    curriculum: "Leadership Weekly Closeout and Community Legacy",
-    focus: "Youth review how leadership, responsibility, and community stewardship showed up through the week.",
-    work: ["Complete weekly leadership reflection", "Update Journey record", "Share one team contribution", "Preview career week", "Celebrate growth"],
-    resources: ["Leadership reflection", "Journey update guide", "Career week preview"],
-    reflection: "What kind of leader are you becoming?",
+    date: "July 17, 2026",
+    curriculum: "Forest, Wildlife, Water & Land Stewardship Investigation",
+    focus: "Youth investigate how forest habitat, wildlife evidence, water movement, soil moisture, crops, and farm decisions connect, then close the week by identifying one responsible action and one legacy contribution.",
+    work: [
+      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
+      "Enter the forest only with a supervisor-approved group and remain together",
+      "Observe trees, understory plants, dead wood, fungi, insects, amphibians, birds, tracks, trails, feeding signs, nests, droppings, and other wildlife evidence",
+      "Revisit known water-pooling locations in the grow area and forest path",
+      "Record where water collects, flows, remains wet, or leaves soil dry",
+      "Compare vegetation, soil condition, pathway condition, and wildlife evidence near wet and dry areas",
+      "Complete one approved discovery investigation without being given the conclusion in advance",
+      "Identify one land-stewardship concern and one sign that the ecosystem is functioning well",
+      "Recommend one practical action that protects crops, habitat, water, soil, people, or future access",
+      "Photograph discoveries, water patterns, wildlife evidence, and the area connected to the recommendation",
+      "Complete the Week 6 legacy response: What became stronger because I was here, and what should future Cultivators continue?"
+    ],
+    resources: ["Forest Stewardship Survey", "Wildlife Evidence Log", "Water Movement Map", "Discovery Investigation Record", "Land Stewardship Decision Guide", "Week 6 Legacy Prompt"],
+    reflection: "How did water, soil, plants, animals, people, and farm work connect this week? What decision would you make next, and what evidence supports it?",
   },
 ];
 
@@ -9151,11 +9208,6 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
         </div>
       </details>
 
-      <div className="rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-white/86">
-        <div className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-100/75">Workbook Flow</div>
-        <div className="mt-2 text-lg font-black text-white">Today’s Work → Workbook → Legacy → My Journey</div>
-        <p className="mt-2 text-sm font-bold leading-6 text-white/72">This area stays focused on today’s learning record. Main navigation remains outside the workbook so youth do not get pulled away from the task.</p>
-      </div>
     </div>
   );
 }
@@ -14867,7 +14919,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Ecosystem 20.0 • My Journey</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey</div>
         <h1 className="mt-4 text-4xl font-black md:text-6xl">How I Am Growing</h1>
         <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">My Journey is generated from my Workbook, completed work, discoveries, photos, supervisor validation, and reflections. I do not have to enter the same information twice.</p>
         <div className="mt-5 flex flex-wrap gap-2">
@@ -14897,7 +14949,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
 
       {activeSection === "alumni" && alumni && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Cultivator Alumni</div><h2 className="mt-2 text-3xl font-black">Cultivation never ends</h2><p className="mt-3 text-sm font-bold leading-7 text-white/82">Your Portfolio, Resume, Legacy, and Opportunities remain available. Alumni may return as contributors, mentors, leaders, and stewards for future generations.</p><div className="mt-5 flex flex-wrap gap-2">{["Explorer", "Contributor", "Mentor", "Leader", "Steward"].map((stage) => <span key={stage} className="rounded-full border border-emerald-200/25 bg-emerald-300/10 px-4 py-2 font-black">{stage}</span>)}</div></Card>}
 
-      <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Permanent Architecture</div><div className="mt-4 flex flex-wrap items-center gap-2 text-sm font-black">{["Self", "Work", "Environment", "Community", "Opportunity", "Legacy", "Civic Responsibility", "Alumni", "Stewardship", "Generations"].map((item, index, all) => <React.Fragment key={item}><span className="rounded-full bg-white/10 px-4 py-2">{item}</span>{index < all.length - 1 && <span className="text-emerald-200">→</span>}</React.Fragment>)}</div><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button><button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Knowledge Library</button></div></Card>
+      <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Continue</div><h2 className="mt-2 text-2xl font-black">Choose where to go next</h2><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button><button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Knowledge Library</button></div></Card>
     </div>
   );
 }
