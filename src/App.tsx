@@ -85,6 +85,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 19.0: Cultivator Intelligence Platform. Workbook is the source of truth; Journey, Parent Reports, Supervisor Reports, Portfolio, Workforce Transcript, and the final Mirror are generated from workbook evidence instead of asking youth to repeat answers.
  * - Ecosystem 19.2: Fixes youth header routing so Today’s Work and Workbook open distinct phases, the correct tab is visibly active, and same-screen phase changes reliably scroll to the selected destination.
  * - Ecosystem 19.3: Replaces the long Workbook page with a five-destination Workbook Dashboard and separates the categorized Knowledge Library into its own top-level youth destination.
+ * - Ecosystem 20.0: Journey, Alumni, Legacy & Civic Responsibility Integration. My Journey now unifies My Firsts, Growth, Skills, Accomplishments, Portfolio, Resume, Opportunities, Legacy, age-gated Civic Responsibility, Alumni continuity, the Legacy Registry, Legacy Tree, and Community Impact.
  * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
 
@@ -14726,61 +14727,112 @@ function CoolingCenterProjectModule({
 
 function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const currentWeek = getCurrentYouthWeek();
-  const completed = getCompletedAssignmentsForYouth(launchParticipantId(activeUser));
-  const skills = getResumeSkillsForYouth(launchParticipantId(activeUser));
+  const participantId = launchParticipantId(activeUser);
+  const completed = getCompletedAssignmentsForYouth(participantId);
+  const skills = getResumeSkillsForYouth(participantId);
   const discoveries = todayDiscoveries(activeUser);
-  const characterRoots = ["Consistency", "Reliability", "Responsibility", "Accountability", "Stewardship", "Maturity", "Critical Thinking"];
+  const characterRoots = ["Confidence", "Communication", "Teamwork", "Leadership", "Stewardship", "Problem Solving"];
+  const firsts = [
+    "My First Forest Exploration",
+    "My First Salamander",
+    "My First Butterfly Cocoon",
+    "My First Natural Trellis",
+    "My First Pollinator Observation",
+    "My First Harvest",
+  ];
+  const accomplishments = [
+    "Helped prepare and improve the grow area",
+    "Collected naturally fallen branches for farm infrastructure",
+    "Observed wildlife and habitat in the forest",
+    "Supported pollinator and butterfly habitat",
+    "Contributed to beehive and apiary preparation",
+    "Connected farm work to community stewardship",
+  ];
+  const opportunities = ["College Credit Plus", "Central State University", "Youngstown State University", "MCCTC", "Choffin", "Flying High", "Apprenticeships", "Entrepreneurship"];
+  const journeyKey = `cultivator-20-journey:${participantId || "guest"}`;
+  const [legacy, setLegacy] = useState(() => safeRead<{ remains: string; improved: string; advice: string }>(journeyKey, { remains: "", improved: "", advice: "" }));
+  const [savedMessage, setSavedMessage] = useState("");
+  const [activeSection, setActiveSection] = useState("firsts");
+
+  const registrationAge = (() => {
+    const registrations = safeRead<any[]>(REGISTRATION_KEY, []);
+    const youth = safeRead<any[]>(YOUTH_KEY, []);
+    const row = [...registrations, ...youth].find((item) => item?.id === participantId || item?.profile_id === participantId || item?.participant_id === participantId || item?.name === activeUser?.name);
+    const directAge = Number(row?.age);
+    if (Number.isFinite(directAge) && directAge > 0) return directAge;
+    const birthDate = row?.birth_date || row?.birthDate || row?.date_of_birth;
+    if (!birthDate) return null;
+    const born = new Date(birthDate);
+    if (Number.isNaN(born.getTime())) return null;
+    const now = new Date();
+    let age = now.getFullYear() - born.getFullYear();
+    const beforeBirthday = now.getMonth() < born.getMonth() || (now.getMonth() === born.getMonth() && now.getDate() < born.getDate());
+    if (beforeBirthday) age -= 1;
+    return age;
+  })();
+  const civicEligible = registrationAge !== null && registrationAge >= 18;
+  const alumni = Boolean(activeUser?.alumni || activeUser?.lifecycle_status === "completed");
+
+  const saveLegacy = () => {
+    safeWrite(journeyKey, legacy);
+    const registryKey = "cultivator-20-legacy-registry";
+    const registry = safeRead<any[]>(registryKey, []);
+    const next = {
+      id: `legacy-${participantId || Date.now()}`,
+      participantId: participantId || "guest",
+      name: activeUser?.name || "Cultivator",
+      year: new Date().getFullYear(),
+      favoriteProject: legacy.improved || currentWeek.title,
+      skills: skills.length ? skills : currentWeek.skills,
+      legacyStatement: legacy.remains || legacy.advice,
+      updatedAt: new Date().toISOString(),
+    };
+    safeWrite(registryKey, [next, ...registry.filter((item) => item.participantId !== next.participantId)]);
+    setSavedMessage("Saved ✓ Your Legacy Registry record has been updated.");
+  };
+
+  const sections = [
+    ["firsts", "🌟 My Firsts"], ["growth", "📈 My Growth"], ["skills", "🔨 My Skills"],
+    ["accomplishments", "🏆 Accomplishments"], ["portfolio", "📂 Portfolio"], ["resume", "📄 Resume"],
+    ["opportunities", "🚀 Opportunities"], ["legacy", "🌳 Legacy"], ["impact", "🌎 Community Impact"],
+  ];
+  if (civicEligible) sections.push(["civic", "🗳️ Civic Responsibility"]);
+  if (alumni) sections.push(["alumni", "🌿 Cultivator Alumni"]);
 
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey • Accomplishments Record</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">My Accomplishments</h1>
-        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">This page is separate from Today's Work. It shows what I have accomplished: my growth, skills, experiences, community connections, opportunities, career interests, legacy record, journey evidence, workforce transcript, and future pathways.</p>
-        <div className="mt-5 rounded-[1.5rem] border border-emerald-200/25 bg-emerald-300/12 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Accomplishment Context</div>
-          <h2 className="mt-2 text-3xl font-black">Skills connected to Week {currentWeek.week}: {currentWeek.title}</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-white/80">This is not the work list. It shows how today's work builds accomplishments, skills, and opportunity.</p>
-          <div className="mt-4 flex flex-wrap gap-2">{currentWeek.skills.map((skill) => <span key={skill} className="rounded-full bg-black/30 px-4 py-2 text-sm font-black">{skill}</span>)}</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Ecosystem 20.0 • My Journey</div>
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">How I Am Growing</h1>
+        <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">My Journey is generated from my Workbook, completed work, discoveries, photos, supervisor validation, and reflections. I do not have to enter the same information twice.</p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {sections.map(([id, label]) => <button key={id} type="button" onClick={() => setActiveSection(id)} className={activeSection === id ? "rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black" : "rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black"}>{label}</button>)}
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Growth</div>
-          <h2 className="mt-2 text-2xl font-black">Character Roots</h2>
-          <div className="mt-4 grid gap-2">{characterRoots.map((root) => <div key={root} className="rounded-xl border border-white/10 bg-white/10 p-3 text-sm font-black">🌱 {root}</div>)}</div>
-        </Card>
-        <Card className="p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Skills Passport</div>
-          <h2 className="mt-2 text-2xl font-black">Skills I am building</h2>
-          <div className="mt-4 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).slice(0, 12).map((skill) => <span key={skill} className="rounded-full bg-emerald-300 px-3 py-2 text-xs font-black text-black">{skill}</span>)}</div>
-        </Card>
-        <Card className="p-5">
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Journey Record Progress</div>
-          <h2 className="mt-2 text-2xl font-black">Evidence collected</h2>
-          <div className="mt-4 grid gap-2 text-sm font-black">
-            <div className="rounded-xl bg-white/10 p-3">Assignments: {completed.length}</div>
-            <div className="rounded-xl bg-white/10 p-3">Today's responses: {discoveries.length}</div>
-            <div className="rounded-xl bg-white/10 p-3">Resume / transcript: in progress</div>
-          </div>
-        </Card>
-      </div>
+      {activeSection === "firsts" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">My Firsts</div><h2 className="mt-2 text-3xl font-black">Moments that changed what I believed I could do</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{firsts.map((item, index) => <div key={item} className="rounded-[1.25rem] border border-amber-200/20 bg-amber-300/10 p-5"><div className="text-3xl">{index === 0 ? "🌳" : index === 1 ? "🦎" : index === 2 ? "🦋" : index === 3 ? "🪵" : index === 4 ? "🐝" : "🥬"}</div><div className="mt-3 text-lg font-black">{item}</div>{index === 0 && <p className="mt-2 text-sm leading-6 text-white/76">The day I stopped being afraid of the forest.</p>}</div>)}</div></Card>}
 
-      <Card>
-        <Launch62MyJourneyPanel compact />
-      </Card>
+      {activeSection === "growth" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Growth</div><h2 className="mt-2 text-3xl font-black">Character roots strengthened through real work</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{characterRoots.map((root) => <div key={root} className="rounded-2xl border border-white/10 bg-white/10 p-4 text-lg font-black">🌱 {root}</div>)}</div></Card>}
 
-      <Card>
-        <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">My Future</div>
-        <h2 className="mt-2 text-3xl font-black">Career, education, and entrepreneurship pathways</h2>
-        <p className="mt-3 text-sm font-bold leading-7 text-white/78">Use Explore & Discover for resources. Use Share My Learning to add photos, videos, observations, and Cultivator Moments to this journey.</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button>
-          <button type="button" onClick={() => setScreen("media")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Share My Learning</button>
-          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Explore & Discover</button>
-        </div>
-      </Card>
+      {activeSection === "skills" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">My Skills Passport</div><h2 className="mt-2 text-3xl font-black">Skills built through Week {currentWeek.week}: {currentWeek.title}</h2><div className="mt-5 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).map((skill) => <span key={skill} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black">{skill}</span>)}</div></Card>}
+
+      {activeSection === "accomplishments" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-yellow-100/75">My Accomplishments</div><h2 className="mt-2 text-3xl font-black">What exists because I contributed</h2><div className="mt-5 grid gap-3 md:grid-cols-2">{accomplishments.map((item) => <div key={item} className="rounded-2xl border border-yellow-200/20 bg-yellow-300/10 p-4 font-black">🏆 {item}</div>)}</div><div className="mt-4 rounded-2xl bg-black/30 p-4 text-sm font-bold">Completed assignments recorded: {completed.length}</div></Card>}
+
+      {activeSection === "portfolio" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">My Portfolio</div><h2 className="mt-2 text-3xl font-black">My work, discoveries, photos, and reflections</h2><div className="mt-5 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-white/10 p-4 font-black">Assignments: {completed.length}</div><div className="rounded-2xl bg-white/10 p-4 font-black">Discoveries: {discoveries.length}</div><div className="rounded-2xl bg-white/10 p-4 font-black">Journey record: Building automatically</div></div><button type="button" onClick={() => setScreen("media")} className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black">Add Photos, Videos, or Observations</button></Card>}
+
+      {activeSection === "resume" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">My Resume</div><h2 className="mt-2 text-3xl font-black">Workforce experience translated into professional language</h2><div className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/30 p-5"><div className="text-xl font-black">Cultivators Youth Workforce Participant</div><p className="mt-2 text-sm leading-7 text-white/80">Participated in regenerative agriculture, environmental observation, teamwork, farm infrastructure, pollinator stewardship, problem solving, and community-connected work.</p></div><div className="mt-4 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).slice(0, 12).map((skill) => <span key={skill} className="rounded-full border border-sky-200/25 bg-sky-300/10 px-3 py-2 text-xs font-black">{skill}</span>)}</div></Card>}
+
+      {activeSection === "opportunities" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-orange-100/75">Opportunities</div><h2 className="mt-2 text-3xl font-black">Where these skills can lead</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{opportunities.map((item) => <div key={item} className="rounded-2xl border border-orange-200/20 bg-orange-300/10 p-4 font-black">🚀 {item}</div>)}</div><button type="button" onClick={() => setScreen("resources")} className="mt-5 rounded-full bg-orange-300 px-6 py-3 font-black text-black">Explore Education, Careers, and Entrepreneurship</button></Card>}
+
+      {activeSection === "legacy" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-lime-100/75">Legacy</div><h2 className="mt-2 text-3xl font-black">What remains because I was here?</h2><div className="mt-5 grid gap-4"><label className="font-black">What remains because you were here?<textarea value={legacy.remains} onChange={(e) => setLegacy({ ...legacy, remains: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label><label className="font-black">What did you improve?<textarea value={legacy.improved} onChange={(e) => setLegacy({ ...legacy, improved: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label><label className="font-black">What would you tell future Cultivators?<textarea value={legacy.advice} onChange={(e) => setLegacy({ ...legacy, advice: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label></div><button type="button" onClick={saveLegacy} className="mt-5 rounded-full bg-lime-300 px-6 py-3 font-black text-black">Save My Legacy</button>{savedMessage && <Notice text={savedMessage} />}</Card>}
+
+      {activeSection === "impact" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-cyan-100/75">Community Impact</div><h2 className="mt-2 text-3xl font-black">My work is part of something larger</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">{[["Youth work completed", completed.length], ["Discoveries recorded", discoveries.length], ["Skills developing", (skills.length || currentWeek.skills.length)], ["Habitat stewardship", "Active"], ["Community contribution", "Growing"], ["Legacy record", legacy.remains ? "Started" : "Ready"]].map(([label, value]) => <div key={String(label)} className="rounded-[1.25rem] border border-cyan-200/20 bg-cyan-300/10 p-5"><div className="text-sm font-black text-white/70">{label}</div><div className="mt-2 text-3xl font-black">{value}</div></div>)}</div></Card>}
+
+      {activeSection === "civic" && civicEligible && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-blue-100/75">Civic Responsibility • Age 18+</div><h2 className="mt-2 text-3xl font-black">Continue cultivating your community</h2><p className="mt-3 max-w-4xl text-sm font-bold leading-7 text-white/82">Communities thrive when people participate. Participation includes volunteering, service, mentoring, leadership, environmental stewardship, public service, and voting. This is civic participation, not political advocacy.</p><a href="https://olvr.ohiosos.gov/" target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-full bg-blue-300 px-6 py-3 font-black text-black">Ohio Online Voter Registration</a></Card>}
+
+      {activeSection === "alumni" && alumni && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Cultivator Alumni</div><h2 className="mt-2 text-3xl font-black">Cultivation never ends</h2><p className="mt-3 text-sm font-bold leading-7 text-white/82">Your Portfolio, Resume, Legacy, and Opportunities remain available. Alumni may return as contributors, mentors, leaders, and stewards for future generations.</p><div className="mt-5 flex flex-wrap gap-2">{["Explorer", "Contributor", "Mentor", "Leader", "Steward"].map((stage) => <span key={stage} className="rounded-full border border-emerald-200/25 bg-emerald-300/10 px-4 py-2 font-black">{stage}</span>)}</div></Card>}
+
+      <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-white/60">Permanent Architecture</div><div className="mt-4 flex flex-wrap items-center gap-2 text-sm font-black">{["Self", "Work", "Environment", "Community", "Opportunity", "Legacy", "Civic Responsibility", "Alumni", "Stewardship", "Generations"].map((item, index, all) => <React.Fragment key={item}><span className="rounded-full bg-white/10 px-4 py-2">{item}</span>{index < all.length - 1 && <span className="text-emerald-200">→</span>}</React.Fragment>)}</div><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button><button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Knowledge Library</button></div></Card>
     </div>
   );
 }
