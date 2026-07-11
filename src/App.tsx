@@ -95,8 +95,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 23.2 FINAL: Removes the youth-facing Living Farm Encyclopedia, Explore & Discover, academy/category cards, and all youth navigation into the separate knowledge-library screen.
  * - Ecosystem 23.2 FINAL: Workbook is the single curriculum home. Weeks 1–8 and all four natural trellis videos are visible immediately when Workbook opens.
  * - Ecosystem 23.2 FINAL: Current program display is locked to Week 6 beginning Saturday, July 11, 2026.
- * - Ecosystem 23.4 FINAL: Adds the third natural trellis video supplied by Constance (YouTube ID PcRdrHiQjGI) to the Week 6 Workbook video panel and workday resources.
- * - Ecosystem 23.4 FINAL: Adds the fourth trellis video (YouTube ID R_MxMrIFhMc), keeps all videos together in Workbook Week 6, returns youth to the forest for fallen-branch collection, adds germination inspection and replacement seeding, and avoids routine watering unless soil conditions require it.
+ * - Ecosystem 23.5 FINAL: Adds the third natural trellis video supplied by Constance (YouTube ID PcRdrHiQjGI) to the Week 6 Workbook video panel and workday resources.
+ * - Ecosystem 23.5 FINAL: Adds the fourth trellis video (YouTube ID R_MxMrIFhMc), keeps all videos together in Workbook Week 6, returns youth to the forest for fallen-branch collection, adds germination inspection and replacement seeding, and avoids routine watering unless soil conditions require it.
  * - Ecosystem 23.0 FINAL: Week 6 is Regeneration Through Stewardship and is synchronized to the live week/day calendar.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and all four natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Week 6 active work is trellis construction, beehive and pollinator restoration, milkweed habitat restoration, inventory stewardship, collard and corn monitoring, wildlife observation, forest stewardship, discovery investigation, and water/land stewardship.
@@ -1319,7 +1319,7 @@ const youthWeekFiveDailyPlan = [
       "Photograph forest discoveries, collected materials, milkweed, and beehive assembly progress",
       "Return to the South Hangar Staging Area if unsure, separated, or redirected"
     ],
-    resources: ["Natural Trellis Design Video #1", "Natural Trellis Design Video #2", "Natural Trellis Design Video #3", "Natural Trellis Design Video #4", "Apiary Assembly Guide", "Beehive Assembly Video", "Beehive Diagram", "Honey Bee Basics", "Pollinator Habitat", "Milkweed & Monarchs", "South Hangar Staging Reminder", "Site Safety Guide"],
+    resources: ["Natural Trellis Design Video #2", "Natural Trellis Design Video #3", "Natural Trellis Design Video #4", "Apiary Assembly Guide", "Beehive Assembly Video", "Beehive Diagram", "Honey Bee Basics", "Pollinator Habitat", "Milkweed & Monarchs", "South Hangar Staging Reminder", "Site Safety Guide"],
     reflection: "How did forests, pollinators, natural materials, and beehive assembly connect to the farm's future?",
   },
 ];
@@ -1329,7 +1329,7 @@ const youthWeekSixDailyPlan = [
     day: "Monday",
     date: "July 13, 2026",
     curriculum: "Forest Material Collection, Germination Check & Replanting",
-    focus: "Youth watch the four trellis videos, return to the forest to collect or choose additional fallen branches, inspect every planted area for germination, and plant a replacement seed wherever an expected crop has not sprouted. Routine watering is not planned unless a supervisor confirms that the soil is dry.",
+    focus: "Youth watch the three trellis videos, return to the forest to collect or choose additional fallen branches, inspect every planted area for germination, and plant a replacement seed wherever an expected crop has not sprouted. Routine watering is not planned unless a supervisor confirms that the soil is dry.",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
       "Watch all four natural trellis videos inside Workbook before material selection",
@@ -1344,7 +1344,7 @@ const youthWeekSixDailyPlan = [
       "Do not perform routine watering; water only if a supervisor checks the soil and determines that it is needed",
       "Photograph forest materials, sprouting crops, planting gaps, replacement seeds, and notable ecosystem discoveries"
     ],
-    resources: ["Natural Trellis Design Video #1", "Natural Trellis Design Video #2", "Natural Trellis Design Video #3", "Natural Trellis Design Video #4", "Natural Material Selection Guide", "Germination Check", "Replacement Seeding Guide", "Crop Observation Record", "Site Safety Guide"],
+    resources: ["Natural Trellis Design Video #2", "Natural Trellis Design Video #3", "Natural Trellis Design Video #4", "Natural Material Selection Guide", "Germination Check", "Replacement Seeding Guide", "Crop Observation Record", "Site Safety Guide"],
     reflection: "",
   },
   {
@@ -2886,14 +2886,6 @@ const launchVideos: LaunchVideo[] = [
     file: "/videos/cooling-station-completion.mp4",
     fallback: "Final Cooling Station Completion Module: This section documents project completion, final setup, team presentation, safety learning, and journey evidence.",
     tags: ["Completion", "Contractor", "Farm Infrastructure"],
-  },
-  {
-    title: "Natural Trellis Design Video #1 — Willow Branch Trellis",
-    purpose: "Shows youth how branches can be selected, arranged, secured, and shaped into a natural plant support before materials are collected from the forest.",
-    embedUrl: "https://www.youtube.com/embed/I0H3cvcQ8OY",
-    embedTitle: "DIY Willow Branch Trellis — Garden Answer",
-    fallback: "Natural trellis video #1: branch selection, spacing, stability, fastening, and safe natural-material construction.",
-    tags: ["Natural Trellis", "Trellis Video #1", "Branches", "Forest Materials"],
   },
   {
     title: "Natural Trellis Design Video #2 — Trellis Hacks With Sticks",
@@ -4787,7 +4779,6 @@ function YouthTodayWorkCard() {
     "Photograph apiary assembly progress",
   ];
   const pinnedResources = [
-    { label: "🎥 Natural Trellis Design Video #1", url: "https://www.youtube.com/watch?v=I0H3cvcQ8OY" },
     { label: "🎥 Natural Trellis Design Video #2", url: "https://www.youtube.com/watch?v=nHOAPjlzceU" },
     { label: "🎥 Natural Trellis Design Video #3", url: "https://www.youtube.com/watch?v=PcRdrHiQjGI" },
     { label: "🐝 Apiary Assembly Guide" },
@@ -7626,7 +7617,6 @@ const bronsonActivityRegistry: ActivityRegistryEntry[] = [
     careers: ["Forester", "Park Ranger", "Environmental Scientist", "Landscaper", "Contractor", "Farmer", "Beekeeper"],
     entrepreneurship: ["Using available resources responsibly", "Reducing material costs", "Building farm infrastructure", "Visitor education", "Pollinator-based value creation"],
     resources: [
-      { title: "Natural Trellis Design Video #1", type: "Link", note: "Use to compare branch shapes, structure, and trellis-building options before collecting materials." },
       { title: "Natural Trellis Design Video #2", type: "Link", note: "Preferred design reference for branch trellises and climbing vegetable supports." },
       { title: "Natural Trellis Design Video #3", type: "Link", note: "Additional construction reference for comparing materials, stability, and crop-support approaches." },
       { title: "Milkweed & Monarchs", type: "Internal", note: "Connect milkweed, seed pods, caterpillars, butterflies, pollinator habitat, and stewardship." },
@@ -9648,7 +9638,6 @@ function workbookLessonResources16_8B(dayPlan: typeof youthWeekOneDailyPlan[numb
   }
 
   if (lessonText.includes("trellis")) {
-    addVideoByTitle("Trellis Video #1", "Natural Trellis Design Video #1");
     addVideoByTitle("Trellis Video #2", "Natural Trellis Design Video #2");
     addVideoByTitle("Trellis Video #3", "Natural Trellis Design Video #3");
     resources.push({
@@ -9892,7 +9881,7 @@ function WorkbookTrellisVideos23_1() {
     <div className="rounded-[1.5rem] border border-sky-200/25 bg-sky-300/10 p-5">
       <div className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/85">Workbook • Week 6 Curriculum Videos</div>
       <h3 className="mt-2 text-2xl font-black">Natural Trellis Learning Series</h3>
-      <p className="mt-2 text-sm font-bold leading-6 text-white/78">All four trellis videos are kept inside the Workbook. Youth can watch them here before selecting branches, comparing designs, or beginning construction.</p>
+      <p className="mt-2 text-sm font-bold leading-6 text-white/78">All three trellis videos are kept inside the Workbook. Youth can watch them here before selecting branches, comparing designs, or beginning construction.</p>
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         {trellisVideos.map((video) => (
           <div key={video.title} className="overflow-hidden rounded-2xl border border-white/12 bg-black/30">
