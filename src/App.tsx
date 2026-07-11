@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 23.0 - WEEK 6 REGENERATION THROUGH STEWARDSHIP FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 23.2 - WEEK 6 CLEAN WORKBOOK + VISIBLE TRELLIS VIDEOS FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -92,6 +92,9 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 22.0: Every activity closes with “What Should Future Cultivators Know?” and saves the answer as knowledge transfer, not a school-style quiz.
  * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
+ * - Ecosystem 23.2 FINAL: Removes the youth-facing Living Farm Encyclopedia, Explore & Discover, academy/category cards, and all youth navigation into the separate knowledge-library screen.
+ * - Ecosystem 23.2 FINAL: Workbook is the single curriculum home. Weeks 1–8 and both natural trellis videos are visible immediately when Workbook opens.
+ * - Ecosystem 23.2 FINAL: Current program display is locked to Week 6 beginning Saturday, July 11, 2026.
  * - Ecosystem 23.0 FINAL: Week 6 is Regeneration Through Stewardship and is synchronized to the live week/day calendar.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and both natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.0 FINAL: Week 6 active work is trellis construction, beehive and pollinator restoration, milkweed habitat restoration, inventory stewardship, collard and corn monitoring, wildlife observation, forest stewardship, discovery investigation, and water/land stewardship.
@@ -2542,7 +2545,6 @@ function PersistentSafetyStrip({ setScreen }: { setScreen: (screen: Screen) => v
 function QuickActionBar({ setScreen, setTab }: { setScreen: (screen: Screen) => void; setTab?: (tab: any) => void }) {
   const actions = [
     ["📅 Calendar", () => setScreen("events")],
-    ["🌿 Explore & Discover", () => setScreen("resources")],
     ["🚑 Nurse Line", () => setScreen("support")],
     ["🌱 Share My Learning", () => setScreen("media")],
     ["🚨 Incident", () => setTab ? setTab("incident") : setScreen("supervisor")],
@@ -5472,7 +5474,7 @@ function App() {
       {screen === "reports" && <Reports setScreen={setScreen} language={language} />}
       {screen === "operations" && <Operations setScreen={setScreen} activeUser={activeUser} />}
       {screen === "almanac" && <FullAlmanacScreen setScreen={setScreen} activeUser={activeUser} />}
-      {screen === "resources" && <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />}
+      {screen === "resources" && (activeUser?.role === "Youth Workforce Participant" ? <YouthWorkbookRedirect23_2 setScreen={setScreen} activeUser={activeUser} /> : <FullResourcesScreen setScreen={setScreen} activeUser={activeUser} />)}
       {screen === "health" && <CultivatorHealthNutritionScreen setScreen={setScreen} activeUser={activeUser} />}
       {screen === "events" && <LaunchEvents setScreen={setScreen} />}
       {screen === "media" && <MyStoryScreen setScreen={setScreen} />}
@@ -5663,7 +5665,6 @@ function Shell({
                 <>
                   <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "work" ? "page" : undefined} onClick={() => openYouthTodayWork16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "work" ? "rounded-full border border-emerald-200 bg-emerald-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Today’s Work</button>
                   <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "page" : undefined} onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "rounded-full border border-sky-200 bg-sky-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Workbook</button>
-                  <button type="button" onClick={() => setScreen("resources")} className={screen === "resources" ? "rounded-full border border-amber-200 bg-amber-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-amber-200/35 bg-amber-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-amber-300/30"}>Living Farm Encyclopedia</button>
                   <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className={screen === "journey" ? "rounded-full border border-purple-200 bg-purple-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30"}>My Journey</button>
                   <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
                 </>
@@ -5711,7 +5712,6 @@ function Shell({
             <summary className="cursor-pointer font-black text-emerald-50">🧰 Quick Tools</summary>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => setScreen("registration")} className={buttonClass("registration")}>Register</button>
-              <button type="button" onClick={() => setScreen("resources")} className={buttonClass("resources")}>🌿 Explore & Discover</button>
               <button type="button" onClick={() => setScreen("almanac")} className={buttonClass("almanac")}>🔥 Weather Operations</button>
               <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>📅 Calendar</button>
               <button type="button" onClick={() => setScreen("media")} className={buttonClass("media")}>Share My Learning</button>
@@ -7871,6 +7871,21 @@ function ResourceSearchPanel() {
 
 type KnowledgeLibraryCategory19_3 = "Environment" | "Food & Growing Systems" | "Pollinator Systems" | "Building & Infrastructure" | "Business & Entrepreneurship" | "Career & Pathways";
 
+function YouthWorkbookRedirect23_2({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
+  useEffect(() => {
+    setYouthDailyPhase16_2(activeUser, "workbook");
+    setScreen("youth");
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  }, [activeUser, setScreen]);
+
+  return (
+    <Card className="p-6">
+      <div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/80">Opening Workbook</div>
+      <h1 className="mt-2 text-3xl font-black">Your curriculum and videos are in the Workbook.</h1>
+    </Card>
+  );
+}
+
 function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null }) {
   const returnScreen = activeUser?.role ? routeForRole(activeUser.role) : "guest";
   const [category, setCategory] = useState<KnowledgeLibraryCategory19_3 | null>(null);
@@ -8031,7 +8046,6 @@ function QuickReturnBar({ setScreen, activeUser }: { setScreen: (screen: Screen)
     <div className="mb-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setScreen(home)} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">{label}</button>
       <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white/85">🏠 Home</button>
-      <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-emerald-200/20 bg-emerald-300/10 px-4 py-2 text-xs font-black text-emerald-50">🌿 Explore & Discover</button>
     </div>
   );
 }
@@ -10487,7 +10501,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
         <Card className="p-4 md:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • 16.8 Workbook / Journey / CSU Access Lock</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/75">Week {currentWeek.week} • {todayPlan.day} • Workbook • Week 6 Curriculum</div>
               <h1 className="mt-2 text-3xl font-black md:text-5xl">{phase === "work" ? "Today’s Work" : "Workbook"}</h1>
               <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-white/78">{phase === "work" ? "See the assignment only. Curriculum questions, photos, counts, and discoveries are documented in Workbook." : "Workbook is the editable curriculum record: activity responses, photos, counts, discoveries, questions, CSU-based curriculum access, and resource links."}</p>
             </div>
@@ -10516,8 +10530,8 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-100/80">Workbook Dashboard • Documentation, Not Assignments</div>
-                <h2 className="mt-2 text-3xl font-black md:text-4xl">{workbookView19_3 === "dashboard" ? "Choose where you want to go." : "Workbook"}</h2>
-                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook is divided into short destinations. Knowledge resources and youth discoveries are organized in the Living Farm Encyclopedia.</p>
+                <h2 className="mt-2 text-3xl font-black md:text-4xl">{workbookView19_3 === "dashboard" ? "Curriculum Weeks 1–8 and Videos" : "Workbook"}</h2>
+                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook contains the curriculum, Weeks 1–8, required videos, activity documentation, photos, discoveries, and unfinished work.</p>
               </div>
               {workbookView19_3 !== "dashboard" && <button type="button" onClick={() => openWorkbookView19_3("dashboard")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">← Workbook Dashboard</button>}
             </div>
@@ -10527,7 +10541,6 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
             <div className="grid gap-4">
               <WorkbookTrellisVideos23_1 />
               <WorkbookWeekAccess16_8 onOpen={(week) => { openWorkbookView19_3("weeks"); openWorkbookPanel16_8({ kind: "week", label: week }); }} />
-              <DiscoveryAcademies22_0 />
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {[
                 ["record", "📖", "Today’s Record", "Document what happened, what you observed, and what you learned."],
@@ -10801,7 +10814,7 @@ function CultivatorHealthNutritionScreen({ setScreen, activeUser }: { setScreen:
         <div className="mt-5 flex flex-wrap gap-2">
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-black">Back to Dashboard</button>
           <button type="button" onClick={() => setScreen("journey")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">My Nutrition Passport</button>
-          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black">Explore & Discover</button>
+          <button type="button" onClick={() => { setYouthDailyPhase16_2(activeUser, "workbook"); setScreen("youth"); }} className="rounded-full border border-sky-200/25 bg-sky-300/10 px-5 py-3 text-sm font-black">Open Workbook Videos</button>
         </div>
       </Card>
 
@@ -13344,7 +13357,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
             <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx" className="sr-only" disabled={uploading} onChange={handleStoryUpload} />
           </label>
           <button type="button" onClick={() => setScreen("youth")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Back to Today’s Work</button>
-          <button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-black text-white hover:bg-white/20">Today’s Explore & Discover</button>
+          <button type="button" onClick={() => { setYouthDailyPhase16_2(activeUser, "workbook"); setScreen("youth"); }} className="rounded-full border border-sky-200/25 bg-sky-300/10 px-5 py-3 text-sm font-black text-white hover:bg-sky-300/20">Open Workbook Videos</button>
         </div>
       </Card>
 
@@ -14980,7 +14993,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
 
       {activeSection === "resume" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">My Resume</div><h2 className="mt-2 text-3xl font-black">Workforce experience translated into professional language</h2><div className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/30 p-5"><div className="text-xl font-black">Cultivators Youth Workforce Participant</div><p className="mt-2 text-sm leading-7 text-white/80">Participated in regenerative agriculture, environmental observation, teamwork, farm infrastructure, pollinator stewardship, problem solving, and community-connected work.</p></div><div className="mt-4 flex flex-wrap gap-2">{(skills.length ? skills : currentWeek.skills).slice(0, 12).map((skill) => <span key={skill} className="rounded-full border border-sky-200/25 bg-sky-300/10 px-3 py-2 text-xs font-black">{skill}</span>)}</div></Card>}
 
-      {activeSection === "opportunities" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-orange-100/75">Opportunities</div><h2 className="mt-2 text-3xl font-black">Where these skills can lead</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{opportunities.map((item) => <div key={item} className="rounded-2xl border border-orange-200/20 bg-orange-300/10 p-4 font-black">🚀 {item}</div>)}</div><button type="button" onClick={() => setScreen("resources")} className="mt-5 rounded-full bg-orange-300 px-6 py-3 font-black text-black">Explore Education, Careers, and Entrepreneurship</button></Card>}
+      {activeSection === "opportunities" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-orange-100/75">Opportunities</div><h2 className="mt-2 text-3xl font-black">Where these skills can lead</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{opportunities.map((item) => <div key={item} className="rounded-2xl border border-orange-200/20 bg-orange-300/10 p-4 font-black">🚀 {item}</div>)}</div><button type="button" onClick={() => setActiveSection("pathways")} className="mt-5 rounded-full bg-orange-300 px-6 py-3 font-black text-black">Open Career Pathways</button></Card>}
 
       {activeSection === "legacy" && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-lime-100/75">Legacy</div><h2 className="mt-2 text-3xl font-black">What remains because I was here?</h2><div className="mt-5 grid gap-4"><label className="font-black">What remains because you were here?<textarea value={legacy.remains} onChange={(e) => setLegacy({ ...legacy, remains: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label><label className="font-black">What did you improve?<textarea value={legacy.improved} onChange={(e) => setLegacy({ ...legacy, improved: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label><label className="font-black">What would you tell future Cultivators?<textarea value={legacy.advice} onChange={(e) => setLegacy({ ...legacy, advice: e.target.value })} className="mt-2 min-h-28 w-full rounded-2xl border border-white/15 bg-black/35 p-4 text-white" /></label></div><button type="button" onClick={saveLegacy} className="mt-5 rounded-full bg-lime-300 px-6 py-3 font-black text-black">Save My Legacy</button>{savedMessage && <Notice text={savedMessage} />}</Card>}
 
@@ -14990,7 +15003,7 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
 
       {activeSection === "alumni" && alumni && <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Cultivator Alumni</div><h2 className="mt-2 text-3xl font-black">Cultivation never ends</h2><p className="mt-3 text-sm font-bold leading-7 text-white/82">Your Portfolio, Resume, Legacy, and Opportunities remain available. Alumni may return as contributors, mentors, leaders, and stewards for future generations.</p><div className="mt-5 flex flex-wrap gap-2">{["Explorer", "Contributor", "Mentor", "Leader", "Steward"].map((stage) => <span key={stage} className="rounded-full border border-emerald-200/25 bg-emerald-300/10 px-4 py-2 font-black">{stage}</span>)}</div></Card>}
 
-      <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Continue</div><h2 className="mt-2 text-2xl font-black">Choose where to go next</h2><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button><button type="button" onClick={() => setScreen("resources")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Open Knowledge Library</button></div></Card>
+      <Card><div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">Continue</div><h2 className="mt-2 text-2xl font-black">Choose where to go next</h2><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => setScreen("youth")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Open Today's Work</button><button type="button" onClick={() => { setYouthDailyPhase16_2(activeUser, "workbook"); setScreen("youth"); }} className="rounded-full border border-sky-200/25 bg-sky-300/10 px-6 py-3 font-black">Open Workbook</button></div></Card>
     </div>
   );
 }
