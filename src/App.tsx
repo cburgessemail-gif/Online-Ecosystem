@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 16.0 FIXED - FULL ECOSYSTEM REPLACEMENT (14.7 BASELINE PRESERVED)
+ * CULTIVATOR ECOSYSTEM 22.0 - EXPLORER TO LEGACY BUILDER MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -86,6 +86,11 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 19.2: Fixes youth header routing so Today’s Work and Workbook open distinct phases, the correct tab is visibly active, and same-screen phase changes reliably scroll to the selected destination.
  * - Ecosystem 19.3: Replaces the long Workbook page with a five-destination Workbook Dashboard and separates the categorized Knowledge Library into its own top-level youth destination.
  * - Ecosystem 20.0: Journey, Alumni, Legacy & Civic Responsibility Integration. My Journey now unifies My Firsts, Growth, Skills, Accomplishments, Portfolio, Resume, Opportunities, Legacy, age-gated Civic Responsibility, Alumni continuity, the Legacy Registry, Legacy Tree, and Community Impact.
+ * - Ecosystem 21.0: Discovery Curriculum Lock. Technical source documents are translated into questions, field discoveries, activities, reflection, career discovery, community connection, opportunity connection, and legacy connection.
+ * - Ecosystem 22.0: Explorer → Investigator → Builder → Steward → Leader → Legacy Builder progression becomes the youth growth pathway.
+ * - Ecosystem 22.0: Workbook becomes a Discovery Journal and Living Farm Encyclopedia contribution system organized into Grow Food, Steward Nature, Pollinator, Soil Detective, Harvest & Food, and Farm Business academies.
+ * - Ecosystem 22.0: Every activity closes with “What Should Future Cultivators Know?” and saves the answer as knowledge transfer, not a school-style quiz.
+ * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
  * - Ecosystem 19.0: Adds Mentor Layer, Pathways Exploration Engine, Community Impact Engine, auto-generated Cultivator Mirror, Aslam's A Cultivator page, and the final no-input question: What Are You Cultivating?
  */
 
@@ -5596,7 +5601,7 @@ function Shell({
                 <>
                   <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "work" ? "page" : undefined} onClick={() => openYouthTodayWork16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "work" ? "rounded-full border border-emerald-200 bg-emerald-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Today’s Work</button>
                   <button type="button" aria-current={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "page" : undefined} onClick={() => openYouthWorkbook16_2(activeUser, setScreen)} className={screen === "youth" && youthHeaderPhase16_2 === "workbook" ? "rounded-full border border-sky-200 bg-sky-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black text-white transition hover:bg-white/20"}>Workbook</button>
-                  <button type="button" onClick={() => setScreen("resources")} className={screen === "resources" ? "rounded-full border border-amber-200 bg-amber-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-amber-200/35 bg-amber-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-amber-300/30"}>Knowledge Library</button>
+                  <button type="button" onClick={() => setScreen("resources")} className={screen === "resources" ? "rounded-full border border-amber-200 bg-amber-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-amber-200/35 bg-amber-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-amber-300/30"}>Living Farm Encyclopedia</button>
                   <button type="button" onClick={() => openYouthJourney16_2(activeUser, setScreen)} className={screen === "journey" ? "rounded-full border border-purple-200 bg-purple-300 px-4 py-2 text-xs font-black text-black" : "rounded-full border border-purple-200/35 bg-purple-300/20 px-4 py-2 text-xs font-black text-white transition hover:bg-purple-300/30"}>My Journey</button>
                   <button type="button" onClick={() => setScreen("events")} className={buttonClass("events")}>Calendar</button>
                 </>
@@ -7818,7 +7823,7 @@ function FullResourcesScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">📚 Knowledge Library</div>
+        <div className="text-xs uppercase tracking-[0.35em] text-amber-100/80">📚 Living Farm Encyclopedia</div>
         <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">Choose what you want to learn.</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/82">The library is organized by knowledge category so youth do not have to scroll through one long list of files and videos.</p>
         <div className="mt-5 flex flex-wrap gap-3">
@@ -9128,7 +9133,7 @@ function YouthMicroMissionEngine13({ activeUser, setScreen }: { activeUser: Ecos
       </Card>
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl" open>
-        <summary className="cursor-pointer text-base font-black text-emerald-50">Search Knowledge Library</summary>
+        <summary className="cursor-pointer text-base font-black text-emerald-50">Search Living Farm Encyclopedia</summary>
         <input
           value={knowledgeSearch}
           onChange={(event) => setKnowledgeSearch(event.target.value)}
@@ -9813,6 +9818,63 @@ function WorkbookRecoveryCenter16_8({ onOpen }: { onOpen?: (status: string) => v
   );
 }
 
+
+const CULTIVATOR_ACADEMIES_22_0 = [
+  { icon: "🌱", title: "Grow Food Academy", question: "Why do plants grow?", topics: ["Soil", "Nutrients", "Seeds", "Water", "Harvest"] },
+  { icon: "🌳", title: "Steward Nature Academy", question: "How do ecosystems work?", topics: ["Forests", "Wildlife", "Water", "Habitat", "Biodiversity"] },
+  { icon: "🐝", title: "Pollinator Academy", question: "Why do pollinators matter?", topics: ["Bees", "Butterflies", "Milkweed", "Native plants"] },
+  { icon: "🧪", title: "Soil Detective Academy", question: "Why are soils different?", topics: ["Soil health", "Nutrients", "Organic matter", "Drainage"] },
+  { icon: "🥕", title: "Harvest & Food Academy", question: "When is food ready and safe?", topics: ["Harvest", "Storage", "Food safety", "Packaging"] },
+  { icon: "💼", title: "Farm Business Academy", question: "How does a farm create value?", topics: ["Markets", "Pricing", "Entrepreneurship", "Recordkeeping"] },
+];
+
+const CULTIVATOR_PROGRESSION_22_0 = [
+  ["Explorer", "What is here?"],
+  ["Investigator", "Why is this happening?"],
+  ["Builder", "How can we improve this?"],
+  ["Steward", "How do we care for this?"],
+  ["Leader", "How do I help others learn?"],
+  ["Legacy Builder", "What remains because I was here?"],
+] as const;
+
+function DiscoveryAcademies22_0() {
+  return (
+    <div className="grid gap-4">
+      <Card className="p-4 md:p-6">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/80">Discovery Journal • Living Farm Encyclopedia</div>
+        <h2 className="mt-2 text-3xl font-black md:text-4xl">Explore the farm through questions, not documents.</h2>
+        <p className="mt-3 max-w-4xl text-sm font-bold leading-7 text-white/76">Each academy turns technical farm knowledge into something youth can wonder about, observe, try, connect, and pass forward.</p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {CULTIVATOR_ACADEMIES_22_0.map((academy) => (
+            <details key={academy.title} className="rounded-[1.35rem] border border-white/12 bg-black/35 p-4">
+              <summary className="cursor-pointer list-none">
+                <div className="text-4xl">{academy.icon}</div>
+                <div className="mt-2 text-xl font-black">{academy.title}</div>
+                <div className="mt-2 text-sm font-bold leading-6 text-emerald-50">{academy.question}</div>
+              </summary>
+              <div className="mt-4 flex flex-wrap gap-2">{academy.topics.map((topic) => <span key={topic} className="rounded-full border border-white/12 bg-white/10 px-3 py-2 text-xs font-black">{topic}</span>)}</div>
+            </details>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/80">Cultivator Growth Pathway</div>
+        <h3 className="mt-2 text-3xl font-black">Explorer → Legacy Builder</h3>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+          {CULTIVATOR_PROGRESSION_22_0.map(([stage, question], index) => (
+            <div key={stage} className="rounded-2xl border border-purple-200/20 bg-purple-300/10 p-4">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-purple-100/70">Stage {index + 1}</div>
+              <div className="mt-2 text-lg font-black">{stage}</div>
+              <div className="mt-2 text-xs font-bold leading-5 text-white/72">{question}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: EcosystemUser | null; setScreen: (screen: Screen) => void }) {
   const [entries, setEntries] = useState<CultivatorDiscovery[]>(() => todayDiscoveries(activeUser));
   const [message, setMessage] = useState("");
@@ -10235,7 +10297,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
     }, {});
   });
   const [legacyAnswer, setLegacyAnswer] = useState(() => {
-    const legacyQuestion = "How did your work today help future generations?";
+    const legacyQuestion = "What Should Future Cultivators Know?";
     return safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []).find((row) => row.date === todayISO() && row.participant_id === launchParticipantId(activeUser) && row.question === legacyQuestion)?.response || "";
   });
   const [message, setMessage] = useState("");
@@ -10303,7 +10365,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       setMessage("Add one legacy answer before continuing.");
       return;
     }
-    const question = "How did your work today help future generations?";
+    const question = "What Should Future Cultivators Know?";
     const now = new Date().toISOString();
     const participantId = launchParticipantId(activeUser);
     const currentRows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
@@ -10365,14 +10427,16 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
               <div>
                 <div className="text-[10px] font-black uppercase tracking-[0.25em] text-sky-100/80">Workbook Dashboard • Documentation, Not Assignments</div>
                 <h2 className="mt-2 text-3xl font-black md:text-4xl">{workbookView19_3 === "dashboard" ? "Choose where you want to go." : "Workbook"}</h2>
-                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook is divided into short destinations. Knowledge resources are now in the separate Knowledge Library.</p>
+                <p className="mt-3 text-sm font-bold leading-6 text-white/76">The Workbook is divided into short destinations. Knowledge resources and youth discoveries are organized in the Living Farm Encyclopedia.</p>
               </div>
               {workbookView19_3 !== "dashboard" && <button type="button" onClick={() => openWorkbookView19_3("dashboard")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white">← Workbook Dashboard</button>}
             </div>
           </Card>
 
           {workbookView19_3 === "dashboard" && (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4">
+              <DiscoveryAcademies22_0 />
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {[
                 ["record", "📖", "Today’s Record", "Document what happened, what you observed, and what you learned."],
                 ["discoveries", "🔍", "My Discoveries", "Review observations, wildlife findings, questions, and learning moments."],
@@ -10387,6 +10451,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
                   <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-sky-100/80">Open →</div>
                 </button>
               ))}
+              </div>
             </div>
           )}
 
@@ -10449,9 +10514,9 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
       {phase === "legacy" && (
         <Card className="p-4 md:p-6">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-100/80">Final Question</div>
-          <h2 className="mt-2 text-3xl font-black md:text-4xl">One last reflection before your Journey is updated.</h2>
-          <div className="mt-5 rounded-3xl border border-amber-200/20 bg-amber-200/10 p-4 text-xl font-black leading-8 text-white">How did your work today help future generations?</div>
-          <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="One answer. Save. Continue to My Journey." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
+          <h2 className="mt-2 text-3xl font-black md:text-4xl">Pass today’s knowledge forward before your Journey is updated.</h2>
+          <div className="mt-5 rounded-3xl border border-amber-200/20 bg-amber-200/10 p-4 text-xl font-black leading-8 text-white">What Should Future Cultivators Know?</div>
+          <textarea value={legacyAnswer} onChange={(event) => setLegacyAnswer(event.target.value)} placeholder="Share one thing future Cultivators should know. Save. Continue to My Journey." className="mt-5 min-h-[120px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" />
           <div className="mt-5 flex flex-wrap gap-2">
             <button type="button" onClick={saveLegacy} className="rounded-full bg-amber-300 px-6 py-3 font-black text-black">Continue to My Journey</button>
           </div>
