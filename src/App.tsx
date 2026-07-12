@@ -93,6 +93,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
  * - Ecosystem 24.0: Replaces the guest topic library with the approved continuous Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds → Get Involved story, while preserving the existing visual layout and all non-guest ecosystem functions.
  * - Ecosystem 24.0: Every guest page has working Previous/Next navigation. Visit, Partner, Support, and Contact appear only on the final screen.
+ * - Ecosystem 24.1: Enlarges Guest Journey story text, widens the narrative column, removes restrictive paragraph width, and makes the image panel use the full available card height for more efficient use of screen space.
+ * - Ecosystem 25.0: Adds Discover Youngstown as a permanent Workbook destination and shared public story layer: Roots, Good Seed, The Land, Opportunity, Legacy, with Invitation remaining public-facing.
+ * - Ecosystem 25.1 FINAL: Consolidates the complete 23.2 operational ecosystem with Workbook Weeks 1–8, all four trellis videos, Today’s Work → Workbook → My Journey routing, Discover Youngstown, Guest/Public story layers, Parent, Supervisor, Mission Control, Calendar/Almanac, Inventory, Search, Resources, Reports, and Supabase/localStorage persistence in one full App.tsx replacement.
+ * - Ecosystem 25.0: Uses one layered content system for youth and visitors: photo/visual, short story, activity or career connection, and deep dive.
+ * - Ecosystem 25.0: Locks Workbook = Learning, My Journey = Growth, and public Guest Pathway = tourism-facing version of the same Youngstown learning ecosystem.
+ * - Ecosystem 24.1: Removes “The sun does not shine for itself.” from Community Impact and updates the reflection accordingly.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and all four natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.2 FINAL: Removes the youth-facing Living Farm Encyclopedia, Explore & Discover, academy/category cards, and all youth navigation into the separate knowledge-library screen.
  * - Ecosystem 23.2 FINAL: Workbook is the single curriculum home. Weeks 1–8 and all four natural trellis videos are visible immediately when Workbook opens.
@@ -2011,7 +2017,7 @@ function FarmConditionsCard({ compact = false }: { compact?: boolean }) {
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌤 LIVE Farm Weather</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">🌤 LIVE Farm Weather</div>
       <div className="mt-4"><WeatherAlertBanner alert={heatAlert} /></div>
       <div className="mt-4"><WeeklyHeatOutlook /></div>
       <div className={`mt-4 rounded-[1.75rem] border p-5 ${statusClass}`}>
@@ -4533,7 +4539,7 @@ const youthSupportLevels = [
 function SupportResponseFrameworkCard() {
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Support Response Framework</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Youth Support Response Framework</div>
       <h2 className="mt-3 text-3xl font-black">Youth + Parent + Supervisor + Case Manager</h2>
       <p className="mt-3 text-sm leading-7 text-white/78">Supervisors coach daily work. Case managers support barriers, wellness, family needs, referrals, and escalation. Leadership protects safety and operations.</p>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -6065,7 +6071,7 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
 
   return (
     <Card className={compact ? "p-4" : ""}>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Safety • Almanac • Notifications</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Safety • Almanac • Notifications</div>
       <h2 className="mt-3 text-3xl font-black">Bronson Daily Operating Status</h2>
       <div className={`mt-4 rounded-[1.35rem] border p-4 ${statusClass}`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -6114,7 +6120,7 @@ function DailyOperationsCommandCenter({ setScreen, compact = false }: { setScree
 function EcosystemImageContextCard() {
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Where Today’s Work Fits</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Where Today’s Work Fits</div>
       <h2 className="mt-3 text-3xl font-black">Connected Food Ecosystem</h2>
       <p className="mt-3 text-sm leading-7 text-white/82">Youth are not only completing tasks. Youth are contributing to a system where food, safety, customers, growers, partners, marketplace, families, and opportunity connect.</p>
       <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_.9fr]">
@@ -6147,7 +6153,7 @@ function ThreePartDailyRhythmCard({ setScreen }: { setScreen: (screen: Screen) =
   ];
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Rhythm in Threes</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Daily Rhythm in Threes</div>
       <h2 className="mt-3 text-3xl font-black">Beginning • During • End</h2>
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {stages.map((stage) => (
@@ -6180,7 +6186,7 @@ function EntrepreneurshipValueCard() {
   ];
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Entrepreneurship Layer</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Entrepreneurship Layer</div>
       <h2 className="mt-3 text-3xl font-black">Problem → Customer → Solution → Value</h2>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {items.map(([label, body]) => (
@@ -6198,7 +6204,7 @@ function EntrepreneurshipValueCard() {
 function CultivatorMomentSkinnyPlantCard() {
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Cultivator Moment</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">🌱 Cultivator Moment</div>
       <h2 className="mt-3 text-2xl font-black">“All of that food comes from this skinny plant?”</h2>
       <details className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
         <summary className="cursor-pointer font-black text-emerald-50">Explore the Connections</summary>
@@ -6353,7 +6359,7 @@ function YouthEvidenceUploadCard({ activeUser }: { activeUser: EcosystemUser | n
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Tell Your Cultivator Story</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">🌱 Tell Your Cultivator Story</div>
       <h2 className="mt-3 text-3xl font-black">Show What You Did Today</h2>
       <p className="mt-3 text-sm leading-7 text-white/82">Every day you are learning something new, building new skills, helping your team, solving problems, and becoming more capable than you were yesterday.</p>
       <p className="mt-2 text-sm leading-7 text-white/76">Take photos or videos of something you learned, built, discovered, helped with, or accomplished today.</p>
@@ -6514,7 +6520,7 @@ function LaunchAuditDetailGrid({
 }) {
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Launch Audit Fix</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Launch Audit Fix</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
@@ -6842,7 +6848,7 @@ function JourneyCompletionCard({
 
   return (
     <Card className="mt-5">
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Your Journey Continues</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Your Journey Continues</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <p className="mt-3 max-w-4xl text-sm leading-7 text-white/82">You entered a pathway, made a contribution, and identified what can happen next. The ecosystem continues because people like you participate in the larger picture.</p>
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
@@ -7025,7 +7031,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       paragraphs: [
         "Nature teaches an important lesson.",
         "A tree produces fruit, but it does not consume it. The fruit nourishes others. The seeds travel outward. New growth begins in places the tree may never see.",
-        "A river does not drink its own water. The sun does not shine for itself. The greatest gifts are often shared.",
+        "A river does not drink its own water. The greatest gifts are often shared.",
         "At Bronson Family Farm, we believe the most meaningful harvests extend beyond ourselves.",
         "Food nourishes families. Knowledge creates opportunity. Skills open doors. Leadership inspires others. Stewardship protects resources for future generations.",
         "The true measure of a harvest is not only what it produces. It is what it makes possible.",
@@ -7055,8 +7061,79 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       imageAlt: "Future generations planting seeds",
     },
     {
+      key: "youngstown-roots",
+      eyebrow: "Discover Youngstown • Roots",
+      title: "A city shaped by land, water, movement, and work.",
+      paragraphs: [
+        "Youngstown grew along the Mahoning River and became a meeting place for settlement, transportation, natural resources, immigration, migration, industry, and neighborhood life.",
+        "Its history is more than a timeline. It is a story of people building families, businesses, institutions, neighborhoods, and possibilities under changing conditions.",
+        "Understanding the roots of Youngstown helps visitors understand why this place matters and why its next chapter must include the people who live here now.",
+      ],
+      highlights: ["Mahoning River", "Early Settlement", "Transportation", "Immigration & Migration", "Neighborhoods"],
+      reflection: ["What roots helped shape the place you call home?"],
+      image: IMG.forest,
+      imageAlt: "Youngstown roots, land, and river story",
+    },
+    {
+      key: "youngstown-good-seed",
+      eyebrow: "Discover Youngstown • Good Seed",
+      title: "GOOD SEED COMES FROM YOUNGSTOWN.",
+      subtitle: "Greatness Grows Here.",
+      paragraphs: [
+        "Youngstown has produced and shaped artists, athletes, educators, scientists, entrepreneurs, civic leaders, and community builders whose influence reaches far beyond the Mahoning Valley.",
+        "Their stories are not presented only as fame. Each story connects talent to work, career pathways, persistence, community, and legacy.",
+        "The message for young people and visitors is simple: greatness can begin here, and the next builder may already be growing among us.",
+      ],
+      highlights: ["Warner Brothers", "Ed O'Neill", "Ray Mancini", "Jim Tressel", "Simeon Booker", "François Clemmons", "Lawrence Brownlee", "Thomas Bopp"],
+      reflection: ["What can one Youngstown-connected journey teach you about your own possibilities?"],
+      image: IMG.grow,
+      imageAlt: "Youngstown people and possibility",
+    },
+    {
+      key: "youngstown-land",
+      eyebrow: "Discover Youngstown • The Land",
+      title: "Youngstown is also a land-and-water story.",
+      paragraphs: [
+        "The Mahoning River, forests, creeks, parks, wildlife, farms, vacant land, and airport landscape continue to shape life in and around Youngstown.",
+        "Bronson Family Farm helps visitors and youth see agriculture, aviation, pollinators, forests, soil, water, food, and community development as connected systems.",
+        "Stewardship asks us to notice what the land is telling us and decide what kind of future our actions are creating.",
+      ],
+      highlights: ["River & Watersheds", "Forests & Wildlife", "Soil & Food", "Pollinators", "Agriculture + Aviation"],
+      reflection: ["What does the land reveal that a building or timeline cannot?"],
+      image: IMG.forest,
+      imageAlt: "Youngstown land, forest, farm, and water",
+    },
+    {
+      key: "youngstown-opportunity",
+      eyebrow: "Discover Youngstown • Opportunity",
+      title: "Success can begin in Youngstown.",
+      paragraphs: [
+        "Youngstown's future is not limited to one industry. Education, skilled trades, agriculture, aviation, technology, healthcare, entrepreneurship, arts, tourism, and public service all create pathways.",
+        "The Cultivator Ecosystem connects real work to careers so that a farm task, forest discovery, design problem, or community project can become evidence of skill and direction.",
+        "Opportunity becomes stronger when young people can see it, practice it, document it, and connect with people who can help them move forward.",
+      ],
+      highlights: ["College", "Trades", "Agriculture", "Aviation", "Technology", "Healthcare", "Entrepreneurship"],
+      reflection: ["Which opportunity could grow from something already happening here?"],
+      image: IMG.grow,
+      imageAlt: "Youngstown opportunity and future pathways",
+    },
+    {
+      key: "youngstown-legacy",
+      eyebrow: "Discover Youngstown • Legacy",
+      title: "The next chapter is being built now.",
+      paragraphs: [
+        "Legacy is not limited to famous people or completed monuments. It begins whenever someone improves a place, protects knowledge, helps another person, or creates an opportunity that remains.",
+        "Cultivator projects, stories, photographs, skills, discoveries, and community contributions can become part of the Youngstown Legacy Walk, Hall of Possibility, Legacy Forest, and future public learning experiences.",
+        "Visitors are not only looking backward. They are being invited to recognize, support, and participate in what Youngstown is becoming.",
+      ],
+      highlights: ["Legacy Walk", "Hall of Possibility", "Legacy Forest", "Cultivator Stories", "Future Builders"],
+      reflection: ["What are you building right now that could help someone you may never meet?"],
+      image: IMG.forest,
+      imageAlt: "Youngstown legacy and future builders",
+    },
+    {
       key: "involved",
-      eyebrow: "Get Involved",
+      eyebrow: "Invitation",
       title: "Become Part of the Journey",
       paragraphs: [
         "Every journey begins with a seed. Every harvest creates new seeds.",
@@ -7100,30 +7177,30 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   };
 
   return (
-    <div id="guest-journey-top" className="grid gap-4 lg:grid-cols-[1.05fr_.75fr] scroll-mt-24">
+    <div id="guest-journey-top" className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{page.eyebrow}</div>
-        {page.openingQuote && <div className="mt-5 rounded-[1.35rem] border border-emerald-200/30 bg-emerald-300/12 p-5 text-2xl font-black leading-tight text-emerald-50 md:text-4xl">{page.openingQuote}</div>}
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">{page.title}</h1>
-        {page.subtitle && <p className="mt-3 text-2xl font-black text-emerald-200">{page.subtitle}</p>}
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">{page.eyebrow}</div>
+        {page.openingQuote && <div className="mt-5 rounded-[1.35rem] border border-emerald-200/30 bg-emerald-300/12 p-6 text-3xl font-black leading-tight text-emerald-50 md:text-5xl">{page.openingQuote}</div>}
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">{page.title}</h1>
+        {page.subtitle && <p className="mt-3 text-3xl font-black text-emerald-200 md:text-4xl">{page.subtitle}</p>}
 
-        <div className="mt-6 grid gap-4">
+        <div className="mt-6 grid gap-3">
           {page.paragraphs.map((paragraph) => (
-            <p key={paragraph} className="max-w-4xl text-base font-semibold leading-7 text-white/84">{paragraph}</p>
+            <p key={paragraph} className="max-w-none text-lg font-semibold leading-8 text-white/88 md:text-xl md:leading-9">{paragraph}</p>
           ))}
         </div>
 
         {page.highlights && (
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {page.highlights.map((item) => <div key={item} className="rounded-[1.2rem] border border-white/12 bg-white/10 p-4 font-black text-white">{item}</div>)}
+            {page.highlights.map((item) => <div key={item} className="rounded-[1.2rem] border border-white/12 bg-white/10 p-5 text-lg font-black leading-7 text-white">{item}</div>)}
           </div>
         )}
 
         {page.reflection && (
-          <div className="mt-6 rounded-[1.35rem] border border-amber-200/25 bg-amber-300/10 p-5">
-            <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Reflection</div>
+          <div className="mt-6 rounded-[1.35rem] border border-amber-200/25 bg-amber-300/10 p-6">
+            <div className="text-sm font-black uppercase tracking-[0.2em] text-amber-100">Reflection</div>
             <div className="mt-3 grid gap-2">
-              {page.reflection.map((item) => <p key={item} className="text-base font-black leading-7 text-white">{item}</p>)}
+              {page.reflection.map((item) => <p key={item} className="text-lg font-black leading-8 text-white md:text-xl">{item}</p>)}
             </div>
           </div>
         )}
@@ -7152,11 +7229,11 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         )}
       </Card>
 
-      <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[420px]">
+      <Card className="h-full overflow-hidden p-0">
+        <div className="relative h-full min-h-[480px] lg:min-h-full">
           <img src={page.image} alt={page.imageAlt} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
-          <div className="relative z-10 flex min-h-[420px] flex-col justify-end p-5">
+          <div className="relative z-10 flex h-full min-h-[480px] flex-col justify-end p-5 lg:min-h-full">
             <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
               <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Your Journey</div>
               <h2 className="mt-2 text-2xl font-black">{pageIndex + 1} of {pages.length}</h2>
@@ -7165,7 +7242,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
                   <button key={item.key} type="button" onClick={() => moveTo(index)} aria-label={`Open ${item.eyebrow}`} className={`h-3 rounded-full transition-all ${index === pageIndex ? "w-10 bg-emerald-300" : "w-3 bg-white/35 hover:bg-white/60"}`} />
                 ))}
               </div>
-              <p className="mt-4 text-sm font-bold leading-6 text-white/78">Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds</p>
+              <p className="mt-4 text-base font-bold leading-7 text-white/82">Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds</p>
             </div>
           </div>
         </div>
@@ -7305,8 +7382,8 @@ function MyWorkspace({
   if (activeUser?.role === "Youth Workforce Participant") {
     return (
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🌱 Cultivator Access</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Open Today’s Work</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">🌱 Cultivator Access</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Open Today’s Work</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">You are signed in as a Cultivator. Youth do not choose another role during the workday.</p>
         <button type="button" onClick={() => setScreen("youth")} className="mt-6 rounded-full bg-emerald-300 px-7 py-4 font-black text-black">Open Today’s Work</button>
       </Card>
@@ -7316,8 +7393,8 @@ function MyWorkspace({
   return (
     <div className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">🔑 {L("Returning")}</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">{L("Enter Today’s Work")}</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">🔑 {L("Returning")}</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">{L("Enter Today’s Work")}</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">
           {L("Choose your role first. The screen will show only the access fields you need.")}
         </p>
@@ -7366,7 +7443,7 @@ function MyWorkspace({
       </Card>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{returningChoice === "Supervisor" ? L("Supervisor Notes") : L("Welcome")}</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">{returningChoice === "Supervisor" ? L("Supervisor Notes") : L("Welcome")}</div>
         <h2 className="mt-3 text-3xl font-black">{returningChoice === "Supervisor" ? L("Supervisor Access") : L("Open the correct daily space")}</h2>
         {returningChoice === "Supervisor" ? (
           <div className="mt-5 grid gap-3">
@@ -7503,8 +7580,8 @@ function Registration({ setScreen, activeUser }: { setScreen: (screen: Screen) =
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Registration Center</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Create the profile once. Reuse it everywhere.</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Registration Center</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Create the profile once. Reuse it everywhere.</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <SelectField label="Role / Registration Type" value={role} onChange={(v) => setRole(v as Role)} options={roles} />
         {role === "Youth Workforce Participant" && <Field label="Nesco 4-digit PIN" value={assignedPin} onChange={setAssignedPin} placeholder="0000" />}
@@ -8008,7 +8085,7 @@ function FullAlmanacScreen({ setScreen, activeUser }: { setScreen: (screen: Scre
       </div>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Official Live Sources</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Official Live Sources</div>
         <h2 className="mt-3 text-2xl font-black">Almanac and planting links</h2>
         <LiveAlmanacResourceLinks />
       </Card>
@@ -8206,7 +8283,7 @@ function June2026CalendarGrid() {
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">📅 Real Calendar Grid</div>
+          <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">📅 Real Calendar Grid</div>
           <h2 className="mt-3 text-3xl font-black">June 2026</h2>
           <p className="mt-2 text-sm leading-6 text-white/78">Dates show workdays, curriculum milestones, services, deliveries, visitors, and farm operations.</p>
         </div>
@@ -10146,7 +10223,209 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
 
 
 type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
-type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks";
+type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks" | "youngstown";
+
+type DiscoverYoungstownSection25 = {
+  key: "roots" | "good-seed" | "land" | "opportunity" | "legacy";
+  icon: string;
+  title: string;
+  subtitle: string;
+  shortStory: string;
+  learnMore: string[];
+  careers: string[];
+  activityPrompt: string;
+  deepDive: string[];
+};
+
+const DISCOVER_YOUNGSTOWN_SECTIONS_25: DiscoverYoungstownSection25[] = [
+  {
+    key: "roots",
+    icon: "🌱",
+    title: "Roots",
+    subtitle: "How Youngstown began and how people, land, water, transportation, and work shaped the city.",
+    shortStory: "Youngstown grew along the Mahoning River and became a place where settlement, transportation, natural resources, immigration, migration, industry, and neighborhood life met.",
+    learnMore: [
+      "John Young and early settlement",
+      "The Mahoning River and regional geography",
+      "Native peoples and earlier histories of the land",
+      "Canals, railroads, roads, and the movement of people and goods",
+      "Immigration, migration, neighborhoods, and community-building",
+    ],
+    careers: ["Historian", "Archivist", "Museum Educator", "Urban Planner", "Tour Guide"],
+    activityPrompt: "What part of Youngstown's roots helps you better understand the place where you live, work, or learn?",
+    deepDive: ["Historic maps", "Primary-source photographs", "Neighborhood histories", "Mahoning Valley timelines"],
+  },
+  {
+    key: "good-seed",
+    icon: "🏆",
+    title: "Good Seed",
+    subtitle: "People connected to Youngstown whose work, talent, courage, and imagination traveled far beyond the city.",
+    shortStory: "Youngstown has produced and shaped artists, athletes, educators, scientists, entrepreneurs, civic leaders, and community builders. Their stories show that greatness can begin here.",
+    learnMore: [
+      "Warner Brothers — film, production, storytelling, and entrepreneurship",
+      "Ed O'Neill — performance, persistence, and the entertainment industry",
+      "Ray Mancini — discipline, athletics, business, and community identity",
+      "Jim Tressel — education, leadership, coaching, and service",
+      "Simeon Booker, François Clemmons, Lawrence Brownlee, Thomas Bopp, and other documented Youngstown-connected builders",
+    ],
+    careers: ["Filmmaker", "Actor", "Athletic Coach", "Educator", "Journalist", "Scientist", "Entrepreneur"],
+    activityPrompt: "Choose one Youngstown-connected person. What did they cultivate, and what can their journey teach you?",
+    deepDive: ["Photo-first profiles", "Career connections", "Oral histories", "Legacy questions", "Verified Youngstown connections"],
+  },
+  {
+    key: "land",
+    icon: "🌳",
+    title: "The Land",
+    subtitle: "The river, forests, soil, water, wildlife, agriculture, and airport landscape that make this place distinct.",
+    shortStory: "Youngstown is not only an industrial story. It is also a land-and-water story. Forests, creeks, parks, wildlife, farms, vacant land, and the Mahoning River continue to shape community life and future opportunity.",
+    learnMore: [
+      "Mahoning River and local watersheds",
+      "Forests, parks, creeks, and wildlife habitat",
+      "Soil health, food production, and regenerative agriculture",
+      "Pollinators, milkweed, butterflies, bees, amphibians, and biodiversity",
+      "Lansdowne Airport, agriculture, transportation, and land stewardship",
+    ],
+    careers: ["Farmer", "Ecologist", "Environmental Scientist", "Park Ranger", "Landscape Architect", "Aviation Planner"],
+    activityPrompt: "What did you observe at the farm, forest, creek, park, or neighborhood that helps explain how Youngstown's land is changing?",
+    deepDive: ["Field observations", "Farm and forest journals", "Pollinator records", "Water and soil investigations", "Aerial and site maps"],
+  },
+  {
+    key: "opportunity",
+    icon: "🚀",
+    title: "Opportunity",
+    subtitle: "Education, trades, agriculture, aviation, technology, healthcare, entrepreneurship, arts, and public service pathways that can begin here.",
+    shortStory: "Youngstown's future is not limited to one industry. Youth can connect today's work to many pathways and learn that success can begin in Youngstown.",
+    learnMore: [
+      "Youngstown State University and College Credit Plus",
+      "Central State University agriculture and extension learning",
+      "Trades, apprenticeships, construction, and manufacturing",
+      "Agriculture, food systems, tourism, and entrepreneurship",
+      "Aviation, healthcare, technology, education, arts, and public service",
+    ],
+    careers: ["Business Owner", "Agronomist", "Pilot", "Engineer", "Nurse", "Teacher", "Skilled Trades Professional"],
+    activityPrompt: "Which opportunity connects most directly to something you did, observed, built, measured, or solved today?",
+    deepDive: ["Career profiles", "Local training options", "Employer and college links", "Mentor stories", "Youth opportunity plans"],
+  },
+  {
+    key: "legacy",
+    icon: "🏛️",
+    title: "Legacy",
+    subtitle: "The continuing story of what people build, protect, improve, teach, and leave for others.",
+    shortStory: "Legacy is not reserved for famous people. It begins with work that improves a place, helps another person, protects knowledge, or creates an opportunity that remains after the day is over.",
+    learnMore: [
+      "Cultivator accomplishments and firsts",
+      "Legacy projects and community improvements",
+      "Cultivators Hall of Possibility",
+      "Legacy Walk and Legacy Forest concepts",
+      "Youth stories that may become part of Youngstown's next chapter",
+    ],
+    careers: ["Community Developer", "Nonprofit Leader", "Architect", "Educator", "Entrepreneur", "Public Historian"],
+    activityPrompt: "What are you building right now that could help a future Cultivator, family, visitor, or community member?",
+    deepDive: ["Journey evidence", "Portfolio projects", "Community impact records", "Legacy Registry", "Future Cultivator knowledge transfer"],
+  },
+];
+
+function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUser | null }) {
+  const [activeKey, setActiveKey] = useState<DiscoverYoungstownSection25["key"]>("roots");
+  const [response, setResponse] = useState("");
+  const [message, setMessage] = useState("");
+  const section = DISCOVER_YOUNGSTOWN_SECTIONS_25.find((item) => item.key === activeKey) || DISCOVER_YOUNGSTOWN_SECTIONS_25[0];
+
+  useEffect(() => {
+    const participantId = launchParticipantId(activeUser);
+    const rows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const prior = rows.find((row) => row.participant_id === participantId && row.category === `Discover Youngstown: ${section.title}` && row.question === section.activityPrompt);
+    setResponse(prior?.response || "");
+    setMessage("");
+  }, [activeKey, activeUser]);
+
+  function saveYoungstownReflection() {
+    const clean = response.trim();
+    if (!clean) {
+      setMessage("Add your response before saving.");
+      return;
+    }
+    const participantId = launchParticipantId(activeUser);
+    const rows = safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, []);
+    const withoutPrior = rows.filter((row) => !(row.participant_id === participantId && row.category === `Discover Youngstown: ${section.title}` && row.question === section.activityPrompt));
+    const row: CultivatorDiscovery = {
+      id: uuid(),
+      participant_id: participantId,
+      user_name: launchParticipantName(activeUser),
+      date: todayISO(),
+      category: `Discover Youngstown: ${section.title}`,
+      question: section.activityPrompt,
+      response: clean,
+      source: "Explore & Discover",
+      created_at: new Date().toISOString(),
+    };
+    safeWrite(DISCOVERY_KEY, [row, ...withoutPrior].slice(0, 500));
+    recordCultivatorIntelligence19_0(activeUser, [row]);
+    setMessage(`${section.title} reflection saved to your Workbook and My Journey source record ✓`);
+  }
+
+  return (
+    <div className="grid gap-4">
+      <Card className="overflow-hidden p-0">
+        <div className="grid gap-0 lg:grid-cols-[1.15fr_.85fr]">
+          <div className="p-6 md:p-8">
+            <div className="text-xs font-black uppercase tracking-[0.3em] text-amber-100/85">Permanent Workbook Shelf</div>
+            <h2 className="mt-3 text-4xl font-black md:text-6xl">Discover Youngstown</h2>
+            <p className="mt-4 max-w-4xl text-base font-bold leading-7 text-white/80 md:text-lg">GOOD SEED COMES FROM YOUNGSTOWN. <span className="text-emerald-200">Greatness Grows Here.</span></p>
+            <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-white/72">Learn where the city came from, who helped shape it, how the land matters, what opportunities exist, and how your own work can become part of Youngstown's continuing story.</p>
+          </div>
+          <div className="min-h-[260px] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.5)), url(${IMG.grow})` }} aria-label="Youngstown and Bronson Family Farm learning landscape" />
+        </div>
+      </Card>
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        {DISCOVER_YOUNGSTOWN_SECTIONS_25.map((item) => (
+          <button key={item.key} type="button" onClick={() => setActiveKey(item.key)} className={`rounded-[1.4rem] border p-4 text-left transition ${activeKey === item.key ? "border-amber-200/60 bg-amber-300/18" : "border-white/12 bg-black/40 hover:bg-black/60"}`}>
+            <div className="text-3xl">{item.icon}</div>
+            <div className="mt-2 text-lg font-black">{item.title}</div>
+            <div className="mt-1 text-xs font-bold leading-5 text-white/65">{item.subtitle}</div>
+          </button>
+        ))}
+      </div>
+
+      <Card className="p-5 md:p-7">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)]">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.24em] text-amber-100/80">Layer 1 • Photo / Visual</div>
+            <div className="mt-3 min-h-[260px] rounded-[1.6rem] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.46)), url(${section.key === "land" ? IMG.forest : IMG.grow})` }} />
+            <div className="mt-5 text-xs font-black uppercase tracking-[0.24em] text-emerald-100/75">Layer 2 • Short Story</div>
+            <h3 className="mt-2 text-4xl font-black">{section.icon} {section.title}</h3>
+            <p className="mt-3 text-base font-bold leading-8 text-white/82">{section.shortStory}</p>
+          </div>
+          <div className="grid content-start gap-4">
+            <div className="rounded-[1.4rem] border border-white/12 bg-white/8 p-5">
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-sky-100/80">Layer 3 • Learn More</div>
+              <div className="mt-3 grid gap-2">{section.learnMore.map((item) => <div key={item} className="text-sm font-bold leading-6 text-white/80">• {item}</div>)}</div>
+            </div>
+            <div className="rounded-[1.4rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/80">Career Connections</div>
+              <div className="mt-3 flex flex-wrap gap-2">{section.careers.map((career) => <span key={career} className="rounded-full border border-emerald-200/25 bg-black/25 px-3 py-2 text-xs font-black">{career}</span>)}</div>
+            </div>
+            <details className="rounded-[1.4rem] border border-white/12 bg-black/35 p-5">
+              <summary className="cursor-pointer text-sm font-black">Layer 4 • Deep Dive</summary>
+              <div className="mt-3 grid gap-2">{section.deepDive.map((item) => <div key={item} className="text-sm font-bold leading-6 text-white/72">• {item}</div>)}</div>
+            </details>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Workbook Activity</div>
+          <div className="mt-3 text-xl font-black leading-8">{section.activityPrompt}</div>
+          <textarea value={response} onChange={(event) => setResponse(event.target.value)} className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/15 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" placeholder="Write, dictate, or summarize your response here." />
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button type="button" onClick={saveYoungstownReflection} className="rounded-full bg-amber-300 px-6 py-3 font-black text-slate-950 hover:bg-amber-200">Save to Workbook</button>
+            {message && <span className="text-sm font-black text-amber-50">{message}</span>}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 function youthDailyPhaseKey16_2(activeUser?: EcosystemUser | null) {
   return `bff.launch.youthDailyPhase16_2.${todayISO()}.${launchParticipantId(activeUser)}`;
@@ -10602,6 +10881,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
                 ["media", "📸", "Photos & Videos", "Upload and review evidence without searching through the full workbook."],
                 ["contributions", "🌱", "My Contributions", "See what you helped build, improve, protect, or grow."],
                 ["weeks", "📅", "Curriculum Weeks 1–8", "Open every week by title, including activities, lesson materials, trellis videos, entries, uploads, and unfinished documentation."],
+                ["youngstown", "🏙️", "Discover Youngstown", "Explore Roots, Good Seed, The Land, Opportunity, and Legacy through photos, stories, careers, activities, and deeper learning."],
               ].map(([key, icon, title, detail]) => (
                 <button key={key} type="button" onClick={() => openWorkbookView19_3(key as WorkbookDashboardView19_3)} className="rounded-[1.5rem] border border-white/12 bg-black/45 p-5 text-left transition hover:-translate-y-0.5 hover:bg-black/60">
                   <div className="text-4xl">{icon}</div>
@@ -10658,6 +10938,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
               <h3 className="mt-2 text-3xl font-black">What your work helped improve.</h3>
               <CultivatorMirror19_0 activeUser={activeUser} compact />
             </Card>
+          )}
+
+          {workbookView19_3 === "youngstown" && (
+            <DiscoverYoungstownWorkbook25 activeUser={activeUser} />
           )}
 
           {workbookView19_3 === "weeks" && (
@@ -10950,7 +11234,7 @@ function CurrentWeekActivityModule({ setScreen }: { setScreen: (screen: Screen) 
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Current Week Activity</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Current Week Activity</div>
         <h2 className="mt-3 text-4xl font-black">Week {currentWeek.week}: {currentWeek.title}</h2>
         <p className="mt-3 text-sm leading-7 text-white/82">{currentWeek.focus}</p>
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
@@ -11039,7 +11323,7 @@ function SupervisorOperationsCenter({ setScreen, activeUser, language }: { setSc
   return (
     <div className="grid gap-5 xl:grid-cols-[310px_1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Real Supervisor Operations Center</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Real Supervisor Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">Morning-to-end-of-day control room.</h1>
         <SupervisorEncouragementCard language={language} />
         <div className="mt-5 grid gap-2">
@@ -11112,7 +11396,7 @@ function SupervisorDashboard({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Dashboard</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Dashboard</div>
       <h2 className="mt-3 text-4xl font-black">Current operating picture.</h2>
       <div className="mt-5">
         <DailyOperationsCommandCenter setScreen={setScreen} compact />
@@ -11289,7 +11573,7 @@ function YouthRosterModule({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Youth Roster</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Youth Roster</div>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-4xl font-black">Active youth participants.</h2>
@@ -11472,7 +11756,7 @@ function AttendanceTool({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Attendance / PPE</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Attendance / PPE</div>
       <h2 className="mt-3 text-4xl font-black">Check youth in and document readiness.</h2>
       <div className="mt-4 rounded-2xl border border-orange-200/30 bg-orange-300/15 p-4 text-sm font-bold leading-6 text-orange-50">
         Cooling towels were handed out yesterday. Supervisors should remind youth: wet the towel, wear it around the neck, re-wet it as needed, and do not snap, throw, trade, or play with cooling towels. They are heat-safety equipment.
@@ -11534,7 +11818,7 @@ function WellnessReview({ wellness, profiles }: { wellness: WellnessCheckIn[]; p
   const flags = wellness.filter((w) => w.safety_flag);
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Wellness Review</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Wellness Review</div>
       <h2 className="mt-3 text-4xl font-black">Staff-facing support awareness.</h2>
       <p className="mt-4 max-w-3xl text-sm leading-6 text-white/80">
         This is not a diagnosis. It is a staff-only way to notice urgent need, isolation, food insecurity, stress, or safety concerns.
@@ -11736,7 +12020,7 @@ function AssessmentTool({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Daily Assessment</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Daily Assessment</div>
       <h2 className="mt-3 text-4xl font-black">Observe today’s work and record growth.</h2>
       <p className="mt-3 max-w-4xl text-sm leading-6 text-white/80">
         Supervisors select what they actually observed. The system calculates the score. Higher numbers mean stronger observed readiness.
@@ -11908,7 +12192,7 @@ function ParentSummaryTool({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent-Safe Summary Generator</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Parent-Safe Summary Generator</div>
       <h2 className="mt-3 text-4xl font-black">Share progress without exposing private youth reflection.</h2>
       {!youthRows.length && (
         <div className="mt-6 rounded-2xl border border-amber-200/25 bg-amber-300/15 p-4 text-sm font-bold leading-6 text-amber-50">
@@ -11989,7 +12273,7 @@ function GuardianContactTool({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guardian Contact Center</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Guardian Contact Center</div>
       <h2 className="mt-3 text-4xl font-black">Log parent and guardian contact.</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This does not send automatic email or text yet. It gives supervisors one place to see guardian contact information and document phone calls, texts sent, emails sent, pickup conversations, concerns, and daily updates.</p>
 
@@ -12040,7 +12324,7 @@ function FeedbackCenter({ feedbackRows }: { feedbackRows: FeedbackRecord[] }) {
   const rows = feedbackRows.slice(0, 40);
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback Center</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Feedback Center</div>
       <h2 className="mt-3 text-4xl font-black">Review feedback from guests, parents, youth, growers, partners, and reviewers.</h2>
       <p className="mt-3 text-sm leading-6 text-white/82">If this list is empty after submitting feedback, the feedback table is not accepting rows yet. Local fallback records will still appear on this device.</p>
       <div className="mt-6 grid gap-3 md:grid-cols-4">
@@ -12097,7 +12381,7 @@ function IndividualYouthProfilesModule({
   if (!selected) {
     return (
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Individual Profiles</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Individual Profiles</div>
         <h2 className="mt-3 text-4xl font-black">No youth profiles found yet.</h2>
         <p className="mt-3 text-sm leading-6 text-white/78">Once youth are registered or loaded from Supabase, supervisors will be able to open one youth at a time and work from that individual profile.</p>
       </Card>
@@ -12123,7 +12407,7 @@ function IndividualYouthProfilesModule({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Individual Youth Profile</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Individual Youth Profile</div>
       <h2 className="mt-3 text-4xl font-black">Work with one youth at a time.</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">This profile gathers the youth roster record, attendance, PPE status, supervisor assessments, wellness flags, incidents, parent-safe summaries, and guardian contact history in one place. It prevents duplicate information by linking each item back to the same participant ID.</p>
 
@@ -12235,7 +12519,7 @@ function SupervisorReports({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Reports</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Reports</div>
       <h2 className="mt-3 text-4xl font-black">Supervisor report snapshot.</h2>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[
@@ -12626,8 +12910,8 @@ function CaseManagerPortal({ setScreen }: { setScreen: (screen: Screen) => void 
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Case Manager Portal</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Whole-person youth support.</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Case Manager Portal</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Whole-person youth support.</h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">Case managers help identify barriers, coordinate resources, support families, respond to wellness concerns, and keep supervisors focused on coaching and safety.</p>
         <div className="mt-6 grid gap-3 md:grid-cols-4">
           {[
@@ -12750,8 +13034,8 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Parent / Guardian Portal</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Progress, encouragement, and next steps.</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Parent / Guardian Portal</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Progress, encouragement, and next steps.</h1>
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
         Parents see attendance, accomplishments, workbook progress, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
       </p>
@@ -12927,7 +13211,7 @@ function MarketplaceRedirect({ setScreen }: { setScreen: (screen: Screen) => voi
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Market</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Market</div>
       <h1 className="mt-3 text-4xl font-black">Opening GrownBy</h1>
       <p className="mt-3 max-w-3xl text-sm font-bold leading-6 text-white/75">The Market button now opens GrownBy in a new tab so families, visitors, and growers do not lose their place in the ecosystem.</p>
       <div className="mt-5 flex flex-wrap gap-3">
@@ -13120,7 +13404,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   return (
     <div className="grid gap-5 xl:grid-cols-[330px_1fr]">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Operations Center</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Marketplace Operations Center</div>
         <h1 className="mt-3 text-3xl font-black leading-tight">GrownBy + Direct Sales.</h1>
         <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
         <LargerPictureCard layerKey="Marketplace Operations Center" />
@@ -13172,7 +13456,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
         {tab === "command" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Live Marketplace Command</div>
+            <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Live Marketplace Command</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Orders become harvest instructions.</h1>
             <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {[
@@ -13210,7 +13494,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
         {tab === "storefront" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Product Catalog</div>
+            <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Product Catalog</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Fresh food, grower supplies, value-added goods, and pickup ordering.</h1>
             <div className="mt-5 flex flex-wrap gap-2">
               {categories.map((cat) => <button type="button" key={cat} onClick={() => setCategory(cat)} className={`rounded-full border px-4 py-2 text-sm font-black ${category === cat ? "border-emerald-200 bg-emerald-300 text-black" : "border-white/10 bg-white/10"}`}>{cat}</button>)}
@@ -13237,7 +13521,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
         {tab === "checkout" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cart / Checkout</div>
+            <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Cart / Checkout</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Record GrownBy or Direct orders.</h1>
             <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_.9fr]">
               <div className="space-y-3">
@@ -13271,7 +13555,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
         {tab === "orders" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Marketplace Orders</div>
+            <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Marketplace Orders</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Pickup and order tracking.</h1>
             <div className="mt-6 grid gap-3">
               {orders.map((order) => {
@@ -13308,7 +13592,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
 
         {tab === "catalog" && (
           <Card>
-            <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Catalog Admin</div>
+            <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Catalog Admin</div>
             <h1 className="mt-3 text-4xl font-black md:text-5xl">Add products and monitor marketplace readiness.</h1>
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-5">
@@ -13401,8 +13685,8 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Journey Record</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Share My Learning</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Journey Record</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Share My Learning</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">This is where youth document photos, videos, field notes, reflections, first-time experiences, and Cultivator Moments.</p>
         {notice && <Notice text={notice} />}
         <div className="mt-6 flex flex-wrap gap-3">
@@ -13416,7 +13700,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
       </Card>
 
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Story Builder</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Story Builder</div>
         <h2 className="mt-3 text-2xl font-black">What belongs in Share My Learning?</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {[
@@ -13434,7 +13718,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
       {recentAssets.length > 0 && (
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Cultivator Stories</div>
+          <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Recent Cultivator Stories</div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {recentAssets.map((asset) => (
               <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
@@ -13549,8 +13833,8 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div className="grid gap-4">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Cultivator Stories</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Share My Learning</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Cultivator Stories</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Share My Learning</h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
           Upload a photo, video, or commentary from your day. This is your Cultivator Story.
         </p>
@@ -13576,7 +13860,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
       {recentAssets.length > 0 && (
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Recent Cultivator Stories</div>
+          <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Recent Cultivator Stories</div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {recentAssets.map((asset) => (
               <a key={asset.id} href={asset.file_url} target="_blank" rel="noreferrer" className="block rounded-xl border border-white/10 bg-black/25 p-3 text-xs text-white/78 hover:bg-white/10">
@@ -13990,8 +14274,8 @@ function Operations({ setScreen, activeUser }: { setScreen: (screen: Screen) => 
       <CropPlannerPanel />
       <OperationsInventoryPanel />
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Operations</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Daily rhythm for launch.</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Operations</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Daily rhythm for launch.</h1>
       <div className="mt-6 grid gap-3 md:grid-cols-3">
         {[
           ["Beginning of Day", "QR/manual check-in, PPE, water, farm worker heat-safety awareness, daily proverb, weather awareness, assignments."],
@@ -14206,8 +14490,8 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guided Demo</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Experience the ecosystem in order.</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Guided Demo</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Experience the ecosystem in order.</h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
         This guided demo lets every user understand the same launch story: Youngstown — Bronson Family Farm, Warren — Parker Farms, and the connected regional ecosystem.
       </p>
@@ -14280,7 +14564,7 @@ function MyGrowthTodayScreen({ setScreen, activeUser }: { setScreen: (screen: Sc
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">After Legacy Reflection</div>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">After Legacy Reflection</div>
         <h1 className="mt-3 text-4xl font-black md:text-6xl">🌱 My Growth Today</h1>
         <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">How did I become more capable than I was this morning?</p>
         <div className="mt-5 rounded-2xl border border-emerald-200/25 bg-emerald-300/12 p-4 text-sm font-black leading-7 text-emerald-50">Week {curriculum.week}: {curriculum.theme} • {curriculum.featuredStory}</div>
@@ -14405,7 +14689,7 @@ function Feedback({ setScreen, activeUser }: { setScreen: (screen: Screen) => vo
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Feedback</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Feedback</div>
       <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">{promptTitle}</h1>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-white/76">{promptIntro}</p>
       <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -14575,8 +14859,8 @@ function SimplePathway({
     <>
       <div className="grid gap-5 lg:grid-cols-[1fr_.85fr]">
         <Card>
-          <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Pathway</div>
-          <h1 className="mt-4 text-4xl font-black md:text-6xl">{title}</h1>
+          <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Pathway</div>
+          <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">{title}</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">{text}</p>
           <LargerPictureCard layerKey={title} />
           <div className="mt-8 flex flex-wrap gap-3">
@@ -14736,8 +15020,8 @@ function CoolingCenterProjectModule({
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">June 8 Workforce Production Challenge</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">June 8 Workforce Production Challenge</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE → OWN IT</h1>
       <p className="mt-5 max-w-5xl text-lg leading-8 text-white/86">
         Youth will complete a real customer order: produce, paint, quality-check, and prepare 63 cooling fans for a contractor building a cooling station at Bronson Family Farm.
       </p>
@@ -15027,8 +15311,8 @@ function MyCultivatorJourneyScreen({ setScreen, activeUser }: { setScreen: (scre
   return (
     <div className="grid gap-5">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">My Journey</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">How I Am Growing</h1>
+        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">My Journey</div>
+        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">How I Am Growing</h1>
         <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">My Journey is generated from my Workbook, completed work, discoveries, photos, supervisor validation, and reflections. I do not have to enter the same information twice.</p>
         <div className="mt-5 flex flex-wrap gap-2">
           {sections.map(([id, label]) => <button key={id} type="button" onClick={() => setActiveSection(id)} className={activeSection === id ? "rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black" : "rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-black"}>{label}</button>)}
@@ -15081,8 +15365,8 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
 
   return (
     <Card>
-      <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Achievement Center</div>
-      <h1 className="mt-4 text-4xl font-black md:text-6xl">Ecosystem Explorer</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Achievement Center</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Ecosystem Explorer</h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
         Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
       </p>
