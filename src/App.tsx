@@ -91,6 +91,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 22.0: Workbook becomes a Discovery Journal and Living Farm Encyclopedia contribution system organized into Grow Food, Steward Nature, Pollinator, Soil Detective, Harvest & Food, and Farm Business academies.
  * - Ecosystem 22.0: Every activity closes with “What Should Future Cultivators Know?” and saves the answer as knowledge transfer, not a school-style quiz.
  * - Ecosystem 22.0: Career discovery uses What Is It? What Do They Do? Why Does It Matter? How Does Today Connect? Could I See Myself Doing This? Education requirements are intentionally excluded.
+ * - Ecosystem 24.0: Replaces the guest topic library with the approved continuous Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds → Get Involved story, while preserving the existing visual layout and all non-guest ecosystem functions.
+ * - Ecosystem 24.0: Every guest page has working Previous/Next navigation. Visit, Partner, Support, and Contact appear only on the final screen.
  * - Ecosystem 23.1 FINAL: Workbook now opens with curriculum Weeks 1–8 displayed by title and all four natural trellis videos pinned inside the Workbook.
  * - Ecosystem 23.2 FINAL: Removes the youth-facing Living Farm Encyclopedia, Explore & Discover, academy/category cards, and all youth navigation into the separate knowledge-library screen.
  * - Ecosystem 23.2 FINAL: Workbook is the single curriculum home. Weeks 1–8 and all four natural trellis videos are visible immediately when Workbook opens.
@@ -6898,250 +6900,279 @@ function JourneyCompletionCard({
 
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  const [guestTopic, setGuestTopic] = useState("Farm Story");
-  type GuestTopic = {
+  type GuestJourneyPage = {
+    key: string;
+    eyebrow: string;
     title: string;
-    body: string;
-    actionLabel: string;
-    action: Screen;
-    whyItMatters: string;
-    whatVisitorsLearn: string[];
-    ecosystemConnections: string[];
-    nextSteps: string[];
-    detailSections: { title: string; text: string }[];
+    subtitle?: string;
+    openingQuote?: string;
+    paragraphs: string[];
+    reflection?: string[];
+    highlights?: string[];
+    image: string;
+    imageAlt: string;
   };
-  const guestTopics: Record<string, GuestTopic> = {
-    "Farm Story": {
-      title: "Farm Story",
-      body: "Bronson Family Farm is a regenerative farm, youth workforce classroom, marketplace, and community growing place at historic Lansdowne Airport.",
-      actionLabel: "Stay on Guest Path",
-      action: "guest",
-      whyItMatters: "Visitors need to understand that this is not only a farm. It is a place where land, learning, workforce development, entrepreneurship, food access, and community connection are cultivated together.",
-      whatVisitorsLearn: [
-        "How Bronson Family Farm uses the land as a living classroom.",
-        "How Farm & Family Alliance connects education, family, growers, and community benefit.",
-        "Why youth workforce development is connected to real farm work, not simulated assignments.",
-        "How the farm story includes food production, stewardship, market participation, and place-based redevelopment.",
+
+  const pages: GuestJourneyPage[] = [
+    {
+      key: "home",
+      eyebrow: "Bronson Family Farm",
+      title: "A Seed Travels Many Ways",
+      subtitle: "That is life.",
+      paragraphs: [
+        "Every seed begins with possibility.",
+        "Some travel by wind. Some by water. Some by animals. Some by people.",
+        "Each follows a different path. Each encounters different challenges. Each carries the potential for growth.",
+        "Bronson Family Farm is the story of roots, stewardship, opportunity, community, and the many journeys that connect them.",
       ],
-      ecosystemConnections: ["Youth Workforce", "Farm & Family Alliance", "Marketplace", "Community Food System", "Agritourism"],
-      nextSteps: ["Attend a farm event", "Visit the marketplace", "Volunteer or support a project", "Ask how your organization can partner"],
-      detailSections: [
-        { title: "The farm is the classroom", text: "Guests should see that planting, compost, infrastructure, safety, weather decisions, storytelling, and marketplace activity are all part of the same learning environment." },
-        { title: "The work is real", text: "Youth are not completing disconnected assignments. They are participating in farm operations that create value for the land, the program, families, growers, customers, and community partners." },
-        { title: "The story is place-based", text: "The farm exists at Lansdowne Airport, which allows the story to include land reuse, food access, youth opportunity, agritourism, entrepreneurship, and community redevelopment." },
-      ],
+      image: IMG.forest,
+      imageAlt: "Bronson Family Farm landscape",
     },
-    "Historic Lansdowne Airport": {
-      title: "Historic Lansdowne Airport",
-      body: "The farm sits within a larger place-based story where land, aviation history, agriculture, and community redevelopment meet.",
-      actionLabel: "Become a Partner",
-      action: "partner",
-      whyItMatters: "The airport context helps visitors understand that Bronson Family Farm is growing inside a unique community asset. The site connects history, land use, economic development, education, and future agritourism possibilities.",
-      whatVisitorsLearn: [
-        "Why the Lansdowne Airport location matters.",
-        "How the farm fits between the hangars and the larger airport property.",
-        "How underused land can become productive, educational, and community-serving.",
-        "How aviation, agriculture, tourism, and youth opportunity can exist in one place-based story.",
+    {
+      key: "roots",
+      eyebrow: "Roots",
+      title: "Where every story begins.",
+      paragraphs: [
+        "The Bronson Family story spans generations of perseverance, stewardship, learning, and community.",
+        "Roots connect us to those who came before us. They provide stability. They provide identity. They provide strength when storms arrive.",
+        "Just as a tree depends upon its roots, every community depends upon the people who helped shape it.",
+        "The lessons we inherit often become the foundation for the opportunities we create.",
+        "Every family carries a story. Every place carries a history. Every journey begins somewhere.",
+        "Our roots remind us where we started and help guide where we are going.",
       ],
-      ecosystemConnections: ["Place-Based Learning", "Agritourism", "Partnerships", "Infrastructure", "Community Redevelopment"],
-      nextSteps: ["Explore the farm story", "Schedule a site conversation", "Discuss partnership opportunities", "Support infrastructure development"],
-      detailSections: [
-        { title: "A larger site story", text: "The farm is not isolated from its location. The airport setting gives visitors a way to understand land, history, transportation, agriculture, and future tourism together." },
-        { title: "Redevelopment without erasing place", text: "Bronson Family Farm can show how a historic property can support food production, youth development, and community activity while still honoring the character of the site." },
-        { title: "Partnership opportunity", text: "The location invites partnerships with education, workforce, aviation, agriculture, tourism, city planning, economic development, and community organizations." },
-      ],
+      reflection: ["What roots helped shape your journey?"],
+      image: IMG.forest,
+      imageAlt: "Roots and family heritage",
     },
-    "Regenerative Agriculture": {
-      title: "Regenerative Agriculture",
-      body: "Guests can learn how soil, compost, crops, pollinators, water, and stewardship connect to food access and community health.",
-      actionLabel: "Open Growing Center",
-      action: "resources",
-      whyItMatters: "Regenerative agriculture is not treated as a slogan. It is the daily practice of improving soil, protecting crops, observing living systems, using available resources wisely, and helping youth understand how food is actually grown.",
-      whatVisitorsLearn: [
-        "How compost, mulch, soil health, and planting decisions support future harvests.",
-        "Why observation is a farm skill, a science skill, and a workforce skill.",
-        "How companion planting, pollinators, crop protection, and water access affect production.",
-        "How the crop plan connects farming to curriculum, nutrition, preservation, marketplace, and entrepreneurship.",
+    {
+      key: "seed",
+      eyebrow: "Seed",
+      title: "Possibility begins here.",
+      paragraphs: [
+        "Bronson Family Farm began as a seed.",
+        "Not a field. Not a harvest. Not a destination. A possibility.",
+        "A belief that agriculture could create opportunity, strengthen communities, and reconnect people to the land.",
+        "Like every seed, the future was hidden from view. The farm existed first as an idea.",
+        "A vision for growing food. A vision for creating experiences. A vision for workforce development. A vision for environmental stewardship. A vision for helping people discover what they are capable of becoming.",
+        "At the beginning, there were no guarantees. Only the willingness to plant something and trust that growth would follow.",
+        "A single seed can become a plant. A plant can become a harvest. A harvest can feed a family. A family can strengthen a community. A community can shape the future.",
+        "The question is never what a seed is. The question is what it may become.",
       ],
-      ecosystemConnections: ["Growing Center", "Crop Plan", "Soil Health", "Companion Planting", "Youth Curriculum"],
-      nextSteps: ["Open the Growing Center", "Review today's crop plan", "Explore companion planting", "Connect farm work to food and marketplace outcomes"],
-      detailSections: [
-        { title: "Soil is a living system", text: "Guests should see compost, mulch, bed preparation, plant health, water, and observation as connected practices rather than separate chores." },
-        { title: "The crop plan is more than production", text: "Bronson's Growing Center connects crops to youth learning, workforce skills, entrepreneurship, nutrition, preservation, marketplace planning, and Cultivator Stories." },
-        { title: "Observation drives decisions", text: "The farm teaches participants to notice shade, heat, moisture, insects, plant stress, deer pressure, and soil condition before taking action." },
-      ],
+      reflection: ["What possibility are you carrying today?"],
+      image: IMG.grow,
+      imageAlt: "A seed beginning to grow",
     },
-    "Events": {
-      title: "Events",
-      body: "Events connect visitors to growers, youth learning, marketplace activity, community partners, and seasonal farm experiences.",
-      actionLabel: "Open Calendar",
-      action: "events",
-      whyItMatters: "Events are how the public experiences the ecosystem. They connect learning, growers, vendors, partners, visitors, youth accomplishments, and community food access.",
-      whatVisitorsLearn: [
-        "What is happening at the farm this season.",
-        "How events connect visitors to growers, youth, vendors, and community partners.",
-        "How the calendar also supports deliveries, visitors, curriculum, and farm operations.",
-        "How farm events become agritourism and community engagement opportunities.",
+    {
+      key: "journey",
+      eyebrow: "Journey",
+      title: "A seed travels many ways.",
+      paragraphs: [
+        "Every journey begins with a step into the unknown.",
+        "The journey of Bronson Family Farm did not begin with perfect conditions. It did not begin with unlimited resources. It did not begin with certainty. It began with a decision to move forward.",
+        "Like a seed carried by the wind, the path was not always predictable.",
+        "There were lessons to learn. Skills to develop. Challenges to overcome. New relationships to build. New opportunities to recognize.",
+        "Some days brought progress. Some days brought setbacks. Every experience became part of the journey.",
+        "Along the way, mentors shared knowledge. Community members offered encouragement. Partners opened doors. Researchers contributed insight. Educators provided guidance. Each person became part of the story.",
+        "The journey led to fields and forests. To classrooms and workshops. To airports and community spaces. To conversations about food, stewardship, opportunity, and the future.",
+        "With every step, the vision became clearer. The seed was beginning to grow.",
       ],
-      ecosystemConnections: ["Calendar", "Visitors", "Marketplace", "Growers", "Community Partners"],
-      nextSteps: ["Open the calendar", "Attend an upcoming event", "Invite a partner organization", "Connect an event to marketplace or youth learning"],
-      detailSections: [
-        { title: "Events are ecosystem moments", text: "A farm event is not only a public gathering. It can include youth learning, grower participation, marketplace sales, tours, food access, partner visibility, and community storytelling." },
-        { title: "Visitors become participants", text: "A visitor can move from attending an event to volunteering, shopping, supporting infrastructure, becoming a partner, or learning about food systems." },
-        { title: "The calendar matters", text: "The calendar should show public events along with visitor days, deliveries, curriculum weeks, market activity, and operational notes." },
-      ],
+      reflection: ["Who encouraged you?", "Who taught you?", "What challenges shaped you?", "What opportunities changed your path?"],
+      image: IMG.forest,
+      imageAlt: "A path through the forest",
     },
-    "Marketplace": {
-      title: "Marketplace",
-      body: "The marketplace connects produce, growers, SNAP access, value-added products, and entrepreneurship.",
-      actionLabel: "Visit Marketplace",
-      action: "marketplace",
-      whyItMatters: "The marketplace shows youth and visitors that food production becomes customer service, pricing, sales, value-added products, nutrition, and economic opportunity.",
-      whatVisitorsLearn: [
-        "How produce and value-added products move from farm work to customers.",
-        "How SNAP access and local growers connect to food access.",
-        "How youth learn entrepreneurship through real marketplace thinking.",
-        "How crop planning affects inventory, harvest timing, sales, and community benefit.",
+    {
+      key: "growth",
+      eyebrow: "Growth",
+      title: "Growth requires stewardship.",
+      paragraphs: [
+        "Growth does not happen by accident.",
+        "A seed may contain potential, but potential alone is not enough.",
+        "Growth requires care. Growth requires attention. Growth requires patience. Growth requires stewardship.",
+        "The same is true for farms, communities, and people.",
+        "At Bronson Family Farm, fields become productive, pollinator habitats become established, trees mature, soil becomes healthier, and wildlife finds places to thrive.",
+        "But growth is not limited to the land. People grow as well.",
+        "Young people discover new skills. Confidence develops through experience. Leadership emerges through responsibility. Curiosity becomes learning. Learning becomes opportunity. Opportunity becomes purpose.",
+        "Every project completed, every challenge overcome, every lesson learned, and every relationship built becomes part of the growth that continues long after the workday ends.",
       ],
-      ecosystemConnections: ["SNAP", "Growers", "Value-Added Producers", "Entrepreneurship", "Crop Plan"],
-      nextSteps: ["Visit the marketplace", "Learn about grower participation", "Explore value-added opportunities", "Connect production to sales and community access"],
-      detailSections: [
-        { title: "Production becomes value", text: "Youth should be able to see how a crop moves from planting to care, harvest, quality, pricing, sale, preservation, or value-added production." },
-        { title: "Food access matters", text: "The marketplace connects local production, SNAP access, growers, customers, and community nutrition instead of treating sales as separate from mission." },
-        { title: "Entrepreneurship is visible", text: "Pricing, inventory, presentation, customer service, crop planning, and value-added production become part of the learning ecosystem." },
-      ],
+      highlights: ["Stewardship of the Land", "Stewardship of People", "Stewardship of Community", "Stewardship of Opportunity"],
+      reflection: ["What areas of your life are still growing?", "What seeds are you nurturing today?"],
+      image: IMG.grow,
+      imageAlt: "Growing crops at Bronson Family Farm",
     },
-    "Volunteer Path": {
-      title: "Volunteer Path",
-      body: "Volunteers support farm operations, youth learning, events, infrastructure, and community food-system work.",
-      actionLabel: "Volunteer / Support",
-      action: "support",
-      whyItMatters: "Volunteers help protect the youth program, strengthen the farm, support events, and make the ecosystem possible when resources are limited.",
-      whatVisitorsLearn: [
-        "What kinds of help are needed on the farm.",
-        "How volunteers can support youth without disrupting the learning environment.",
-        "How infrastructure, planting, events, food access, and storytelling all need support.",
-        "How community members can contribute time, skills, materials, or connections.",
+    {
+      key: "harvest",
+      eyebrow: "Harvest",
+      title: "The visible result of growth.",
+      paragraphs: [
+        "Every season eventually reaches a moment when growth becomes visible.",
+        "The seed that was once hidden beneath the soil emerges. The work invested over time begins to reveal itself. The harvest is evidence that growth has occurred.",
+        "At Bronson Family Farm, harvest can be measured in baskets, fields, and flowers.",
+        "But some of the most important harvests cannot be weighed or counted.",
+        "Knowledge is a harvest. Skills are a harvest. Confidence is a harvest. Leadership is a harvest. Opportunity is a harvest.",
+        "The harvest reflects everything that came before it: the roots, the seed, the journey, and the growth.",
+        "A harvest is not created in a single day. It is created through many small actions repeated over time.",
       ],
-      ecosystemConnections: ["Support", "Infrastructure", "Youth Learning", "Events", "Community Food System"],
-      nextSteps: ["Volunteer for a project", "Donate materials", "Support a youth learning activity", "Connect the farm to a useful partner"],
-      detailSections: [
-        { title: "Volunteers extend capacity", text: "Because the farm operates with limited staffing and many real daily needs, volunteers can support safe operations, infrastructure, events, and documentation." },
-        { title: "Support should be directed", text: "The ecosystem should help volunteers understand where help is useful without pulling attention away from youth safety and the curriculum." },
-        { title: "Materials and skills count", text: "Support can include time, tools, supplies, infrastructure help, professional expertise, storytelling, transportation, event support, or community connections." },
-      ],
+      highlights: ["Food", "Knowledge", "Skills", "Confidence", "Leadership", "Opportunity"],
+      reflection: ["What harvest are you creating in your own life?", "What harvest do you hope to leave for others?"],
+      image: IMG.grow,
+      imageAlt: "A farm harvest",
     },
+    {
+      key: "community",
+      eyebrow: "Community Impact",
+      title: "The harvest we share.",
+      openingQuote: "A tree does not eat its own fruit.",
+      paragraphs: [
+        "Nature teaches an important lesson.",
+        "A tree produces fruit, but it does not consume it. The fruit nourishes others. The seeds travel outward. New growth begins in places the tree may never see.",
+        "A river does not drink its own water. The sun does not shine for itself. The greatest gifts are often shared.",
+        "At Bronson Family Farm, we believe the most meaningful harvests extend beyond ourselves.",
+        "Food nourishes families. Knowledge creates opportunity. Skills open doors. Leadership inspires others. Stewardship protects resources for future generations.",
+        "The true measure of a harvest is not only what it produces. It is what it makes possible.",
+        "The most enduring harvests are rarely measured in pounds. They are measured in lives touched, opportunities created, communities strengthened, and futures made possible.",
+      ],
+      highlights: ["Strengthening Families", "Developing Future Leaders", "Stewarding the Environment", "Creating Opportunity", "Inspiring Future Seeds"],
+      reflection: ["What gifts do you have that were meant to be shared?"],
+      image: IMG.forest,
+      imageAlt: "Community at Bronson Family Farm",
+    },
+    {
+      key: "future",
+      eyebrow: "Future Seeds",
+      title: "What we plant today becomes tomorrow.",
+      paragraphs: [
+        "Every harvest contains seeds. Some are visible. Some are not.",
+        "The visible seeds may grow into flowers, vegetables, orchards, forests, and fields. The invisible seeds may become ideas, opportunities, relationships, skills, and dreams. Both shape the future.",
+        "Every generation inherits seeds planted by those who came before them.",
+        "The opportunities we enjoy today were once someone's vision, effort, sacrifice, and belief that tomorrow could be better than today.",
+        "The same responsibility now belongs to us.",
+        "What we choose to plant today will influence people we may never meet.",
+        "The future is not something we discover. The future is something we create.",
+        "Every harvest creates new seeds. Every seed begins a new journey. Every journey creates new possibilities. The cycle continues, generation after generation and season after season.",
+      ],
+      reflection: ["What future are you helping create?", "What seeds are you planting today?", "What might grow because of something you begin now?"],
+      image: IMG.grow,
+      imageAlt: "Future generations planting seeds",
+    },
+    {
+      key: "involved",
+      eyebrow: "Get Involved",
+      title: "Become Part of the Journey",
+      paragraphs: [
+        "Every journey begins with a seed. Every harvest creates new seeds.",
+        "The story of Bronson Family Farm continues through the people who visit, support, partner, volunteer, and share the vision.",
+        "The future will be shaped by the seeds we plant together.",
+        "Perhaps your journey and ours are meant to cross paths.",
+        "Perhaps there is a seed you are carrying that belongs here.",
+        "Perhaps there is a harvest we can create together.",
+        "The next chapter has not yet been written.",
+      ],
+      reflection: ["What kind of future do you want to help create?"],
+      image: IMG.forest,
+      imageAlt: "Visitors joining the Bronson Family Farm journey",
+    },
+    {
+      key: "final",
+      eyebrow: "Bronson Family Farm",
+      title: "A Seed Travels Many Ways.",
+      subtitle: "That is life.",
+      paragraphs: [
+        "Wherever your journey leads next, may the seeds you carry find good soil.",
+        "May your roots remain strong.",
+        "May your growth be purposeful.",
+        "May your harvest bless others.",
+        "And may the seeds you plant today create opportunities for generations yet to come.",
+      ],
+      highlights: ["Rooted in Stewardship.", "Growing Opportunity.", "Sharing the Harvest."],
+      image: IMG.forest,
+      imageAlt: "Bronson Family Farm at sunset",
+    },
+  ];
+
+  const [pageIndex, setPageIndex] = useState(0);
+  const page = pages[pageIndex];
+  const isFirst = pageIndex === 0;
+  const isFinal = pageIndex === pages.length - 1;
+
+  const moveTo = (nextIndex: number) => {
+    setPageIndex(Math.max(0, Math.min(pages.length - 1, nextIndex)));
+    window.setTimeout(() => document.getElementById("guest-journey-top")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
   };
-  const selected = guestTopics[guestTopic] || guestTopics["Farm Story"];
-  const topicKeys = Object.keys(guestTopics);
-  const openTopic = (item: string) => {
-    setGuestTopic(item);
-    window.setTimeout(() => document.getElementById("guest-topic-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }), 40);
-  };
+
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.05fr_.75fr]">
+    <div id="guest-journey-top" className="grid gap-4 lg:grid-cols-[1.05fr_.75fr] scroll-mt-24">
       <Card>
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">Guest Pathway</div>
-        <h1 className="mt-4 text-4xl font-black md:text-6xl">Explore the farm.</h1>
-        <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
-          Guests see the farm story, events, marketplace, volunteer options, and ways to connect. Youth workforce operations stay in the youth pathway.
-        </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-4 text-left font-black text-black hover:bg-emerald-200">Attend an Event</button>
-          <button type="button" onClick={openGrownByMarketplace} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Visit Marketplace</button>
-          <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Volunteer / Support</button>
-          <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-4 text-left font-black hover:bg-white/20">Become a Partner</button>
+        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/75">{page.eyebrow}</div>
+        {page.openingQuote && <div className="mt-5 rounded-[1.35rem] border border-emerald-200/30 bg-emerald-300/12 p-5 text-2xl font-black leading-tight text-emerald-50 md:text-4xl">{page.openingQuote}</div>}
+        <h1 className="mt-4 text-4xl font-black md:text-6xl">{page.title}</h1>
+        {page.subtitle && <p className="mt-3 text-2xl font-black text-emerald-200">{page.subtitle}</p>}
+
+        <div className="mt-6 grid gap-4">
+          {page.paragraphs.map((paragraph) => (
+            <p key={paragraph} className="max-w-4xl text-base font-semibold leading-7 text-white/84">{paragraph}</p>
+          ))}
         </div>
+
+        {page.highlights && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {page.highlights.map((item) => <div key={item} className="rounded-[1.2rem] border border-white/12 bg-white/10 p-4 font-black text-white">{item}</div>)}
+          </div>
+        )}
+
+        {page.reflection && (
+          <div className="mt-6 rounded-[1.35rem] border border-amber-200/25 bg-amber-300/10 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Reflection</div>
+            <div className="mt-3 grid gap-2">
+              {page.reflection.map((item) => <p key={item} className="text-base font-black leading-7 text-white">{item}</p>)}
+            </div>
+          </div>
+        )}
+
+        {!isFinal && (
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
+            {!isFirst ? <button type="button" onClick={() => moveTo(pageIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20">← Previous</button> : <span />}
+            <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{isFirst ? "Enter the Journey" : "Next →"}</button>
+          </div>
+        )}
+
+        {isFinal && (
+          <div className="mt-7">
+            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">Choose Your Next Step</div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => setScreen("events")} className="rounded-[1.35rem] bg-emerald-300 p-5 text-left text-black hover:bg-emerald-200"><span className="block text-xl font-black">Visit</span><span className="mt-2 block text-sm font-bold leading-6 text-black/70">Experience the farm, forest, flowers, food, and community firsthand.</span></button>
+              <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"><span className="block text-xl font-black">Partner</span><span className="mt-2 block text-sm font-bold leading-6 text-white/70">Help grow opportunities through collaboration and shared vision.</span></button>
+              <button type="button" onClick={() => setScreen("support")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"><span className="block text-xl font-black">Support</span><span className="mt-2 block text-sm font-bold leading-6 text-white/70">Invest in stewardship, education, workforce development, and community impact.</span></button>
+              <button type="button" onClick={() => setScreen("partner")} className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"><span className="block text-xl font-black">Contact</span><span className="mt-2 block text-sm font-bold leading-6 text-white/70">Start a conversation and learn more about the journey.</span></button>
+            </div>
+            <div className="mt-5 flex flex-wrap justify-between gap-3">
+              <button type="button" onClick={() => moveTo(pageIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20">← Get Involved</button>
+              <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black hover:bg-white/10">Return Home</button>
+            </div>
+          </div>
+        )}
       </Card>
+
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[340px]">
-          <img src={IMG.forest} alt="Bronson Family Farm guest exploration" className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
-          <div className="relative z-10 flex min-h-[340px] flex-col justify-end p-5">
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/40 p-4 backdrop-blur-xl">
-              <h2 className="text-2xl font-black">What visitors can do</h2>
-              <p className="mt-2 text-sm leading-6 text-white/80">Explore the story, learn about the land, attend events, shop, volunteer, or connect as a partner.</p>
+        <div className="relative min-h-[420px]">
+          <img src={page.image} alt={page.imageAlt} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
+          <div className="relative z-10 flex min-h-[420px] flex-col justify-end p-5">
+            <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Your Journey</div>
+              <h2 className="mt-2 text-2xl font-black">{pageIndex + 1} of {pages.length}</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {pages.map((item, index) => (
+                  <button key={item.key} type="button" onClick={() => moveTo(index)} aria-label={`Open ${item.eyebrow}`} className={`h-3 rounded-full transition-all ${index === pageIndex ? "w-10 bg-emerald-300" : "w-3 bg-white/35 hover:bg-white/60"}`} />
+                ))}
+              </div>
+              <p className="mt-4 text-sm font-bold leading-6 text-white/78">Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds</p>
             </div>
           </div>
         </div>
       </Card>
-
-      <section className="lg:col-span-2 rounded-[1.35rem] border border-white/10 bg-black/35 p-5 backdrop-blur-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-black text-emerald-50">Learn more about the guest journey</h2>
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-white/55">Select a topic to open the full detail below</div>
-        </div>
-
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {topicKeys.map((item) => {
-            const topic = guestTopics[item];
-            const active = guestTopic === item;
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => openTopic(item)}
-                className={`rounded-2xl border p-4 text-left transition ${active ? "border-emerald-200 bg-emerald-300 text-black shadow-lg shadow-emerald-950/20" : "border-white/10 bg-white/10 text-white hover:bg-white/20"}`}
-                aria-pressed={active}
-              >
-                <span className="block text-base font-black">{item}</span>
-                <span className={`mt-2 block text-xs font-bold leading-5 ${active ? "text-black/70" : "text-white/65"}`}>{topic.body}</span>
-                <span className={`mt-3 inline-flex rounded-full px-3 py-2 text-center text-xs font-black ${active ? "bg-black text-white" : "bg-white/10 text-white"}`}>{active ? "Open below" : "Open topic"}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div id="guest-topic-detail" className="mt-5 rounded-[1.35rem] border-2 border-emerald-200 bg-white p-5 text-slate-950 shadow-sm scroll-mt-24">
-          <div className="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">Full Guest Topic Detail</div>
-          <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="text-3xl font-black">{selected.title}</h2>
-              <p className="mt-2 max-w-4xl text-sm font-bold leading-6 text-slate-700">{selected.body}</p>
-            </div>
-            <button type="button" onClick={() => setScreen(selected.action)} className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-emerald-700">{selected.actionLabel}</button>
-          </div>
-
-          <div className="mt-5 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Why this matters</div>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-800">{selected.whyItMatters}</p>
-            </div>
-            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-800">What visitors learn</div>
-              <div className="mt-3 grid gap-2">
-                {selected.whatVisitorsLearn.map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm">• {item}</div>)}
-              </div>
-            </div>
-            <div className="rounded-2xl border border-purple-200 bg-purple-50 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-purple-800">Next steps</div>
-              <div className="mt-3 grid gap-2">
-                {selected.nextSteps.map((item) => <div key={item} className="rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm">→ {item}</div>)}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {selected.detailSections.map((section) => (
-              <div key={section.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-sm font-black text-slate-950">{section.title}</div>
-                <p className="mt-2 text-sm font-bold leading-6 text-slate-700">{section.text}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Ecosystem connections</div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {selected.ecosystemConnections.map((item) => <span key={item} className="rounded-full bg-white px-3 py-2 text-xs font-black text-slate-800 shadow-sm">{item}</span>)}
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
-
 
 function MyWorkspace({
   signIn,
