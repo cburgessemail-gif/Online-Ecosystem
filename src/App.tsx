@@ -12,7 +12,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 23.3 - WEEK 6 ALL THREE TRELLIS VIDEOS FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 25.2 - HISTORY-FIRST DISCOVER YOUNGSTOWN FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -96,6 +96,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 24.1: Enlarges Guest Journey story text, widens the narrative column, removes restrictive paragraph width, and makes the image panel use the full available card height for more efficient use of screen space.
  * - Ecosystem 25.0: Adds Discover Youngstown as a permanent Workbook destination and shared public story layer: Roots, Good Seed, The Land, Opportunity, Legacy, with Invitation remaining public-facing.
  * - Ecosystem 25.1 FINAL: Consolidates the complete 23.2 operational ecosystem with Workbook Weeks 1–8, all four trellis videos, Today’s Work → Workbook → My Journey routing, Discover Youngstown, Guest/Public story layers, Parent, Supervisor, Mission Control, Calendar/Almanac, Inventory, Search, Resources, Reports, and Supabase/localStorage persistence in one full App.tsx replacement.
+ * - Ecosystem 25.2 FINAL: Rebuilds Discover Youngstown as a history-first, photo-first ten-part experience: Before Youngstown; Founding Youngstown; Coal, Canals & Railroads; Steel City; A City of Many Cultures; Parks, Forests & Wildlife; Builders & Innovators; Agriculture & Food; Opportunity Today; and Your Story. Long philosophy blocks and developer-facing layer language are removed; each page ends with one reflection.
  * - Ecosystem 25.0: Uses one layered content system for youth and visitors: photo/visual, short story, activity or career connection, and deep dive.
  * - Ecosystem 25.0: Locks Workbook = Learning, My Journey = Growth, and public Guest Pathway = tourism-facing version of the same Youngstown learning ecosystem.
  * - Ecosystem 24.1: Removes “The sun does not shine for itself.” from Community Impact and updates the reflection accordingly.
@@ -3481,7 +3482,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Cultivator Journey": "Cultivator Journey",
     "My Contribution": "Aking Kontribusyon",
     "What Did I Learn?": "Ano ang Natutuhan Ko?",
-    "Career Connections": "Career Connections",
+    "Careers & Community": "Career Connections",
     "One Acre Challenge": "One Acre Challenge",
     "What opportunity do you see?": "Anong opportunity ang nakikita mo?",
     "What opportunity do you see now?": "Anong opportunity ang nakikita mo ngayon?",
@@ -7061,75 +7062,145 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       imageAlt: "Future generations planting seeds",
     },
     {
-      key: "youngstown-roots",
-      eyebrow: "Discover Youngstown • Roots",
-      title: "A city shaped by land, water, movement, and work.",
+      key: "youngstown-before",
+      eyebrow: "Discover Youngstown • Before Youngstown",
+      title: "The story begins before the city had a name.",
       paragraphs: [
-        "Youngstown grew along the Mahoning River and became a meeting place for settlement, transportation, natural resources, immigration, migration, industry, and neighborhood life.",
-        "Its history is more than a timeline. It is a story of people building families, businesses, institutions, neighborhoods, and possibilities under changing conditions.",
-        "Understanding the roots of Youngstown helps visitors understand why this place matters and why its next chapter must include the people who live here now.",
+        "Long before Youngstown became an industrial city, the Mahoning Valley was shaped by water, forests, wildlife, seasonal change, and the people who knew how to live with the land.",
+        "The Mahoning River and its tributaries supported travel, food, habitat, and settlement. The land was not empty; it carried Indigenous histories and relationships that began before modern city boundaries.",
+        "To understand Youngstown, begin with the valley itself: the river corridor, wooded ridges, wetlands, soil, and routes that later attracted settlement and industry.",
       ],
-      highlights: ["Mahoning River", "Early Settlement", "Transportation", "Immigration & Migration", "Neighborhoods"],
-      reflection: ["What roots helped shape the place you call home?"],
+      highlights: ["Mahoning Valley", "Indigenous History", "Mahoning River", "Forests & Wildlife", "Land Before Industry"],
+      reflection: ["What does the land tell us about Youngstown before buildings and factories?"],
       image: IMG.forest,
-      imageAlt: "Youngstown roots, land, and river story",
+      imageAlt: "Forest and river landscape representing the Mahoning Valley before Youngstown",
     },
     {
-      key: "youngstown-good-seed",
-      eyebrow: "Discover Youngstown • Good Seed",
+      key: "youngstown-founding",
+      eyebrow: "Discover Youngstown • Founding Youngstown",
+      title: "A settlement grows beside the Mahoning River.",
+      paragraphs: [
+        "John Young purchased land in the Connecticut Western Reserve and laid out Youngstown in 1797.",
+        "The early settlement developed around farms, mills, roads, the river, and the exchange of goods. Families and businesses depended on practical knowledge, labor, and access to transportation.",
+        "Youngstown's founding story is not only about one person. It is also about the many people whose work turned a surveyed place into neighborhoods, institutions, and a community.",
+      ],
+      highlights: ["1797", "John Young", "Western Reserve", "Early Farms & Mills", "Community Building"],
+      reflection: ["What does a new community need in order to grow and last?"],
+      image: IMG.grow,
+      imageAlt: "Early settlement and community growth in Youngstown",
+    },
+    {
+      key: "youngstown-transport",
+      eyebrow: "Discover Youngstown • Coal, Canals & Railroads",
+      title: "Transportation turned local resources into regional growth.",
+      paragraphs: [
+        "Coal deposits helped establish the Mahoning Valley as an important center of fuel and industry.",
+        "The Pennsylvania and Ohio Canal opened through the region during the 1830s and 1840s, connecting farms, mines, mills, and markets. Railroads reached Youngstown in the 1850s and moved people and materials faster and farther.",
+        "Canals and railroads changed where people worked, where businesses located, and how quickly Youngstown became connected to the national economy.",
+      ],
+      highlights: ["Coal", "Pennsylvania & Ohio Canal", "1830s–1840s", "Railroads in the 1850s", "Movement of Goods & People"],
+      reflection: ["How can a transportation system change the future of a place?"],
+      image: IMG.grow,
+      imageAlt: "Coal canal and railroad history of Youngstown",
+    },
+    {
+      key: "youngstown-steel",
+      eyebrow: "Discover Youngstown • Steel City",
+      title: "Iron and steel reshaped the city and the nation.",
+      paragraphs: [
+        "Coal, transportation, labor, investment, and growing markets helped iron and steel production expand across the Mahoning Valley.",
+        "Companies such as Republic Iron and Steel and many related mills, suppliers, rail operations, and manufacturers created jobs and drew thousands of families to the region.",
+        "Steel built prosperity and identity, but it also brought difficult working conditions, pollution, labor conflict, and dependence on one major industry. Mill closings later forced the city to confront economic loss and reinvention.",
+      ],
+      highlights: ["Iron & Steel", "Republic Iron and Steel", "Industrial Labor", "Neighborhood Growth", "Industrial Decline & Reinvention"],
+      reflection: ["What can Youngstown learn from both the success and the decline of steel?"],
+      image: IMG.grow,
+      imageAlt: "Youngstown iron and steel industry history",
+    },
+    {
+      key: "youngstown-cultures",
+      eyebrow: "Discover Youngstown • A City of Many Cultures",
+      title: "People from many places built Youngstown together.",
+      paragraphs: [
+        "Industrial growth attracted Welsh, German, Irish, Italian, Greek, Eastern European, Lebanese, Syrian, and other immigrant communities.",
+        "African American families also came through migration, seeking work, safety, education, homeownership, and opportunity while confronting discrimination and unequal access.",
+        "Churches, clubs, businesses, music, food traditions, mutual-aid networks, and neighborhoods helped people preserve identity while building a shared city.",
+      ],
+      highlights: ["Immigration", "African American Migration", "Neighborhoods", "Faith & Cultural Institutions", "Food, Music & Family Traditions"],
+      reflection: ["Which cultural traditions help a community remain strong across generations?"],
+      image: IMG.grow,
+      imageAlt: "Youngstown neighborhoods and cultural communities",
+    },
+    {
+      key: "youngstown-nature",
+      eyebrow: "Discover Youngstown • Parks, Forests & Wildlife",
+      title: "Youngstown is more than its industrial skyline.",
+      paragraphs: [
+        "The Mahoning River, neighborhood woods, city parks, creeks, vacant land, farms, and wildlife habitats continue to shape daily life.",
+        "Forests absorb water, cool neighborhoods, shelter wildlife, and hold evidence of environmental change. Parks and green spaces give residents places to learn, gather, move, and recover.",
+        "Bronson Family Farm connects this larger landscape to soil, pollinators, amphibians, butterflies, bees, food production, aviation, and responsible land stewardship.",
+      ],
+      highlights: ["Mahoning River", "City Parks", "Neighborhood Woods", "Creeks & Wet Areas", "Pollinators & Wildlife"],
+      reflection: ["What natural place in Youngstown should future generations be able to experience?"],
+      image: IMG.forest,
+      imageAlt: "Youngstown parks forests waterways and wildlife",
+    },
+    {
+      key: "youngstown-builders",
+      eyebrow: "Discover Youngstown • Builders & Innovators",
       title: "GOOD SEED COMES FROM YOUNGSTOWN.",
       subtitle: "Greatness Grows Here.",
       paragraphs: [
-        "Youngstown has produced and shaped artists, athletes, educators, scientists, entrepreneurs, civic leaders, and community builders whose influence reaches far beyond the Mahoning Valley.",
-        "Their stories are not presented only as fame. Each story connects talent to work, career pathways, persistence, community, and legacy.",
-        "The message for young people and visitors is simple: greatness can begin here, and the next builder may already be growing among us.",
+        "Youngstown has produced and shaped artists, athletes, educators, journalists, scientists, entrepreneurs, civic leaders, and community builders whose work traveled far beyond the Mahoning Valley.",
+        "The Warner Brothers, Ed O'Neill, Ray Mancini, Jim Tressel, Simeon Booker, François Clemmons, Lawrence Brownlee, Thomas Bopp, Joseph G. Butler Jr., and many others represent different kinds of talent and service.",
+        "Their histories matter because they connect imagination to discipline, careers, institutions, and the places that helped shape them.",
       ],
       highlights: ["Warner Brothers", "Ed O'Neill", "Ray Mancini", "Jim Tressel", "Simeon Booker", "François Clemmons", "Lawrence Brownlee", "Thomas Bopp"],
-      reflection: ["What can one Youngstown-connected journey teach you about your own possibilities?"],
+      reflection: ["Which Youngstown builder or innovator makes you curious to learn more?"],
       image: IMG.grow,
-      imageAlt: "Youngstown people and possibility",
+      imageAlt: "Youngstown builders innovators artists athletes and leaders",
     },
     {
-      key: "youngstown-land",
-      eyebrow: "Discover Youngstown • The Land",
-      title: "Youngstown is also a land-and-water story.",
+      key: "youngstown-agriculture",
+      eyebrow: "Discover Youngstown • Agriculture & Food",
+      title: "Food history is also labor, land, business, and family history.",
       paragraphs: [
-        "The Mahoning River, forests, creeks, parks, wildlife, farms, vacant land, and airport landscape continue to shape life in and around Youngstown.",
-        "Bronson Family Farm helps visitors and youth see agriculture, aviation, pollinators, forests, soil, water, food, and community development as connected systems.",
-        "Stewardship asks us to notice what the land is telling us and decide what kind of future our actions are creating.",
+        "Before heavy industry dominated the region, farms, gardens, orchards, mills, markets, and household food production were essential to local life.",
+        "Immigrant and migrant families carried seeds, recipes, growing knowledge, preservation skills, and food businesses into Youngstown neighborhoods.",
+        "Today, urban agriculture and regional farms can support fresh food access, youth employment, entrepreneurship, environmental repair, tourism, and a stronger local economy.",
       ],
-      highlights: ["River & Watersheds", "Forests & Wildlife", "Soil & Food", "Pollinators", "Agriculture + Aviation"],
-      reflection: ["What does the land reveal that a building or timeline cannot?"],
-      image: IMG.forest,
-      imageAlt: "Youngstown land, forest, farm, and water",
-    },
-    {
-      key: "youngstown-opportunity",
-      eyebrow: "Discover Youngstown • Opportunity",
-      title: "Success can begin in Youngstown.",
-      paragraphs: [
-        "Youngstown's future is not limited to one industry. Education, skilled trades, agriculture, aviation, technology, healthcare, entrepreneurship, arts, tourism, and public service all create pathways.",
-        "The Cultivator Ecosystem connects real work to careers so that a farm task, forest discovery, design problem, or community project can become evidence of skill and direction.",
-        "Opportunity becomes stronger when young people can see it, practice it, document it, and connect with people who can help them move forward.",
-      ],
-      highlights: ["College", "Trades", "Agriculture", "Aviation", "Technology", "Healthcare", "Entrepreneurship"],
-      reflection: ["Which opportunity could grow from something already happening here?"],
+      highlights: ["Farms & Gardens", "Markets", "Family Food Traditions", "Preservation", "Urban Agriculture", "Food Entrepreneurship"],
+      reflection: ["What food, recipe, seed, or growing practice carries history in your family or community?"],
       image: IMG.grow,
-      imageAlt: "Youngstown opportunity and future pathways",
+      imageAlt: "Youngstown agriculture gardens food traditions and markets",
     },
     {
-      key: "youngstown-legacy",
-      eyebrow: "Discover Youngstown • Legacy",
-      title: "The next chapter is being built now.",
+      key: "youngstown-opportunity-today",
+      eyebrow: "Discover Youngstown • Opportunity Today",
+      title: "The next economy can grow from many kinds of work.",
       paragraphs: [
-        "Legacy is not limited to famous people or completed monuments. It begins whenever someone improves a place, protects knowledge, helps another person, or creates an opportunity that remains.",
-        "Cultivator projects, stories, photographs, skills, discoveries, and community contributions can become part of the Youngstown Legacy Walk, Hall of Possibility, Legacy Forest, and future public learning experiences.",
-        "Visitors are not only looking backward. They are being invited to recognize, support, and participate in what Youngstown is becoming.",
+        "Youngstown's future is not limited to one industry. Education, skilled trades, agriculture, aviation, technology, healthcare, manufacturing, arts, tourism, entrepreneurship, and public service all create pathways.",
+        "History shows that transportation, natural resources, institutions, labor, and human talent can transform a region. Today the challenge is to connect those strengths to new opportunities without repeating past harms.",
+        "A farm task, forest discovery, design problem, community project, or documented skill can become the beginning of a career direction.",
       ],
-      highlights: ["Legacy Walk", "Hall of Possibility", "Legacy Forest", "Cultivator Stories", "Future Builders"],
-      reflection: ["What are you building right now that could help someone you may never meet?"],
+      highlights: ["Education", "Skilled Trades", "Agriculture", "Aviation", "Technology", "Healthcare", "Entrepreneurship & Tourism"],
+      reflection: ["Which opportunity today connects to something you have already done or learned?"],
+      image: IMG.grow,
+      imageAlt: "Youngstown education careers entrepreneurship and opportunity",
+    },
+    {
+      key: "youngstown-your-story",
+      eyebrow: "Discover Youngstown • Your Story",
+      title: "History continues through the people living it now.",
+      paragraphs: [
+        "A city's history is never finished. New photographs, oral histories, family records, discoveries, businesses, public spaces, and acts of service become part of the record.",
+        "Young people are not outside Youngstown history. Their work, questions, skills, and ideas can help explain what the city is becoming.",
+        "Your story can connect where you came from, what you are learning, what you are building, and what you want future residents to inherit.",
+      ],
+      highlights: ["Family History", "Neighborhood Memory", "Cultivator Work", "Community Contribution", "Future Youngstown"],
+      reflection: ["What part of your Youngstown story should be remembered?"],
       image: IMG.forest,
-      imageAlt: "Youngstown legacy and future builders",
+      imageAlt: "Youngstown youth families and future community stories",
     },
     {
       key: "involved",
@@ -10226,7 +10297,7 @@ type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
 type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks" | "youngstown";
 
 type DiscoverYoungstownSection25 = {
-  key: "roots" | "good-seed" | "land" | "opportunity" | "legacy";
+  key: "before" | "founding" | "transport" | "steel" | "cultures" | "nature" | "builders" | "agriculture" | "opportunity-today" | "your-story";
   icon: string;
   title: string;
   subtitle: string;
@@ -10239,94 +10310,89 @@ type DiscoverYoungstownSection25 = {
 
 const DISCOVER_YOUNGSTOWN_SECTIONS_25: DiscoverYoungstownSection25[] = [
   {
-    key: "roots",
-    icon: "🌱",
-    title: "Roots",
-    subtitle: "How Youngstown began and how people, land, water, transportation, and work shaped the city.",
-    shortStory: "Youngstown grew along the Mahoning River and became a place where settlement, transportation, natural resources, immigration, migration, industry, and neighborhood life met.",
-    learnMore: [
-      "John Young and early settlement",
-      "The Mahoning River and regional geography",
-      "Native peoples and earlier histories of the land",
-      "Canals, railroads, roads, and the movement of people and goods",
-      "Immigration, migration, neighborhoods, and community-building",
-    ],
-    careers: ["Historian", "Archivist", "Museum Educator", "Urban Planner", "Tour Guide"],
-    activityPrompt: "What part of Youngstown's roots helps you better understand the place where you live, work, or learn?",
-    deepDive: ["Historic maps", "Primary-source photographs", "Neighborhood histories", "Mahoning Valley timelines"],
+    key: "before", icon: "🌊", title: "Before Youngstown", subtitle: "The river, forests, wildlife, and Indigenous histories that came before the modern city.",
+    shortStory: "Youngstown's story begins with the Mahoning Valley itself. The river, wooded land, wetlands, wildlife, and Indigenous relationships to place existed long before surveyed streets, mills, and factories.",
+    learnMore: ["Mahoning Valley geography", "Mahoning River and tributaries", "Indigenous histories of the land", "Forests, wetlands, and wildlife", "Travel and settlement routes"],
+    careers: ["Archaeologist", "Historian", "Ecologist", "Museum Educator", "GIS Specialist"],
+    activityPrompt: "What does the land tell us about Youngstown before buildings and factories?",
+    deepDive: ["Historic and ecological maps", "Indigenous history resources", "River and watershed studies", "Forest and wildlife observations"],
   },
   {
-    key: "good-seed",
-    icon: "🏆",
-    title: "Good Seed",
-    subtitle: "People connected to Youngstown whose work, talent, courage, and imagination traveled far beyond the city.",
-    shortStory: "Youngstown has produced and shaped artists, athletes, educators, scientists, entrepreneurs, civic leaders, and community builders. Their stories show that greatness can begin here.",
-    learnMore: [
-      "Warner Brothers — film, production, storytelling, and entrepreneurship",
-      "Ed O'Neill — performance, persistence, and the entertainment industry",
-      "Ray Mancini — discipline, athletics, business, and community identity",
-      "Jim Tressel — education, leadership, coaching, and service",
-      "Simeon Booker, François Clemmons, Lawrence Brownlee, Thomas Bopp, and other documented Youngstown-connected builders",
-    ],
-    careers: ["Filmmaker", "Actor", "Athletic Coach", "Educator", "Journalist", "Scientist", "Entrepreneur"],
-    activityPrompt: "Choose one Youngstown-connected person. What did they cultivate, and what can their journey teach you?",
-    deepDive: ["Photo-first profiles", "Career connections", "Oral histories", "Legacy questions", "Verified Youngstown connections"],
+    key: "founding", icon: "🏘️", title: "Founding Youngstown", subtitle: "How a settlement beside the Mahoning River became a growing community.",
+    shortStory: "John Young laid out Youngstown in 1797 within the Connecticut Western Reserve. Farms, mills, roads, households, and local exchange helped the settlement become a community.",
+    learnMore: ["John Young and 1797", "Connecticut Western Reserve", "Early farms and mills", "Roads, river crossings, and trade", "Families, institutions, and community growth"],
+    careers: ["Historian", "Archivist", "Surveyor", "Urban Planner", "Historic Preservationist"],
+    activityPrompt: "What does a new community need in order to grow and last?",
+    deepDive: ["Early maps", "Land records", "Founding-era timelines", "Historic buildings and sites"],
   },
   {
-    key: "land",
-    icon: "🌳",
-    title: "The Land",
-    subtitle: "The river, forests, soil, water, wildlife, agriculture, and airport landscape that make this place distinct.",
-    shortStory: "Youngstown is not only an industrial story. It is also a land-and-water story. Forests, creeks, parks, wildlife, farms, vacant land, and the Mahoning River continue to shape community life and future opportunity.",
-    learnMore: [
-      "Mahoning River and local watersheds",
-      "Forests, parks, creeks, and wildlife habitat",
-      "Soil health, food production, and regenerative agriculture",
-      "Pollinators, milkweed, butterflies, bees, amphibians, and biodiversity",
-      "Lansdowne Airport, agriculture, transportation, and land stewardship",
-    ],
-    careers: ["Farmer", "Ecologist", "Environmental Scientist", "Park Ranger", "Landscape Architect", "Aviation Planner"],
-    activityPrompt: "What did you observe at the farm, forest, creek, park, or neighborhood that helps explain how Youngstown's land is changing?",
-    deepDive: ["Field observations", "Farm and forest journals", "Pollinator records", "Water and soil investigations", "Aerial and site maps"],
+    key: "transport", icon: "🚂", title: "Coal, Canals & Railroads", subtitle: "How resources and transportation connected Youngstown to wider markets.",
+    shortStory: "Coal deposits, the Pennsylvania and Ohio Canal, and railroads changed Youngstown's scale and speed. Materials, workers, and products could move farther, helping mines, mills, farms, and businesses expand.",
+    learnMore: ["Coal discovery and mining", "Pennsylvania and Ohio Canal, 1830s–1840s", "David Tod and regional development", "Railroads arriving in the 1850s", "Movement of people, fuel, food, and manufactured goods"],
+    careers: ["Civil Engineer", "Logistics Manager", "Railroad Worker", "Transportation Planner", "Economic Historian"],
+    activityPrompt: "How can a transportation system change the future of a place?",
+    deepDive: ["Canal maps", "Railroad timelines", "Coal and industrial geography", "Transportation and business connections"],
   },
   {
-    key: "opportunity",
-    icon: "🚀",
-    title: "Opportunity",
-    subtitle: "Education, trades, agriculture, aviation, technology, healthcare, entrepreneurship, arts, and public service pathways that can begin here.",
-    shortStory: "Youngstown's future is not limited to one industry. Youth can connect today's work to many pathways and learn that success can begin in Youngstown.",
-    learnMore: [
-      "Youngstown State University and College Credit Plus",
-      "Central State University agriculture and extension learning",
-      "Trades, apprenticeships, construction, and manufacturing",
-      "Agriculture, food systems, tourism, and entrepreneurship",
-      "Aviation, healthcare, technology, education, arts, and public service",
-    ],
+    key: "steel", icon: "🏭", title: "Steel City", subtitle: "The industry that created jobs, neighborhoods, identity, and difficult consequences.",
+    shortStory: "Iron and steel grew from the region's coal, transportation, labor, investment, and markets. Mills and related businesses transformed Youngstown, but dependence on one industry also made later mill closings deeply damaging.",
+    learnMore: ["Iron and steel production", "Republic Iron and Steel", "Mill labor and working conditions", "Industrial neighborhoods and businesses", "Shutdowns, job loss, pollution, and reinvention"],
+    careers: ["Metallurgist", "Welder", "Industrial Engineer", "Machinist", "Environmental Engineer"],
+    activityPrompt: "What can Youngstown learn from both the success and the decline of steel?",
+    deepDive: ["Mill photographs", "Worker oral histories", "Labor and union history", "Industrial cleanup and redevelopment"],
+  },
+  {
+    key: "cultures", icon: "🌍", title: "A City of Many Cultures", subtitle: "Immigration, migration, neighborhoods, faith, food, music, and family traditions.",
+    shortStory: "Welsh, German, Irish, Italian, Greek, Eastern European, Lebanese, Syrian, African American, and other communities helped build Youngstown. Their labor and institutions shaped the city's neighborhoods and identity.",
+    learnMore: ["European immigration", "African American migration", "Lebanese, Syrian, and other communities", "Churches, clubs, and mutual aid", "Food, music, language, business, and family traditions"],
+    careers: ["Genealogist", "Journalist", "Community Organizer", "Cultural Historian", "Chef or Food Entrepreneur"],
+    activityPrompt: "Which cultural traditions help a community remain strong across generations?",
+    deepDive: ["Family and neighborhood histories", "Oral history interviews", "Cultural institutions", "Recipes, music, festivals, and local businesses"],
+  },
+  {
+    key: "nature", icon: "🌳", title: "Parks, Forests & Wildlife", subtitle: "The natural Youngstown of rivers, creeks, parks, neighborhood woods, farms, and habitat.",
+    shortStory: "Youngstown is also a land-and-water story. Forests absorb water and cool neighborhoods. Parks support recreation and learning. Creeks, wetlands, farms, vacant land, and wildlife reveal both environmental health and past damage.",
+    learnMore: ["Mahoning River and watersheds", "City parks and neighborhood woods", "Creeks, wetlands, and pooled water", "Pollinators, butterflies, bees, amphibians, and birds", "Farm, forest, and airport-land stewardship"],
+    careers: ["Park Ranger", "Environmental Scientist", "Wildlife Biologist", "Landscape Architect", "Watershed Coordinator"],
+    activityPrompt: "What natural place in Youngstown should future generations be able to experience?",
+    deepDive: ["Field observations", "Water and soil investigations", "Wildlife records", "Park, forest, and watershed maps"],
+  },
+  {
+    key: "builders", icon: "⭐", title: "Builders & Innovators", subtitle: "Youngstown-connected people whose talent, work, and ideas traveled far beyond the city.",
+    shortStory: "GOOD SEED COMES FROM YOUNGSTOWN. The Warner Brothers, Ed O'Neill, Ray Mancini, Jim Tressel, Simeon Booker, François Clemmons, Lawrence Brownlee, Thomas Bopp, Joseph G. Butler Jr., and many others show how many forms greatness can take.",
+    learnMore: ["Warner Brothers — filmmaking and entrepreneurship", "Ed O'Neill — acting and persistence", "Ray Mancini — athletics and community identity", "Simeon Booker — journalism and civil rights reporting", "François Clemmons, Lawrence Brownlee, Thomas Bopp, Joseph G. Butler Jr., and other builders"],
+    careers: ["Filmmaker", "Actor", "Athlete or Coach", "Journalist", "Scientist", "Entrepreneur"],
+    activityPrompt: "Which Youngstown builder or innovator makes you curious to learn more?",
+    deepDive: ["Photo-first profiles", "Verified Youngstown connections", "Career timelines", "Oral histories and archives"],
+  },
+  {
+    key: "agriculture", icon: "🌾", title: "Agriculture & Food", subtitle: "Farms, gardens, markets, preservation, family traditions, and today's food economy.",
+    shortStory: "Food history is labor, land, business, and family history. Farms and gardens fed early communities, while later immigrant and migrant families carried seeds, recipes, preservation skills, and food businesses into Youngstown neighborhoods.",
+    learnMore: ["Early farms, gardens, orchards, and mills", "Neighborhood gardens and household food production", "Markets and food businesses", "Canning, drying, freezing, and preservation", "Urban agriculture, fresh-food access, and entrepreneurship"],
+    careers: ["Farmer", "Food Scientist", "Chef", "Dietitian", "Market Manager", "Agricultural Entrepreneur"],
+    activityPrompt: "What food, recipe, seed, or growing practice carries history in your family or community?",
+    deepDive: ["Historic foodways", "Family recipes and interviews", "Local farm and market records", "Food access and urban agriculture"],
+  },
+  {
+    key: "opportunity-today", icon: "🛠️", title: "Opportunity Today", subtitle: "Education, trades, agriculture, aviation, healthcare, technology, arts, tourism, and service.",
+    shortStory: "Youngstown's next economy can grow from many kinds of work. History shows that transportation, institutions, natural resources, labor, and talent can transform a region. Today's opportunity depends on connecting those strengths to new paths.",
+    learnMore: ["College and College Credit Plus", "Trades, apprenticeships, and manufacturing", "Agriculture, food systems, and tourism", "Aviation, healthcare, technology, and education", "Entrepreneurship, arts, nonprofit work, and public service"],
     careers: ["Business Owner", "Agronomist", "Pilot", "Engineer", "Nurse", "Teacher", "Skilled Trades Professional"],
-    activityPrompt: "Which opportunity connects most directly to something you did, observed, built, measured, or solved today?",
-    deepDive: ["Career profiles", "Local training options", "Employer and college links", "Mentor stories", "Youth opportunity plans"],
+    activityPrompt: "Which opportunity today connects to something you have already done or learned?",
+    deepDive: ["Local training options", "Career profiles", "Employer and college connections", "Mentor and alumni stories"],
   },
   {
-    key: "legacy",
-    icon: "🏛️",
-    title: "Legacy",
-    subtitle: "The continuing story of what people build, protect, improve, teach, and leave for others.",
-    shortStory: "Legacy is not reserved for famous people. It begins with work that improves a place, helps another person, protects knowledge, or creates an opportunity that remains after the day is over.",
-    learnMore: [
-      "Cultivator accomplishments and firsts",
-      "Legacy projects and community improvements",
-      "Cultivators Hall of Possibility",
-      "Legacy Walk and Legacy Forest concepts",
-      "Youth stories that may become part of Youngstown's next chapter",
-    ],
-    careers: ["Community Developer", "Nonprofit Leader", "Architect", "Educator", "Entrepreneur", "Public Historian"],
-    activityPrompt: "What are you building right now that could help a future Cultivator, family, visitor, or community member?",
-    deepDive: ["Journey evidence", "Portfolio projects", "Community impact records", "Legacy Registry", "Future Cultivator knowledge transfer"],
+    key: "your-story", icon: "📖", title: "Your Story", subtitle: "How family, neighborhood, work, learning, and service become part of Youngstown history.",
+    shortStory: "A city's history is never finished. Youth photographs, discoveries, family stories, skills, businesses, and community contributions can help document what Youngstown is becoming now.",
+    learnMore: ["Family and neighborhood memory", "Cultivator accomplishments and firsts", "Photographs, interviews, and field notes", "Community projects and improvements", "Future Youngstown ideas"],
+    careers: ["Public Historian", "Photographer", "Writer", "Community Developer", "Architect", "Nonprofit Leader"],
+    activityPrompt: "What part of your Youngstown story should be remembered?",
+    deepDive: ["Workbook evidence", "Youth oral histories", "Community impact records", "Legacy Walk and Hall of Possibility concepts"],
   },
 ];
 
 function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUser | null }) {
-  const [activeKey, setActiveKey] = useState<DiscoverYoungstownSection25["key"]>("roots");
+  const [activeKey, setActiveKey] = useState<DiscoverYoungstownSection25["key"]>("before");
   const [response, setResponse] = useState("");
   const [message, setMessage] = useState("");
   const section = DISCOVER_YOUNGSTOWN_SECTIONS_25.find((item) => item.key === activeKey) || DISCOVER_YOUNGSTOWN_SECTIONS_25[0];
@@ -10369,10 +10435,10 @@ function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUse
       <Card className="overflow-hidden p-0">
         <div className="grid gap-0 lg:grid-cols-[1.15fr_.85fr]">
           <div className="p-6 md:p-8">
-            <div className="text-xs font-black uppercase tracking-[0.3em] text-amber-100/85">Permanent Workbook Shelf</div>
+            <div className="text-xs font-black uppercase tracking-[0.3em] text-amber-100/85">Youngstown History</div>
             <h2 className="mt-3 text-4xl font-black md:text-6xl">Discover Youngstown</h2>
             <p className="mt-4 max-w-4xl text-base font-bold leading-7 text-white/80 md:text-lg">GOOD SEED COMES FROM YOUNGSTOWN. <span className="text-emerald-200">Greatness Grows Here.</span></p>
-            <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-white/72">Learn where the city came from, who helped shape it, how the land matters, what opportunities exist, and how your own work can become part of Youngstown's continuing story.</p>
+            <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-white/72">Explore Youngstown through ten history-first chapters. Begin with the land and founding, follow coal, canals, railroads, steel, migration, nature, food, and builders, then connect that history to opportunity and your own story.</p>
           </div>
           <div className="min-h-[260px] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.5)), url(${IMG.grow})` }} aria-label="Youngstown and Bronson Family Farm learning landscape" />
         </div>
@@ -10391,15 +10457,15 @@ function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUse
       <Card className="p-5 md:p-7">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)]">
           <div>
-            <div className="text-xs font-black uppercase tracking-[0.24em] text-amber-100/80">Layer 1 • Photo / Visual</div>
-            <div className="mt-3 min-h-[260px] rounded-[1.6rem] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.46)), url(${section.key === "land" ? IMG.forest : IMG.grow})` }} />
-            <div className="mt-5 text-xs font-black uppercase tracking-[0.24em] text-emerald-100/75">Layer 2 • Short Story</div>
+            <div className="text-xs font-black uppercase tracking-[0.24em] text-amber-100/80">Historic Image</div>
+            <div className="mt-3 min-h-[260px] rounded-[1.6rem] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.46)), url(${["before", "nature", "your-story"].includes(section.key) ? IMG.forest : IMG.grow})` }} />
+            <div className="mt-5 text-xs font-black uppercase tracking-[0.24em] text-emerald-100/75">Historical Story</div>
             <h3 className="mt-2 text-4xl font-black">{section.icon} {section.title}</h3>
             <p className="mt-3 text-base font-bold leading-8 text-white/82">{section.shortStory}</p>
           </div>
           <div className="grid content-start gap-4">
             <div className="rounded-[1.4rem] border border-white/12 bg-white/8 p-5">
-              <div className="text-xs font-black uppercase tracking-[0.22em] text-sky-100/80">Layer 3 • Learn More</div>
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-sky-100/80">Timeline & Local Facts</div>
               <div className="mt-3 grid gap-2">{section.learnMore.map((item) => <div key={item} className="text-sm font-bold leading-6 text-white/80">• {item}</div>)}</div>
             </div>
             <div className="rounded-[1.4rem] border border-emerald-200/20 bg-emerald-300/10 p-5">
@@ -10407,14 +10473,14 @@ function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUse
               <div className="mt-3 flex flex-wrap gap-2">{section.careers.map((career) => <span key={career} className="rounded-full border border-emerald-200/25 bg-black/25 px-3 py-2 text-xs font-black">{career}</span>)}</div>
             </div>
             <details className="rounded-[1.4rem] border border-white/12 bg-black/35 p-5">
-              <summary className="cursor-pointer text-sm font-black">Layer 4 • Deep Dive</summary>
+              <summary className="cursor-pointer text-sm font-black">More to Explore</summary>
               <div className="mt-3 grid gap-2">{section.deepDive.map((item) => <div key={item} className="text-sm font-bold leading-6 text-white/72">• {item}</div>)}</div>
             </details>
           </div>
         </div>
 
         <div className="mt-6 rounded-[1.5rem] border border-amber-200/25 bg-amber-300/10 p-5">
-          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Workbook Activity</div>
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Your Reflection</div>
           <div className="mt-3 text-xl font-black leading-8">{section.activityPrompt}</div>
           <textarea value={response} onChange={(event) => setResponse(event.target.value)} className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/15 bg-white p-4 font-bold text-slate-950 outline-none focus:border-amber-300" placeholder="Write, dictate, or summarize your response here." />
           <div className="mt-4 flex flex-wrap items-center gap-3">
