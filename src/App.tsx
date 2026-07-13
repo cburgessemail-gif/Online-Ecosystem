@@ -97,6 +97,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 25.0: Adds Discover Youngstown as a permanent Workbook destination and shared public story layer: Roots, Good Seed, The Land, Opportunity, Legacy, with Invitation remaining public-facing.
  * - Ecosystem 25.1 FINAL: Consolidates the complete 23.2 operational ecosystem with Workbook Weeks 1–8, all four trellis videos, Today’s Work → Workbook → My Journey routing, Discover Youngstown, Guest/Public story layers, Parent, Supervisor, Mission Control, Calendar/Almanac, Inventory, Search, Resources, Reports, and Supabase/localStorage persistence in one full App.tsx replacement.
  * - Ecosystem 25.2 FINAL: Rebuilds Discover Youngstown as a history-first, photo-first ten-part experience: Before Youngstown; Founding Youngstown; Coal, Canals & Railroads; Steel City; A City of Many Cultures; Parks, Forests & Wildlife; Builders & Innovators; Agriculture & Food; Opportunity Today; and Your Story. Long philosophy blocks and developer-facing layer language are removed; each page ends with one reflection.
+ * - Ecosystem 25.3 FINAL: Parent / Guardian access now opens through the Visitor Pathway first. Parents experience the public farm and Youngstown story before entering their private Parent Portal through the persistent Parent navigation.
+ * - Ecosystem 25.4 FINAL: Returning parents retain permanent two-way access between the private Parent Portal and the public Visitor Pathway. The Visitor experience is never treated as a one-time onboarding screen.
  * - Ecosystem 25.0: Uses one layered content system for youth and visitors: photo/visual, short story, activity or career connection, and deep dive.
  * - Ecosystem 25.0: Locks Workbook = Learning, My Journey = Growth, and public Guest Pathway = tourism-facing version of the same Youngstown learning ecosystem.
  * - Ecosystem 24.1: Removes “The sun does not shine for itself.” from Community Impact and updates the reflection accordingly.
@@ -5461,7 +5463,14 @@ function App() {
     const normalizedUser = user.lifecycle_status === "inactive" ? { ...user, accessLevel: "public" as AccessLevel } : user;
     safeWrite(SESSION_KEY, normalizedUser);
     saveParticipantLifecycleRecord(normalizedUser);
-    const target = normalizedUser.lifecycle_status === "inactive" || normalizedUser.lifecycle_status === "pending" ? "guest" : routeForRole(role);
+    // Parents enter through the same Visitor Pathway as the public before opening
+    // their private Parent Portal from the persistent Parent navigation.
+    const target =
+      normalizedUser.lifecycle_status === "inactive" || normalizedUser.lifecycle_status === "pending"
+        ? "guest"
+        : role === "Parent / Guardian"
+        ? "guest"
+        : routeForRole(role);
     recordJourney(target, normalizedUser);
     if (role === "Youth Workforce Participant" && target === "youth") {
       setYouthDailyPhase16_2(normalizedUser, "work");
@@ -13080,8 +13089,8 @@ function ParentQuickAccess16_8({ setScreen }: { setScreen: (screen: Screen) => v
         ))}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {["Home", "My Child", "Progress", "Messages", "Reports"].map((label) => (
-          <button key={label} type="button" onClick={() => label === "Messages" ? setScreen("feedback") : label === "Reports" ? setScreen("reports") : setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white hover:bg-white/18">{label}</button>
+        {["Home", "My Child", "Progress", "Messages", "Reports", "Visit the Ecosystem"].map((label) => (
+          <button key={label} type="button" onClick={() => label === "Visit the Ecosystem" ? setScreen("guest") : label === "Messages" ? setScreen("feedback") : label === "Reports" ? setScreen("reports") : setScreen("parent")} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black text-white hover:bg-white/18">{label}</button>
         ))}
       </div>
     </div>
