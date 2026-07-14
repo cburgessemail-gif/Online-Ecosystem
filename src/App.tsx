@@ -8,12 +8,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
- * - Ecosystem 26.5 FINAL: Single ecosystem navigation. Removes the duplicate lower Explore the Farm grid and preserves the upper working navigation as the only farm-area navigator.
+ * - Ecosystem 26.6 FINAL: Parent-ready, real-farm visitor story. Replaces abstract Roots/Seed/Journey philosophy with the airport, family, Cultivators, current projects, discoveries, learning, Youngstown, opportunity, and documented legacy. Removes public map-style navigation.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 25.2 - HISTORY-FIRST DISCOVER YOUNGSTOWN FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 26.6 - PARENT-READY REAL FARM STORY FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -6463,33 +6463,49 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
     setScreen("guest");
   };
 
-  const ecosystemNodes = [
-    { icon: "🌲", title: "Forest", question: "What can nature teach us?", key: "youngstown-nature" },
-    { icon: "🌱", title: "Grow Area", question: "How does food begin?", key: "youngstown-agriculture" },
-    { icon: "🦋", title: "Pollinator Habitat", question: "Why do pollinators matter?", key: "growth" },
-    { icon: "🐝", title: "Apiary", question: "How do bees support agriculture?", key: "growth" },
-    { icon: "🧺", title: "Marketplace", question: "How does food become a business?", key: "harvest" },
-    { icon: "🤝", title: "Community", question: "Who benefits?", key: "community" },
-    { icon: "✨", title: "Opportunity", question: "Where can this lead?", key: "youngstown-opportunity-today" },
+  const currentProjects = [
+    "Milkweed seed collection and processing",
+    "Melon trellis construction",
+    "Apiary restoration",
+    "Squash and pumpkin grow-area preparation",
+    "Corn and crop monitoring",
+    "Wildlife and forest observation",
+  ];
+
+  const recentDiscoveries = [
+    "Two baby salamanders",
+    "A toad in the forest habitat",
+    "A butterfly cocoon",
+    "Deer footprints near missing corn seedlings",
+    "Six plant varieties growing together in one area",
+  ];
+
+  const visitorChoices = [
+    { label: "A Farm at an Airport", detail: "Learn why Bronson Family Farm is growing at Lansdowne Airport.", key: "airport" },
+    { label: "The Bronson Family Farm Story", detail: "Meet the family, purpose, and work behind the farm.", key: "family" },
+    { label: "Meet the Cultivators", detail: "See what youth are building, growing, observing, and learning.", key: "cultivators" },
+    { label: "Discoveries from the Field", detail: "Explore wildlife, pollinators, plants, and forest discoveries.", key: "discoveries" },
+    { label: "Discover Youngstown", detail: "Explore the history, people, land, food, and opportunity of Youngstown.", key: "youngstown-before" },
   ];
 
   return (
     <div className="grid gap-4">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[70vh]">
+        <div className="relative min-h-[68vh]">
           <img
             src={IMG.forest}
             alt="Bronson Family Farm forest and growing landscape"
             className="absolute inset-0 h-full w-full object-cover"
             onError={(event) => (event.currentTarget.src = IMG.grow)}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/94 via-black/78 to-black/58" />
-          <div className="relative z-10 grid min-h-[70vh] items-center gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,.95fr)] lg:p-14">
-            <div>
-              <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm")}</div>
-              <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-7xl">{TT("Greatness Grows Here")}</h1>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/82 to-black/62" />
+          <div className="relative z-10 flex min-h-[68vh] items-center p-6 sm:p-10 lg:p-14">
+            <div className="max-w-4xl">
+              <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm • Lansdowne Airport • Youngstown, Ohio")}</div>
+              <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-7xl">{TT("Welcome to Bronson Family Farm")}</h1>
+              <p className="mt-4 text-2xl font-black text-emerald-200 sm:text-3xl">{TT("We Grow Green to Harvest Dreams")}</p>
               <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/88 sm:text-xl">
-                {TT("Explore a working farm where young people grow food, care for pollinators, study the forest, rebuild the apiary, learn practical skills, and contribute to the Youngstown community.")}
+                {TT("Bronson Family Farm is a youth workforce, education, and environmental stewardship program located at Lansdowne Airport in Youngstown. Young people learn through real work, real discovery, and real responsibility.")}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button type="button" onClick={() => openGuestAt("home")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Explore the Farm")}</button>
@@ -6498,32 +6514,51 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
                 <button type="button" onClick={openGrownByMarketplace} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Marketplace")}</button>
               </div>
             </div>
-
-            <div className="rounded-[2rem] border border-emerald-200/25 bg-black/52 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
-              <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Farm")}</div>
-              <h2 className="mt-2 text-3xl font-black text-white">{TT("Choose an Area")}</h2>
-              <div className="mt-5 grid gap-2">
-                {ecosystemNodes.map((node, index) => (
-                  <React.Fragment key={node.title}>
-                    <button
-                      type="button"
-                      onClick={() => openGuestAt(node.key)}
-                      className="group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-white/12 bg-white/8 p-3 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/16 focus:border-emerald-200 focus:outline-none"
-                    >
-                      <span className="text-2xl" aria-hidden="true">{node.icon}</span>
-                      <span>
-                        <span className="block text-lg font-black text-white">{TT(node.title)}</span>
-                        <span className="mt-0.5 block text-xs font-semibold text-white/65">{TT(node.question)}</span>
-                      </span>
-                      <span className="text-xl font-black text-emerald-200 transition group-hover:translate-x-1" aria-hidden="true">→</span>
-                    </button>
-                    {index < ecosystemNodes.length - 1 && <div className="text-center text-lg font-black leading-none text-emerald-200/60" aria-hidden="true">↓</div>}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
+      </Card>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("This Week at the Farm")}</div>
+        <h2 className="mt-2 text-4xl font-black">{TT("Real work. Real discoveries. Real growth.")}</h2>
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <section>
+            <h3 className="text-2xl font-black">{TT("Current Projects")}</h3>
+            <ul className="mt-3 grid gap-2">
+              {currentProjects.map((item) => <li key={item} className="flex gap-3 text-base font-bold leading-7 text-white/86"><span aria-hidden="true">•</span><span>{TT(item)}</span></li>)}
+            </ul>
+          </section>
+          <section>
+            <h3 className="text-2xl font-black">{TT("Recent Discoveries")}</h3>
+            <ul className="mt-3 grid gap-2">
+              {recentDiscoveries.map((item) => <li key={item} className="flex gap-3 text-base font-bold leading-7 text-white/86"><span aria-hidden="true">•</span><span>{TT(item)}</span></li>)}
+            </ul>
+          </section>
+        </div>
+        <button type="button" onClick={() => openGuestAt("this-week")} className="mt-6 rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{TT("See This Week at the Farm")}</button>
+      </Card>
+
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore")}</div>
+        <h2 className="mt-2 text-4xl font-black">{TT("The farm, the people, and the work")}</h2>
+        <div className="mt-6 divide-y divide-white/12 border-y border-white/12">
+          {visitorChoices.map((choice) => (
+            <button key={choice.key} type="button" onClick={() => openGuestAt(choice.key)} className="group grid w-full gap-1 py-5 text-left sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6">
+              <span>
+                <span className="block text-xl font-black text-white group-hover:text-emerald-200">{TT(choice.label)}</span>
+                <span className="mt-1 block text-sm font-semibold leading-6 text-white/68">{TT(choice.detail)}</span>
+              </span>
+              <span className="text-2xl font-black text-emerald-200 transition group-hover:translate-x-1" aria-hidden="true">→</span>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="border-amber-200/20 bg-amber-300/10">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-amber-100/75">{TT("Parents and Guardians")}</div>
+        <h2 className="mt-2 text-3xl font-black">{TT("See what your child is doing and learning")}</h2>
+        <p className="mt-3 max-w-4xl text-base font-semibold leading-7 text-white/82">{TT("The Parent Portal provides the current program status, report and dismissal times, lunch and hydration reminders, today's learning, progress, and accomplishments.")}</p>
+        <button type="button" onClick={() => setScreen("roles")} className="mt-5 rounded-full bg-amber-200 px-6 py-3 font-black text-black">{TT("Open Parent Access")}</button>
       </Card>
 
       {activeUser && (
@@ -6949,144 +6984,142 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const pages: GuestJourneyPage[] = [
     {
       key: "home",
-      eyebrow: "Bronson Family Farm • Youngstown, Ohio",
-      title: "Greatness Grows Here",
-      subtitle: "Purpose. Place. Experience. Opportunity. Legacy.",
+      eyebrow: "Bronson Family Farm • Lansdowne Airport • Youngstown, Ohio",
+      title: "Welcome to Bronson Family Farm",
+      subtitle: "We Grow Green to Harvest Dreams",
       paragraphs: [
-        "Youngstown has always been a place where people built futures.",
-        "Inventors. Artists. Educators. Builders. Entrepreneurs. Workers. Community leaders.",
-        "Today, a new generation is growing those same possibilities.",
-        "At Bronson Family Farm, youth learn through stewardship, discovery, work, service, and opportunity.",
+        "Bronson Family Farm is a youth workforce, education, and environmental stewardship program located at Lansdowne Airport in Youngstown, Ohio.",
+        "Young people learn through real work, real discovery, and real responsibility.",
+        "They grow food, care for pollinators, explore the forest, restore the apiary, build projects, document discoveries, and develop practical workforce skills.",
+        "This is a working farm, a learning environment, and a growing community resource.",
       ],
-      highlights: ["Every seed is a lesson.", "Every lesson creates opportunity.", "Every opportunity creates legacy."],
+      highlights: ["A farm at an airport", "Youth workforce development", "Agriculture and food", "Forest and wildlife discovery", "Pollinator and apiary stewardship"],
       image: IMG.forest,
       imageAlt: "Bronson Family Farm landscape in Youngstown",
     },
     {
-      key: "roots",
-      eyebrow: "Roots",
-      title: "Where every story begins.",
+      key: "airport",
+      eyebrow: "Lansdowne Airport",
+      title: "A Farm at an Airport?",
       paragraphs: [
-        "The Bronson Family story spans generations of perseverance, stewardship, learning, and community.",
-        "Roots connect us to those who came before us. They provide stability. They provide identity. They provide strength when storms arrive.",
-        "Just as a tree depends upon its roots, every community depends upon the people who helped shape it.",
-        "The lessons we inherit often become the foundation for the opportunities we create.",
-        "Every family carries a story. Every place carries a history. Every journey begins somewhere.",
-        "Our roots remind us where we started and help guide where we are going.",
+        "Yes. Bronson Family Farm operates at Lansdowne Airport in Youngstown.",
+        "The airport property includes open grassland, wooded areas, wildlife habitat, pollinator spaces, and agricultural growing areas.",
+        "That unusual setting gives youth opportunities to learn about agriculture, aviation, transportation, land stewardship, environmental observation, and community development in one place.",
+        "The farm develops while respecting airport operations, safety requirements, and the surrounding environment.",
       ],
-      reflection: ["What roots helped shape your journey?"],
+      highlights: ["Active airport setting", "Agricultural growing areas", "Forest and wildlife habitat", "Pollinator environments", "Youth learning and workforce development"],
+      image: IMG.grow,
+      imageAlt: "Bronson Family Farm growing area at Lansdowne Airport",
+    },
+    {
+      key: "family",
+      eyebrow: "Our Story",
+      title: "The Bronson Family Farm Story",
+      paragraphs: [
+        "Bronson Family Farm grew from a family vision to use land, agriculture, and real work to create opportunity for young people and the Youngstown community.",
+        "The work began with growing food and continued to expand through environmental stewardship, youth workforce development, pollinator habitat, forest exploration, apiary restoration, entrepreneurship, and community partnerships.",
+        "The farm is still being built. Youth, family members, volunteers, educators, growers, researchers, and community partners each contribute to what it is becoming.",
+        "The story is not an abstract idea. It is visible in every prepared row, repaired structure, documented discovery, planted seed, and new skill.",
+      ],
+      highlights: ["Family vision", "Youth opportunity", "Food production", "Environmental stewardship", "Community partnership"],
       image: IMG.forest,
-      imageAlt: "Roots and family heritage",
+      imageAlt: "Bronson Family Farm family and community story",
     },
     {
-      key: "seed",
-      eyebrow: "Seed",
-      title: "Possibility begins here.",
+      key: "cultivators",
+      eyebrow: "Meet the Cultivators",
+      title: "Youth learn by doing.",
       paragraphs: [
-        "Bronson Family Farm began as a seed.",
-        "Not a field. Not a harvest. Not a destination. A possibility.",
-        "A belief that agriculture could create opportunity, strengthen communities, and reconnect people to the land.",
-        "Like every seed, the future was hidden from view. The farm existed first as an idea.",
-        "A vision for growing food. A vision for creating experiences. A vision for workforce development. A vision for environmental stewardship. A vision for helping people discover what they are capable of becoming.",
-        "At the beginning, there were no guarantees. Only the willingness to plant something and trust that growth would follow.",
-        "A single seed can become a plant. A plant can become a harvest. A harvest can feed a family. A family can strengthen a community. A community can shape the future.",
-        "The question is never what a seed is. The question is what it may become.",
+        "Cultivators are young people who contribute to the farm through meaningful work.",
+        "They plant, build, observe, measure, clean, restore, record, solve problems, work together, and learn how their contribution affects the larger farm.",
+        "Recent accomplishments include preparing squash and pumpkin growing areas, collecting milkweed seed, rebuilding apiary equipment, installing trellises, monitoring crops, restoring compost systems, and documenting wildlife.",
+        "Their work becomes part of the farm and part of their own record of skills, accomplishments, service, and growth.",
       ],
-      reflection: ["What possibility are you carrying today?"],
+      highlights: ["Teamwork", "Responsibility", "Observation", "Problem solving", "Leadership", "Workforce skills"],
       image: IMG.grow,
-      imageAlt: "A seed beginning to grow",
+      imageAlt: "Cultivators working and learning at Bronson Family Farm",
     },
     {
-      key: "journey",
-      eyebrow: "Journey",
-      title: "A seed travels many ways.",
+      key: "this-week",
+      eyebrow: "This Week at the Farm",
+      title: "What the Cultivators are doing now",
       paragraphs: [
-        "Every journey begins with a step into the unknown.",
-        "The journey of Bronson Family Farm did not begin with perfect conditions. It did not begin with unlimited resources. It did not begin with certainty. It began with a decision to move forward.",
-        "Like a seed carried by the wind, the path was not always predictable.",
-        "There were lessons to learn. Skills to develop. Challenges to overcome. New relationships to build. New opportunities to recognize.",
-        "Some days brought progress. Some days brought setbacks. Every experience became part of the journey.",
-        "Along the way, mentors shared knowledge. Community members offered encouragement. Partners opened doors. Researchers contributed insight. Educators provided guidance. Each person became part of the story.",
-        "The journey led to fields and forests. To classrooms and workshops. To airports and community spaces. To conversations about food, stewardship, opportunity, and the future.",
-        "With every step, the vision became clearer. The seed was beginning to grow.",
+        "Cultivators are collecting and processing milkweed seed, building the melon trellis, restoring the apiary, monitoring corn and other crops, and preparing the squash and pumpkin area.",
+        "They are also observing wildlife, watching for animal activity near the growing areas, and using the forest as a cooler work and learning space when conditions require it.",
+        "Recent work included fertilizing plants and using hot embers to continue the wood-ash recovery process.",
+        "Each activity is documented in the Workbook. Skills and accomplishments are carried into My Journey without asking youth to repeat the same information.",
       ],
-      reflection: ["Who encouraged you?", "Who taught you?", "What challenges shaped you?", "What opportunities changed your path?"],
+      highlights: ["Milkweed stewardship", "Melon trellis", "Apiary restoration", "Crop monitoring", "Forest observation", "Wood ash recovery"],
+      image: IMG.grow,
+      imageAlt: "Current projects at Bronson Family Farm",
+    },
+    {
+      key: "discoveries",
+      eyebrow: "Discoveries from the Field",
+      title: "The farm is a living outdoor classroom.",
+      paragraphs: [
+        "Cultivators recently found two baby salamanders, a toad, a butterfly cocoon, and six different plant varieties growing close together in one forest area.",
+        "They also found deer footprints near an area where several corn seedlings were missing.",
+        "The evidence was limited, so the lesson was clear: observation is not the same as conclusion. Youth recorded what they saw, considered possible causes, and continued monitoring.",
+        "Every discovery helps youth learn to observe carefully, ask better questions, and understand relationships among soil, water, plants, insects, wildlife, food, and people.",
+      ],
+      highlights: ["Baby salamanders", "Toad", "Butterfly cocoon", "Deer footprints", "Plant diversity", "Evidence-based observation"],
       image: IMG.forest,
-      imageAlt: "A path through the forest",
+      imageAlt: "Wildlife and plant discoveries at Bronson Family Farm",
     },
     {
-      key: "growth",
-      eyebrow: "Growth",
-      title: "Growth requires stewardship.",
+      key: "learning",
+      eyebrow: "What Youth Learn",
+      title: "Every project develops practical skills.",
       paragraphs: [
-        "Growth does not happen by accident.",
-        "A seed may contain potential, but potential alone is not enough.",
-        "Growth requires care. Growth requires attention. Growth requires patience. Growth requires stewardship.",
-        "The same is true for farms, communities, and people.",
-        "At Bronson Family Farm, fields become productive, pollinator habitats become established, trees mature, soil becomes healthier, and wildlife finds places to thrive.",
-        "But growth is not limited to the land. People grow as well.",
-        "Young people discover new skills. Confidence develops through experience. Leadership emerges through responsibility. Curiosity becomes learning. Learning becomes opportunity. Opportunity becomes purpose.",
-        "Every project completed, every challenge overcome, every lesson learned, and every relationship built becomes part of the growth that continues long after the workday ends.",
+        "Farm work gives youth repeated opportunities to practice attendance, readiness, communication, teamwork, problem solving, responsibility, and leadership.",
+        "Agriculture introduces soil health, crop care, food systems, nutrition, inventory, pricing, and entrepreneurship.",
+        "Forest, pollinator, and wildlife work introduces environmental observation, habitat stewardship, conservation, and scientific thinking.",
+        "The Workbook records what youth did and learned. My Journey shows the skills, achievements, career interests, service, and growth that emerge from that work.",
       ],
-      highlights: ["Stewardship of the Land", "Stewardship of People", "Stewardship of Community", "Stewardship of Opportunity"],
-      reflection: ["What areas of your life are still growing?", "What seeds are you nurturing today?"],
+      highlights: ["Workforce readiness", "Agriculture", "Environmental science", "Entrepreneurship", "Career exploration", "Community service"],
       image: IMG.grow,
-      imageAlt: "Growing crops at Bronson Family Farm",
+      imageAlt: "Youth learning through real farm work",
     },
     {
-      key: "harvest",
-      eyebrow: "Harvest",
-      title: "The visible result of growth.",
+      key: "parents",
+      eyebrow: "Parents and Guardians",
+      title: "Parents are partners in the work.",
       paragraphs: [
-        "Every season eventually reaches a moment when growth becomes visible.",
-        "The seed that was once hidden beneath the soil emerges. The work invested over time begins to reveal itself. The harvest is evidence that growth has occurred.",
-        "At Bronson Family Farm, harvest can be measured in baskets, fields, and flowers.",
-        "But some of the most important harvests cannot be weighed or counted.",
-        "Knowledge is a harvest. Skills are a harvest. Confidence is a harvest. Leadership is a harvest. Opportunity is a harvest.",
-        "The harvest reflects everything that came before it: the roots, the seed, the journey, and the growth.",
-        "A harvest is not created in a single day. It is created through many small actions repeated over time.",
+        "Parents need clear, useful information about the program and their child's experience.",
+        "The Parent Portal places the current program status first: Full Day, Half Day, or Cancelled.",
+        "It also provides report time, dismissal time, lunch information, hydration reminders, today's learning, progress, and accomplishments.",
+        "Parents can see evidence of growth through completed projects, documented discoveries, attendance, skills, and contribution rather than generic statements.",
       ],
-      highlights: ["Food", "Knowledge", "Skills", "Confidence", "Leadership", "Opportunity"],
-      reflection: ["What harvest are you creating in your own life?", "What harvest do you hope to leave for others?"],
-      image: IMG.grow,
-      imageAlt: "A farm harvest",
-    },
-    {
-      key: "community",
-      eyebrow: "Community Impact",
-      title: "The harvest we share.",
-      openingQuote: "A tree does not eat its own fruit.",
-      paragraphs: [
-        "Nature teaches an important lesson.",
-        "A tree produces fruit, but it does not consume it. The fruit nourishes others. The seeds travel outward. New growth begins in places the tree may never see.",
-        "A river does not drink its own water. The greatest gifts are often shared.",
-        "At Bronson Family Farm, we believe the most meaningful harvests extend beyond ourselves.",
-        "Food nourishes families. Knowledge creates opportunity. Skills open doors. Leadership inspires others. Stewardship protects resources for future generations.",
-        "The true measure of a harvest is not only what it produces. It is what it makes possible.",
-        "The most enduring harvests are rarely measured in pounds. They are measured in lives touched, opportunities created, communities strengthened, and futures made possible.",
-      ],
-      highlights: ["Strengthening Families", "Developing Future Leaders", "Stewarding the Environment", "Creating Opportunity", "Inspiring Future Seeds"],
-      reflection: ["What gifts do you have that were meant to be shared?"],
+      highlights: ["Program status", "Arrival and dismissal", "Lunch and hydration", "Today's learning", "Progress and accomplishments"],
       image: IMG.forest,
-      imageAlt: "Community at Bronson Family Farm",
+      imageAlt: "Parents and families connected to the Cultivator program",
     },
     {
-      key: "future",
-      eyebrow: "Future Seeds",
-      title: "What we plant today becomes tomorrow.",
+      key: "opportunity",
+      eyebrow: "Opportunity",
+      title: "Real work opens real pathways.",
       paragraphs: [
-        "Every harvest contains seeds. Some are visible. Some are not.",
-        "The visible seeds may grow into flowers, vegetables, orchards, forests, and fields. The invisible seeds may become ideas, opportunities, relationships, skills, and dreams. Both shape the future.",
-        "Every generation inherits seeds planted by those who came before them.",
-        "The opportunities we enjoy today were once someone's vision, effort, sacrifice, and belief that tomorrow could be better than today.",
-        "The same responsibility now belongs to us.",
-        "What we choose to plant today will influence people we may never meet.",
-        "The future is not something we discover. The future is something we create.",
-        "Every harvest creates new seeds. Every seed begins a new journey. Every journey creates new possibilities. The cycle continues, generation after generation and season after season.",
+        "A farm task can introduce a career, a business idea, a college pathway, a skilled trade, or a new way to serve the community.",
+        "Cultivators explore agriculture, environmental science, education, engineering, aviation, skilled trades, entrepreneurship, healthcare, technology, and public service through activities they actually perform.",
+        "The goal is not to tell youth what they must become. It is to help them recognize what they can do, what interests them, and where their experience may lead.",
       ],
-      reflection: ["What future are you helping create?", "What seeds are you planting today?", "What might grow because of something you begin now?"],
+      highlights: ["Agriculture", "Environmental science", "Aviation", "Engineering and skilled trades", "Entrepreneurship", "Education and public service"],
       image: IMG.grow,
-      imageAlt: "Future generations planting seeds",
+      imageAlt: "Career and education opportunity through farm experience",
+    },
+    {
+      key: "legacy",
+      eyebrow: "What the Work Leaves Behind",
+      title: "Legacy is shown through what was built.",
+      paragraphs: [
+        "At Bronson Family Farm, legacy is not a slogan. It is the food grown, habitat improved, apiary restored, discoveries recorded, skills gained, and opportunities created.",
+        "It is visible when a Cultivator can point to a trellis, a prepared growing area, a cleaned hive component, a milkweed inventory, a wildlife record, or a completed Workbook entry and say, ‘I helped do that.’",
+        "The permanent record belongs in photographs, projects, accomplishments, youth stories, community impact, and the knowledge passed to future Cultivators.",
+      ],
+      highlights: ["Projects completed", "Skills documented", "Habitat improved", "Knowledge transferred", "Community contribution"],
+      image: IMG.forest,
+      imageAlt: "Cultivator accomplishments and lasting farm impact",
     },
     {
       key: "youngstown-before",
@@ -7231,38 +7264,32 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     },
     {
       key: "involved",
-      eyebrow: "Invitation",
-      title: "Become Part of the Journey",
+      eyebrow: "Get Involved",
+      title: "Help the work continue.",
       paragraphs: [
-        "Every journey begins with a seed. Every harvest creates new seeds.",
-        "The story of Bronson Family Farm continues through the people who visit, support, partner, volunteer, and share the vision.",
-        "The future will be shaped by the seeds we plant together.",
-        "Perhaps your journey and ours are meant to cross paths.",
-        "Perhaps there is a seed you are carrying that belongs here.",
-        "Perhaps there is a harvest we can create together.",
-        "The next chapter has not yet been written.",
+        "Visitors, families, volunteers, educators, growers, researchers, businesses, and community partners can support Bronson Family Farm in practical ways.",
+        "Support may include volunteering, mentoring, sharing expertise, providing materials, sponsoring youth experiences, purchasing through the marketplace, or helping build farm infrastructure.",
+        "Every contribution should connect to a real need, a real project, and a clear community benefit.",
       ],
-      reflection: ["What kind of future do you want to help create?"],
+      highlights: ["Volunteer", "Mentor", "Partner", "Provide materials", "Support youth experiences", "Shop the marketplace"],
       image: IMG.forest,
-      imageAlt: "Visitors joining the Bronson Family Farm journey",
+      imageAlt: "Community members supporting Bronson Family Farm",
     },
     {
       key: "final",
       eyebrow: "Bronson Family Farm",
-      title: "A Seed Travels Many Ways.",
-      subtitle: "That is life.",
+      title: "Come see what is growing here.",
+      subtitle: "The farm, the youth, the discoveries, and the work tell the story.",
       paragraphs: [
-        "Wherever your journey leads next, may the seeds you carry find good soil.",
-        "May your roots remain strong.",
-        "May your growth be purposeful.",
-        "May your harvest bless others.",
-        "And may the seeds you plant today create opportunities for generations yet to come.",
+        "Bronson Family Farm is being built through agriculture, stewardship, learning, service, and community participation.",
+        "Explore the farm. Meet the Cultivators. Follow current projects. Discover Youngstown. Support the marketplace. Become part of the work.",
       ],
-      highlights: ["Rooted in Stewardship.", "Growing Opportunity.", "Sharing the Harvest."],
+      highlights: ["Visit", "Learn", "Partner", "Support", "Marketplace"],
       image: IMG.forest,
-      imageAlt: "Bronson Family Farm at sunset",
+      imageAlt: "Bronson Family Farm landscape and community",
     },
   ];
+
 
   const [pageIndex, setPageIndex] = useState(() => {
     try {
@@ -7322,7 +7349,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         {!isFinal && (
           <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
             {!isFirst ? <button type="button" onClick={() => moveTo(pageIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20">← Previous</button> : <span />}
-            <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{isFirst ? "Discover Youngstown →" : "Next →"}</button>
+            <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{isFirst ? "Begin the Farm Story →" : "Next →"}</button>
           </div>
         )}
 
