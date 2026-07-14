@@ -8,7 +8,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
- * - Ecosystem 26.2 FINAL: Greatness Grows Here + clickable ecosystem map public orientation lock.
+ * - Ecosystem 26.3 FINAL: Plain-language audience experience for visitors, youth, parents, partners, and funders. Internal design language remains hidden.
  */
 
 /**
@@ -46,7 +46,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 10.0: adds the Regenerative Cultivator Theory of Change as the organizing layer for youth, parent, supervisor, Journey record, workbook, workforce transcript, and Mission Control.
  * - Ecosystem 10.0 youth-facing language: The Cultivator Way — See Potential. Work the Possibility. Cultivate Growth. Regenerate the Future.
  * - Ecosystem 10.0 professional-facing language: Regenerative Cultivator Theory of Change — current conditions do not determine future potential.
- * - Ecosystem 11.0: Progressive Discovery Architecture + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
+ * - Ecosystem 11.0: Progressive Discovery + Cultivator Health & Nutrition Pathway. Dashboards are action-first; deeper learning opens in bite-sized layers.
  * - Ecosystem 11.12: fixes Returning access blank screen by defining the heat operations gate used by the header.
  * - Ecosystem 11.13: Supervisor pathway buttons are active; Clear becomes Submit/Confirm Participant; youth registration is saved and verified before daily records.
  * - Ecosystem 11.14: Week 4 operations update adds Zone 5 Melon Improvement Project, thermal rock safety boundaries, pepper supports, Grow Area Manicure Day, and reflection response capture.
@@ -171,7 +171,7 @@ type Role =
   | "Partner"
   | "Administrator"
   | "Value-Added Producer"
-  | "Board / Funder";
+  | "Funder / Board";
 
 type AccessLevel = "public" | "participant" | "family" | "staff" | "admin" | "board";
 type ProfileType = "youth" | "supervisor" | "case_manager" | "parent" | "grower" | "value_added" | "volunteer" | "partner" | "customer" | "board";
@@ -3125,7 +3125,7 @@ function languageDir(language: LanguageCode) {
 const screenTranslations: Record<LanguageCode, Record<string, string>> = {
   en: {},
   es: {
-    "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.": "Área protegida. Primero ingrese como Supervisor / Personal, Administrador o Junta / Financiador.",
+    "Protected area. Enter as Supervisor / Staff, Administrator, or Funder / Board first.": "Área protegida. Primero ingrese como Supervisor / Personal, Administrador o Junta / Financiador.",
     "Enter the living ecosystem.": "Entre al ecosistema vivo.",
     "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Bienvenido al Ecosistema Regional de Alimentos de Mahoning y Trumbull. Centros regionales actuales: Youngstown — Bronson Family Farm y Warren — Parker Farms. Esta plataforma conecta desarrollo laboral juvenil, padres, productores, aliados, colaboradores, mercado, bienestar, seguridad, comentarios e informes de impacto.",
     "Start Guided Demo": "Iniciar recorrido guiado",
@@ -3146,7 +3146,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Pathway": "Ruta",
     "Guest Pathway": "Ruta de visitante",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Los visitantes conocen la historia de la granja, el ecosistema alimentario conectado, el contexto del aeropuerto y cómo jóvenes, productores, familias y aliados avanzan juntos.",
-    "Return to Portal": "Volver al portal",
+    "Return Home": "Volver al portal",
     "Choose Another Role": "Elegir otro rol",
     "Comment on This Screen": "Comentar esta pantalla",
     "Record Achievement": "Completar recorrido",
@@ -3195,18 +3195,18 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Progress, encouragement, and next steps.": "Progreso, ánimo y próximos pasos.",
     "No parent summaries have been saved yet. Supervisors can create them in the Supervisor Operations Center.": "Aún no se han guardado resúmenes para padres. Los supervisores pueden crearlos en el Centro de Operaciones de Supervisores.",
     "Supervisor Center": "Centro de supervisores",
-    "Achievement Center": "Finalización del recorrido",
+    "Thank You": "Finalización del recorrido",
     "Cultivator Achievement Certificate": "Certificado de finalización",
     "This certifies that": "Esto certifica que",
-    "documented achievement through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.": "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.",
+    "explored Bronson Family Farm, learned about local food and nature, and discovered ways to stay connected.": "completó un recorrido por el Ecosistema Regional de Alimentos de Mahoning y Trumbull y ayudó a fortalecer la experiencia de lanzamiento.",
     "Save Completion": "Guardar finalización",
     "Impact Interests": "Intereses de impacto",
     "Leave Feedback": "Dejar comentarios",
     "Recently Viewed": "Visto recientemente",
-    "No journey activity recorded yet.": "Aún no hay actividad registrada."
+    "No activity recorded yet.": "Aún no hay actividad registrada."
   },
   tl: {
-    "Protected area. Enter as Supervisor / Staff, Administrator, or Board / Funder first.": "Protektadong lugar. Pumasok muna bilang Supervisor / Staff, Administrator, o Board / Funder.",
+    "Protected area. Enter as Supervisor / Staff, Administrator, or Funder / Board first.": "Protektadong lugar. Pumasok muna bilang Supervisor / Staff, Administrator, o Funder / Board.",
     "Enter the living ecosystem.": "Pumasok sa buhay na ecosystem.",
     "Welcome to the Mahoning & Trumbull Regional Food Ecosystem. Current regional hubs: Youngstown — Bronson Family Farm and Warren — Parker Farms. This platform connects youth workforce development, parents, growers, partners, supporters, marketplace, wellness, safety, feedback, and impact reporting.": "Maligayang pagdating sa Mahoning at Trumbull Regional Food Ecosystem. Kasalukuyang regional hubs: Youngstown — Bronson Family Farm at Warren — Parker Farms. Pinag-uugnay ng platform na ito ang youth workforce development, mga magulang, growers, partners, supporters, marketplace, wellness, safety, feedback, at impact reporting.",
     "Start Guided Demo": "Simulan ang Guided Demo",
@@ -3227,7 +3227,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Pathway": "Landas",
     "Guest Pathway": "Landas ng Bisita",
     "Guests learn the farm story, the connected food ecosystem, the airport place-based context, and how youth, growers, families, and partners move together.": "Natututuhan ng mga bisita ang farm story, connected food ecosystem, airport place-based context, at kung paano gumagalaw nang sama-sama ang youth, growers, families, at partners.",
-    "Return to Portal": "Bumalik sa Portal",
+    "Return Home": "Bumalik sa Portal",
     "Choose Another Role": "Pumili ng Ibang Role",
     "Comment on This Screen": "Magkomento sa Screen na Ito",
     "Record Achievement": "Kumpletuhin ang Journey",
@@ -3271,14 +3271,14 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Parent / Guardian Portal": "Portal ng Magulang / Guardian",
     "Progress, encouragement, and next steps.": "Pag-unlad, paghihikayat, at susunod na hakbang.",
     "Supervisor Center": "Supervisor Center",
-    "Achievement Center": "Achievement Center",
+    "Thank You": "Thank You",
     "Cultivator Achievement Certificate": "Cultivator Achievement Certificate",
     "This certifies that": "Pinatutunayan nito na",
     "Save Completion": "I-save ang Completion",
     "Impact Interests": "Impact Interests",
     "Leave Feedback": "Mag-iwan ng Feedback",
     "Recently Viewed": "Kamakailang Tiningnan",
-    "No journey activity recorded yet.": "Wala pang recorded journey activity."
+    "No activity recorded yet.": "Wala pang recorded journey activity."
   },
   it: {
     "Enter the living ecosystem.": "Entra nell’ecosistema vivente.",
@@ -3288,7 +3288,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Register / Check In": "Registrati / Check-in",
     "Today’s Work": "Il mio spazio",
     "Launch Focus": "Focus del lancio",
-    "Return to Portal": "Ritorna al portale",
+    "Return Home": "Ritorna al portale",
     "Choose Another Role": "Scegli un altro ruolo",
     "Comment on This Screen": "Commenta questa schermata",
     "Record Achievement": "Completa percorso",
@@ -3304,7 +3304,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "Salva feedback / commenti",
     "Progress, encouragement, and next steps.": "Progresso, incoraggiamento e prossimi passi.",
     "Supervisor Center": "Centro supervisori",
-    "Achievement Center": "Completamento del percorso",
+    "Thank You": "Completamento del percorso",
     "Cultivator Achievement Certificate": "Certificato di completamento",
     "Save Completion": "Salva completamento",
     "Leave Feedback": "Lascia feedback"
@@ -3316,7 +3316,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Register / Check In": "הרשמה / צ׳ק-אין",
     "Today’s Work": "המרחב שלי",
     "Launch Focus": "מוקד ההשקה",
-    "Return to Portal": "חזרה לשער",
+    "Return Home": "חזרה לשער",
     "Choose Another Role": "בחר תפקיד אחר",
     "Comment on This Screen": "הגב על המסך הזה",
     "Record Achievement": "סיים מסע",
@@ -3332,7 +3332,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "שמור משוב / תגובות",
     "Progress, encouragement, and next steps.": "התקדמות, עידוד והצעדים הבאים.",
     "Supervisor Center": "מרכז מדריכים",
-    "Achievement Center": "השלמת מסע",
+    "Thank You": "השלמת מסע",
     "Cultivator Achievement Certificate": "תעודת השלמה",
     "Save Completion": "שמור השלמה",
     "Leave Feedback": "השאר משוב"
@@ -3345,7 +3345,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Register / Check In": "S’inscrire / Check-in",
     "Today’s Work": "Mon espace",
     "Launch Focus": "Objectif du lancement",
-    "Return to Portal": "Retour au portail",
+    "Return Home": "Retour au portail",
     "Choose Another Role": "Choisir un autre rôle",
     "Comment on This Screen": "Commenter cet écran",
     "Record Achievement": "Terminer le parcours",
@@ -3361,7 +3361,7 @@ const screenTranslations: Record<LanguageCode, Record<string, string>> = {
     "Save Feedback / Comments": "Enregistrer commentaires / feedback",
     "Progress, encouragement, and next steps.": "Progrès, encouragement et prochaines étapes.",
     "Supervisor Center": "Centre superviseur",
-    "Achievement Center": "Achèvement du parcours",
+    "Thank You": "Achèvement du parcours",
     "Cultivator Achievement Certificate": "Certificat d’achèvement",
     "Save Completion": "Enregistrer l’achèvement",
     "Leave Feedback": "Laisser un commentaire"
@@ -3468,7 +3468,7 @@ const launchCriticalTranslations: Partial<Record<LanguageCode, Record<string, st
     "Attend an Event": "Dumalo sa Event",
     "Volunteer / Support": "Mag-volunteer / Suporta",
     "Become a Partner": "Maging Partner",
-    "Return to Portal": "Bumalik sa Portal",
+    "Return Home": "Bumalik sa Portal",
     "Choose Another Role": "Pumili ng Ibang Role",
     "Comment on This Screen": "Magkomento sa Screen na Ito",
     "Record Achievement": "I-record ang Achievement",
@@ -3737,7 +3737,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Elegir rol',
     'Go to Today’s Work': 'Ir a mi espacio',
-    "Case Manager": "Administrador de Casos", "My Journey Record": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Journey Growth Record": "Crecimiento de Currículum y Portafolio", "Youth Support Response Framework": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
+    "Case Manager": "Administrador de Casos", "My Journey Record": "Mi Portafolio", "Resume Builder": "Constructor de Currículum", "Journey Growth Record": "Crecimiento de Currículum y Portafolio", "Youth Support": "Marco de Respuesta de Apoyo Juvenil", "Whole-person youth support.": "Apoyo integral para jóvenes.", "Marketplace Listing": "Listado del Mercado", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Tarjeta de lanzamiento solo con texto. Las imágenes de productos están ocultas intencionalmente hasta verificar que coincidan con cada artículo.", "Proprietary & Confidential": "Propietario y Confidencial"
   },
   tl: {
     'Forest Gate Portal': 'Forest Gate Portal',
@@ -3764,7 +3764,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Pumili ng Role',
     'Go to Today’s Work': 'Pumunta sa Aking Araw',
-    "Case Manager": "Case Manager", "My Journey Record": "Aking Journey Record", "Resume Builder": "Resume Builder", "Journey Growth Record": "Paglago ng Resume at Journey Record", "Youth Support Response Framework": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
+    "Case Manager": "Case Manager", "My Journey Record": "Aking Journey Record", "Resume Builder": "Resume Builder", "Journey Growth Record": "Paglago ng Resume at Journey Record", "Youth Support": "Framework ng Suporta sa Kabataan", "Whole-person youth support.": "Suporta para sa buong pangangailangan ng kabataan.", "Marketplace Listing": "Marketplace Listing", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Text-only launch card. Nakatago muna ang product images hanggang verified na tumutugma sa bawat item.", "Proprietary & Confidential": "Proprietary at Confidential"
   },
   it: {
     'Forest Gate Portal': 'Portale del Cancello Forestale',
@@ -3791,7 +3791,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Scegli ruolo',
     'Go to Today’s Work': 'Vai al mio spazio',
-    "Case Manager": "Case Manager", "My Journey Record": "Il Mio Journey Record", "Resume Builder": "Creatore di Curriculum", "Journey Growth Record": "Crescita di Curriculum e Journey Record", "Youth Support Response Framework": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
+    "Case Manager": "Case Manager", "My Journey Record": "Il Mio Journey Record", "Resume Builder": "Creatore di Curriculum", "Journey Growth Record": "Crescita di Curriculum e Journey Record", "Youth Support": "Quadro di Supporto per i Giovani", "Whole-person youth support.": "Supporto completo per i giovani.", "Marketplace Listing": "Annuncio del Mercato", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Scheda di lancio solo testuale. Le immagini dei prodotti sono nascoste finché non saranno verificate.", "Proprietary & Confidential": "Riservato e Confidenziale"
   },
   he: {
     'Forest Gate Portal': 'שער היער',
@@ -3818,7 +3818,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'מחר: משימה, תזכורת ציוד מגן, בקבוק מים והצעד הבא.',
     'Choose Role': 'בחר תפקיד',
     'Go to Today’s Work': 'עבור למרחב העבודה',
-    "Case Manager": "מנהל מקרה", "My Journey Record": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Journey Growth Record": "צמיחת קורות חיים ותיק עבודות", "Youth Support Response Framework": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
+    "Case Manager": "מנהל מקרה", "My Journey Record": "התיק שלי", "Resume Builder": "בונה קורות חיים", "Journey Growth Record": "צמיחת קורות חיים ותיק עבודות", "Youth Support": "מסגרת תמיכה לנוער", "Whole-person youth support.": "תמיכה כוללת לנוער.", "Marketplace Listing": "רישום בשוק", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "כרטיס השקה עם מילים בלבד. תמונות מוצר מוסתרות עד לאימות התאמה.", "Proprietary & Confidential": "קנייני וסודי"
   },
   fr: {
     'Forest Gate Portal': 'Portail de la Forêt',
@@ -3845,7 +3845,7 @@ const launchIntegrationTranslations: Partial<Record<LanguageCode, Record<string,
     'Tomorrow: assignment, PPE reminder, water bottle, next step.': 'Mañana: asignación, recordatorio de PPE, botella de agua y próximo paso.',
     'Choose Role': 'Choisir un rôle',
     'Go to Today’s Work': 'Aller à mon espace',
-    "Case Manager": "Gestionnaire de cas", "My Journey Record": "Mon Journey Record", "Resume Builder": "Créateur de CV", "Journey Growth Record": "Développement du CV et du Journey Record", "Youth Support Response Framework": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
+    "Case Manager": "Gestionnaire de cas", "My Journey Record": "Mon Journey Record", "Resume Builder": "Créateur de CV", "Journey Growth Record": "Développement du CV et du Journey Record", "Youth Support": "Cadre de soutien aux jeunes", "Whole-person youth support.": "Soutien global des jeunes.", "Marketplace Listing": "Fiche du marché", "Words-only launch card. Product images are intentionally hidden until verified images match each item.": "Carte de lancement avec texte seulement. Les images sont masquées jusqu’à vérification.", "Proprietary & Confidential": "Propriétaire et confidentiel"
   }
 };
 
@@ -3861,7 +3861,7 @@ const roles: Role[] = [
   "Partner",
   "Administrator",
   "Value-Added Producer",
-  "Board / Funder",
+  "Funder / Board",
 ];
 
 const roleAccess: Record<Role, AccessLevel> = {
@@ -3876,7 +3876,7 @@ const roleAccess: Record<Role, AccessLevel> = {
   Partner: "family",
   Administrator: "admin",
   "Value-Added Producer": "participant",
-  "Board / Funder": "board",
+  "Funder / Board": "board",
 };
 
 function uuid() {
@@ -4121,7 +4121,7 @@ function screenLabel(screen: Screen) {
     launchProject: "June 8 Cooling Station Challenge",
     feedback: "Feedback / Comments",
     growth: "My Journey — Growth Section",
-    completion: "Achievement Center",
+    completion: "Thank You",
   };
   return labels[screen];
 }
@@ -4501,7 +4501,7 @@ function roleToProfileType(role: Role): ProfileType {
     Partner: "partner",
     Administrator: "partner",
     "Value-Added Producer": "value_added",
-    "Board / Funder": "board",
+    "Funder / Board": "board",
   };
   return map[role];
 }
@@ -4519,7 +4519,7 @@ function routeForRole(role: Role): Screen {
     Partner: "partner",
     Administrator: "reports",
     "Value-Added Producer": "valueAdded",
-    "Board / Funder": "reports",
+    "Funder / Board": "reports",
   };
   return map[role];
 }
@@ -4543,7 +4543,7 @@ const youthSupportLevels = [
 function SupportResponseFrameworkCard() {
   return (
     <Card>
-      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Youth Support Response Framework</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Youth Support</div>
       <h2 className="mt-3 text-3xl font-black">Youth + Parent + Supervisor + Case Manager</h2>
       <p className="mt-3 text-sm leading-7 text-white/78">Supervisors coach daily work. Case managers support barriers, wellness, family needs, referrals, and escalation. Leadership protects safety and operations.</p>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -5095,7 +5095,7 @@ function Launch62LivingFarmFrameworkPanel({ compact = false }: { compact?: boole
   ];
   return (
     <Card className="p-4 md:p-5">
-      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">Living Farm Framework</div>
+      <div className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-100/75">Farm Learning</div>
       <h2 className="mt-2 text-3xl font-black">Operational areas without forcing a final map</h2>
       <p className="mt-3 text-sm font-bold leading-6 text-white/75">This launch uses named farm areas so youth can work today while the exact visual map is refined later without breaking the app.</p>
       <div className={`mt-5 grid gap-3 ${compact ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
@@ -5639,11 +5639,11 @@ function Shell({
   const role = activeUser?.role;
   const dashboardTarget: Screen = role && role !== "Guest" ? routeForRole(role) : "roles";
   const workTarget: Screen = role === "Youth Workforce Participant" ? (hasCompletedTodayWorkCheckIn(activeUser) ? "youth" : "wellness") : dashboardTarget;
-  const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Board / Funder";
+  const isStaff = role === "Supervisor / Staff" || role === "Case Manager" || role === "Administrator" || role === "Funder / Board";
 
   const primaryNav: { label: string; screen?: Screen; external?: "grownby" }[] = role === "Youth Workforce Participant"
     ? []
-    : role === "Supervisor / Staff" || role === "Administrator" || role === "Board / Funder"
+    : role === "Supervisor / Staff" || role === "Administrator" || role === "Funder / Board"
     ? [
         { label: "Supervisor", screen: "supervisor" },
         { label: "Mission Control", screen: "reports" },
@@ -6197,7 +6197,7 @@ function EntrepreneurshipValueCard() {
   ];
   return (
     <Card>
-      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Entrepreneurship Layer</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Entrepreneurship</div>
       <h2 className="mt-3 text-3xl font-black">Problem → Customer → Solution → Value</h2>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {items.map(([label, body]) => (
@@ -6446,7 +6446,7 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
               <div key={event.id} className="rounded-xl bg-black/25 p-3 text-sm font-bold">{event.label}</div>
             ))}
             {completions.map((completion) => (
-              <div key={completion.id} className="rounded-xl bg-emerald-300/15 p-3 text-sm font-bold">Completed: {completion.pathway}</div>
+              <div key={completion.id} className="rounded-xl bg-emerald-300/15 p-3 text-sm font-bold">Completed: {completion.pathway.replace(/Pathway/gi, "").trim()}</div>
             ))}
           </div>
         </div>
@@ -6489,15 +6489,10 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
               <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm")}</div>
               <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-7xl">{TT("Greatness Grows Here")}</h1>
               <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/88 sm:text-xl">
-                {TT("Youngstown has always been a place where people built futures. Today, a new generation is growing those same possibilities through stewardship, discovery, work, service, and opportunity.")}
+                {TT("Explore a working farm where young people grow food, care for pollinators, study the forest, rebuild the apiary, learn practical skills, and contribute to the Youngstown community.")}
               </p>
-              <div className="mt-7 grid max-w-3xl gap-2 text-xl font-black leading-8 text-emerald-100 sm:text-2xl">
-                <div>{TT("Every seed is a lesson.")}</div>
-                <div>{TT("Every lesson creates opportunity.")}</div>
-                <div>{TT("Every opportunity creates legacy.")}</div>
-              </div>
               <div className="mt-8 flex flex-wrap gap-3">
-                <button type="button" onClick={() => openGuestAt("home")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Explore the Ecosystem")}</button>
+                <button type="button" onClick={() => openGuestAt("home")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Explore the Farm")}</button>
                 <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Enter My Workspace")}</button>
                 <button type="button" onClick={() => openGuestAt("youngstown-before")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Discover Youngstown")}</button>
                 <button type="button" onClick={openGrownByMarketplace} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Marketplace")}</button>
@@ -6505,8 +6500,8 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
             </div>
 
             <div className="rounded-[2rem] border border-emerald-200/25 bg-black/52 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
-              <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("How Everything Connects")}</div>
-              <h2 className="mt-2 text-3xl font-black text-white">{TT("The Ecosystem")}</h2>
+              <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Farm")}</div>
+              <h2 className="mt-2 text-3xl font-black text-white">{TT("Choose an Area")}</h2>
               <div className="mt-5 grid gap-2">
                 {ecosystemNodes.map((node, index) => (
                   <React.Fragment key={node.title}>
@@ -6532,9 +6527,9 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
       </Card>
 
       <Card>
-        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Ecosystem")}</div>
-        <h2 className="mt-2 text-3xl font-black">{TT("See how place becomes possibility")}</h2>
-        <p className="mt-3 max-w-4xl text-base font-semibold leading-7 text-white/75">{TT("Choose any part of the ecosystem to see what youth discover, build, protect, and carry forward into community and opportunity.")}</p>
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Farm")}</div>
+        <h2 className="mt-2 text-3xl font-black">{TT("Discover what is happening across the farm")}</h2>
+        <p className="mt-3 max-w-4xl text-base font-semibold leading-7 text-white/75">{TT("Choose an area to see current projects, youth discoveries, photos, resources, and ways to participate.")}</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {ecosystemNodes.map((node) => (
             <button key={node.title} type="button" onClick={() => openGuestAt(node.key)} className="rounded-[1.35rem] border border-white/12 bg-black/28 p-5 text-left transition hover:border-emerald-200/65 hover:bg-emerald-300/12">
@@ -6568,7 +6563,7 @@ function LaunchAuditDetailGrid({
 }) {
   return (
     <Card className="mt-5">
-      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Launch Audit Fix</div>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Details</div>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
@@ -13351,7 +13346,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
   const [cart, setCart] = useState<CartItem[]>([]);
   const [category, setCategory] = useState("All");
   const [message, setMessage] = useState("");
-  const isMarketplaceManager = activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Board / Funder";
+  const isMarketplaceManager = activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Funder / Board";
   useEffect(() => {
     if (!isMarketplaceManager && (tab === "command" || tab === "catalog" || tab === "fulfillment")) {
       setTab("storefront");
@@ -13527,7 +13522,7 @@ function MarketplaceOperations({ activeUser, setScreen }: { activeUser: Ecosyste
         <p className="mt-4 text-sm leading-7 text-white/82">Sales can happen through GrownBy or directly through Bronson. This center turns orders into harvest planning, packing, pickup, and reporting.</p>
         <LargerPictureCard layerKey="Marketplace Operations Center" />
         <div className="mt-5 grid gap-2">
-          {(activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Board / Funder"
+          {(activeUser?.role === "Administrator" || activeUser?.role === "Supervisor / Staff" || activeUser?.role === "Funder / Board"
             ? [
                 ["command", "Operations"],
                 ["storefront", "Products"],
@@ -14627,7 +14622,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="mt-7 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Role</button>
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Comment / Save Feedback</button>
-        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
       </div>
     </Card>
   );
@@ -14983,7 +14978,7 @@ function SimplePathway({
           <LargerPictureCard layerKey={title} />
           <div className="mt-8 flex flex-wrap gap-3">
             {extra}
-            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
             <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
             <button type="button" onClick={() => setScreen("feedback")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Comment on This Screen</button>
             <button type="button" onClick={() => setScreen("completion")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Record Achievement</button>
@@ -15483,8 +15478,8 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
 
   return (
     <Card>
-      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Achievement Center</div>
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Ecosystem Explorer</h1>
+      <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">Thank You</div>
+      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">Farm Explorer</h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
         Thank you for exploring the Mahoning & Trumbull Regional Food Ecosystem: Youngstown — Bronson Family Farm and Warren — Parker Farms.
       </p>
@@ -15495,9 +15490,9 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
           <Field label="Name for certificate" value={name} onChange={setName} placeholder="Enter name" />
           <div className="mt-5 rounded-[1.25rem] border border-emerald-200/25 bg-emerald-300/12 p-5 text-center">
             <div className="text-xs uppercase tracking-[0.28em] text-emerald-100/75">This certifies that</div>
-            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Ecosystem Explorer"}</div>
+            <div className="mt-3 text-3xl font-black">{name || activeUser?.name || "Farm Explorer"}</div>
             <p className="mt-3 text-sm leading-6 text-white/82">
-              documented achievement through the Mahoning & Trumbull Regional Food Ecosystem and helped strengthen the launch experience.
+              explored Bronson Family Farm, learned about local food and nature, and discovered ways to stay connected.
             </p>
             <div className="mt-4 text-sm font-black">{new Date().toLocaleDateString()}</div>
           </div>
@@ -15517,7 +15512,7 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
           <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
             <div className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100/75">Recently Viewed</div>
             <div className="mt-3 grid gap-2">
-              {recent.length ? recent.map((event) => <div key={event.id} className="rounded-xl bg-white/10 p-3 text-sm">{event.label}</div>) : <div className="rounded-xl bg-white/10 p-3 text-sm">No journey activity recorded yet.</div>}
+              {recent.length ? recent.map((event) => <div key={event.id} className="rounded-xl bg-white/10 p-3 text-sm">{event.label}</div>) : <div className="rounded-xl bg-white/10 p-3 text-sm">No activity recorded yet.</div>}
             </div>
           </div>
         </div>
@@ -15526,7 +15521,7 @@ function CompletionExperience({ setScreen, activeUser }: { setScreen: (screen: S
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setScreen("feedback")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Leave Feedback</button>
         <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Choose Another Role</button>
-        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return to Portal</button>
+        <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black">Return Home</button>
       </div>
     </Card>
   );
