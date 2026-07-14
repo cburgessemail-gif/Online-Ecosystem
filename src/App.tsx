@@ -8,7 +8,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
- * - Ecosystem 26.0 FINAL: Greatness Grows Here public mission and visitor flow lock.
+ * - Ecosystem 26.2 FINAL: Greatness Grows Here + clickable ecosystem map public orientation lock.
  */
 
 /**
@@ -6458,59 +6458,94 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const TT = (phrase: string) => translatePhrase(language, phrase);
 
-  const doors: { icon: string; title: string; body: string; screen: Screen }[] = [
-    { icon: "🌱", title: "Discover Youngstown", body: "Meet the people, places, history, and possibility that continue to shape this community.", screen: "guest" },
-    { icon: "🌲", title: "Explore the Ecosystem", body: "See how the farm, forest, youth workforce, pollinators, food, and opportunity connect.", screen: "guest" },
-    { icon: "✨", title: "New Participant", body: "Request access to a role-based pathway.", screen: "registration" },
-    { icon: "🔑", title: "Returning Participant", body: "Enter your assigned workspace.", screen: "roles" },
+  const openGuestAt = (key: string) => {
+    try { window.sessionStorage.setItem("bff_guest_start_key", key); } catch { /* continue without storage */ }
+    setScreen("guest");
+  };
+
+  const ecosystemNodes = [
+    { icon: "🌲", title: "Forest", question: "What can nature teach us?", key: "youngstown-nature" },
+    { icon: "🌱", title: "Grow Area", question: "How does food begin?", key: "youngstown-agriculture" },
+    { icon: "🦋", title: "Pollinator Habitat", question: "Why do pollinators matter?", key: "growth" },
+    { icon: "🐝", title: "Apiary", question: "How do bees support agriculture?", key: "growth" },
+    { icon: "🧺", title: "Marketplace", question: "How does food become a business?", key: "harvest" },
+    { icon: "🤝", title: "Community", question: "Who benefits?", key: "community" },
+    { icon: "✨", title: "Opportunity", question: "Where can this lead?", key: "youngstown-opportunity-today" },
   ];
 
   return (
     <div className="grid gap-4">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[68vh]">
+        <div className="relative min-h-[70vh]">
           <img
             src={IMG.forest}
             alt="Bronson Family Farm forest and growing landscape"
             className="absolute inset-0 h-full w-full object-cover"
             onError={(event) => (event.currentTarget.src = IMG.grow)}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/68 to-black/30" />
-          <div className="relative z-10 flex min-h-[68vh] max-w-5xl flex-col justify-center p-6 sm:p-10 lg:p-14">
-            <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm")}</div>
-            <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-8xl">{TT("Greatness Grows Here")}</h1>
-            <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/88 sm:text-xl">
-              {TT("Youngstown has always been a place where people built futures. Today, a new generation is growing those same possibilities through stewardship, discovery, work, service, and opportunity.")}
-            </p>
-            <div className="mt-7 grid max-w-3xl gap-2 text-xl font-black leading-8 text-emerald-100 sm:text-2xl">
-              <div>{TT("Every seed is a lesson.")}</div>
-              <div>{TT("Every lesson creates opportunity.")}</div>
-              <div>{TT("Every opportunity creates legacy.")}</div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/94 via-black/78 to-black/58" />
+          <div className="relative z-10 grid min-h-[70vh] items-center gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,.95fr)] lg:p-14">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm")}</div>
+              <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-7xl">{TT("Greatness Grows Here")}</h1>
+              <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/88 sm:text-xl">
+                {TT("Youngstown has always been a place where people built futures. Today, a new generation is growing those same possibilities through stewardship, discovery, work, service, and opportunity.")}
+              </p>
+              <div className="mt-7 grid max-w-3xl gap-2 text-xl font-black leading-8 text-emerald-100 sm:text-2xl">
+                <div>{TT("Every seed is a lesson.")}</div>
+                <div>{TT("Every lesson creates opportunity.")}</div>
+                <div>{TT("Every opportunity creates legacy.")}</div>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button type="button" onClick={() => openGuestAt("home")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Explore the Ecosystem")}</button>
+                <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Enter My Workspace")}</button>
+                <button type="button" onClick={() => openGuestAt("youngstown-before")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Discover Youngstown")}</button>
+                <button type="button" onClick={openGrownByMarketplace} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Marketplace")}</button>
+              </div>
             </div>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <button type="button" onClick={() => setScreen("guest")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Begin the Visitor Journey")}</button>
-              <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Enter My Workspace")}</button>
+
+            <div className="rounded-[2rem] border border-emerald-200/25 bg-black/52 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+              <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("How Everything Connects")}</div>
+              <h2 className="mt-2 text-3xl font-black text-white">{TT("The Ecosystem")}</h2>
+              <div className="mt-5 grid gap-2">
+                {ecosystemNodes.map((node, index) => (
+                  <React.Fragment key={node.title}>
+                    <button
+                      type="button"
+                      onClick={() => openGuestAt(node.key)}
+                      className="group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-white/12 bg-white/8 p-3 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/16 focus:border-emerald-200 focus:outline-none"
+                    >
+                      <span className="text-2xl" aria-hidden="true">{node.icon}</span>
+                      <span>
+                        <span className="block text-lg font-black text-white">{TT(node.title)}</span>
+                        <span className="mt-0.5 block text-xs font-semibold text-white/65">{TT(node.question)}</span>
+                      </span>
+                      <span className="text-xl font-black text-emerald-200 transition group-hover:translate-x-1" aria-hidden="true">→</span>
+                    </button>
+                    {index < ecosystemNodes.length - 1 && <div className="text-center text-lg font-black leading-none text-emerald-200/60" aria-hidden="true">↓</div>}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {doors.map((door) => (
-          <button
-            key={door.title}
-            type="button"
-            onClick={() => setScreen(door.screen)}
-            className="rounded-[1.5rem] border border-white/14 bg-black/35 p-5 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">{door.icon}</span>
-              <span className="text-xl font-black">{TT(door.title)}</span>
-            </div>
-            <div className="mt-3 text-sm font-semibold leading-6 text-white/74">{TT(door.body)}</div>
-          </button>
-        ))}
-      </div>
+      <Card>
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Ecosystem")}</div>
+        <h2 className="mt-2 text-3xl font-black">{TT("See how place becomes possibility")}</h2>
+        <p className="mt-3 max-w-4xl text-base font-semibold leading-7 text-white/75">{TT("Choose any part of the ecosystem to see what youth discover, build, protect, and carry forward into community and opportunity.")}</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {ecosystemNodes.map((node) => (
+            <button key={node.title} type="button" onClick={() => openGuestAt(node.key)} className="rounded-[1.35rem] border border-white/12 bg-black/28 p-5 text-left transition hover:border-emerald-200/65 hover:bg-emerald-300/12">
+              <div className="text-3xl" aria-hidden="true">{node.icon}</div>
+              <div className="mt-3 text-xl font-black">{TT(node.title)}</div>
+              <div className="mt-2 text-sm font-semibold leading-6 text-white/68">{TT(node.question)}</div>
+              <div className="mt-4 text-sm font-black text-emerald-200">{TT("Explore")} →</div>
+            </button>
+          ))}
+        </div>
+      </Card>
 
       {activeUser && (
         <Card className="border-emerald-200/20 bg-emerald-300/10">
@@ -7250,7 +7285,16 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     },
   ];
 
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(() => {
+    try {
+      const requestedKey = window.sessionStorage.getItem("bff_guest_start_key");
+      window.sessionStorage.removeItem("bff_guest_start_key");
+      const requestedIndex = pages.findIndex((item) => item.key === requestedKey);
+      return requestedIndex >= 0 ? requestedIndex : 0;
+    } catch {
+      return 0;
+    }
+  });
   const page = pages[pageIndex];
   const isFirst = pageIndex === 0;
   const isFinal = pageIndex === pages.length - 1;
@@ -7319,14 +7363,9 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
           <div className="relative z-10 flex h-full min-h-[480px] flex-col justify-end p-5 lg:min-h-full">
             <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
-              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Your Journey</div>
-              <h2 className="mt-2 text-2xl font-black">{pageIndex + 1} of {pages.length}</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {pages.map((item, index) => (
-                  <button key={item.key} type="button" onClick={() => moveTo(index)} aria-label={`Open ${item.eyebrow}`} className={`h-3 rounded-full transition-all ${index === pageIndex ? "w-10 bg-emerald-300" : "w-3 bg-white/35 hover:bg-white/60"}`} />
-                ))}
-              </div>
-              <p className="mt-4 text-base font-bold leading-7 text-white/82">Roots → Seed → Journey → Growth → Harvest → Community Impact → Future Seeds</p>
+              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Bronson Family Farm Ecosystem</div>
+              <h2 className="mt-2 text-2xl font-black">{page.eyebrow}</h2>
+              <p className="mt-3 text-base font-bold leading-7 text-white/82">Purpose → Place → Experience → Opportunity → Legacy</p>
             </div>
           </div>
         </div>
