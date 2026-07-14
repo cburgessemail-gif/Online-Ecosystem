@@ -7314,13 +7314,20 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
 
         {page.highlights && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {page.highlights.map((item) => <div key={item} className="rounded-[1.2rem] border border-white/12 bg-white/10 p-5 text-lg font-black leading-7 text-white">{item}</div>)}
+          <div className="mt-7">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {page.highlights.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-lg font-black leading-7 text-white">
+                  <span aria-hidden="true" className="mt-3 h-2 w-2 shrink-0 rounded-full bg-emerald-200" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
         {page.reflection && (
-          <div className="mt-6 rounded-[1.35rem] border border-amber-200/25 bg-amber-300/10 p-6">
+          <div className="mt-8 border-t border-white/15 pt-6">
             <div className="text-sm font-black uppercase tracking-[0.2em] text-amber-100">Reflection</div>
             <div className="mt-3 grid gap-2">
               {page.reflection.map((item) => <p key={item} className="text-lg font-black leading-8 text-white md:text-xl">{item}</p>)}
@@ -7356,12 +7363,8 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="relative h-full min-h-[480px] lg:min-h-full">
           <img src={page.image} alt={page.imageAlt} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
-          <div className="relative z-10 flex h-full min-h-[480px] flex-col justify-end p-5 lg:min-h-full">
-            <div className="rounded-[1.25rem] border border-white/10 bg-black/45 p-4 backdrop-blur-xl">
-              <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/75">Bronson Family Farm Ecosystem</div>
-              <h2 className="mt-2 text-2xl font-black">{page.eyebrow}</h2>
-              <p className="mt-3 text-base font-bold leading-7 text-white/82">Purpose → Place → Experience → Opportunity → Legacy</p>
-            </div>
+          <div className="relative z-10 flex h-full min-h-[480px] flex-col justify-end p-7 lg:min-h-full">
+            <h2 className="max-w-md text-3xl font-black leading-tight text-white drop-shadow-lg">{page.eyebrow}</h2>
           </div>
         </div>
       </Card>
