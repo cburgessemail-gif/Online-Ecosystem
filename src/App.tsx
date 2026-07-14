@@ -8,7 +8,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
- * - Ecosystem 26.3 FINAL: Plain-language audience experience for visitors, youth, parents, partners, and funders. Internal design language remains hidden.
+ * - Ecosystem 26.5 FINAL: Single ecosystem navigation. Removes the duplicate lower Explore the Farm grid and preserves the upper working navigation as the only farm-area navigator.
  */
 
 /**
@@ -6523,22 +6523,6 @@ function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Scree
               </div>
             </div>
           </div>
-        </div>
-      </Card>
-
-      <Card>
-        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-100/75">{TT("Explore the Farm")}</div>
-        <h2 className="mt-2 text-3xl font-black">{TT("Discover what is happening across the farm")}</h2>
-        <p className="mt-3 max-w-4xl text-base font-semibold leading-7 text-white/75">{TT("Choose an area to see current projects, youth discoveries, photos, resources, and ways to participate.")}</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {ecosystemNodes.map((node) => (
-            <button key={node.title} type="button" onClick={() => openGuestAt(node.key)} className="rounded-[1.35rem] border border-white/12 bg-black/28 p-5 text-left transition hover:border-emerald-200/65 hover:bg-emerald-300/12">
-              <div className="text-3xl" aria-hidden="true">{node.icon}</div>
-              <div className="mt-3 text-xl font-black">{TT(node.title)}</div>
-              <div className="mt-2 text-sm font-semibold leading-6 text-white/68">{TT(node.question)}</div>
-              <div className="mt-4 text-sm font-black text-emerald-200">{TT("Explore")} →</div>
-            </button>
-          ))}
         </div>
       </Card>
 
