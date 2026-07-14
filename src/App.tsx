@@ -8,6 +8,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Send/record unmatched PIN verification for bhchatman@gmail.com.
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
+ * - Ecosystem 26.0 FINAL: Greatness Grows Here public mission and visitor flow lock.
  */
 
 /**
@@ -6455,68 +6456,70 @@ function MyDayPreview({ setScreen }: { setScreen: (screen: Screen) => void }) {
 }
 
 function Portal({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
-  const portalText = {
-    en: { eyebrow: "Window Into The Ecosystem", title: "Enter the Ecosystem", subtitle: "Look through the window. Choose how you would like to enter.", guest: "Guest", guestBody: "Explore.", next: "New", nextBody: "Request access.", returning: "Returning", returningBody: "Enter your workspace." },
-    es: { eyebrow: "Ventana al ecosistema", title: "Entrar al Ecosistema", subtitle: "Mire por la ventana. Elija cómo desea entrar.", guest: "Visitante", guestBody: "Explorar.", next: "Nuevo", nextBody: "Solicitar acceso.", returning: "Regresar", returningBody: "Entrar a mi espacio." },
-    tl: { eyebrow: "Bintana sa Ecosystem", title: "Pumasok sa Ecosystem", subtitle: "Tumingin sa bintana. Piliin kung paano papasok.", guest: "Bisita", guestBody: "Mag-explore.", next: "Bago", nextBody: "Humingi ng access.", returning: "Bumabalik", returningBody: "Pumasok sa workspace." },
-    it: { eyebrow: "Finestra sull’ecosistema", title: "Entra nell’Ecosistema", subtitle: "Guarda attraverso la finestra. Scegli come entrare.", guest: "Ospite", guestBody: "Esplora.", next: "Nuovo", nextBody: "Richiedi accesso.", returning: "Di ritorno", returningBody: "Entra nel tuo spazio." },
-    he: { eyebrow: "חלון לאקוסיסטם", title: "כניסה לאקוסיסטם", subtitle: "הביטו דרך החלון. בחרו כיצד להיכנס.", guest: "אורח", guestBody: "חקירה.", next: "חדש", nextBody: "בקשת גישה.", returning: "חוזר", returningBody: "כניסה למרחב שלי." },
-    fr: { eyebrow: "Fenêtre sur l’écosystème", title: "Entrer dans l’Écosystème", subtitle: "Regardez par la fenêtre. Choisissez comment entrer.", guest: "Invité", guestBody: "Explorer.", next: "Nouveau", nextBody: "Demander l’accès.", returning: "Retour", returningBody: "Entrer dans mon espace." },
-  }[language];
   const TT = (phrase: string) => translatePhrase(language, phrase);
 
   const doors: { icon: string; title: string; body: string; screen: Screen }[] = [
-    { icon: "🌲", title: portalText.guest, body: portalText.guestBody, screen: "guest" },
-    { icon: "✨", title: portalText.next, body: portalText.nextBody, screen: "registration" },
-    { icon: "🔑", title: portalText.returning, body: portalText.returningBody, screen: "roles" },
+    { icon: "🌱", title: "Discover Youngstown", body: "Meet the people, places, history, and possibility that continue to shape this community.", screen: "guest" },
+    { icon: "🌲", title: "Explore the Ecosystem", body: "See how the farm, forest, youth workforce, pollinators, food, and opportunity connect.", screen: "guest" },
+    { icon: "✨", title: "New Participant", body: "Request access to a role-based pathway.", screen: "registration" },
+    { icon: "🔑", title: "Returning Participant", body: "Enter your assigned workspace.", screen: "roles" },
   ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.1fr_.9fr] lg:items-stretch">
+    <div className="grid gap-4">
       <Card className="overflow-hidden p-0">
-        <div className="relative min-h-[62vh] bg-black/35">
+        <div className="relative min-h-[68vh]">
           <img
-            src={IMG.ecosystem}
-            alt="Bronson Family Farm connected food ecosystem map"
-            className="absolute inset-0 h-full w-full object-contain p-3 sm:p-5"
-            onError={(event) => (event.currentTarget.src = IMG.forest)}
+            src={IMG.forest}
+            alt="Bronson Family Farm forest and growing landscape"
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(event) => (event.currentTarget.src = IMG.grow)}
           />
-          <div className="absolute left-4 top-4 rounded-full border border-emerald-200/25 bg-black/70 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-emerald-50 backdrop-blur-xl">
-            {TT("Forest Gate Portal")}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/68 to-black/30" />
+          <div className="relative z-10 flex min-h-[68vh] max-w-5xl flex-col justify-center p-6 sm:p-10 lg:p-14">
+            <div className="text-xs font-black uppercase tracking-[0.34em] text-emerald-100/85">{TT("Bronson Family Farm")}</div>
+            <h1 className="mt-4 text-5xl font-black leading-[.95] text-white sm:text-6xl lg:text-8xl">{TT("Greatness Grows Here")}</h1>
+            <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/88 sm:text-xl">
+              {TT("Youngstown has always been a place where people built futures. Today, a new generation is growing those same possibilities through stewardship, discovery, work, service, and opportunity.")}
+            </p>
+            <div className="mt-7 grid max-w-3xl gap-2 text-xl font-black leading-8 text-emerald-100 sm:text-2xl">
+              <div>{TT("Every seed is a lesson.")}</div>
+              <div>{TT("Every lesson creates opportunity.")}</div>
+              <div>{TT("Every opportunity creates legacy.")}</div>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button type="button" onClick={() => setScreen("guest")} className="rounded-full bg-emerald-300 px-7 py-4 text-base font-black text-black hover:bg-emerald-200">{TT("Begin the Visitor Journey")}</button>
+              <button type="button" onClick={() => setScreen("roles")} className="rounded-full border border-white/25 bg-black/40 px-7 py-4 text-base font-black text-white backdrop-blur hover:bg-white/15">{TT("Enter My Workspace")}</button>
+            </div>
           </div>
         </div>
       </Card>
 
-      <Card className="flex flex-col justify-center">
-        <div className="text-xs uppercase tracking-[0.35em] text-emerald-100/70">{portalText.eyebrow}</div>
-        <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">{portalText.title}</h1>
-        <p className="mt-4 max-w-xl text-base leading-7 text-white/82">
-          {portalText.subtitle}
-        </p>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {doors.map((door) => (
+          <button
+            key={door.title}
+            type="button"
+            onClick={() => setScreen(door.screen)}
+            className="rounded-[1.5rem] border border-white/14 bg-black/35 p-5 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">{door.icon}</span>
+              <span className="text-xl font-black">{TT(door.title)}</span>
+            </div>
+            <div className="mt-3 text-sm font-semibold leading-6 text-white/74">{TT(door.body)}</div>
+          </button>
+        ))}
+      </div>
 
-        <div className="mt-6 grid gap-3">
-          {doors.map((door) => (
-            <button
-              key={door.title}
-              type="button"
-              onClick={() => setScreen(door.screen)}
-              className="rounded-[1.5rem] border border-white/14 bg-black/35 p-5 text-left transition hover:border-emerald-200/70 hover:bg-emerald-300/14 focus:border-emerald-200 focus:outline-none"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">{door.icon}</span>
-                <span className="text-2xl font-black">{door.title}</span>
-              </div>
-              <div className="mt-2 text-sm leading-6 text-white/72">{door.body}</div>
-            </button>
-          ))}
-        </div>
-
-        {activeUser && (
-          <div className="mt-5 rounded-[1.25rem] border border-emerald-200/20 bg-emerald-300/10 p-4 text-sm leading-6 text-white/78">
-            Signed in as <strong className="text-white">{activeUser.name}</strong>. Choose Returning to enter your workspace, or Sign Out to change users.
+      {activeUser && (
+        <Card className="border-emerald-200/20 bg-emerald-300/10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm leading-6 text-white/82">{TT("Signed in as")} <strong className="text-white">{activeUser.name}</strong>.</div>
+            <button type="button" onClick={() => setScreen("roles")} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">{TT("Continue to My Workspace")}</button>
           </div>
-        )}
-      </Card>
+        </Card>
+      )}
     </div>
   );
 }
@@ -6932,17 +6935,18 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const pages: GuestJourneyPage[] = [
     {
       key: "home",
-      eyebrow: "Bronson Family Farm",
-      title: "A Seed Travels Many Ways",
-      subtitle: "That is life.",
+      eyebrow: "Bronson Family Farm • Youngstown, Ohio",
+      title: "Greatness Grows Here",
+      subtitle: "Purpose. Place. Experience. Opportunity. Legacy.",
       paragraphs: [
-        "Every seed begins with possibility.",
-        "Some travel by wind. Some by water. Some by animals. Some by people.",
-        "Each follows a different path. Each encounters different challenges. Each carries the potential for growth.",
-        "Bronson Family Farm is the story of roots, stewardship, opportunity, community, and the many journeys that connect them.",
+        "Youngstown has always been a place where people built futures.",
+        "Inventors. Artists. Educators. Builders. Entrepreneurs. Workers. Community leaders.",
+        "Today, a new generation is growing those same possibilities.",
+        "At Bronson Family Farm, youth learn through stewardship, discovery, work, service, and opportunity.",
       ],
+      highlights: ["Every seed is a lesson.", "Every lesson creates opportunity.", "Every opportunity creates legacy."],
       image: IMG.forest,
-      imageAlt: "Bronson Family Farm landscape",
+      imageAlt: "Bronson Family Farm landscape in Youngstown",
     },
     {
       key: "roots",
@@ -7288,7 +7292,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         {!isFinal && (
           <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
             {!isFirst ? <button type="button" onClick={() => moveTo(pageIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20">← Previous</button> : <span />}
-            <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{isFirst ? "Enter the Journey" : "Next →"}</button>
+            <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200">{isFirst ? "Discover Youngstown →" : "Next →"}</button>
           </div>
         )}
 
