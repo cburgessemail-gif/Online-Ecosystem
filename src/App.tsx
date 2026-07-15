@@ -10,11 +10,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
  * - Ecosystem 26.6 FINAL: Parent-ready, real-farm visitor story. Replaces abstract Roots/Seed/Journey philosophy with the airport, family, Cultivators, current projects, discoveries, learning, Youngstown, opportunity, and documented legacy. Removes public map-style navigation.
  * - Ecosystem 26.8 FINAL: Adds one-button discovery capture, permanent photo/video/audio preservation, Species Library, Living Ecosystem Timeline, Before/After documentation, and Future Cultivators Legacy Registry. One upload is reused across Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.
+ * - Ecosystem 26.9 FINAL: Rebuilds Discover Youngstown → Builders & Innovators as an eight-profile, photo-changing educational library; separates Community Partners & Mentors; removes builder uploads, workbook/journey documentation, evidence, and completion tracking; and provides one immediate, optional reflection response on each builder profile.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 26.8 - LIVING DISCOVERY + MEDIA PRESERVATION FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 26.9 - BUILDERS & INNOVATORS FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -10399,7 +10400,7 @@ type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
 type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks" | "youngstown";
 
 type DiscoverYoungstownSection25 = {
-  key: "before" | "founding" | "transport" | "steel" | "cultures" | "nature" | "builders" | "agriculture" | "opportunity-today" | "your-story";
+  key: "before" | "founding" | "transport" | "steel" | "cultures" | "nature" | "builders" | "partners-mentors" | "agriculture" | "opportunity-today" | "your-story";
   icon: string;
   title: string;
   subtitle: string;
@@ -10460,12 +10461,20 @@ const DISCOVER_YOUNGSTOWN_SECTIONS_25: DiscoverYoungstownSection25[] = [
     deepDive: ["Field observations", "Water and soil investigations", "Wildlife records", "Park, forest, and watershed maps"],
   },
   {
-    key: "builders", icon: "⭐", title: "Builders & Innovators", subtitle: "Youngstown-connected people whose talent, work, and ideas traveled far beyond the city.",
-    shortStory: "GOOD SEED COMES FROM YOUNGSTOWN. The Warner Brothers, Ed O'Neill, Ray Mancini, Jim Tressel, Simeon Booker, François Clemmons, Lawrence Brownlee, Thomas Bopp, Joseph G. Butler Jr., and many others show how many forms greatness can take.",
-    learnMore: ["Warner Brothers — filmmaking and entrepreneurship", "Ed O'Neill — acting and persistence", "Ray Mancini — athletics and community identity", "Simeon Booker — journalism and civil rights reporting", "François Clemmons, Lawrence Brownlee, Thomas Bopp, Joseph G. Butler Jr., and other builders"],
-    careers: ["Filmmaker", "Actor", "Athlete or Coach", "Journalist", "Scientist", "Entrepreneur"],
-    activityPrompt: "Which Youngstown builder or innovator makes you curious to learn more?",
-    deepDive: ["Photo-first profiles", "Verified Youngstown connections", "Career timelines", "Oral histories and archives"],
+    key: "builders", icon: "⭐", title: "Builders & Innovators", subtitle: "Eight Youngstown-connected stories of building, leadership, truth, art, excellence, and discovery.",
+    shortStory: "GOOD SEED COMES FROM YOUNGSTOWN. Greatness Grows Here. Explore one builder at a time through a unique visual, a concise story, career connections, an opportunity lesson, a legacy lesson, and one optional reflection.",
+    learnMore: ["Augustas ‘Gus’ Rigas", "Warner Brothers", "Jim Tressel", "Simeon Booker", "Lawrence Brownlee", "Dr. François S. Clemmons", "Thomas Bopp", "Coming Soon"],
+    careers: ["Construction", "Engineering", "Business", "Education", "Journalism", "Government", "Music", "Science"],
+    activityPrompt: "What stood out most about this builder's journey?",
+    deepDive: ["One builder per page", "A different hero image on every page", "Previous and Next navigation", "No uploads or completion tracking"],
+  },
+  {
+    key: "partners-mentors", icon: "🤝", title: "Community Partners & Mentors", subtitle: "People helping create opportunities today.",
+    shortStory: "Community partners and mentors strengthen Bronson Family Farm through guidance, education, planning, research, technical support, and opportunity-building. This section recognizes current contributors without placing them inside the historical Builders & Innovators sequence.",
+    learnMore: ["Dave Deibel", "Dr. Brad Richardson", "Dr. Lathardus Goggins II", "Marc Amante", "Jay Wargacki", "Daniel O’Connell", "Kate Spires"],
+    careers: ["Mentor", "Researcher", "Educator", "Designer", "Engineer", "Business Advisor", "Community Partner"],
+    activityPrompt: "",
+    deepDive: ["Connection to Bronson Family Farm", "Opportunities created", "Areas of knowledge and service", "Current community contribution"],
   },
   {
     key: "agriculture", icon: "🌾", title: "Agriculture & Food", subtitle: "Farms, gardens, markets, preservation, family traditions, and today's food economy.",
@@ -10492,6 +10501,227 @@ const DISCOVER_YOUNGSTOWN_SECTIONS_25: DiscoverYoungstownSection25[] = [
     deepDive: ["Workbook evidence", "Youth oral histories", "Community impact records", "Legacy Walk and Hall of Possibility concepts"],
   },
 ];
+
+
+type YoungstownBuilderProfile26_9 = {
+  name: string;
+  theme: string;
+  image: string;
+  imageAlt: string;
+  introduction: string;
+  importance: string;
+  careers: string[];
+  opportunityLesson: string;
+  legacyLesson: string;
+};
+
+const YOUNGSTOWN_BUILDERS_26_9: YoungstownBuilderProfile26_9[] = [
+  {
+    name: "Augustas ‘Gus’ Rigas",
+    theme: "Building Communities",
+    image: IMG.deerFencing,
+    imageAlt: "Construction and community-building work representing Gus Rigas",
+    introduction: "Youngstown helped shape a builder whose education, military service, construction leadership, and entrepreneurship reached communities far beyond the city.",
+    importance: "Gus Rigas was born in Youngstown, attended Cranbrook School, graduated from MIT, served as a First Lieutenant in the United States Air Force, worked for the DeBartolo Corporation, became Executive Vice President of Construction, helped develop enclosed shopping malls, and founded Rigas Construction. His journey connects technical learning, responsibility, leadership, and business ownership.",
+    careers: ["Construction", "Engineering", "Project Management", "Entrepreneurship", "Military Service"],
+    opportunityLesson: "Education and practical responsibility can prepare someone to turn plans into places that serve people.",
+    legacyLesson: "A builder's legacy is not only the structure—it is the community activity, work, and opportunity that the structure makes possible.",
+  },
+  {
+    name: "Warner Brothers",
+    theme: "Building Entertainment",
+    image: IMG.interview,
+    imageAlt: "Media and storytelling image representing the Warner Brothers",
+    introduction: "A family connected to Youngstown helped turn moving pictures, business risk, and persistence into an entertainment company recognized around the world.",
+    importance: "The Warner brothers built their enterprise through exhibition, distribution, production, and the willingness to adapt as film technology changed. Their story shows that creative work also requires organization, investment, teamwork, and entrepreneurship.",
+    careers: ["Film", "Media", "Business", "Production", "Entrepreneurship"],
+    opportunityLesson: "A creative idea grows when people learn the business, technology, and teamwork needed to carry it forward.",
+    legacyLesson: "Ideas that begin locally can influence how people around the world see stories, culture, and possibility.",
+  },
+  {
+    name: "Jim Tressel",
+    theme: "Building Leaders",
+    image: IMG.youth,
+    imageAlt: "Youth teamwork and leadership image representing Jim Tressel",
+    introduction: "A Youngstown native built a career around coaching, education, institutional leadership, and public service.",
+    importance: "Jim Tressel's journey connects athletics with teaching, discipline, relationship-building, university leadership, and government service. His story demonstrates that leadership is measured by how people are prepared, encouraged, and supported—not only by personal recognition.",
+    careers: ["Education", "Athletics", "Coaching", "Leadership", "Government", "Public Service"],
+    opportunityLesson: "The ability to teach, organize, and help others improve can open pathways across many professions.",
+    legacyLesson: "Leadership lasts when it develops people who are prepared to lead and serve after you.",
+  },
+  {
+    name: "Simeon Booker",
+    theme: "Building Understanding",
+    image: IMG.supervisor,
+    imageAlt: "Writing and professional observation image representing Simeon Booker",
+    introduction: "A journalist shaped by Youngstown used reporting, courage, and careful observation to help the nation understand major events in the Civil Rights Movement.",
+    importance: "Simeon Booker moved to Youngstown as a child, attended school in the city, wrote for the Youngstown Vindicator, became the first full-time Black reporter at The Washington Post, and reported for Jet and Ebony. His coverage connected facts, human experience, and public accountability.",
+    careers: ["Journalism", "Writing", "Communications", "Research", "History"],
+    opportunityLesson: "Learning to observe, verify, ask questions, and communicate clearly can become work that protects public understanding.",
+    legacyLesson: "Truthful reporting can preserve voices, challenge injustice, and change what a nation is willing to see.",
+  },
+  {
+    name: "Lawrence Brownlee",
+    theme: "Building Excellence",
+    image: IMG.culinaryFlowers,
+    imageAlt: "Colorful artistic image representing Lawrence Brownlee's musical excellence",
+    introduction: "A Youngstown-born artist developed early musical ability through disciplined study and became an internationally recognized operatic tenor, educator, and cultural leader.",
+    importance: "Lawrence Brownlee studied music from an early age, continued his education at Anderson University and Indiana University, and built an international performance career. His journey shows that talent becomes excellence through practice, coaching, resilience, and continued learning.",
+    careers: ["Music", "Performing Arts", "Education", "Cultural Leadership"],
+    opportunityLesson: "Natural ability is a beginning; disciplined practice and learning turn ability into professional excellence.",
+    legacyLesson: "Excellence can expand representation, inspire younger artists, and open doors in institutions where others may not have seen themselves.",
+  },
+  {
+    name: "Dr. François S. Clemmons",
+    theme: "Building Opportunity Through Talent",
+    image: IMG.queens,
+    imageAlt: "Community arts and culture image representing Dr. François S. Clemmons",
+    introduction: "Raised in Youngstown, a young church singer became an opera performer, Grammy-winning artist, television neighbor, ensemble founder, educator, and keeper of cultural traditions.",
+    importance: "Dr. François S. Clemmons directed a church choir at age ten, studied at Oberlin and Carnegie Mellon, performed with the Metropolitan Opera, appeared as Officer Clemmons on Mister Rogers' Neighborhood, founded the Harlem Spiritual Ensemble, and taught at Middlebury College. His work joined artistic excellence with education, visibility, and community connection.",
+    careers: ["Music", "Education", "Television", "Community Leadership", "Cultural Preservation"],
+    opportunityLesson: "One ability can connect to many careers when it is developed, shared, and used in service to others.",
+    legacyLesson: "Art can preserve culture while also creating belonging, understanding, and new opportunity.",
+  },
+  {
+    name: "Thomas Bopp",
+    theme: "Building Discovery",
+    image: IMG.seeds,
+    imageAlt: "Observation and discovery image representing Thomas Bopp",
+    introduction: "A Youngstown-connected astronomy enthusiast became a co-discoverer of Comet Hale-Bopp through curiosity, patient observation, and participation in science.",
+    importance: "Thomas Bopp's story shows that discovery is not limited to people with one official title. Careful observation, learning, participation, and the willingness to report what is seen can contribute to scientific knowledge.",
+    careers: ["Science", "Astronomy", "Observation", "Research", "Technology"],
+    opportunityLesson: "Curiosity becomes opportunity when a person learns how to observe carefully and share a discovery responsibly.",
+    legacyLesson: "A single observation can become part of humanity's long record of understanding the universe.",
+  },
+  {
+    name: "Coming Soon",
+    theme: "The Story Continues",
+    image: IMG.compost,
+    imageAlt: "Growing and future possibility image for a coming Youngstown builder",
+    introduction: "Youngstown's story is still being written. The next builder, innovator, artist, scientist, entrepreneur, educator, or community leader may be growing into that work now.",
+    importance: "This permanent space allows the library to expand when another profile is approved. It also reminds every visitor that history is not limited to people from the past.",
+    careers: ["Your Interest", "Your Skill", "Your Idea", "Your Community"],
+    opportunityLesson: "The next opportunity may begin with something you are learning, noticing, practicing, or trying today.",
+    legacyLesson: "The next Youngstown builder may be reading this page.",
+  },
+];
+
+const COMMUNITY_PARTNERS_MENTORS_26_9 = [
+  { name: "Dave Deibel", connection: "Farm advisor and community relationship-builder", opportunities: "Planning, partnership, and practical support" },
+  { name: "Dr. Brad Richardson", connection: "Research colleague and trusted advisor", opportunities: "Research insight, feedback, and youth/family systems knowledge" },
+  { name: "Dr. Lathardus Goggins II", connection: "Education partner", opportunities: "Learning design, youth development, and community education" },
+  { name: "Marc Amante", connection: "Central State University agriculture connection", opportunities: "Agriculture education, technical learning, and institutional connection" },
+  { name: "Jay Wargacki", connection: "Youngstown State University engineering and technology connection", opportunities: "Engineering, technology, design, and student opportunity" },
+  { name: "Daniel O’Connell", connection: "SCORE mentor", opportunities: "Business planning, entrepreneurship, and organizational guidance" },
+  { name: "Kate Spires", connection: "Architect and Aspect Studio partner", opportunities: "Architecture, site design, recreation, visitor experience, and destination planning" },
+];
+
+function BuildersInnovatorsLibrary26_9() {
+  const [builderIndex, setBuilderIndex] = useState(0);
+  const [reflection, setReflection] = useState("");
+  const builder = YOUNGSTOWN_BUILDERS_26_9[builderIndex];
+  const reflectionOptions = ["Leadership", "Education", "Service", "Discovery", "Entrepreneurship", "Creativity", "Not Sure Yet", "Skip"];
+
+  function moveBuilder(nextIndex: number) {
+    setBuilderIndex(Math.max(0, Math.min(YOUNGSTOWN_BUILDERS_26_9.length - 1, nextIndex)));
+    setReflection("");
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+  }
+
+  return (
+    <div className="grid gap-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {YOUNGSTOWN_BUILDERS_26_9.map((item, index) => (
+          <button key={item.name} type="button" onClick={() => moveBuilder(index)} className={`rounded-[1.35rem] border p-4 text-left transition ${builderIndex === index ? "border-amber-200/60 bg-amber-300/18" : "border-white/12 bg-black/40 hover:bg-black/60"}`}>
+            <div className="text-xs font-black uppercase tracking-[0.18em] text-amber-100/75">Builder {index + 1}</div>
+            <div className="mt-2 text-lg font-black">{item.name}</div>
+            <div className="mt-1 text-xs font-bold leading-5 text-white/65">{item.theme}</div>
+          </button>
+        ))}
+      </div>
+
+      <Card className="overflow-hidden p-0">
+        <div key={builder.name} className="grid lg:grid-cols-[1.05fr_.95fr]">
+          <div className="min-h-[340px] bg-cover bg-center md:min-h-[480px]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.62)), url(${builder.image})` }} role="img" aria-label={builder.imageAlt} />
+          <div className="p-6 md:p-8">
+            <div className="text-xs font-black uppercase tracking-[0.26em] text-amber-100/80">Greatness Grows Here</div>
+            <h3 className="mt-3 text-4xl font-black md:text-5xl">{builder.name}</h3>
+            <div className="mt-3 inline-flex rounded-full border border-emerald-200/25 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-50">{builder.theme}</div>
+            <p className="mt-5 text-base font-bold leading-8 text-white/82">{builder.introduction}</p>
+            <div className="mt-6 rounded-[1.35rem] border border-white/12 bg-black/30 p-5">
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-sky-100/80">Journey</div>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-black">
+                {['Student', 'Learning', 'Opportunity', 'Career', 'Leadership', 'Legacy'].map((step, index) => <React.Fragment key={step}><span className="rounded-full bg-white/10 px-3 py-2">{step}</span>{index < 5 && <span aria-hidden="true">→</span>}</React.Fragment>)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="p-6">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100/80">What Makes This Person Important?</div>
+          <p className="mt-3 text-base font-bold leading-8 text-white/82">{builder.importance}</p>
+        </Card>
+        <Card className="p-6">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-emerald-100/80">Career Connections</div>
+          <div className="mt-4 flex flex-wrap gap-2">{builder.careers.map((career) => <span key={career} className="rounded-full border border-emerald-200/25 bg-emerald-300/10 px-3 py-2 text-sm font-black">{career}</span>)}</div>
+        </Card>
+        <Card className="p-6">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-sky-100/80">Opportunity Lesson</div>
+          <p className="mt-3 text-base font-bold leading-8 text-white/82">{builder.opportunityLesson}</p>
+        </Card>
+        <Card className="p-6">
+          <div className="text-xs font-black uppercase tracking-[0.22em] text-violet-100/80">Legacy Lesson</div>
+          <p className="mt-3 text-base font-bold leading-8 text-white/82">{builder.legacyLesson}</p>
+        </Card>
+      </div>
+
+      <Card className="p-6">
+        <div className="text-xs font-black uppercase tracking-[0.22em] text-amber-100">Reflection</div>
+        <div className="mt-3 text-xl font-black">What stood out most about this builder's journey?</div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {reflectionOptions.map((option) => <button key={option} type="button" onClick={() => setReflection(option)} className={`rounded-full border px-4 py-3 text-sm font-black ${reflection === option ? "border-amber-200 bg-amber-300 text-slate-950" : "border-white/15 bg-white/8 text-white hover:bg-white/14"}`}>{option}</button>)}
+        </div>
+        {reflection && <div className="mt-4 text-sm font-black text-amber-50">Response selected: {reflection}</div>}
+      </Card>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.4rem] border border-white/12 bg-black/35 p-4">
+        <button type="button" disabled={builderIndex === 0} onClick={() => moveBuilder(builderIndex - 1)} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-35">← Previous Builder</button>
+        <div className="text-sm font-black">Builder {builderIndex + 1} of {YOUNGSTOWN_BUILDERS_26_9.length}</div>
+        <button type="button" disabled={builderIndex === YOUNGSTOWN_BUILDERS_26_9.length - 1} onClick={() => moveBuilder(builderIndex + 1)} className="rounded-full bg-amber-300 px-5 py-3 text-sm font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-35">Next Builder →</button>
+      </div>
+    </div>
+  );
+}
+
+function CommunityPartnersMentors26_9() {
+  return (
+    <div className="grid gap-5">
+      <Card className="overflow-hidden p-0">
+        <div className="grid lg:grid-cols-[1.05fr_.95fr]">
+          <div className="min-h-[300px] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.58)), url(${IMG.partners})` }} role="img" aria-label="Community partners and mentors creating opportunities today" />
+          <div className="p-6 md:p-8">
+            <div className="text-xs font-black uppercase tracking-[0.26em] text-emerald-100/80">Community Partners & Mentors</div>
+            <h3 className="mt-3 text-4xl font-black">People Helping Create Opportunities Today</h3>
+            <p className="mt-5 text-base font-bold leading-8 text-white/82">These current contributors support Bronson Family Farm through knowledge, relationships, planning, research, education, design, business guidance, and community connection. They are recognized separately from the historical Builders & Innovators library.</p>
+          </div>
+        </div>
+      </Card>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {COMMUNITY_PARTNERS_MENTORS_26_9.map((partner) => (
+          <Card key={partner.name} className="p-5">
+            <div className="text-2xl font-black">{partner.name}</div>
+            <div className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-sky-100/75">Connection to Bronson Family Farm</div>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/78">{partner.connection}</p>
+            <div className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-100/75">Opportunities Created</div>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/78">{partner.opportunities}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUser | null }) {
   const [activeKey, setActiveKey] = useState<DiscoverYoungstownSection25["key"]>("before");
@@ -10556,6 +10786,11 @@ function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUse
         ))}
       </div>
 
+      {section.key === "builders" ? (
+        <BuildersInnovatorsLibrary26_9 />
+      ) : section.key === "partners-mentors" ? (
+        <CommunityPartnersMentors26_9 />
+      ) : (
       <Card className="p-5 md:p-7">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)]">
           <div>
@@ -10591,6 +10826,7 @@ function DiscoverYoungstownWorkbook25({ activeUser }: { activeUser: EcosystemUse
           </div>
         </div>
       </Card>
+      )}
     </div>
   );
 }
