@@ -11,11 +11,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 26.6 FINAL: Parent-ready, real-farm visitor story. Replaces abstract Roots/Seed/Journey philosophy with the airport, family, Cultivators, current projects, discoveries, learning, Youngstown, opportunity, and documented legacy. Removes public map-style navigation.
  * - Ecosystem 26.8 FINAL: Adds one-button discovery capture, permanent photo/video/audio preservation, Species Library, Living Ecosystem Timeline, Before/After documentation, and Future Cultivators Legacy Registry. One upload is reused across Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.
  * - Ecosystem 26.9 FINAL: Rebuilds Discover Youngstown → Builders & Innovators as an eight-profile, photo-changing educational library; separates Community Partners & Mentors; removes builder uploads, workbook/journey documentation, evidence, and completion tracking; and provides one immediate, optional reflection response on each builder profile.
+ * - Ecosystem 27.0 FINAL: Records Wednesday, July 15 wood-ash processing and visitor-trail stewardship. Youth removed nails and foreign objects from recovered ash, bagged the filtered material for future responsible distribution, established a visitor walking trail in the forest, identified wet crossings, and documented locations where bridges or raised crossings are needed. Uses uploaded farm images in the current-story layer.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 26.9 - BUILDERS & INNOVATORS FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 27.0 - WOOD ASH + VISITOR TRAIL FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -851,6 +852,9 @@ const IMG = {
   deerFencing: "/images/Deer Fencing.png",
   volunteers: "/images/Fence_volunteers.png",
   culinaryFlowers: "/images/culniary_edibleflowers.jpeg",
+  // Uploaded farm images reused for the July 15 stewardship story.
+  ashProcessing: "/images/Compost_Elliott.png",
+  visitorTrail: "/images/GrowArea2.jpg",
 };
 
 const launchEvents = [
@@ -1387,22 +1391,24 @@ const youthWeekSixDailyPlan = [
   {
     day: "Wednesday",
     date: "July 15, 2026",
-    curriculum: "Milkweed Habitat Restoration & Pollinator Stewardship",
-    focus: "Youth collect mature milkweed seed responsibly, protect seed quality during drying, document habitat conditions, and connect milkweed restoration to monarchs, pollinators, biodiversity, and future farm planning.",
+    curriculum: "Wood-Ash Recovery & Visitor Trail Stewardship",
+    focus: "Youth completed two connected stewardship projects: preparing recovered wood ash for safe future use and establishing a forest walking trail for visitors. They practiced material inspection, contamination removal, safe handling, trail observation, water-crossing assessment, teamwork, and visitor-centered planning.",
     work: [
-      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Wear gloves and enter only supervisor-approved milkweed collection areas",
-      "Observe pod color, dryness, opening, seed condition, insects, caterpillars, eggs, and surrounding habitat before collection",
-      "Collect only mature seeds or mature pods as directed; leave immature pods and needed habitat in place",
-      "Place seeds in a breathable paper envelope and label the date, location, collector, and observation",
-      "LEAVE THE ENVELOPE OPEN while the seeds dry",
-      "DO NOT seal the envelope, fold the flap inside, or remove the adhesive or protective strip",
-      "Stage open envelopes in the approved dry location where air can circulate",
-      "Count envelopes and collection locations and record pollinator or monarch observations",
-      "Photograph the habitat, mature pod, labeled open envelope, and any approved pollinator discovery"
+      "Report to the South Hangar Staging Area for check-in, PPE, water, gloves, and the daily briefing",
+      "Allow recovered ash to cool fully before handling and work only in the supervisor-approved processing area",
+      "Spread and inspect the ash carefully so nails, metal, glass, plastic, charcoal pieces, and other foreign objects can be seen",
+      "Remove every nail and foreign object with the approved tools; never reach blindly into ash",
+      "Keep removed metal and foreign material in a separate disposal container",
+      "Filter or screen the ash until only clean, usable material remains",
+      "Place the filtered ash in a labeled bag for future distribution; do not apply it to crops until a supervisor confirms the approved use, amount, and location",
+      "Enter the forest only with the supervisor-approved group and remain together",
+      "Establish and clear a practical walking trail for future visitors while protecting living plants, habitat, and natural drainage",
+      "Mark muddy, pooled, or flowing-water crossings that are difficult or unsafe to walk through",
+      "Identify locations that may need a small bridge, raised crossing, stepping structure, drainage solution, or rerouted trail",
+      "Photograph the ash-processing stages, removed foreign objects, filtered bagged ash, trail progress, water crossings, and proposed bridge locations using approved uploaded farm images where they accurately represent the work"
     ],
-    resources: ["Milkweed Seed Collection Guide", "Open-Envelope Drying Reminder", "Milkweed & Monarchs", "Pollinator Observation Guide", "Habitat Restoration Record"],
-    reflection: "What did the condition of the milkweed habitat tell you? Why must collected seeds remain in an open paper envelope while drying? What should future Cultivators know about collecting without damaging habitat?",
+    resources: ["Wood-Ash Safety & Screening Guide", "Foreign-Object Removal Checklist", "Responsible Ash Use Record", "Visitor Trail Stewardship Guide", "Water-Crossing Observation Sheet", "Bridge Location Planning Record"],
+    reflection: "Which action made the farm or future visitor trail safer today, and what should be built or improved next?",
   },
   {
     day: "Thursday",
@@ -7086,14 +7092,14 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       eyebrow: "This Week at the Farm",
       title: "What the Cultivators are doing now",
       paragraphs: [
-        "Cultivators are collecting and processing milkweed seed, building the melon trellis, restoring the apiary, monitoring corn and other crops, and preparing the squash and pumpkin area.",
-        "They are also observing wildlife, watching for animal activity near the growing areas, and using the forest as a cooler work and learning space when conditions require it.",
-        "Recent work included fertilizing plants and using hot embers to continue the wood-ash recovery process.",
-        "Each activity is documented in the Workbook. Skills and accomplishments are carried into My Journey without asking youth to repeat the same information.",
+        "Cultivators processed recovered wood ash by carefully removing nails, metal, and every other foreign object before filtering the usable ash.",
+        "The clean ash was placed in a labeled bag for future responsible distribution. It will not be applied until the approved crop, location, amount, and soil need are confirmed.",
+        "Youth also spent an extended period in the forest establishing a walking trail for future visitors. As they worked, they found wet crossings and places where bridges, raised walkways, drainage improvements, or trail rerouting may be needed.",
+        "The work is documented in the Workbook and Living Ecosystem Timeline. Skills and accomplishments carry into My Journey without requiring youth to repeat the same information.",
       ],
-      highlights: ["Milkweed stewardship", "Melon trellis", "Apiary restoration", "Crop monitoring", "Forest observation", "Wood ash recovery"],
-      image: IMG.grow,
-      imageAlt: "Current projects at Bronson Family Farm",
+      highlights: ["Ash safety", "Foreign-object removal", "Filtered ash storage", "Visitor trail", "Water crossings", "Bridge planning"],
+      image: IMG.ashProcessing,
+      imageAlt: "Uploaded Bronson Family Farm image supporting the wood-ash processing and stewardship story",
     },
     {
       key: "discoveries",
@@ -7106,8 +7112,8 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         "Every discovery helps youth learn to observe carefully, ask better questions, and understand relationships among soil, water, plants, insects, wildlife, food, and people.",
       ],
       highlights: ["Baby salamanders", "Toad", "Butterfly cocoon", "Deer footprints", "Plant diversity", "Evidence-based observation"],
-      image: IMG.forest,
-      imageAlt: "Wildlife and plant discoveries at Bronson Family Farm",
+      image: IMG.visitorTrail,
+      imageAlt: "Uploaded Bronson Family Farm image supporting forest trail and water-crossing observations",
     },
     {
       key: "learning",
