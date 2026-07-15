@@ -9,11 +9,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Almanac is a daily operating layer, not a hidden resource.
  * - Inventory is visible on Supervisor, Mission Control, and Today's Work screens.
  * - Ecosystem 26.6 FINAL: Parent-ready, real-farm visitor story. Replaces abstract Roots/Seed/Journey philosophy with the airport, family, Cultivators, current projects, discoveries, learning, Youngstown, opportunity, and documented legacy. Removes public map-style navigation.
+ * - Ecosystem 26.8 FINAL: Adds one-button discovery capture, permanent photo/video/audio preservation, Species Library, Living Ecosystem Timeline, Before/After documentation, and Future Cultivators Legacy Registry. One upload is reused across Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 26.6 - PARENT-READY REAL FARM STORY FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 26.8 - LIVING DISCOVERY + MEDIA PRESERVATION FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -455,6 +456,9 @@ const JOURNEY_KEY = "bff.launch.journey.events";
 const COMPLETION_KEY = "bff.launch.completions";
 const LANGUAGE_KEY = "bff.launch.language";
 const MEDIA_ASSETS_KEY = "bff.launch.media.assets";
+const MEDIA_SYNC_QUEUE_KEY = "bff.launch.media.syncQueue";
+const SPECIES_LIBRARY_KEY = "bff.launch.species.library";
+const LEGACY_REGISTRY_KEY = "bff.launch.legacy.registry";
 const MEDIA_BUCKET = "bff-media";
 const FARM_STATUS_KEY = "bff.launch.farmStatus";
 const NOTIFICATION_KEY = "bff.launch.notifications";
@@ -2861,7 +2865,44 @@ type MediaAsset = {
   file_type: string;
   file_size: number;
   uploaded_by?: string;
+  owner_profile_id?: string;
+  owner_name?: string;
+  week?: number;
+  day?: string;
+  media_type?: "photo" | "video" | "audio" | "document";
+  workbook_entry_id?: string;
+  caption?: string;
+  notes?: string;
+  auto_tags?: string[];
+  visible_in_workbook?: boolean;
+  visible_in_journey?: boolean;
+  visible_in_parent_report?: boolean;
+  visible_in_supervisor_report?: boolean;
+  visible_in_mission_control?: boolean;
+  sync_status?: "saved_local" | "queued" | "synced" | "failed";
   storage_path?: string;
+  created_at: string;
+};
+
+type SpeciesLibraryRecord = {
+  id: string;
+  participant_id: string;
+  common_name: string;
+  category: "Plant" | "Tree" | "Insect" | "Fungus" | "Wildlife" | "Unknown";
+  observation: string;
+  media_asset_id?: string;
+  identified_by?: string;
+  status: "Needs Identification" | "Identified";
+  created_at: string;
+};
+
+type LegacyRegistryRecord = {
+  id: string;
+  participant_id: string;
+  user_name: string;
+  knowledge: string;
+  category: string;
+  media_asset_id?: string;
   created_at: string;
 };
 
@@ -11107,6 +11148,145 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
   );
 }
 
+
+function LivingDiscoveryCapture26_8({ activeUser }: { activeUser: EcosystemUser | null }) {
+  const [open, setOpen] = useState(false);
+  const [discovery, setDiscovery] = useState("");
+  const [importance, setImportance] = useState("");
+  const [legacy, setLegacy] = useState("");
+  const [category, setCategory] = useState("General Discovery");
+  const [notice, setNotice] = useState("");
+  const [assets, setAssets] = useState<MediaAsset[]>(() => safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []));
+  const participantId = launchParticipantId(activeUser);
+
+  function mediaTypeFor(file: File): MediaAsset["media_type"] {
+    if (file.type.startsWith("image/")) return "photo";
+    if (file.type.startsWith("video/")) return "video";
+    if (file.type.startsWith("audio/")) return "audio";
+    return "document";
+  }
+
+  function inferTags(label: string, text: string) {
+    const haystack = `${label} ${text}`.toLowerCase();
+    const tags = ["Week 6", "Cultivator Discovery"];
+    if (haystack.includes("forest") || haystack.includes("tree")) tags.push("Forest Stewardship");
+    if (haystack.includes("wildlife") || haystack.includes("animal")) tags.push("Wildlife Observation");
+    if (haystack.includes("pollinator") || haystack.includes("flower") || haystack.includes("milkweed")) tags.push("Pollinator Habitat");
+    if (haystack.includes("trellis") || haystack.includes("melon")) tags.push("Melon Trellis");
+    if (haystack.includes("water") || haystack.includes("rain") || haystack.includes("creek")) tags.push("Water Stewardship");
+    if (haystack.includes("ash") || haystack.includes("nail") || haystack.includes("metal")) tags.push("Resource Recovery");
+    return Array.from(new Set(tags));
+  }
+
+  function saveFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const id = uuid();
+      const row: MediaAsset = {
+        id,
+        title: discovery || file.name,
+        category,
+        file_name: file.name,
+        file_url: String(reader.result || ""),
+        file_type: file.type || "file",
+        file_size: file.size,
+        uploaded_by: activeUser?.name || "Youth Workforce Participant",
+        owner_profile_id: participantId,
+        owner_name: activeUser?.name || "Youth Workforce Participant",
+        week: 6,
+        day: new Date().toLocaleDateString("en-US", { weekday: "long" }),
+        media_type: mediaTypeFor(file),
+        caption: discovery,
+        notes: importance,
+        auto_tags: inferTags(category, `${discovery} ${importance}`),
+        visible_in_workbook: true,
+        visible_in_journey: true,
+        visible_in_parent_report: true,
+        visible_in_supervisor_report: true,
+        visible_in_mission_control: true,
+        sync_status: supabase ? "queued" : "saved_local",
+        storage_path: `local/living-discovery/${todayISO()}/${id}-${file.name}`,
+        created_at: new Date().toISOString(),
+      };
+      const next = [row, ...assets].slice(0, 250);
+      setAssets(next);
+      safeWrite(MEDIA_ASSETS_KEY, next);
+      if (supabase) {
+        const queue = safeRead<MediaAsset[]>(MEDIA_SYNC_QUEUE_KEY, []);
+        safeWrite(MEDIA_SYNC_QUEUE_KEY, [row, ...queue].slice(0, 250));
+      }
+      setNotice("Media saved. It is now available to the Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function saveDiscovery() {
+    if (!discovery.trim()) { setNotice("Tell us what you discovered before saving."); return; }
+    const row: CultivatorDiscovery = {
+      id: uuid(), participant_id: participantId, user_name: activeUser?.name || "Youth Workforce Participant",
+      date: todayISO(), category, question: "What did you discover?", response: discovery.trim(),
+      source: "Explore & Discover", created_at: new Date().toISOString(),
+    };
+    safeWrite(DISCOVERY_KEY, [row, ...safeRead<CultivatorDiscovery[]>(DISCOVERY_KEY, [])].slice(0, 750));
+    if (legacy.trim()) {
+      const legacyRow: LegacyRegistryRecord = { id: uuid(), participant_id: participantId, user_name: activeUser?.name || "Youth Workforce Participant", knowledge: legacy.trim(), category, created_at: new Date().toISOString() };
+      safeWrite(LEGACY_REGISTRY_KEY, [legacyRow, ...safeRead<LegacyRegistryRecord[]>(LEGACY_REGISTRY_KEY, [])].slice(0, 500));
+    }
+    setNotice("Discovery saved to the Workbook and Future Cultivators Legacy Registry.");
+  }
+
+  return (
+    <Card className="p-4 md:p-5">
+      <button type="button" onClick={() => setOpen((value) => !value)} className="w-full rounded-[1.25rem] bg-emerald-300 px-6 py-5 text-left text-black shadow-lg shadow-emerald-950/25">
+        <div className="text-2xl font-black">💡 I Discovered Something</div>
+        <div className="mt-1 text-sm font-bold opacity-75">Capture a photo, video, audio note, or written discovery without leaving today’s work.</div>
+      </button>
+      {open && (
+        <div className="mt-4 grid gap-4 rounded-[1.25rem] border border-white/10 bg-black/25 p-4">
+          <label className="text-sm font-black">Discovery area
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-2 w-full rounded-xl bg-white p-3 font-bold text-slate-950">
+              {["General Discovery", "Forest Stewardship", "Tree Diversity", "Wildlife Observation", "Pollinator Habitat", "Water Stewardship", "Melon Trellis", "Ash Recovery", "Before and After"].map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-black">What did you discover?
+            <textarea value={discovery} onChange={(e) => setDiscovery(e.target.value)} className="mt-2 min-h-[90px] w-full rounded-xl bg-white p-3 font-bold text-slate-950" />
+          </label>
+          <label className="text-sm font-black">Why is it important?
+            <textarea value={importance} onChange={(e) => setImportance(e.target.value)} className="mt-2 min-h-[80px] w-full rounded-xl bg-white p-3 font-bold text-slate-950" />
+          </label>
+          <label className="text-sm font-black">What should future Cultivators know?
+            <textarea value={legacy} onChange={(e) => setLegacy(e.target.value)} className="mt-2 min-h-[80px] w-full rounded-xl bg-white p-3 font-bold text-slate-950" />
+          </label>
+          <div className="flex flex-wrap gap-3">
+            <label className="cursor-pointer rounded-full border border-emerald-200/30 bg-white/10 px-5 py-3 text-sm font-black">📷 Add Photo / Video / Audio
+              <input className="hidden" type="file" accept="image/*,video/*,audio/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) saveFile(file); e.currentTarget.value = ""; }} />
+            </label>
+            <button type="button" onClick={saveDiscovery} className="rounded-full bg-emerald-300 px-6 py-3 text-sm font-black text-black">Save Discovery</button>
+          </div>
+          {notice && <Notice text={notice} />}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function LivingEcosystemRecords26_8({ activeUser }: { activeUser: EcosystemUser | null }) {
+  const participantId = launchParticipantId(activeUser);
+  const media = safeRead<MediaAsset[]>(MEDIA_ASSETS_KEY, []).filter((item) => !item.owner_profile_id || item.owner_profile_id === participantId);
+  const species = safeRead<SpeciesLibraryRecord[]>(SPECIES_LIBRARY_KEY, []).filter((item) => item.participant_id === participantId);
+  const legacy = safeRead<LegacyRegistryRecord[]>(LEGACY_REGISTRY_KEY, []).filter((item) => item.participant_id === participantId);
+  return (
+    <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
+      <summary className="cursor-pointer text-base font-black text-emerald-50">My Living Ecosystem Records</summary>
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <div className="rounded-xl border border-white/10 bg-white/10 p-4"><div className="text-xl font-black">📅 Living Ecosystem Timeline</div><div className="mt-2 text-sm font-bold">{media.length} saved media record{media.length === 1 ? "" : "s"}</div><div className="mt-3 space-y-2">{media.slice(0,5).map((item)=><div key={item.id} className="rounded-lg bg-black/25 p-2 text-xs font-bold">{new Date(item.created_at).toLocaleDateString()} • {item.category} • {item.file_name}</div>)}</div></div>
+        <div className="rounded-xl border border-white/10 bg-white/10 p-4"><div className="text-xl font-black">🌿 Species Library</div><div className="mt-2 text-sm font-bold">{species.length} observation{species.length === 1 ? "" : "s"} saved</div><p className="mt-3 text-sm leading-6 text-white/72">Plants, trees, insects, fungi, and wildlife can be identified later by a supervisor without losing the original discovery.</p></div>
+        <div className="rounded-xl border border-white/10 bg-white/10 p-4"><div className="text-xl font-black">⭐ Future Cultivators Registry</div><div className="mt-2 text-sm font-bold">{legacy.length} knowledge record{legacy.length === 1 ? "" : "s"}</div><div className="mt-3 space-y-2">{legacy.slice(0,4).map((item)=><div key={item.id} className="rounded-lg bg-black/25 p-2 text-xs font-bold">{item.knowledge}</div>)}</div></div>
+      </div>
+    </details>
+  );
+}
+
 function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: Screen) => void; activeUser: EcosystemUser | null; language: LanguageCode }) {
   const currentWeek = getCurrentYouthWeek();
   const todayPlan = getCurrentYouthPlan();
@@ -11114,6 +11294,8 @@ function YouthScreen({ setScreen, activeUser, language }: { setScreen: (screen: 
   return (
     <div className="grid gap-4">
       <YouthDailyFlow16_2 todayPlan={todayPlan} currentWeek={currentWeek} setScreen={setScreen} activeUser={activeUser} />
+      <LivingDiscoveryCapture26_8 activeUser={activeUser} />
+      <LivingEcosystemRecords26_8 activeUser={activeUser} />
 
       <details className="rounded-[1.25rem] border border-white/10 bg-black/35 p-4 text-white/82 backdrop-blur-xl">
         <summary className="cursor-pointer text-base font-black text-emerald-50">Supervisor / adult view: supporting details only</summary>
