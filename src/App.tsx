@@ -14,12 +14,13 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.0 FINAL: Records wood-ash recovery and visitor-trail stewardship using actual farm activity and uploaded farm images.
  * - Ecosystem 27.2 FINAL: Preserves the complete Week 6 timeline and closes Friday, July 17, 2026 for dangerous heat index and Code Red air quality. Monday's bonfire and community gathering are complete; Tuesday and Wednesday document ash recovery; Thursday completes contaminant removal, filtering, bagging, responsible ash application, mowing, forest cartography, creek-crossing evaluation, bridge-location planning, and photography; Friday is cancelled and the Forest Atlas work carries forward.
  * - Ecosystem 27.1 FINAL: Adds Forest Cartography, Cartographer career exploration, Forest Cartographer I–III recognition, visitor trail mapping, creek crossings, bridge locations, educational stops, trail naming, wildlife registry, and automatic Journey skills without creating a new architecture.
- * - Ecosystem 27.2 FINAL: Friday, July 17, 2026 is an administrative closure because of dangerous heat index conditions and Code Red air quality. No attendance, workbook response, missing-work, badge, or workforce-progress penalty is created. Forest Atlas assembly, wildlife registry expansion, educational stop cataloging, and trail naming carry forward to the next appropriate stewardship day.
+ * - Ecosystem 27.2 FINAL: Friday, July 17, 2026 is an administrative closure because of dangerous heat index conditions and Code Red air quality. Attendance displays “No Work Today.” No attendance, workbook response, missing-work, badge, or workforce-progress penalty is created. Forest Atlas assembly, wildlife registry expansion, educational stop cataloging, and trail naming carry forward to Week 7.
+ * - Ecosystem 27.3 FINAL: Activates Week 7 for July 20–24, 2026 with Forest Atlas completion, career discovery, business and entrepreneurship, the July 23 WRTA workforce-development visit, Route #12 Lansdowne public-access planning, apprenticeship exploration, and professional communication. Replaces Week 8 placeholders with Legacy Builder and Capstone Development for July 27–31, 2026.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 27.2 - FRIDAY CANCELLATION + FOREST ATLAS CARRY-FORWARD FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 27.3 - WEEK 7 OPPORTUNITY + WRTA + WEEK 8 LEGACY FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -271,7 +272,7 @@ type AttendanceRecord = {
   date: string;
   check_in_time?: string;
   check_out_time?: string;
-  status: "present" | "absent" | "late" | "excused";
+  status: "present" | "absent" | "late" | "excused" | "no_work_today";
   ppe_status: "complete" | "missing_gloves" | "missing_shoes" | "missing_water" | "needs_review";
   qr_method?: "manual" | "qr" | "supervisor";
   notes?: string;
@@ -1055,20 +1056,20 @@ const youthCurriculumWeeks = [
   },
   {
     week: 7,
-    title: "Career Exploration",
-    focus: "Agriculture, construction, engineering, culinary, tourism, marketing, environmental science, and public safety careers.",
-    project: "Career pathway exploration and Journey record development",
-    skills: ["Career Awareness", "Interviewing", "Goal Setting", "Professional Identity"],
-    badge: "🧭 Career Pathfinder",
+    title: "Opportunity, Transportation & Community Infrastructure",
+    focus: "Forest Atlas completion, career discovery, business and entrepreneurship, WRTA transportation operations, apprenticeships, public access, and community planning.",
+    project: "Forest Atlas → Career Discovery → WRTA Workforce Experience → Route #12 Public Access Planning",
+    skills: ["Career Awareness", "Professional Communication", "Transportation Systems", "Community Planning", "Entrepreneurship", "Interviewing"],
+    badge: "🧭 Opportunity Pathfinder",
     status: "Upcoming",
   },
   {
     week: 8,
-    title: "Capstone & Achievement",
-    focus: "Final project presentation, Journey record review, supervisor recognition, skills summary, and achievement certificate.",
-    project: "Cultivator capstone and achievement showcase",
-    skills: ["Presentation", "Reflection", "Journey Record", "Readiness"],
-    badge: "🏆 Cultivator Achievement",
+    title: "Legacy Builder & Capstone Development",
+    focus: "Legacy inventory, growth story, community impact, capstone creation, recognition, Journey completion, workforce record, and future pathways.",
+    project: "What Will You Leave Behind? — Cultivator Legacy and Capstone Showcase",
+    skills: ["Presentation", "Reflection", "Community Impact", "Professional Storytelling", "Legacy", "Readiness"],
+    badge: "🏆 Legacy Builder",
     status: "Upcoming",
   },
 ];
@@ -1501,20 +1502,153 @@ const youthWeekSixDailyPlan = [
   },
 ];
 
+const WRTA_ROUTE_12_URL = "https://www.wrtaonline.com/schedules/route-12-lansdowne/";
+
 const youthWeekSevenDailyPlan = [
-  { day: "Monday", date: "Week 7 Monday", curriculum: "Career Exploration and Skills Inventory", focus: "Youth identify skills they have practiced and connect them to real careers.", work: ["Review skills practiced", "Choose careers connected to farm work", "Update resume skills", "Record one career interest"], resources: ["Career pathway cards", "Skills inventory", "Resume skills prompt"], reflection: "Which skill did you practice on the farm that could help you in a job?" },
-  { day: "Tuesday", date: "Week 7 Tuesday", curriculum: "Agriculture, Environment, and Science Careers", focus: "Youth connect observation, plants, pollinators, soil, water, and wildlife to career pathways.", work: ["Identify science and agriculture careers", "Connect one task to a career", "Ask one career question", "Document one pathway"], resources: ["Agriculture careers", "Environmental science careers", "Career question prompt"], reflection: "Which outdoor or science career interested you and why?" },
-  { day: "Wednesday", date: "Week 7 Wednesday", curriculum: "Business, Operations, and Entrepreneurship Careers", focus: "Youth connect inventory, pricing, marketing, customer service, operations, and ownership to careers and businesses.", work: ["Review inventory and pricing lessons", "Identify business roles", "Practice explaining value", "Record one entrepreneurship idea"], resources: ["Business career cards", "Pricing review", "Entrepreneurship prompt"], reflection: "What business role could you imagine yourself learning more about?" },
-  { day: "Thursday", date: "Week 7 Thursday", curriculum: "Resume, Interview, and Professional Story", focus: "Youth practice telling the story of their work in professional language.", work: ["Choose three resume skills", "Write one work example", "Practice one interview answer", "Update journey evidence"], resources: ["Resume builder", "Interview prompt", "Journey evidence guide"], reflection: "How would you explain your Cultivator work to an employer?" },
-  { day: "Friday", date: "Week 7 Friday", curriculum: "Career Pathway Closeout", focus: "Youth complete career reflections and prepare for capstone week.", work: ["Review career interests", "Complete weekly reflection", "Choose capstone evidence", "Preview final showcase"], resources: ["Career closeout", "Capstone preview", "Journey checklist"], reflection: "What opportunity do you see for yourself after this program?" },
+  {
+    day: "Monday",
+    date: "July 20, 2026",
+    curriculum: "Forest Atlas Completion, Skills Inventory, and Career Discovery",
+    focus: "Youth complete the stewardship work carried forward from the cancelled Friday and recognize the professional skills demonstrated through farm and forest work.",
+    work: [
+      "Compare youth trail maps and combine key features into one shared visitor-trail map",
+      "Organize approved forest and wood-ash photographs",
+      "Expand the Wildlife Registry with plants, wildlife, creek crossings, and unknown discoveries",
+      "Catalog educational stops, trail entrances, scenic points, difficult terrain, and potential bridge locations",
+      "Propose names for trails and educational stops",
+      "Identify signage, safety, drainage, accessibility, and bridge needs",
+      "Select all skills practiced during Weeks 1–6",
+      "Add at least three demonstrated skills to My Journey and the resume record"
+    ],
+    resources: ["Forest Atlas Assembly Guide", "Visitor Trail Map", "Wildlife Registry", "Educational Stop Catalog", "Skills Inventory", "Career Pathway Cards"],
+    reflection: "Which skill did you use while helping map, document, and protect the forest that could help you in a future job?",
+    carryForward: pendingWeekSixStewardshipProjects,
+  },
+  {
+    day: "Tuesday",
+    date: "July 21, 2026",
+    curriculum: "Agriculture, Environment, and Science Careers",
+    focus: "Youth connect real farm, forest, wildlife, soil, plant, pollinator, and water experiences to professional opportunities.",
+    work: [
+      "Review farm and forest discoveries",
+      "Connect completed activities to agriculture and science careers",
+      "Examine how professionals observe, identify, measure, document, and communicate",
+      "Select all careers that interest you",
+      "Write or record one question you would ask a professional",
+      "Add one career pathway to My Journey"
+    ],
+    resources: ["Agriculture Career Cards", "Environmental Science Career Cards", "Career Question Prompt", "My Journey Career Pathway"],
+    reflection: "Which agriculture, outdoor, or science career interests you, and why?",
+  },
+  {
+    day: "Wednesday",
+    date: "July 22, 2026",
+    curriculum: "Business, Operations, and Entrepreneurship Careers",
+    focus: "Youth connect inventory, measurement, pricing, customer experience, visitor planning, and ownership to business careers and entrepreneurship.",
+    work: [
+      "Review inventory, measurement, cost, pricing, and customer-service activities",
+      "Identify the people and systems needed to operate Bronson Family Farm",
+      "Connect the Forest Atlas and visitor trail to agritourism",
+      "Identify products, services, lessons, demonstrations, or visitor experiences the farm could responsibly offer",
+      "Practice explaining the value of one product, service, or experience",
+      "Record one realistic entrepreneurship idea"
+    ],
+    resources: ["Business Career Cards", "Pricing Review", "Agritourism Opportunity Prompt", "Entrepreneurship Idea Record"],
+    reflection: "What business role or responsible farm opportunity would you like to learn more about?",
+  },
+  {
+    day: "Thursday",
+    date: "July 23, 2026",
+    curriculum: "WRTA Workforce Development, Transportation Careers, and Apprenticeship Exploration",
+    focus: "Approximately 10 Cultivator youth ages 16–18 visit WRTA for a meaningful and safe workforce-development experience involving transportation operations, careers, apprenticeships, professional communication, and community access.",
+    work: [
+      "Review professional behavior, trip safety, and public-setting expectations",
+      "Prepare at least one question for WRTA staff",
+      "Observe operations, vehicle maintenance, safety, scheduling, dispatch, customer service, technology, and leadership roles",
+      "Identify three careers, two required skills, and one career that surprised you",
+      "Explore apprenticeships and earn-while-you-learn pathways",
+      "Practice professional conversation during the planned pizza-and-drinks gathering when confirmed",
+      "Record one career discovered, one skill already possessed, one skill to improve, and one possible next step",
+      "Practice answering: Tell me about a time you helped complete an important project"
+    ],
+    resources: ["WRTA Visit Guide", "Professional Question Builder", "Transportation Career Cards", "Apprenticeship Explorer", "Interview Response Builder", WRTA_ROUTE_12_URL],
+    reflection: "How would you explain your Cultivator experience to an employer or apprenticeship representative?",
+    fieldExperience: {
+      host: "Western Reserve Transit Authority",
+      address: "604 Mahoning Avenue, Youngstown, Ohio 44502",
+      group: "Approximately 10 youth ages 16–18",
+      contact: "Jordan T. Pennell",
+      partner: "NAACP Youngstown Branch President James Brown",
+    },
+  },
+  {
+    day: "Friday",
+    date: "July 24, 2026",
+    curriculum: "Public Access, Community Planning, Professional Thanks, and Opportunity Closeout",
+    focus: "Youth use WRTA's actual Route #12 Lansdowne information to examine how transportation affects access to work, education, healthcare, recreation, tourism, and Bronson Family Farm.",
+    work: [
+      "Review careers, skills, apprenticeships, and community services observed at WRTA",
+      "Study Route #12 Lansdowne, which operates hourly and departs at :40 past the hour",
+      "Identify the Atkinson Avenue stop south of the farm as the closest fixed-route stop",
+      "Examine the short walk required from the stop to the farm",
+      "Recognize that federal regulations do not permit WRTA to operate a private shuttle service",
+      "Identify visitor-access challenges including wayfinding, walking safety, weather, accessibility, and distance",
+      "Develop possible public-access solutions such as directional signs, visitor maps, QR-code directions, trail markers, bicycle access, and partnerships",
+      "Write or record a professional thank-you message to WRTA, Jordan Pennell, James Brown, or another host",
+      "Select one education, training, employment, apprenticeship, or entrepreneurship opportunity to explore next",
+      "Choose evidence for Week 8 capstone development"
+    ],
+    resources: ["WRTA Route #12 Lansdowne Schedule", WRTA_ROUTE_12_URL, "Farm Public Access Planning Sheet", "Professional Thank-You Builder", "Opportunity Pathway Selector", "Capstone Evidence Checklist"],
+    reflection: "What opportunity do you now see for yourself or your community that you may not have considered before?",
+  },
 ];
 
 const youthWeekEightDailyPlan = [
-  { day: "Monday", date: "Week 8 Monday", curriculum: "Capstone Planning and Journey Review", focus: "Youth select what work, growth, skills, and evidence best represents their Cultivator journey.", work: ["Review Journey record", "Choose capstone story", "Select evidence", "Plan presentation"], resources: ["Capstone planner", "Journey review", "Presentation outline"], reflection: "What work best shows your growth?" },
-  { day: "Tuesday", date: "Week 8 Tuesday", curriculum: "Capstone Build and Practice", focus: "Youth assemble their capstone, practice explaining their work, and connect skills to opportunity.", work: ["Build capstone presentation", "Practice speaking", "Add skills evidence", "Ask for feedback"], resources: ["Presentation practice", "Feedback guide", "Skills evidence checklist"], reflection: "What do you want people to understand about your work?" },
-  { day: "Wednesday", date: "Week 8 Wednesday", curriculum: "Achievement Showcase Preparation", focus: "Youth prepare final Journey record, journey summary, and parent-safe achievement highlights.", work: ["Finalize Journey record", "Review journey growth", "Prepare achievement statement", "Practice showcase"], resources: ["Showcase checklist", "Achievement statement", "Parent summary guide"], reflection: "How are you different from the person who started this program?" },
-  { day: "Thursday", date: "Week 8 Thursday", curriculum: "Capstone Showcase and Recognition", focus: "Youth present what they learned, built, observed, counted, improved, and became.", work: ["Present capstone", "Receive feedback", "Celebrate achievements", "Record next step"], resources: ["Showcase guide", "Recognition checklist", "Next step prompt"], reflection: "What are you proud of, and what will you carry forward?" },
-  { day: "Friday", date: "Week 8 Friday", curriculum: "Legacy Closeout and Future Pathway", focus: "Youth close the program by naming what they helped build and what future Cultivators can inherit.", work: ["Complete legacy reflection", "Download or review Journey record", "Confirm skills transcript", "Share future goal", "Celebrate completion"], resources: ["Legacy reflection", "Journey record download guide", "Skills transcript", "Future goal prompt"], reflection: "What did you help build that can help someone tomorrow?" },
+  {
+    day: "Monday",
+    date: "July 27, 2026",
+    curriculum: "Legacy Inventory",
+    focus: "Youth identify and preserve the projects, discoveries, improvements, and community contributions they helped create during Summer 2026.",
+    work: ["Review Weeks 1–7 projects", "Select all projects contributed to", "Choose the project you are most proud of", "Collect approved photos, videos, audio, and written records", "Confirm accomplishments saved to My Journey"],
+    resources: ["Legacy Inventory", "Project History", "My Journey Accomplishments", "Story Upload"],
+    reflection: "What project are you most proud of, and why?",
+  },
+  {
+    day: "Tuesday",
+    date: "July 28, 2026",
+    curriculum: "My Growth Story",
+    focus: "Youth recognize growth in teamwork, leadership, communication, confidence, safety, responsibility, problem-solving, environmental awareness, and career awareness.",
+    work: ["Review beginning and current Journey records", "Select all areas of growth", "Choose examples that show growth", "Add one growth statement to My Journey", "Choose text, audio, video, or upload to tell the growth story"],
+    resources: ["Growth Inventory", "My Journey Timeline", "Growth Story Builder"],
+    reflection: "How are you different today than when you started the program?",
+  },
+  {
+    day: "Wednesday",
+    date: "July 29, 2026",
+    curriculum: "Community Impact and Capstone Planning",
+    focus: "Youth identify who benefits from healthier soil, food production, pollinator habitat, visitor trails, public education, transportation access, and youth workforce development.",
+    work: ["Map Farm to Community to Region to Future Generations", "Identify who benefited from your work", "Choose a capstone format", "Select the evidence and story to include", "Plan the five required capstone elements"],
+    resources: ["Community Impact Map", "Capstone Format Selector", "Capstone Planner", "Evidence Checklist"],
+    reflection: "How did your work help someone besides yourself?",
+  },
+  {
+    day: "Thursday",
+    date: "July 30, 2026",
+    curriculum: "Capstone Creation and Practice",
+    focus: "Youth build and practice a poster, slide presentation, photo story, video, audio documentary, Forest Atlas exhibit, trail guide, wildlife guide, or entrepreneurship proposal.",
+    work: ["Build the chosen capstone", "Explain what you did", "Explain what you learned", "Describe a challenge", "Name what you are proud of", "State what comes next", "Practice presenting and receive feedback"],
+    resources: ["Capstone Builder", "Presentation Practice", "Peer Feedback Guide", "Accessibility Checklist"],
+    reflection: "What do you want people to understand about your work?",
+  },
+  {
+    day: "Friday",
+    date: "July 31, 2026",
+    curriculum: "Legacy Celebration, Recognition, and Future Pathway",
+    focus: "Youth present their work, receive noncompetitive recognition, complete workforce records, and name what future Cultivators can inherit.",
+    work: ["Present capstone", "Receive recognition based on demonstrated contributions", "Confirm resume skills", "Review or download My Journey record", "Confirm workforce experience and community impact", "Choose a future education, training, apprenticeship, employment, or entrepreneurship step", "Complete the final Legacy reflection", "Celebrate completion"],
+    resources: ["Showcase Guide", "Recognition Record", "Resume Skills", "Workforce Transcript", "My Journey Download", "Future Pathway Planner", "Legacy Registry"],
+    reflection: "What do you hope someone discovers, learns, or experiences because of the work you completed this summer?",
+  },
 ];
 
 const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
