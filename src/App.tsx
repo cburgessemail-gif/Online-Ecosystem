@@ -12,13 +12,14 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 26.8 FINAL: Adds one-button discovery capture, permanent photo/video/audio preservation, Species Library, Living Ecosystem Timeline, Before/After documentation, and Future Cultivators Legacy Registry. One upload is reused across Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.
  * - Ecosystem 26.9 FINAL: Rebuilds Discover Youngstown → Builders & Innovators as an eight-profile, photo-changing educational library; separates Community Partners & Mentors; removes builder uploads, workbook/journey documentation, evidence, and completion tracking; and provides one immediate, optional reflection response on each builder profile.
  * - Ecosystem 27.0 FINAL: Records wood-ash recovery and visitor-trail stewardship using actual farm activity and uploaded farm images.
- * - Ecosystem 27.1 FINAL: Corrects the complete Week 6 timeline. Monday's bonfire and community gathering are complete; Tuesday and Wednesday ash recovery remain in progress; Thursday completes contaminant removal, filtering, bagging, responsible ash application, mowing, forest cartography, creek-crossing evaluation, bridge-location planning, and photography; Friday assembles the first Bronson Family Farm Forest Atlas.
+ * - Ecosystem 27.2 FINAL: Preserves the complete Week 6 timeline and closes Friday, July 17, 2026 for dangerous heat index and Code Red air quality. Monday's bonfire and community gathering are complete; Tuesday and Wednesday document ash recovery; Thursday completes contaminant removal, filtering, bagging, responsible ash application, mowing, forest cartography, creek-crossing evaluation, bridge-location planning, and photography; Friday is cancelled and the Forest Atlas work carries forward.
  * - Ecosystem 27.1 FINAL: Adds Forest Cartography, Cartographer career exploration, Forest Cartographer I–III recognition, visitor trail mapping, creek crossings, bridge locations, educational stops, trail naming, wildlife registry, and automatic Journey skills without creating a new architecture.
+ * - Ecosystem 27.2 FINAL: Friday, July 17, 2026 is an administrative closure because of dangerous heat index conditions and Code Red air quality. No attendance, workbook response, missing-work, badge, or workforce-progress penalty is created. Forest Atlas assembly, wildlife registry expansion, educational stop cataloging, and trail naming carry forward to the next appropriate stewardship day.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 27.1 - WOOD ASH + FOREST CARTOGRAPHY + VISITOR TRAIL FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 27.2 - FRIDAY CANCELLATION + FOREST ATLAS CARRY-FORWARD FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -774,6 +775,46 @@ const defaultFridayJuly3HalfDayStatusUpdate: WorkStatusUpdate = {
 };
 
 
+const FRIDAY_JULY_17_CANCELLATION_MESSAGE = `Bronson Family Farm Work Status
+
+Friday, July 17, 2026
+
+STATUS: CANCELLED
+
+Due to dangerous heat index conditions and Code Red air quality, all Cultivators Youth Workforce Program activities are cancelled.
+
+Youth should not report to the farm. Parents, supervisors, volunteers, and visitors should remain off site.
+
+No attendance, Workbook response, or field assignment is required. Planned Forest Atlas activities will be carried forward to the next appropriate stewardship day.
+
+Bronson Family Farm
+Farm & Family Alliance
+“We Grow Green to Harvest Dreams.”`;
+
+const defaultFridayJuly17CancellationStatusUpdate: WorkStatusUpdate = {
+  id: "weather-cancel-2026-07-17",
+  date: "Friday, July 17, 2026",
+  effective_date: "2026-07-17",
+  expires_date: "2026-07-17",
+  status: "CANCELLED",
+  label: "Program Cancelled — Heat Index & Code Red Air Quality",
+  reason: "Dangerous heat index conditions and Code Red air quality make outdoor farm, forest, trail, and cartography activities unsafe.",
+  action: "Do not report to the farm. Stay indoors when possible, remain hydrated, and await the next scheduled program-day update.",
+  audiences: ["Parents", "Youth", "Supervisors", "Everyone"],
+  hangar_note: "The farm and hangar are closed for program activities. No youth, volunteer, visitor, Forest Atlas, or visitor-trail work is scheduled.",
+  parent_message: FRIDAY_JULY_17_CANCELLATION_MESSAGE,
+  created_by: "Mission Control",
+  created_at: new Date().toISOString(),
+  launched_at: new Date().toISOString(),
+};
+
+const pendingWeekSixStewardshipProjects = [
+  "Bronson Family Farm Forest Atlas assembly",
+  "Wildlife Registry expansion",
+  "Educational stop cataloging",
+  "Trail naming and interpretation",
+].map((title) => ({ title, status: "Deferred Due To Weather" as const, deferred_from: "2026-07-17" }));
+
 const launchAlmanacSnapshot = {
   label: "Today’s Farm Conditions",
   note: "Live weather appears on the workday screen. The official Almanac is opened through the live Youngstown Almanac links instead of being replaced by static text.",
@@ -797,6 +838,7 @@ const launchAlmanacSnapshot = {
 };
 
 const defaultNotifications: EcosystemNotification[] = [
+  { id: "friday-july-17-cancelled", audience: "All", priority: "Urgent", title: "Friday Program Cancelled", body: "Friday, July 17, 2026 is cancelled because of dangerous heat index conditions and Code Red air quality. Do not report to the farm. Forest Atlas work will be carried forward.", created_at: new Date().toISOString() },
   { id: "farm-status", audience: "All", priority: "Info", title: "Check Today’s Farm Conditions", body: "Begin with the live farm conditions card. Mission Control will change status if heat, weather, water, or site conditions affect work.", created_at: new Date().toISOString() },
   { id: "today-assignment", audience: "Youth", priority: "Action", title: "Start with Safety, Then Today’s Assignment", body: "Check the Nurse Line, farm conditions, and current week activity before starting work.", created_at: new Date().toISOString() },
   { id: "cultivator-story", audience: "Youth", priority: "Info", title: "Tell Your Cultivator Story", body: "Take photos or videos of what you learned, built, helped with, or accomplished today. You are becoming more capable than you were yesterday.", created_at: new Date().toISOString() },
@@ -1437,23 +1479,25 @@ const youthWeekSixDailyPlan = [
   {
     day: "Friday",
     date: "July 17, 2026",
-    curriculum: "Forest Atlas Assembly & Visitor Trail Planning",
-    focus: "Youth compare team maps, organize photographs and discoveries, name trails, identify educational stops, review creek crossings and bridge locations, and assemble the first pages of the Bronson Family Farm Forest Atlas.",
-    status: "Planned",
+    curriculum: "Program Cancelled — Administrative Closure",
+    focus: "Friday operations are cancelled because of dangerous heat index conditions and Code Red air quality. Youth, parents, supervisors, volunteers, and visitors should not report to the farm.",
+    status: "Cancelled",
+    administrativeClosure: true,
+    workbookRequired: false,
+    attendanceRequired: false,
+    allowMissingWorkFlags: false,
+    allowCompletionPenalty: false,
     work: [
-      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Review every team trail map and identify the clearest routes and shared features",
-      "Combine trail entrances, intersections, creek crossings, scenic viewpoints, wildlife locations, difficult terrain, and bridge sites into one shared visitor-trail record",
-      "Propose trail names and explain how each name connects to the place",
-      "Select educational stops for pollinators, milkweed, salamanders, toads, forest ecology, creek systems, soil health, regenerative agriculture, wildlife habitat, and farm history",
-      "Review which creek crossing is most difficult and explain why a bridge, raised crossing, reroute, or drainage improvement may help",
-      "Organize photographs into Bonfire, S’mores, Ash Recovery, Nail Removal, Ash Filtering, Forest Exploration, Creek Crossings, Cartography, Wildlife, and Visitor Trail Design",
-      "Add wildlife observations and unknown discoveries to the Forest Atlas registry",
-      "Recommend signage, safety improvements, visitor information, and future trail work",
-      "Complete the Week 6 legacy response: What should future trail explorers know?"
+      "Do not report to Bronson Family Farm",
+      "No youth attendance or check-in is required",
+      "No outdoor farm, forest, visitor-trail, cartography, mowing, or Atlas work will occur",
+      "No Workbook response, upload, reflection, or Legacy answer is required",
+      "Forest Atlas assembly, Wildlife Registry expansion, educational stop cataloging, and trail naming are deferred due to weather",
+      "Stay indoors when possible, remain hydrated, and follow local heat and air-quality safety guidance"
     ],
-    resources: ["Forest Atlas Assembly Guide", "Trail Naming Record", "Educational Stop Planner", "Wildlife Registry", "Bridge Review Sheet", "Visitor Experience Planner", "Week 6 Legacy Prompt"],
-    reflection: "How could the Forest Atlas help visitors enjoy the farm while protecting the forest?",
+    resources: ["Friday Program Cancellation Notice", "Heat Safety Notice", "Code Red Air Quality Notice"],
+    reflection: "No response required — administrative closure.",
+    carryForward: pendingWeekSixStewardshipProjects,
   },
 ];
 
@@ -6068,6 +6112,11 @@ function isStaleNotification(item: EcosystemNotification | BroadcastMessageRecor
 function getOperationalCancellationForDate(date = new Date()) {
   const saved = getSavedWorkStatus();
   if (saved?.status === "CANCELLED" && isWorkStatusActiveForDate(saved, date)) return saved;
+
+  // Week 6 administrative closure: active only on Friday, July 17, 2026.
+  if (isWorkStatusActiveForDate(defaultFridayJuly17CancellationStatusUpdate, date)) {
+    return defaultFridayJuly17CancellationStatusUpdate;
+  }
 
   // Historical one-day launch cancellation: available only on its effective date.
   // It must never appear on later weeks as a current advisory.
