@@ -11,12 +11,14 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 26.6 FINAL: Parent-ready, real-farm visitor story. Replaces abstract Roots/Seed/Journey philosophy with the airport, family, Cultivators, current projects, discoveries, learning, Youngstown, opportunity, and documented legacy. Removes public map-style navigation.
  * - Ecosystem 26.8 FINAL: Adds one-button discovery capture, permanent photo/video/audio preservation, Species Library, Living Ecosystem Timeline, Before/After documentation, and Future Cultivators Legacy Registry. One upload is reused across Workbook, My Journey, Parent, Supervisor, Mission Control, and reports.
  * - Ecosystem 26.9 FINAL: Rebuilds Discover Youngstown → Builders & Innovators as an eight-profile, photo-changing educational library; separates Community Partners & Mentors; removes builder uploads, workbook/journey documentation, evidence, and completion tracking; and provides one immediate, optional reflection response on each builder profile.
- * - Ecosystem 27.0 FINAL: Records Wednesday, July 15 wood-ash processing and visitor-trail stewardship. Youth removed nails and foreign objects from recovered ash, bagged the filtered material for future responsible distribution, established a visitor walking trail in the forest, identified wet crossings, and documented locations where bridges or raised crossings are needed. Uses uploaded farm images in the current-story layer.
+ * - Ecosystem 27.0 FINAL: Records wood-ash recovery and visitor-trail stewardship using actual farm activity and uploaded farm images.
+ * - Ecosystem 27.1 FINAL: Corrects the complete Week 6 timeline. Monday's bonfire and community gathering are complete; Tuesday and Wednesday ash recovery remain in progress; Thursday completes contaminant removal, filtering, bagging, responsible ash application, mowing, forest cartography, creek-crossing evaluation, bridge-location planning, and photography; Friday assembles the first Bronson Family Farm Forest Atlas.
+ * - Ecosystem 27.1 FINAL: Adds Forest Cartography, Cartographer career exploration, Forest Cartographer I–III recognition, visitor trail mapping, creek crossings, bridge locations, educational stops, trail naming, wildlife registry, and automatic Journey skills without creating a new architecture.
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 27.0 - WOOD ASH + VISITOR TRAIL FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 27.1 - WOOD ASH + FOREST CARTOGRAPHY + VISITOR TRAIL FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1350,105 +1352,108 @@ const youthWeekSixDailyPlan = [
   {
     day: "Monday",
     date: "July 13, 2026",
-    curriculum: "Forest Material Collection, Germination Check & Replanting",
-    focus: "Youth watch the three trellis videos, return to the forest to collect or choose additional fallen branches, inspect every planted area for germination, and plant a replacement seed wherever an expected crop has not sprouted. Routine watering is not planned unless a supervisor confirms that the soil is dry.",
+    curriculum: "Community Bonfire, Gathering & Resource Beginning",
+    focus: "Youth and community members gathered around a supervised bonfire, shared s’mores, and observed how burned untreated wood became ash that could later be evaluated as a farm resource. Monday is complete.",
+    status: "Complete",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Watch the three natural trellis videos inside Workbook before material selection",
-      "Review the branches already collected and identify what additional shapes, lengths, forks, or strengths may be needed",
-      "Enter the forest only with the supervisor-approved group and remain together",
-      "Collect only naturally fallen branches, dead wood, or dropped limbs — do not cut living trees",
-      "Stage and sort collected materials by length, strength, straightness, flexibility, forked shape, and possible use",
-      "Inspect all planted areas to identify what is sprouting, what is emerging slowly, and what has not sprouted",
-      "Where a planting location has not germinated, plant another seed as directed and mark the location for follow-up",
-      "Check potatoes, corn, melons, squash, pumpkins, collards, yams, flowers, pollinator areas, and recently planted locations",
-      "Observe plant health, insect activity, wildlife impact, soil moisture, and water-pooling locations",
-      "Do not perform routine watering; water only if a supervisor checks the soil and determines that it is needed",
-      "Photograph forest materials, sprouting crops, planting gaps, replacement seeds, and notable ecosystem discoveries"
+      "Participate in the supervised community bonfire and gathering",
+      "Practice safe distance, tool awareness, and fire-area boundaries",
+      "Share s’mores and contribute to the community experience",
+      "Observe the difference between wood, charcoal, embers, and cooled ash",
+      "Photograph the bonfire, gathering, and s’mores using actual farm photographs when available",
+      "Leave the burn site undisturbed until the material is fully cool and a supervisor approves recovery"
     ],
-    resources: ["Natural Trellis Design Video #2", "Natural Trellis Design Video #3", "Natural Trellis Design Video #4", "Natural Material Selection Guide", "Germination Check", "Replacement Seeding Guide", "Crop Observation Record", "Site Safety Guide"],
-    reflection: "",
+    resources: ["Bonfire Safety Guide", "Community Gathering Record", "Wood-to-Ash Observation", "Photo Consent Reminder"],
+    reflection: "How did a community gathering become the beginning of a stewardship project?",
   },
   {
     day: "Tuesday",
     date: "July 14, 2026",
-    curriculum: "Beehive Construction, Cleaning & Pollinator Restoration",
-    focus: "Youth continue rebuilding the beehive as a real pollinator-restoration project by inspecting, cleaning, drying, sorting, assembling, and documenting hive components.",
+    curriculum: "Ash Recovery, Nail Identification & Foreign-Object Investigation",
+    focus: "Youth returned to the cooled burn site, began recovering ash, and identified nails and other foreign objects that must be removed before the ash can be considered for responsible use. The project remains in progress.",
+    status: "In Progress",
     work: [
-      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Identify and count the bottom board, hive bodies, frames, inner cover, outer cover, and other components",
-      "Inspect each component for damage, wear, moisture, residue, missing pieces, or repair needs",
-      "Clean or continue sterilizing components only under supervisor direction",
-      "Allow every cleaned component to dry completely before assembly",
-      "Sort components in assembly order and compare them with the pinned beehive diagram and video",
-      "Reassemble the hive carefully, checking frame placement, alignment, stability, and ventilation",
-      "Observe the future apiary area for shade, drainage, access, safety, and pollinator habitat",
-      "Photograph inspection findings, cleaned parts, assembly progress, and the final condition"
+      "Report to the South Hangar Staging Area for check-in, PPE, water, gloves, and the daily briefing",
+      "Confirm that the burn material is fully cool before entering the recovery area",
+      "Recover ash only in the supervisor-approved processing area",
+      "Spread small amounts carefully so nails, metal fragments, glass, plastic, charcoal pieces, and other foreign objects can be seen",
+      "Use approved tools instead of reaching blindly into ash",
+      "Separate nails, metal, and every other foreign object into a disposal container",
+      "Keep usable ash separate from contaminated or uncertain material",
+      "Photograph ash recovery, discovered nails, and foreign objects",
+      "Record what still needs to be removed on Wednesday and Thursday"
     ],
-    resources: ["Beehive Assembly Video", "Beehive Diagram", "Apiary Assembly Guide", "Honey Bee Basics", "Pollinator Habitat Guide", "Hive Component Inventory"],
-    reflection: "Why must reusable equipment be inspected, cleaned, dried, and inventoried before assembly? How can a restored hive support food production and habitat?",
+    resources: ["Wood-Ash Safety & Screening Guide", "Foreign-Object Removal Checklist", "Ash Recovery Record", "Safe Tool Use"],
+    reflection: "What did careful inspection reveal that could not be seen from a distance?",
   },
   {
     day: "Wednesday",
     date: "July 15, 2026",
-    curriculum: "Wood-Ash Recovery & Visitor Trail Stewardship",
-    focus: "Youth completed two connected stewardship projects: preparing recovered wood ash for safe future use and establishing a forest walking trail for visitors. They practiced material inspection, contamination removal, safe handling, trail observation, water-crossing assessment, teamwork, and visitor-centered planning.",
+    curriculum: "Ash Filtering, Forest Exploration & Visitor Trail Establishment",
+    focus: "Youth continued nail, metal-fragment, and foreign-object removal, began filtering the ash, photographed the work, entered the forest, established a visitor trail, observed the year-round creek, and identified possible crossing and bridge locations. The ash project remains in progress until Thursday.",
+    status: "In Progress",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, gloves, and the daily briefing",
-      "Allow recovered ash to cool fully before handling and work only in the supervisor-approved processing area",
-      "Spread and inspect the ash carefully so nails, metal, glass, plastic, charcoal pieces, and other foreign objects can be seen",
-      "Remove every nail and foreign object with the approved tools; never reach blindly into ash",
-      "Keep removed metal and foreign material in a separate disposal container",
-      "Filter or screen the ash until only clean, usable material remains",
-      "Place the filtered ash in a labeled bag for future distribution; do not apply it to crops until a supervisor confirms the approved use, amount, and location",
+      "Continue removing nails, metal fragments, glass, plastic, charcoal pieces, and every foreign object from recovered ash",
+      "Begin filtering or screening the ash while keeping uncertain material separate",
+      "Do not mark the ash project complete and do not distribute ash yet",
+      "Photograph the ash-processing stages, removed objects, and filtered material",
       "Enter the forest only with the supervisor-approved group and remain together",
-      "Establish and clear a practical walking trail for future visitors while protecting living plants, habitat, and natural drainage",
-      "Mark muddy, pooled, or flowing-water crossings that are difficult or unsafe to walk through",
-      "Identify locations that may need a small bridge, raised crossing, stepping structure, drainage solution, or rerouted trail",
-      "Photograph the ash-processing stages, removed foreign objects, filtered bagged ash, trail progress, water crossings, and proposed bridge locations using approved uploaded farm images where they accurately represent the work"
+      "Continue establishing a practical walking trail while protecting living plants, habitat, and natural drainage",
+      "Observe and document the year-round creek",
+      "Identify wet, muddy, pooled, or flowing-water crossings",
+      "Identify possible bridge, raised-crossing, stepping, drainage, or rerouting locations",
+      "Photograph trail entrances, creek crossings, scenic locations, wildlife evidence, and possible bridge sites"
     ],
-    resources: ["Wood-Ash Safety & Screening Guide", "Foreign-Object Removal Checklist", "Responsible Ash Use Record", "Visitor Trail Stewardship Guide", "Water-Crossing Observation Sheet", "Bridge Location Planning Record"],
-    reflection: "Which action made the farm or future visitor trail safer today, and what should be built or improved next?",
+    resources: ["Wood-Ash Safety & Screening Guide", "Foreign-Object Removal Checklist", "Visitor Trail Stewardship Guide", "Water-Crossing Observation Sheet", "Bridge Location Planning Record"],
+    reflection: "Which discovery changed how the group understood the future visitor trail?",
   },
   {
     day: "Thursday",
     date: "July 16, 2026",
-    curriculum: "Crop Census, Inventory Management & Resource Stewardship",
-    focus: "Youth think like farm managers by counting living crops and available resources, comparing estimates with actual observations, identifying shortages or damage, and using evidence to set priorities.",
+    curriculum: "Wood-Ash Completion, Property Stewardship & Forest Cartography",
+    focus: "Youth complete the ash-recovery process, apply approved wood ash responsibly, mow designated lawn areas, and work in small groups as cartographers to map forest trails, creek crossings, visitor features, and future bridge locations.",
+    status: "Active Work Day",
     work: [
-      "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Count collard rows and sample plant counts to estimate the total living collard population",
-      "Record healthy, questionable, damaged, missing, and pest-affected collard plants",
-      "Measure or compare selected corn plants for height, leaf development, color, moisture, and damage",
-      "Count trellis materials, beehive components, milkweed envelopes, buckets, gloves, hoes, hand shovels, scissors, and measuring tools",
-      "Compare what projects require with what is actually available",
-      "Identify one shortage, surplus, damaged item, or resource that can be reused",
-      "Recommend which need should be addressed first and support the decision with observations",
-      "Photograph crop conditions, inventory groups, counts, and one management concern"
+      "Report to the South Hangar Staging Area for check-in, PPE, water, gloves, and the daily briefing",
+      "Finish nail, metal-fragment, and every other foreign-object removal",
+      "Finish filtering or screening the recovered ash",
+      "Bag the remaining clean ash and label it for farm use",
+      "Apply only supervisor-approved clean ash in a light, responsible scattering through designated grow areas",
+      "Do not place concentrated ash directly against seedlings, stems, or uncertain crop areas",
+      "Photograph the completed ash process, bagged ash, and approved application",
+      "Mow the designated lawn with the zero-turn mower only under approved supervision",
+      "Record maintenance observations and take before-and-after photographs",
+      "Divide into small groups for the Forest Cartography Project",
+      "Map trail entrances, intersections, creek crossings, scenic viewpoints, wildlife locations, difficult terrain, potential bridge locations, areas needing signage, and educational stops",
+      "Continue visitor trail development while protecting living plants, wildlife habitat, and drainage",
+      "Evaluate creek crossings and identify the strongest bridge or crossing locations",
+      "Photograph mapping activities, trail entrances, creek crossings, wildlife evidence, plants, scenic locations, and bridge sites"
     ],
-    resources: ["Collard Green Census Sheet", "Corn Monitoring Record", "Farm Inventory Audit", "Resource Priority Guide", "Plant Health Checklist", "Business Cost Connection"],
-    reflection: "What did counting reveal that guessing could not? Which resource or crop concern should receive attention first, and what evidence supports your decision?",
+    resources: ["Wood-Ash Completion Checklist", "Responsible Ash Use Record", "Zero-Turn Mower Safety", "Forest Cartography Field Sheet", "Visitor Trail Map Guide", "Creek Crossing & Bridge Planning Record", "Photography Checklist"],
+    reflection: "How did cartography help turn forest observations into a plan that other people can use?",
   },
   {
     day: "Friday",
     date: "July 17, 2026",
-    curriculum: "Forest, Wildlife, Water & Land Stewardship Investigation",
-    focus: "Youth investigate how forest habitat, wildlife evidence, water movement, soil moisture, crops, and farm decisions connect, then close the week by identifying one responsible action and one legacy contribution.",
+    curriculum: "Forest Atlas Assembly & Visitor Trail Planning",
+    focus: "Youth compare team maps, organize photographs and discoveries, name trails, identify educational stops, review creek crossings and bridge locations, and assemble the first pages of the Bronson Family Farm Forest Atlas.",
+    status: "Planned",
     work: [
       "Report to the South Hangar Staging Area for check-in, PPE, water, and the daily briefing",
-      "Enter the forest only with a supervisor-approved group and remain together",
-      "Observe trees, understory plants, dead wood, fungi, insects, amphibians, birds, tracks, trails, feeding signs, nests, droppings, and other wildlife evidence",
-      "Revisit known water-pooling locations in the grow area and forest path",
-      "Record where water collects, flows, remains wet, or leaves soil dry",
-      "Compare vegetation, soil condition, pathway condition, and wildlife evidence near wet and dry areas",
-      "Complete one approved discovery investigation without being given the conclusion in advance",
-      "Identify one land-stewardship concern and one sign that the ecosystem is functioning well",
-      "Recommend one practical action that protects crops, habitat, water, soil, people, or future access",
-      "Photograph discoveries, water patterns, wildlife evidence, and the area connected to the recommendation",
-      "Complete the Week 6 legacy response: What became stronger because I was here, and what should future Cultivators continue?"
+      "Review every team trail map and identify the clearest routes and shared features",
+      "Combine trail entrances, intersections, creek crossings, scenic viewpoints, wildlife locations, difficult terrain, and bridge sites into one shared visitor-trail record",
+      "Propose trail names and explain how each name connects to the place",
+      "Select educational stops for pollinators, milkweed, salamanders, toads, forest ecology, creek systems, soil health, regenerative agriculture, wildlife habitat, and farm history",
+      "Review which creek crossing is most difficult and explain why a bridge, raised crossing, reroute, or drainage improvement may help",
+      "Organize photographs into Bonfire, S’mores, Ash Recovery, Nail Removal, Ash Filtering, Forest Exploration, Creek Crossings, Cartography, Wildlife, and Visitor Trail Design",
+      "Add wildlife observations and unknown discoveries to the Forest Atlas registry",
+      "Recommend signage, safety improvements, visitor information, and future trail work",
+      "Complete the Week 6 legacy response: What should future trail explorers know?"
     ],
-    resources: ["Forest Stewardship Survey", "Wildlife Evidence Log", "Water Movement Map", "Discovery Investigation Record", "Land Stewardship Decision Guide", "Week 6 Legacy Prompt"],
-    reflection: "How did water, soil, plants, animals, people, and farm work connect this week? What decision would you make next, and what evidence supports it?",
+    resources: ["Forest Atlas Assembly Guide", "Trail Naming Record", "Educational Stop Planner", "Wildlife Registry", "Bridge Review Sheet", "Visitor Experience Planner", "Week 6 Legacy Prompt"],
+    reflection: "How could the Forest Atlas help visitors enjoy the farm while protecting the forest?",
   },
 ];
 
@@ -7092,7 +7097,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       eyebrow: "This Week at the Farm",
       title: "What the Cultivators are doing now",
       paragraphs: [
-        "Cultivators processed recovered wood ash by carefully removing nails, metal, and every other foreign object before filtering the usable ash.",
+        "Cultivators began recovering and filtering wood ash, removed nails, metal, and other foreign objects, and kept the project in progress until Thursday completion.",
         "The clean ash was placed in a labeled bag for future responsible distribution. It will not be applied until the approved crop, location, amount, and soil need are confirmed.",
         "Youth also spent an extended period in the forest establishing a walking trail for future visitors. As they worked, they found wet crossings and places where bridges, raised walkways, drainage improvements, or trail rerouting may be needed.",
         "The work is documented in the Workbook and Living Ecosystem Timeline. Skills and accomplishments carry into My Journey without requiring youth to repeat the same information.",
@@ -10403,7 +10408,238 @@ function YouthWorkbookCenter13_1({ activeUser, setScreen }: { activeUser: Ecosys
 
 
 type YouthDailyPhase16_2 = "work" | "workbook" | "legacy" | "journey";
-type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks" | "youngstown";
+
+const FOREST_ATLAS_KEY_27_1 = "bff.launch.forestAtlas.v27_1";
+
+type ForestAtlasState27_1 = {
+  trailName: string;
+  trailNameReason: string;
+  clearestRoute: string;
+  importantLocations: string[];
+  educationalStops: string[];
+  difficultCrossing: string;
+  bridgeBenefits: string[];
+  visitorBenefit: string[];
+  tourismPotential: string;
+  tourismWhy: string;
+  futureAdvice: string;
+  wildlifeNotes: string;
+  cartographerCareer: string;
+  updated_at: string;
+};
+
+const forestAtlasDefault27_1: ForestAtlasState27_1 = {
+  trailName: "",
+  trailNameReason: "",
+  clearestRoute: "",
+  importantLocations: [],
+  educationalStops: [],
+  difficultCrossing: "",
+  bridgeBenefits: [],
+  visitorBenefit: [],
+  tourismPotential: "",
+  tourismWhy: "",
+  futureAdvice: "",
+  wildlifeNotes: "",
+  cartographerCareer: "",
+  updated_at: "",
+};
+
+const forestCartographerBadges27_1 = [
+  {
+    title: "Forest Cartographer I",
+    requirements: ["Participate in trail mapping", "Identify at least one trail feature", "Participate in group mapping", "Contribute observations"],
+  },
+  {
+    title: "Forest Cartographer II",
+    requirements: ["Identify creek crossings", "Identify visitor improvements", "Photograph discoveries", "Contribute to trail recommendations"],
+  },
+  {
+    title: "Forest Cartographer III",
+    requirements: ["Lead a mapping team", "Present findings", "Contribute to future trail planning", "Mentor younger youth"],
+  },
+];
+
+const forestAtlasSkills27_1 = [
+  "Cartography",
+  "Trail Mapping",
+  "Environmental Observation",
+  "Forest Stewardship",
+  "Soil Stewardship",
+  "Visitor Experience Design",
+  "Photography",
+  "Critical Thinking",
+  "Teamwork",
+  "Problem Solving",
+];
+
+function ForestAtlasWorkbook27_1({ activeUser }: { activeUser: EcosystemUser | null }) {
+  const participantId = launchParticipantId(activeUser);
+  const allSaved = safeRead<Record<string, ForestAtlasState27_1>>(FOREST_ATLAS_KEY_27_1, {});
+  const [atlas, setAtlas] = useState<ForestAtlasState27_1>(allSaved[participantId] || forestAtlasDefault27_1);
+  const [message, setMessage] = useState("");
+
+  function toggle(field: "importantLocations" | "educationalStops" | "bridgeBenefits" | "visitorBenefit", value: string) {
+    setAtlas((previous) => ({
+      ...previous,
+      [field]: previous[field].includes(value)
+        ? previous[field].filter((item) => item !== value)
+        : [...previous[field], value],
+    }));
+  }
+
+  function saveAtlas() {
+    const updated = { ...atlas, updated_at: new Date().toISOString() };
+    const current = safeRead<Record<string, ForestAtlasState27_1>>(FOREST_ATLAS_KEY_27_1, {});
+    safeWrite(FOREST_ATLAS_KEY_27_1, { ...current, [participantId]: updated });
+    setAtlas(updated);
+    setMessage("Forest Atlas saved ✓ Your map ideas, visitor recommendations, career response, and legacy advice are preserved.");
+  }
+
+  const checkboxGroup = (
+    field: "importantLocations" | "educationalStops" | "bridgeBenefits" | "visitorBenefit",
+    options: string[],
+  ) => (
+    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      {options.map((option) => (
+        <label key={option} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-sm font-bold">
+          <input type="checkbox" checked={atlas[field].includes(option)} onChange={() => toggle(field, option)} className="mt-1 h-4 w-4" />
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="grid gap-4">
+      <Card className="p-4 md:p-6">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-100/80">Week 6 • Permanent Discovery Library</div>
+        <h2 className="mt-2 text-3xl font-black md:text-4xl">Bronson Family Farm Forest Atlas</h2>
+        <p className="mt-3 max-w-4xl text-sm font-bold leading-6 text-white/75">
+          This living atlas preserves youth-created trail maps, creek crossings, wildlife observations, bridge locations, visitor ideas, historical discoveries, and future improvements.
+        </p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {["Trail Maps", "Creek Crossings", "Wildlife Observations", "Bridge Locations", "Visitor Experience Ideas", "Historical Discoveries", "Future Improvements"].map((section) => (
+            <div key={section} className="rounded-2xl border border-white/10 bg-black/25 p-4 font-black">{section}</div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <h3 className="text-2xl font-black">Assemble the visitor trail record.</h3>
+        <label className="mt-5 block">
+          <span className="text-sm font-black">Which map provides the clearest route?</span>
+          <textarea value={atlas.clearestRoute} onChange={(e) => setAtlas({ ...atlas, clearestRoute: e.target.value })} placeholder="Describe the clearest route, or write Skip / Not yet decided." className="mt-2 min-h-[90px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+
+        <div className="mt-5">
+          <div className="text-sm font-black">What important locations should appear on every map? Select all that apply.</div>
+          {checkboxGroup("importantLocations", ["Trail entrance", "Trail intersection", "Creek crossing", "Bridge location", "Wildlife area", "Scenic viewpoint", "Educational stop", "Rest area", "Area needing signage", "Difficult terrain"])}
+        </div>
+
+        <label className="mt-5 block">
+          <span className="text-sm font-black">Suggested trail name</span>
+          <input value={atlas.trailName} onChange={(e) => setAtlas({ ...atlas, trailName: e.target.value })} placeholder="Example: Salamander Trail" className="mt-2 w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+        <label className="mt-4 block">
+          <span className="text-sm font-black">Why did you choose this name?</span>
+          <textarea value={atlas.trailNameReason} onChange={(e) => setAtlas({ ...atlas, trailNameReason: e.target.value })} placeholder="Explain the connection to the forest, or write Skip." className="mt-2 min-h-[90px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+
+        <div className="mt-5">
+          <div className="text-sm font-black">What should visitors learn at educational stops?</div>
+          {checkboxGroup("educationalStops", ["Pollinators", "Milkweed", "Salamanders", "Toads", "Forest ecology", "Creek systems", "Soil health", "Regenerative agriculture", "Wildlife habitat", "Farm history"])}
+        </div>
+
+        <label className="mt-5 block">
+          <span className="text-sm font-black">Which crossing appears most difficult?</span>
+          <textarea value={atlas.difficultCrossing} onChange={(e) => setAtlas({ ...atlas, difficultCrossing: e.target.value })} placeholder="Describe the crossing, or write Skip / Not observed." className="mt-2 min-h-[90px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+        <div className="mt-5">
+          <div className="text-sm font-black">Why might a bridge or improved crossing be helpful?</div>
+          {checkboxGroup("bridgeBenefits", ["Safety", "Accessibility", "Visitor experience", "Erosion prevention", "Educational access", "Tourism", "Protecting natural drainage"])}
+        </div>
+
+        <label className="mt-5 block">
+          <span className="text-sm font-black">Wildlife registry notes</span>
+          <textarea value={atlas.wildlifeNotes} onChange={(e) => setAtlas({ ...atlas, wildlifeNotes: e.target.value })} placeholder="Record toad, salamander, cocoon, pollinator, plant, tracks, habitat, unknown discovery, or Skip." className="mt-2 min-h-[100px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <h3 className="text-2xl font-black">Career Exploration • Cartographer</h3>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {[
+            ["What Is It?", "A cartographer is a person who studies places and creates maps that help people understand and navigate them."],
+            ["What Do They Do?", "Cartographers collect observations, measure locations, organize symbols and routes, use photographs or technology, and present geographic information clearly."],
+            ["Why Does It Matter?", "A useful map can improve safety, access, conservation, visitor experience, planning, and emergency response."],
+            ["How Does Today Connect?", "Youth mapped trails, creek crossings, difficult terrain, scenic areas, wildlife evidence, signs, educational stops, and possible bridge locations."],
+          ].map(([title, answer]) => (
+            <div key={title} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="font-black">{title}</div>
+              <p className="mt-2 text-sm font-bold leading-6 text-white/72">{answer}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 text-sm font-black">Could I see myself doing this?</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {["Yes", "Maybe", "No", "I need to learn more"].map((option) => (
+            <button key={option} type="button" onClick={() => setAtlas({ ...atlas, cartographerCareer: option })} className={`rounded-full px-4 py-2 text-sm font-black ${atlas.cartographerCareer === option ? "bg-emerald-300 text-black" : "border border-white/15 bg-white/10 text-white"}`}>{option}</button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <h3 className="text-2xl font-black">Community • Opportunity • Legacy</h3>
+        <div className="mt-5 text-sm font-black">How could a visitor trail benefit Youngstown? Select all that apply.</div>
+        {checkboxGroup("visitorBenefit", ["Tourism", "Education", "Recreation", "Conservation", "Community pride", "Workforce development", "Family activities"])}
+
+        <div className="mt-5 text-sm font-black">Could the Forest Atlas become part of a future agritourism experience?</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {["Yes", "Maybe", "No"].map((option) => (
+            <button key={option} type="button" onClick={() => setAtlas({ ...atlas, tourismPotential: option })} className={`rounded-full px-4 py-2 text-sm font-black ${atlas.tourismPotential === option ? "bg-sky-300 text-black" : "border border-white/15 bg-white/10 text-white"}`}>{option}</button>
+          ))}
+        </div>
+        <textarea value={atlas.tourismWhy} onChange={(e) => setAtlas({ ...atlas, tourismWhy: e.target.value })} placeholder="Why? Write your idea, or write Skip." className="mt-3 min-h-[90px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+
+        <label className="mt-5 block">
+          <span className="text-sm font-black">What advice would you leave for future trail explorers?</span>
+          <textarea value={atlas.futureAdvice} onChange={(e) => setAtlas({ ...atlas, futureAdvice: e.target.value })} placeholder="Leave knowledge for future Cultivators, or write Skip." className="mt-2 min-h-[100px] w-full rounded-2xl border border-white/10 bg-white p-4 font-bold text-slate-950" />
+        </label>
+
+        <button type="button" onClick={saveAtlas} className="mt-5 rounded-full bg-emerald-300 px-6 py-3 font-black text-black">Save Forest Atlas Contribution</button>
+        {message && <Notice text={message} />}
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <h3 className="text-2xl font-black">Forest Cartographer Recognition</h3>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {forestCartographerBadges27_1.map((badge) => (
+            <div key={badge.title} className="rounded-2xl border border-amber-200/20 bg-amber-300/10 p-4">
+              <div className="text-xl font-black text-amber-50">{badge.title}</div>
+              <div className="mt-3 grid gap-2">
+                {badge.requirements.map((requirement) => <div key={requirement} className="text-sm font-bold text-white/78">• {requirement}</div>)}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 text-sm font-black">Automatic Journey skills</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {forestAtlasSkills27_1.map((skill) => <span key={skill} className="rounded-full border border-white/12 bg-black/30 px-3 py-2 text-xs font-black">{skill}</span>)}
+        </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-lime-100/80">Living Ecosystem Story</div>
+        <p className="mt-3 text-sm font-bold leading-7 text-white/80">
+          Cultivators transformed a community bonfire into a resource recovery project. Youth recovered wood ash, removed nails and foreign materials, filtered usable ash, and prepared it for responsible use throughout the grow area. They also entered the forest as cartographers, documenting trails, identifying creek crossings, photographing discoveries, and locating future bridge sites. Their work contributes to the first youth-created visitor trail map and the growing knowledge of the Bronson Family Farm ecosystem.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+type WorkbookDashboardView19_3 = "dashboard" | "record" | "discoveries" | "media" | "contributions" | "weeks" | "youngstown" | "forestAtlas";
 
 type DiscoverYoungstownSection25 = {
   key: "before" | "founding" | "transport" | "steel" | "cultures" | "nature" | "builders" | "partners-mentors" | "agriculture" | "opportunity-today" | "your-story";
@@ -11292,6 +11528,7 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
                 ["contributions", "🌱", "My Contributions", "See what you helped build, improve, protect, or grow."],
                 ["weeks", "📅", "Curriculum Weeks 1–8", "Open every week by title, including activities, lesson materials, trellis videos, entries, uploads, and unfinished documentation."],
                 ["youngstown", "🏙️", "Discover Youngstown", "Explore Roots, Good Seed, The Land, Opportunity, and Legacy through photos, stories, careers, activities, and deeper learning."],
+                ["forestAtlas", "🗺️", "Forest Atlas", "Open trail maps, creek crossings, wildlife observations, bridge locations, visitor ideas, cartography career learning, and future improvements."],
               ].map(([key, icon, title, detail]) => (
                 <button key={key} type="button" onClick={() => openWorkbookView19_3(key as WorkbookDashboardView19_3)} className="rounded-[1.5rem] border border-white/12 bg-black/45 p-5 text-left transition hover:-translate-y-0.5 hover:bg-black/60">
                   <div className="text-4xl">{icon}</div>
@@ -11352,6 +11589,10 @@ function YouthDailyFlow16_2({ todayPlan, currentWeek, setScreen, activeUser }: {
 
           {workbookView19_3 === "youngstown" && (
             <DiscoverYoungstownWorkbook25 activeUser={activeUser} />
+          )}
+
+          {workbookView19_3 === "forestAtlas" && (
+            <ForestAtlasWorkbook27_1 activeUser={activeUser} />
           )}
 
           {workbookView19_3 === "weeks" && (
