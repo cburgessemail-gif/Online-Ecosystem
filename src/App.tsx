@@ -16,11 +16,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.1 FINAL: Adds Forest Cartography, Cartographer career exploration, Forest Cartographer I–III recognition, visitor trail mapping, creek crossings, bridge locations, educational stops, trail naming, wildlife registry, and automatic Journey skills without creating a new architecture.
  * - Ecosystem 27.2 FINAL: Friday, July 17, 2026 is an administrative closure because of dangerous heat index conditions and Code Red air quality. Attendance displays “No Work Today.” No attendance, workbook response, missing-work, badge, or workforce-progress penalty is created. Forest Atlas assembly, wildlife registry expansion, educational stop cataloging, and trail naming carry forward to Week 7.
  * - Ecosystem 27.3 FINAL: Activates Week 7 for July 20–24, 2026 with Forest Atlas completion, career discovery, business and entrepreneurship, the July 23 WRTA workforce-development visit, Route #12 Lansdowne public-access planning, apprenticeship exploration, and professional communication. Replaces Week 8 placeholders with Legacy Builder and Capstone Development for July 27–31, 2026.
+ * - Ecosystem 27.4 FINAL: Confirms Week 6 complete and Week 7 active. Adds the Monday, August 17, 2026 Youngstown Cultivator Showcase & Open House (11:00 AM–2:00 PM) to the ecosystem calendar and pins the invitation in the Parent / Guardian pathway using “Great Things Grow Here. Regenerative Farming. Restored Land. Empowered Youth.”
  */
 
 /**
  * Bronson Family Farm Online Ecosystem
- * CULTIVATOR ECOSYSTEM 27.3 - WEEK 7 OPPORTUNITY + WRTA + WEEK 8 LEGACY FINAL MASTER FULL REPLACEMENT
+ * CULTIVATOR ECOSYSTEM 27.4 - WEEK 7 ACTIVE + SHOWCASE CALENDAR + PARENT INVITATION FINAL MASTER FULL REPLACEMENT
  *
  * Complete React/Vite App.tsx replacement focused on launch operations.
  * Preserves the ecosystem concept while making the Supervisor pathway operational:
@@ -1664,6 +1665,19 @@ const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
 
 const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
 const LAUNCH_MINIMUM_ACTIVE_WEEK = 3;
+const COMPLETED_PROGRAM_WEEKS = [1, 2, 3, 4, 5, 6] as const;
+const ACTIVE_PROGRAM_WEEK = 7;
+const SHOWCASE_DATE_ISO = "2026-08-17";
+const SHOWCASE_FLYER_SRC = "/youngstown-cultivator-showcase-2026.png";
+const SHOWCASE_EVENT = {
+  title: "Youngstown Cultivator Showcase & Open House",
+  date: SHOWCASE_DATE_ISO,
+  time: "11:00 AM – 2:00 PM",
+  location: "Bronson Family Farm • Lansdowne Airport • Youngstown, Ohio",
+  theme: "Great Things Grow Here.",
+  subtitle: "Regenerative Farming. Restored Land. Empowered Youth.",
+  parentMessage: "Families are invited to walk the farm, meet our youth, see the progress, and experience regenerative farming in action.",
+};
 
 function getCurrentProgramWeek(date = new Date()) {
   const current = new Date(date);
@@ -1688,6 +1702,12 @@ function getCurrentProgramWeek(date = new Date()) {
     if (current >= start) return Math.min(8, Math.max(LAUNCH_MINIMUM_ACTIVE_WEEK, week));
   }
   return LAUNCH_MINIMUM_ACTIVE_WEEK;
+}
+
+function getProgramWeekStatus(week: number) {
+  if ((COMPLETED_PROGRAM_WEEKS as readonly number[]).includes(week)) return "Completed";
+  if (week === ACTIVE_PROGRAM_WEEK) return "Active";
+  return "Upcoming";
 }
 
 function getProgramDayIndex(date = new Date()) {
@@ -2865,6 +2885,14 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
   const weekDays = Array.from({ length: 5 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
   const eventForDate = (d: Date) => {
     const day = d.getDay();
+    const iso = getDateISO(d);
+    if (iso === SHOWCASE_DATE_ISO) {
+      return [
+        { title: SHOWCASE_EVENT.title, kind: "curriculum" },
+        { title: SHOWCASE_EVENT.theme, kind: "work" },
+        { title: SHOWCASE_EVENT.time, kind: "delivery" },
+      ];
+    }
     const cancellation = getOperationalCancellationForDate(d);
     if (cancellation) {
       return [
@@ -2886,6 +2914,7 @@ function RealCalendarGrid({ setScreen }: { setScreen: (screen: Screen) => void }
         <div>
           <div className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Actual Calendar</div>
           <h2 className="mt-1 text-3xl font-black">{view === "week" ? `Week ${getCurrentProgramWeek(base)} • ${calendarWeekRangeLabel(weekDays)}` : base.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</h2>
+          {view === "week" && <div className="mt-2 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900">Week 6 Completed • Week 7 Active</div>}
         </div>
         <div className="flex rounded-full border border-slate-200 bg-slate-50 p-1">
           {(["month", "week", "day"] as const).map((item) => <button key={item} onClick={() => setView(item)} className={`rounded-full px-4 py-2 text-sm font-black capitalize ${view === item ? "bg-slate-900 text-white" : "text-slate-700"}`}>{item}</button>)}
@@ -8485,7 +8514,7 @@ function CurriculumWeekViewCard({ compact = false }: { compact?: boolean }) {
             </div>
           )}
         </div>
-        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Week {currentWeek.week} of 8</div>
+        <div className="rounded-full border border-emerald-200/25 bg-emerald-300/12 px-4 py-2 text-xs font-black text-emerald-50">Week {currentWeek.week} of 8 • {getProgramWeekStatus(currentWeek.week)}</div>
       </div>
 
       <div className="mt-4 grid gap-2 md:grid-cols-5">
@@ -13969,6 +13998,46 @@ function ActiveCurriculumProjectCard({ setScreen, compact = false }: { setScreen
 }
 
 
+function ParentShowcaseInvitationCard({ setScreen }: { setScreen: (screen: Screen) => void }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  return (
+    <div className="mt-6 overflow-hidden rounded-[1.75rem] border-2 border-lime-300/60 bg-gradient-to-br from-emerald-950 via-emerald-900 to-lime-900 shadow-xl">
+      <div className="grid md:grid-cols-[1.1fr_.9fr]">
+        <div className="p-6 md:p-8">
+          <div className="inline-flex rounded-full bg-lime-300 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-950">Pinned Parent Invitation</div>
+          <div className="mt-5 text-sm font-black uppercase tracking-[0.24em] text-lime-200">You're Invited</div>
+          <h2 className="mt-2 text-4xl font-black leading-tight text-white">{SHOWCASE_EVENT.theme}</h2>
+          <p className="mt-2 text-lg font-black text-lime-200">{SHOWCASE_EVENT.subtitle}</p>
+          <h3 className="mt-6 text-2xl font-black text-white">{SHOWCASE_EVENT.title}</h3>
+          <div className="mt-4 grid gap-2 text-sm font-bold text-white/90">
+            <div>📅 Monday, August 17, 2026</div>
+            <div>🕚 {SHOWCASE_EVENT.time}</div>
+            <div>📍 {SHOWCASE_EVENT.location}</div>
+          </div>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-white/82">{SHOWCASE_EVENT.parentMessage}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setScreen("events")} className="rounded-full bg-lime-300 px-6 py-3 font-black text-emerald-950">Open Ecosystem Calendar</button>
+            <button type="button" onClick={() => setScreen("guest")} className="rounded-full border border-white/25 bg-white/10 px-6 py-3 font-black text-white">Visit the Ecosystem</button>
+          </div>
+        </div>
+        <div className="min-h-[280px] bg-black/20">
+          {!imageFailed ? (
+            <img src={SHOWCASE_FLYER_SRC} alt="Youngstown Cultivator Showcase invitation flyer" className="h-full w-full object-cover" onError={() => setImageFailed(true)} />
+          ) : (
+            <div className="flex h-full min-h-[280px] items-center justify-center p-8 text-center">
+              <div>
+                <div className="text-5xl">🌱</div>
+                <div className="mt-4 text-2xl font-black text-white">Great Things Grow Here.</div>
+                <div className="mt-2 text-sm font-bold text-lime-200">Flyer image: {SHOWCASE_FLYER_SRC}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ParentQuickAccess16_8({ setScreen }: { setScreen: (screen: Screen) => void }) {
   const cards = [
     ["Is my child here?", "Present / check-in status"],
@@ -14014,6 +14083,8 @@ function ParentScreen({ setScreen, activeUser, language }: { setScreen: (screen:
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
         Parents see attendance, accomplishments, workbook progress, project milestones, and parent-safe messages. Private wellness reflections and sensitive staff notes remain staff-protected.
       </p>
+
+      <ParentShowcaseInvitationCard setScreen={setScreen} />
 
       <ParentQuickAccess16_8 setScreen={setScreen} />
 
