@@ -20,6 +20,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.5 FINAL: Rebuilds the Visitor / Guest story as a plain-language Youngstown experience connecting Mahoning Valley history, industry, General Motors, Packard Electric, Lansdowne Airport, Zachary Lansdowne, famous and accomplished Youngstown-connected people, community builders, Bronson Family Farm, and today's Cultivators. Every person profile explains who the person is or was, what they did, why they matter, and what visitors can learn without assuming prior knowledge.
  * - Ecosystem 27.6 FINAL: Applies a compact, readable system-wide spacing standard; keeps related lines, bullets, labels, and controls close together; reduces card padding and excessive scrolling; and centralizes the 2:00 PM America/New_York operational-day advance used by curriculum, calendar, workbook, Journey, parent, supervisor, and Mission Control views.
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
+ * - Ecosystem 27.8 FINAL: Enforces the compact spacing standard in the rendered interface. Related banners, cards, headings, paragraphs, bullets, controls, images, and action areas now remain visually connected with substantially less empty vertical space and less scrolling throughout every pathway.
  */
 
 /**
@@ -10786,22 +10787,35 @@ function Shell({
       dir={languageDir(language)}
     >
       <style>{`
-        [data-bff-app-root] { line-height: 1.4; }
-        [data-bff-app-root] p { margin-top: .45rem; margin-bottom: .45rem; line-height: 1.48; }
-        [data-bff-app-root] h1, [data-bff-app-root] h2, [data-bff-app-root] h3, [data-bff-app-root] h4 { line-height: 1.12; margin-bottom: .35rem; }
-        [data-bff-app-root] ul, [data-bff-app-root] ol { margin-top: .4rem; margin-bottom: .4rem; }
-        [data-bff-app-root] li + li { margin-top: .18rem; }
-        [data-bff-app-root] .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; }
-        [data-bff-app-root] .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: .85rem !important; }
-        [data-bff-app-root] .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: .75rem !important; }
-        [data-bff-app-root] .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: .65rem !important; }
-        [data-bff-app-root] .gap-8 { gap: 1rem !important; }
-        [data-bff-app-root] .gap-6 { gap: .85rem !important; }
-        [data-bff-app-root] .gap-5 { gap: .75rem !important; }
-        [data-bff-app-root] .gap-4 { gap: .65rem !important; }
-        [data-bff-app-root] .leading-8, [data-bff-app-root] .leading-7 { line-height: 1.5 !important; }
-        [data-bff-app-root] .leading-6 { line-height: 1.45 !important; }
-        [data-bff-app-root] details > summary { line-height: 1.3; }
+        [data-bff-app-root] { line-height: 1.32; }
+        [data-bff-app-root] p { margin-top: .22rem; margin-bottom: .22rem; line-height: 1.38; }
+        [data-bff-app-root] h1, [data-bff-app-root] h2, [data-bff-app-root] h3, [data-bff-app-root] h4 { line-height: 1.04; margin-top: 0; margin-bottom: .18rem; }
+        [data-bff-app-root] ul, [data-bff-app-root] ol { margin-top: .22rem; margin-bottom: .22rem; }
+        [data-bff-app-root] li + li { margin-top: .08rem; }
+        [data-bff-app-root] .space-y-12 > :not([hidden]) ~ :not([hidden]),
+        [data-bff-app-root] .space-y-10 > :not([hidden]) ~ :not([hidden]),
+        [data-bff-app-root] .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: .7rem !important; }
+        [data-bff-app-root] .space-y-7 > :not([hidden]) ~ :not([hidden]),
+        [data-bff-app-root] .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: .6rem !important; }
+        [data-bff-app-root] .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem !important; }
+        [data-bff-app-root] .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: .42rem !important; }
+        [data-bff-app-root] .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: .34rem !important; }
+        [data-bff-app-root] .gap-12, [data-bff-app-root] .gap-10, [data-bff-app-root] .gap-8 { gap: .7rem !important; }
+        [data-bff-app-root] .gap-7, [data-bff-app-root] .gap-6 { gap: .6rem !important; }
+        [data-bff-app-root] .gap-5 { gap: .5rem !important; }
+        [data-bff-app-root] .gap-4 { gap: .42rem !important; }
+        [data-bff-app-root] .gap-3 { gap: .34rem !important; }
+        [data-bff-app-root] .leading-10, [data-bff-app-root] .leading-9, [data-bff-app-root] .leading-8, [data-bff-app-root] .leading-7 { line-height: 1.38 !important; }
+        [data-bff-app-root] .leading-6 { line-height: 1.34 !important; }
+        [data-bff-app-root] details > summary { line-height: 1.2; }
+        [data-bff-app-root] .mt-10, [data-bff-app-root] .mt-9, [data-bff-app-root] .mt-8 { margin-top: .75rem !important; }
+        [data-bff-app-root] .mt-7, [data-bff-app-root] .mt-6 { margin-top: .62rem !important; }
+        [data-bff-app-root] .mt-5, [data-bff-app-root] .mt-4 { margin-top: .5rem !important; }
+        [data-bff-app-root] .mt-3 { margin-top: .38rem !important; }
+        [data-bff-app-root] .mb-8, [data-bff-app-root] .mb-7, [data-bff-app-root] .mb-6 { margin-bottom: .62rem !important; }
+        [data-bff-app-root] .mb-5, [data-bff-app-root] .mb-4, [data-bff-app-root] .mb-3 { margin-bottom: .45rem !important; }
+        [data-bff-app-root] .pt-8, [data-bff-app-root] .pt-7, [data-bff-app-root] .pt-6 { padding-top: .7rem !important; }
+        [data-bff-app-root] .pb-8, [data-bff-app-root] .pb-7, [data-bff-app-root] .pb-6 { padding-bottom: .7rem !important; }
         @media (max-width: 640px) {
           [data-bff-app-root] { font-size: 16px; }
           [data-bff-app-root] p { line-height: 1.43; }
@@ -10817,7 +10831,7 @@ function Shell({
       </div>
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.12),rgba(0,0,0,.35)),radial-gradient(circle_at_top_left,rgba(52,211,153,.18),transparent_32%)]" />
-      <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-3 pb-8 md:px-6">
+      <div className="relative z-10 mx-auto max-w-[1280px] px-3 py-2 pb-5 md:px-5">
         <NurseLineBanner onOpen={() => setShowNurseLine(true)} />
         {showNurseLine && (
           <NurseLineModal onClose={() => setShowNurseLine(false)} />
@@ -10827,7 +10841,7 @@ function Shell({
           <GlobalOperationsHeader screen={screen} setScreen={setScreen} />
         </div>
 
-        <div className="relative z-40 mb-3 rounded-[1.15rem] border border-white/10 bg-black/70 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="relative z-40 mb-2 rounded-[1.15rem] border border-white/10 bg-black/70 p-2 shadow-[0_18px_55px_rgba(0,0,0,.38)] backdrop-blur-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <button
               type="button"
@@ -11055,7 +11069,7 @@ function Shell({
 
 function NurseLineBanner({ onOpen }: { onOpen: () => void }) {
   return (
-    <div className="sticky top-0 z-[60] mb-3 rounded-[1rem] border border-red-200/35 bg-red-700/92 px-3 py-2 text-white shadow-[0_14px_45px_rgba(0,0,0,.38)] backdrop-blur-xl">
+    <div className="sticky top-0 z-[60] mb-1 rounded-[1rem] border border-red-200/35 bg-red-700/92 px-3 py-1.5 text-white shadow-[0_14px_45px_rgba(0,0,0,.38)] backdrop-blur-xl">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="text-[10px] font-black uppercase tracking-[0.24em] text-red-50/85">
@@ -11198,7 +11212,7 @@ function Card({
 }) {
   return (
     <div
-      className={`rounded-[1.4rem] border border-white/10 bg-black/32 p-4 shadow-[0_24px_70px_rgba(0,0,0,.44)] backdrop-blur-2xl ${className}`}
+      className={`rounded-[1.4rem] border border-white/10 bg-black/32 p-3 shadow-[0_24px_70px_rgba(0,0,0,.44)] backdrop-blur-2xl ${className}`}
     >
       {children}
     </div>
@@ -13857,7 +13871,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   return (
     <div
       id="guest-journey-top"
-      className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24"
+      className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24"
     >
       <Card>
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
@@ -13868,7 +13882,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
             {page.openingQuote}
           </div>
         )}
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           {page.title}
         </h1>
         {page.subtitle && (
@@ -13877,11 +13891,11 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </p>
         )}
 
-        <div className="mt-6 grid gap-3">
+        <div className="mt-3 grid gap-1.5">
           {page.paragraphs.map((paragraph) => (
             <p
               key={paragraph}
-              className="max-w-none text-lg font-semibold leading-8 text-white/88 md:text-xl md:leading-9"
+              className="max-w-none text-lg font-semibold leading-7 text-white/88 md:text-xl md:leading-8"
             >
               {paragraph}
             </p>
@@ -13889,16 +13903,16 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
         </div>
 
         {page.highlights && (
-          <div className="mt-7">
-            <ul className="grid gap-3 sm:grid-cols-2">
+          <div className="mt-4">
+            <ul className="grid gap-1.5 sm:grid-cols-2">
               {page.highlights.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-3 text-lg font-black leading-7 text-white"
+                  className="flex items-start gap-2 text-lg font-black leading-6 text-white"
                 >
                   <span
                     aria-hidden="true"
-                    className="mt-3 h-2 w-2 shrink-0 rounded-full bg-emerald-200"
+                    className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-200"
                   />
                   <span>{item}</span>
                 </li>
@@ -14227,7 +14241,7 @@ function MyWorkspace({
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           🌱 Cultivator Access
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           Open Today’s Work
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">
@@ -14251,7 +14265,7 @@ function MyWorkspace({
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           🔑 {L("Returning")}
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           {L("Enter Today’s Work")}
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/82">
@@ -14588,7 +14602,7 @@ function Registration({
       <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
         Registration Center
       </div>
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+      <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
         Create the profile once. Reuse it everywhere.
       </h1>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -24686,7 +24700,7 @@ function WellnessReview({
         This is not a diagnosis. It is a staff-only way to notice urgent need,
         isolation, food insecurity, stress, or safety concerns.
       </p>
-      <div className="mt-6 grid gap-3">
+      <div className="mt-3 grid gap-1.5">
         {(flags.length ? flags : wellness.slice(0, 8)).map((w) => (
           <div
             key={w.id}
@@ -25523,7 +25537,7 @@ function FeedbackCenter({ feedbackRows }: { feedbackRows: FeedbackRecord[] }) {
           }
         />
       </div>
-      <div className="mt-6 grid gap-3">
+      <div className="mt-3 grid gap-1.5">
         {rows.length === 0 ? (
           <div className="rounded-2xl border border-white/10 bg-black/35 p-5 text-white/78">
             No feedback records found yet.
@@ -26709,7 +26723,7 @@ function CaseManagerPortal({
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           Case Manager Portal
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           Whole-person youth support.
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
@@ -27041,7 +27055,7 @@ function ParentScreen({
         Parent / Guardian Portal
       </div>
       <WorkforceExploration27_7 compact audience="Parent" />
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+      <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
         Progress, encouragement, and next steps.
       </h1>
       <p className="mt-4 max-w-3xl text-sm leading-7 text-white/80">
@@ -27157,7 +27171,7 @@ function ParentScreen({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3">
+      <div className="mt-3 grid gap-1.5">
         {summaries.slice(0, 6).map((summary) => (
           <div
             key={summary.id}
@@ -28013,7 +28027,7 @@ function MarketplaceOperations({
             <h1 className="mt-3 text-4xl font-black md:text-5xl">
               Pickup and order tracking.
             </h1>
-            <div className="mt-6 grid gap-3">
+            <div className="mt-3 grid gap-1.5">
               {orders.map((order) => {
                 const items = orderItems.filter(
                   (item) => item.order_id === order.id,
@@ -28359,7 +28373,7 @@ function MyStoryScreen({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           Cultivator Journey Record
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           Share My Learning
         </h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
@@ -28618,7 +28632,7 @@ function MediaCenter({ setScreen }: { setScreen: (screen: Screen) => void }) {
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           Cultivator Stories
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           Share My Learning
         </h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-white/84">
@@ -29675,7 +29689,7 @@ function Operations({
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           Operations
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           Daily rhythm for launch.
         </h1>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
@@ -30051,7 +30065,7 @@ function GuidedDemo({ setScreen }: { setScreen: (screen: Screen) => void }) {
       <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
         Guided Demo
       </div>
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+      <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
         Experience the ecosystem in order.
       </h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
@@ -30813,7 +30827,7 @@ function SimplePathway({
           <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
             Pathway
           </div>
-          <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+          <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
             {title}
           </h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/88">
@@ -31035,7 +31049,7 @@ function CoolingCenterProjectModule({
       <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
         June 8 Workforce Production Challenge
       </div>
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+      <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
         SEE IT → IMAGINE IT → DESIGN IT → BUILD IT → DELIVER IT → CREATE VALUE →
         OWN IT
       </h1>
@@ -31548,7 +31562,7 @@ function MyCultivatorJourneyScreen({
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           My Journey
         </div>
-        <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
           How I Am Growing
         </h1>
         <p className="mt-4 max-w-4xl text-lg font-bold leading-8 text-white/84">
@@ -31959,7 +31973,7 @@ function CompletionExperience({
       <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
         Thank You
       </div>
-      <h1 className="mt-4 text-5xl font-black leading-[1.02] md:text-7xl">
+      <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
         Farm Explorer
       </h1>
       <p className="mt-5 max-w-4xl text-lg leading-8 text-white/86">
