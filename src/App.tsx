@@ -22,6 +22,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
  * - Ecosystem 27.8 FINAL: Enforces the compact spacing standard in the rendered interface. Related banners, cards, headings, paragraphs, bullets, controls, images, and action areas now remain visually connected with substantially less empty vertical space and less scrolling throughout every pathway.
  * - Ecosystem 27.9 FINAL: Fixes the live 2:00 PM America/New_York operational-day rollover. The entire ecosystem now re-evaluates time every 30 seconds and whenever the browser regains focus or visibility, so Wednesday automatically becomes Thursday after 2:00 PM without requiring refresh or sign-in.
+ * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
 
 /**
@@ -2137,8 +2138,36 @@ const youthWeekSixDailyPlan = [
 const WRTA_ROUTE_12_URL =
   "https://www.wrtaonline.com/schedules/route-12-lansdowne/";
 
+const THURSDAY_FARM_WORK_PATHWAY_28_0 = {
+  title: "Farm Stewardship and Pea Trellis Workday",
+  ageGroup: "Youth ages 14–16 remaining at the farm",
+  supervisor: "Ms. Jesska Mack",
+  location: "Bronson Family Farm",
+  safetyBoundary:
+    "Install branch poles around the grow area only. Do not install branch poles around or inside the Butterfly Sanctuary.",
+  work: [
+    "Watch the natural trellis videos in the ecosystem before beginning pea-trellis construction",
+    "Complete installation of branch poles around the grow area only — not the Butterfly Sanctuary",
+    "Rake cut grass from the north end of the field near the T-hangar toward the south end",
+    "Pick up garbage and litter from all areas of the farm",
+    "Collect surplus wood branches and place them on the cement near the burn area for future burning",
+    "Create trellises for peas using suitable tree branches",
+    "Keep usable trellis branches separate from surplus branches intended for future burning",
+    "Photograph completed branch-pole, grass-raking, cleanup, branch-staging, and pea-trellis work",
+  ],
+  resources: [
+    "Natural Trellis Design Video #2",
+    "Natural Trellis Design Video #3",
+    "Natural Trellis Design Video #4",
+    "Branch-Pole Installation Safety Reminder",
+    "Pea Trellis Construction Guide",
+  ],
+};
+
 const WRTA_WORKFORCE_EXPERIENCE_27_7 = {
   title: "WRTA Workforce Exploration Day",
+  eligibleGroup:
+    "Youth ages 16–18 assigned and approved for the WRTA field experience",
   theme: "Transportation Connects Opportunity",
   essentialQuestion: "How does transportation create opportunity?",
   date: "Thursday, July 23, 2026",
@@ -2224,6 +2253,18 @@ function WorkforceExploration27_7({
         </div>
       </div>
 
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl border border-sky-200/25 bg-sky-300/10 p-4 text-sm font-bold leading-6">
+          <div className="font-black">WRTA Group</div>
+          <div>{experience.eligibleGroup}</div>
+        </div>
+        <div className="rounded-2xl border border-emerald-200/25 bg-emerald-300/10 p-4 text-sm font-bold leading-6">
+          <div className="font-black">Farm Group</div>
+          <div>{THURSDAY_FARM_WORK_PATHWAY_28_0.ageGroup}</div>
+          <div>Supervisor: {THURSDAY_FARM_WORK_PATHWAY_28_0.supervisor}</div>
+        </div>
+      </div>
+
       {audience !== "Parent" && (
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-black/25 p-4 text-sm leading-6 text-white/82">
@@ -2296,6 +2337,23 @@ function WorkforceExploration27_7({
           </div>
         </div>
       )}
+
+      <div className="mt-4 rounded-2xl border border-emerald-200/25 bg-emerald-300/10 p-4">
+        <div className="text-sm font-black">Farm Work Pathway</div>
+        <div className="mt-1 text-sm font-bold text-white/82">
+          {THURSDAY_FARM_WORK_PATHWAY_28_0.ageGroup} • Supervised by {THURSDAY_FARM_WORK_PATHWAY_28_0.supervisor}
+        </div>
+        <div className="mt-3 rounded-xl border border-amber-200/25 bg-amber-300/10 p-3 text-sm font-black">
+          {THURSDAY_FARM_WORK_PATHWAY_28_0.safetyBoundary}
+        </div>
+        <div className="mt-3 grid gap-2">
+          {THURSDAY_FARM_WORK_PATHWAY_28_0.work.map((item) => (
+            <div key={item} className="rounded-xl bg-black/25 px-3 py-2 text-sm font-bold">
+              • {item}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {audience === "Workbook" && (
         <div className="mt-4 rounded-2xl border border-purple-200/20 bg-purple-300/10 p-4">
@@ -2433,20 +2491,21 @@ const youthWeekSevenDailyPlan = [
     curriculum:
       "WRTA Workforce Exploration Day — Transportation Connects Opportunity",
     focus:
-      "Cultivators travel together on WRTA Route #12 to WRTA Headquarters for a Board Room workforce exploration program connecting transportation, careers, apprenticeships, community infrastructure, professional communication, and opportunity.",
+      "Thursday operates as two supervised pathways: youth ages 16–18 assigned and approved for WRTA complete the transportation workforce experience; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack on grow-area infrastructure, field cleanup, branch management, and pea trellises.",
     work: [
-      "8:00 AM — Report to Bronson Family Farm",
-      "8:00–10:00 AM — Complete morning farm activities and prepare for the visit",
-      "10:00 AM — Walk together to the WRTA Route #12 stop",
-      "10:40 AM — Board Route #12",
-      "Approximately 11:00 AM — Arrive at WRTA Headquarters",
-      "11:00 AM–12:45 PM — Participate in the WRTA Board Room workforce exploration program",
-      "12:45 PM — Depart WRTA",
-      "Approximately 1:30–1:45 PM — Return to Bronson Family Farm",
-      "2:00 PM — Dismissal",
-      "Practice professional conduct, listen carefully, ask thoughtful questions, and thank our hosts",
-      "Identify transportation careers, skills, apprenticeships, and community services",
-      "Record one career discovered, one skill already possessed, one skill to improve, and one possible next step",
+      "ALL YOUTH — 8:00 AM report to Bronson Family Farm and confirm assigned Thursday pathway",
+      "WRTA GROUP (ages 16–18 assigned/approved) — Prepare for and complete the WRTA Route #12 workforce exploration visit",
+      "WRTA GROUP — 10:00 AM walk together to the Route #12 stop; 10:40 AM board; approximately 11:00 AM arrive",
+      "WRTA GROUP — 11:00 AM–12:45 PM participate in the WRTA Board Room program; 12:45 PM depart; return approximately 1:30–1:45 PM",
+      "WRTA GROUP — Practice professional conduct, ask thoughtful questions, thank hosts, and identify careers, skills, apprenticeships, and community services",
+      "FARM GROUP (ages 14–16 remaining at farm) — Work under the supervision of Ms. Jesska Mack",
+      "FARM GROUP — Watch the natural trellis videos in the ecosystem before constructing pea trellises",
+      "FARM GROUP — Complete branch-pole installation around the grow area only; do not place branch poles around or inside the Butterfly Sanctuary",
+      "FARM GROUP — Rake grass from the north end of the field near the T-hangar toward the south end",
+      "FARM GROUP — Pick up garbage and litter throughout the entire farm",
+      "FARM GROUP — Collect surplus wood branches and place them on the cement near the burn area for future burning",
+      "FARM GROUP — Build pea trellises using suitable tree branches",
+      "ALL YOUTH — 2:00 PM dismissal",
     ],
     resources: [
       "WRTA Visit Guide",
@@ -2454,11 +2513,16 @@ const youthWeekSevenDailyPlan = [
       "Transportation Career Cards",
       "Apprenticeship Explorer",
       "Interview Response Builder",
+      "Natural Trellis Design Video #2",
+      "Natural Trellis Design Video #3",
+      "Natural Trellis Design Video #4",
+      "Pea Trellis Construction Guide",
       WRTA_ROUTE_12_URL,
     ],
     reflection:
-      "How does transportation create opportunity, and how would you explain your Cultivator experience to an employer or apprenticeship representative?",
+      "WRTA group: How does transportation create opportunity? Farm group: How did your stewardship, cleanup, branch management, or pea-trellis work improve the farm?",
     fieldExperience: WRTA_WORKFORCE_EXPERIENCE_27_7,
+    farmWorkPathway: THURSDAY_FARM_WORK_PATHWAY_28_0,
   },
   {
     day: "Friday",
