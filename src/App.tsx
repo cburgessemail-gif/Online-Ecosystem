@@ -22,6 +22,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
  * - Ecosystem 27.8 FINAL: Enforces the compact spacing standard in the rendered interface. Related banners, cards, headings, paragraphs, bullets, controls, images, and action areas now remain visually connected with substantially less empty vertical space and less scrolling throughout every pathway.
  * - Ecosystem 27.9 FINAL: Fixes the live 2:00 PM America/New_York operational-day rollover. The entire ecosystem now re-evaluates time every 30 seconds and whenever the browser regains focus or visibility, so Wednesday automatically becomes Thursday after 2:00 PM without requiring refresh or sign-in.
+ * - Ecosystem 28.1 FINAL: Creates a separate read-only Visitor Only / Media Access pathway centered on Youngstown history, industry, automotive and aviation legacy, accomplished Youngstown-connected people, Bronson Family Farm, the Cultivators, the living farm story, and an approved Media Center. No private youth, parent, supervisor, incident, workbook, attendance, or administrative information is exposed.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
 
@@ -13445,482 +13446,204 @@ function JourneyCompletionCard({
 }
 
 function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
-  type GuestJourneyPage = {
+  type MediaPage = {
     key: string;
     eyebrow: string;
     title: string;
     subtitle?: string;
-    openingQuote?: string;
     paragraphs: string[];
-    reflection?: string[];
     highlights?: string[];
     image: string;
     imageAlt: string;
   };
 
-  const pages: GuestJourneyPage[] = [
+  const pages: MediaPage[] = [
     {
       key: "home",
-      eyebrow: "Bronson Family Farm • Lansdowne Airport • Youngstown, Ohio",
-      title: "Welcome to Bronson Family Farm",
-      subtitle: "We Grow Green to Harvest Dreams",
+      eyebrow: "VISITOR ONLY • MEDIA ACCESS",
+      title: "Great People Come From Youngstown.",
+      subtitle: "Greatness Grows Here.",
       paragraphs: [
-        "Bronson Family Farm is a youth workforce, education, and environmental stewardship program located at Lansdowne Airport in Youngstown, Ohio.",
-        "Young people learn through real work, real discovery, and real responsibility.",
-        "They grow food, care for pollinators, explore the forest, restore the apiary, build projects, document discoveries, and develop practical workforce skills.",
-        "This is a working farm, a learning environment, and a growing community resource.",
+        "Welcome to the public media pathway of the Cultivator Ecosystem.",
+        "This guided experience shares the history, people, resilience, and continuing greatness of Youngstown—and shows how a new generation is cultivating its future at Bronson Family Farm.",
+        "This pathway is read-only. It contains no youth records, attendance, workbooks, reflections, parent information, supervisor tools, incident records, or administrative data.",
       ],
       highlights: [
-        "A farm at an airport",
-        "Youth workforce development",
-        "Agriculture and food",
-        "Forest and wildlife discovery",
-        "Pollinator and apiary stewardship",
+        "Youngstown history",
+        "Builders and innovators",
+        "Manufacturing and automotive legacy",
+        "Aviation history",
+        "Bronson Family Farm",
+        "Cultivators Youth Workforce",
       ],
-      image: IMG.forest,
-      imageAlt: "Bronson Family Farm landscape in Youngstown",
+      image: IMG.interview,
+      imageAlt: "Bronson Family Farm media interview in Youngstown",
     },
     {
-      key: "airport",
-      eyebrow: "Lansdowne Airport",
-      title: "A Farm at an Airport?",
+      key: "youngstown-story",
+      eyebrow: "THE YOUNGSTOWN STORY",
+      title: "A city built by people who made things happen.",
       paragraphs: [
-        "Yes. Bronson Family Farm operates at Lansdowne Airport in Youngstown.",
-        "The airport is named for Zachary Lansdowne, a Youngstown-born United States naval aviator who became commander of the airship USS Shenandoah. Visitors do not need to know his name before arriving; this story explains who he was, what he accomplished, and why his aviation legacy is remembered here.",
-        "The airport property includes open grassland, wooded areas, wildlife habitat, pollinator spaces, and agricultural growing areas. That unusual setting gives youth opportunities to learn about agriculture, aviation, transportation, land stewardship, environmental observation, and community development in one place.",
-        "The farm develops while respecting airport operations, safety requirements, and the surrounding environment. The land now connects Youngstown's aviation history with a new chapter of food production, conservation, workforce learning, and community opportunity.",
+        "Youngstown grew through natural resources, transportation, immigration, invention, manufacturing, organized labor, entrepreneurship, and generations of people willing to work, build, repair, create, and lead.",
+        "Steel shaped the region, but Youngstown's story is larger than steel. Its neighborhoods, churches, schools, cultural institutions, family businesses, artists, athletes, educators, public servants, and community leaders helped define the city.",
+        "Economic losses changed Youngstown, but they did not erase its talent, identity, or determination. The city continues to reinvent itself through education, skilled trades, health care, technology, agriculture, aviation, arts, public service, and entrepreneurship.",
       ],
       highlights: [
-        "Who Zachary Lansdowne was",
-        "Why the airport bears his name",
+        "Founding and early settlement",
+        "Coal, canals, and railroads",
+        "Steel and manufacturing",
+        "Labor and community",
+        "Neighborhood cultures",
+        "Resilience and reinvention",
+      ],
+      image: IMG.ecosystem,
+      imageAlt: "Youngstown's connected community and food ecosystem",
+    },
+    {
+      key: "manufacturing",
+      eyebrow: "INDUSTRY • MANUFACTURING • AUTOMOTIVE",
+      title: "Youngstown has always been a city of builders.",
+      paragraphs: [
+        "Steel mills made Youngstown internationally known, while supporting industries and skilled workers strengthened the Mahoning Valley's manufacturing identity.",
+        "Packard Electric became an important part of the region's industrial story. General Motors later connected the Mahoning Valley to automobile production and generations of family livelihoods.",
+        "The work changed over time, but the underlying strengths remain: precision, teamwork, problem solving, production, logistics, maintenance, design, entrepreneurship, and pride in making something useful.",
+        "Bronson Family Farm carries that spirit forward—not by trying to recreate the past, but by helping young people recognize that they, too, can build, grow, solve, and contribute.",
+      ],
+      highlights: [
+        "Steel production",
+        "Packard Electric",
+        "General Motors",
+        "Skilled trades",
+        "Production and logistics",
+        "Innovation and problem solving",
+      ],
+      image: IMG.fencing,
+      imageAlt: "Young people and volunteers building farm infrastructure",
+    },
+    {
+      key: "aviation",
+      eyebrow: "AVIATION HISTORY",
+      title: "Youngstown's story also reaches the sky.",
+      paragraphs: [
+        "Bronson Family Farm is located at historic Lansdowne Airport in Youngstown.",
+        "The airport bears the name of Zachary Lansdowne, a Youngstown-born United States naval aviator who became commander of the airship USS Shenandoah.",
+        "The setting connects aviation history, open land, agriculture, environmental stewardship, transportation, workforce learning, and community development in one unusual place.",
+        "The farm operates with respect for airport safety and land-use requirements while creating a new public story for a historic Youngstown property.",
+      ],
+      highlights: [
+        "Lansdowne Airport",
+        "Zachary Lansdowne",
         "Youngstown aviation history",
-        "Agricultural growing areas",
-        "Forest and wildlife habitat",
-        "Youth learning and workforce development",
+        "Transportation and public access",
+        "Safe land stewardship",
       ],
       image: IMG.grow,
       imageAlt: "Bronson Family Farm growing area at Lansdowne Airport",
     },
     {
-      key: "family",
-      eyebrow: "Our Story",
-      title: "The Bronson Family Farm Story",
+      key: "greatness",
+      eyebrow: "GREATNESS GROWS HERE",
+      title: "Youngstown has produced people of national and lasting influence.",
       paragraphs: [
-        "Bronson Family Farm grew from a family vision to use land, agriculture, and real work to create opportunity for young people and the Youngstown community.",
-        "The work began with growing food and continued to expand through environmental stewardship, youth workforce development, pollinator habitat, forest exploration, apiary restoration, entrepreneurship, and community partnerships.",
-        "The farm is still being built. Youth, family members, volunteers, educators, growers, researchers, and community partners each contribute to what it is becoming.",
-        "The story is not an abstract idea. It is visible in every prepared row, repaired structure, documented discovery, planted seed, and new skill.",
+        "Youngstown-connected people have made important contributions in entertainment, music, sports, journalism, business, education, science, government, public service, civil rights, and community leadership.",
+        "This experience does not assume that visitors already know every name. Each featured profile explains who the person is or was, what they did, how they are connected to Youngstown, why their contribution matters, and what others can learn from their example.",
+        "The message is not that greatness belongs only to famous people. Their stories demonstrate that talent, discipline, imagination, courage, and service can grow from this community.",
       ],
       highlights: [
-        "Family vision",
-        "Youth opportunity",
+        "Artists and entertainers",
+        "Athletes",
+        "Business and industry leaders",
+        "Educators and scientists",
+        "Journalists and communicators",
+        "Public servants and community builders",
+      ],
+      image: IMG.interview,
+      imageAlt: "Youngstown media and community storytelling",
+    },
+    {
+      key: "farm",
+      eyebrow: "BRONSON FAMILY FARM",
+      title: "From manufacturing strength to cultivation.",
+      subtitle: "We Grow Green to Harvest Dreams",
+      paragraphs: [
+        "Bronson Family Farm is an off-grid regenerative farm and learning environment at Lansdowne Airport.",
+        "The farm was created to grow food, restore land, expand environmental learning, develop community opportunity, and give young people meaningful work through which they can discover their own abilities.",
+        "Its development includes growing areas, deer-resistant fencing, pollinator habitat, apiary restoration, forest exploration, composting, crop protection, visitor-trail planning, entrepreneurship, and community partnerships.",
+        "Farm & Family Alliance supports the people-centered mission. Bronson Family Farm grows the place; Farm & Family Alliance grows people and opportunity.",
+      ],
+      highlights: [
+        "Regenerative agriculture",
+        "Off-grid development",
         "Food production",
         "Environmental stewardship",
+        "Workforce development",
         "Community partnership",
       ],
-      image: IMG.forest,
-      imageAlt: "Bronson Family Farm family and community story",
+      image: IMG.grow,
+      imageAlt: "Actual Bronson Family Farm growing area",
     },
     {
       key: "cultivators",
-      eyebrow: "Meet the Cultivators",
-      title: "Youth learn by doing.",
+      eyebrow: "CULTIVATORS YOUTH WORKFORCE",
+      title: "Young people learn through real work.",
       paragraphs: [
-        "Cultivators are young people who contribute to the farm through meaningful work.",
-        "They plant, build, observe, measure, clean, restore, record, solve problems, work together, and learn how their contribution affects the larger farm.",
-        "Recent accomplishments include preparing squash and pumpkin growing areas, collecting milkweed seed, rebuilding apiary equipment, installing trellises, monitoring crops, restoring compost systems, and documenting wildlife.",
-        "Their work becomes part of the farm and part of their own record of skills, accomplishments, service, and growth.",
+        "Cultivators are young people who help build the farm while building skills, confidence, responsibility, and a record of accomplishment.",
+        "They prepare land, plant crops, build fences and trellises, care for pollinators, restore apiary equipment, observe wildlife, explore the forest, document discoveries, solve problems, and learn how individual work connects to a larger operation.",
+        "Career exploration grows directly from the work. Agriculture can connect to science, engineering, construction, transportation, education, skilled trades, business, tourism, public service, and entrepreneurship.",
+        "Only photographs, stories, quotations, and media that have been approved for public use should appear in this pathway.",
       ],
       highlights: [
         "Teamwork",
         "Responsibility",
-        "Observation",
         "Problem solving",
         "Leadership",
-        "Workforce skills",
+        "Career exposure",
+        "Documented accomplishments",
       ],
-      image: IMG.grow,
-      imageAlt: "Cultivators working and learning at Bronson Family Farm",
+      image: IMG.youth,
+      imageAlt: "Approved image of youth and volunteers working at Bronson Family Farm",
     },
     {
-      key: "this-week",
-      eyebrow: "This Week at the Farm",
-      title: "What the Cultivators are doing now",
+      key: "living-story",
+      eyebrow: "THE LIVING FARM STORY",
+      title: "Progress is visible in the work.",
       paragraphs: [
-        "Cultivators began recovering and filtering wood ash, removed nails, metal, and other foreign objects, and kept the project in progress until Thursday completion.",
-        "The clean ash was placed in a labeled bag for future responsible distribution. It will not be applied until the approved crop, location, amount, and soil need are confirmed.",
-        "Youth also spent an extended period in the forest establishing a walking trail for future visitors. As they worked, they found wet crossings and places where bridges, raised walkways, drainage improvements, or trail rerouting may be needed.",
-        "The work is documented in the Workbook and Living Ecosystem Timeline. Skills and accomplishments carry into My Journey without requiring youth to repeat the same information.",
+        "The farm story is presented through changing, authentic photographs from Bronson Family Farm—not a repeated stock image.",
+        "Visitors can follow the transformation of the land: preparing the ground, planting, building fences and gates, protecting crops from deer and wildlife, responding to difficult weather, restoring compost and apiary systems, exploring the forest, and creating future visitor experiences.",
+        "The challenges are part of the story. Weather, wildlife, limited infrastructure, crop losses, and the realities of building an off-grid farm require patience, adaptation, teamwork, and innovation.",
+        "Each image should help visitors see what changed, who contributed, what was learned, and what happens next.",
       ],
       highlights: [
-        "Ash safety",
-        "Foreign-object removal",
-        "Filtered ash storage",
-        "Visitor trail",
-        "Water crossings",
-        "Bridge planning",
+        "Before and after progress",
+        "Actual farm photographs",
+        "Youth projects",
+        "Environmental discoveries",
+        "Challenges and solutions",
+        "Growth over time",
       ],
-      image: IMG.ashProcessing,
-      imageAlt:
-        "Uploaded Bronson Family Farm image supporting the wood-ash processing and stewardship story",
+      image: IMG.deerFencing,
+      imageAlt: "Actual deer fencing and farm progress at Bronson Family Farm",
     },
     {
-      key: "discoveries",
-      eyebrow: "Discoveries from the Field",
-      title: "The farm is a living outdoor classroom.",
+      key: "media-center",
+      eyebrow: "MEDIA CENTER",
+      title: "A clear source for the Bronson Family Farm story.",
       paragraphs: [
-        "Cultivators recently found two baby salamanders, a toad, a butterfly cocoon, and six different plant varieties growing close together in one forest area.",
-        "They also found deer footprints near an area where several corn seedlings were missing.",
-        "The evidence was limited, so the lesson was clear: observation is not the same as conclusion. Youth recorded what they saw, considered possible causes, and continued monitoring.",
-        "Every discovery helps youth learn to observe carefully, ask better questions, and understand relationships among soil, water, plants, insects, wildlife, food, and people.",
+        "The media center provides public, approved information for reporters, photographers, broadcasters, researchers, partners, and community storytellers.",
+        "Materials should include the approved farm description, Cultivators Youth Workforce overview, Youngstown history summary, leadership information, current press releases, program fact sheet, approved photographs and videos, logos, contact information, and links to official public channels.",
+        "Private youth information, unrestricted image libraries, internal reports, incident records, attendance, workbooks, parent records, supervisor notes, and administrative materials are never available here.",
+        "Media representatives may use the contact pathway to request interviews, schedule a visit, confirm facts, or request approved high-resolution materials.",
       ],
       highlights: [
-        "Baby salamanders",
-        "Toad",
-        "Butterfly cocoon",
-        "Deer footprints",
-        "Plant diversity",
-        "Evidence-based observation",
+        "Approved organization description",
+        "Program fact sheet",
+        "Press releases",
+        "Approved photographs and video",
+        "Leadership and contact information",
+        "Interview and visit requests",
       ],
-      image: IMG.visitorTrail,
-      imageAlt:
-        "Uploaded Bronson Family Farm image supporting forest trail and water-crossing observations",
-    },
-    {
-      key: "learning",
-      eyebrow: "What Youth Learn",
-      title: "Every project develops practical skills.",
-      paragraphs: [
-        "Farm work gives youth repeated opportunities to practice attendance, readiness, communication, teamwork, problem solving, responsibility, and leadership.",
-        "Agriculture introduces soil health, crop care, food systems, nutrition, inventory, pricing, and entrepreneurship.",
-        "Forest, pollinator, and wildlife work introduces environmental observation, habitat stewardship, conservation, and scientific thinking.",
-        "The Workbook records what youth did and learned. My Journey shows the skills, achievements, career interests, service, and growth that emerge from that work.",
-      ],
-      highlights: [
-        "Workforce readiness",
-        "Agriculture",
-        "Environmental science",
-        "Entrepreneurship",
-        "Career exploration",
-        "Community service",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youth learning through real farm work",
-    },
-    {
-      key: "parents",
-      eyebrow: "Parents and Guardians",
-      title: "Parents are partners in the work.",
-      paragraphs: [
-        "Parents need clear, useful information about the program and their child's experience.",
-        "The Parent Portal places the current program status first: Full Day, Half Day, or Cancelled.",
-        "It also provides report time, dismissal time, lunch information, hydration reminders, today's learning, progress, and accomplishments.",
-        "Parents can see evidence of growth through completed projects, documented discoveries, attendance, skills, and contribution rather than generic statements.",
-      ],
-      highlights: [
-        "Program status",
-        "Arrival and dismissal",
-        "Lunch and hydration",
-        "Today's learning",
-        "Progress and accomplishments",
-      ],
-      image: IMG.forest,
-      imageAlt: "Parents and families connected to the Cultivator program",
-    },
-    {
-      key: "opportunity",
-      eyebrow: "Opportunity",
-      title: "Real work opens real pathways.",
-      paragraphs: [
-        "A farm task can introduce a career, a business idea, a college pathway, a skilled trade, or a new way to serve the community.",
-        "Cultivators explore agriculture, environmental science, education, engineering, aviation, skilled trades, entrepreneurship, healthcare, technology, and public service through activities they actually perform.",
-        "The goal is not to tell youth what they must become. It is to help them recognize what they can do, what interests them, and where their experience may lead.",
-      ],
-      highlights: [
-        "Agriculture",
-        "Environmental science",
-        "Aviation",
-        "Engineering and skilled trades",
-        "Entrepreneurship",
-        "Education and public service",
-      ],
-      image: IMG.grow,
-      imageAlt: "Career and education opportunity through farm experience",
-    },
-    {
-      key: "legacy",
-      eyebrow: "What the Work Leaves Behind",
-      title: "Legacy is shown through what was built.",
-      paragraphs: [
-        "At Bronson Family Farm, legacy is not a slogan. It is the food grown, habitat improved, apiary restored, discoveries recorded, skills gained, and opportunities created.",
-        "It is visible when a Cultivator can point to a trellis, a prepared growing area, a cleaned hive component, a milkweed inventory, a wildlife record, or a completed Workbook entry and say, ‘I helped do that.’",
-        "The permanent record belongs in photographs, projects, accomplishments, youth stories, community impact, and the knowledge passed to future Cultivators.",
-      ],
-      highlights: [
-        "Projects completed",
-        "Skills documented",
-        "Habitat improved",
-        "Knowledge transferred",
-        "Community contribution",
-      ],
-      image: IMG.forest,
-      imageAlt: "Cultivator accomplishments and lasting farm impact",
-    },
-    {
-      key: "youngstown-before",
-      eyebrow: "Discover Youngstown • Before Youngstown",
-      title: "The story begins before the city had a name.",
-      paragraphs: [
-        "Long before Youngstown became an industrial city, the Mahoning Valley was shaped by water, forests, wildlife, seasonal change, and the people who knew how to live with the land.",
-        "The Mahoning River and its tributaries supported travel, food, habitat, and settlement. The land was not empty; it carried Indigenous histories and relationships that began before modern city boundaries.",
-        "To understand Youngstown, begin with the valley itself: the river corridor, wooded ridges, wetlands, soil, and routes that later attracted settlement and industry.",
-      ],
-      highlights: [
-        "Mahoning Valley",
-        "Indigenous History",
-        "Mahoning River",
-        "Forests & Wildlife",
-        "Land Before Industry",
-      ],
-      reflection: [
-        "What does the land tell us about Youngstown before buildings and factories?",
-      ],
-      image: IMG.forest,
-      imageAlt:
-        "Forest and river landscape representing the Mahoning Valley before Youngstown",
-    },
-    {
-      key: "youngstown-founding",
-      eyebrow: "Discover Youngstown • Founding Youngstown",
-      title: "A settlement grows beside the Mahoning River.",
-      paragraphs: [
-        "John Young purchased land in the Connecticut Western Reserve and laid out Youngstown in 1797.",
-        "The early settlement developed around farms, mills, roads, the river, and the exchange of goods. Families and businesses depended on practical knowledge, labor, and access to transportation.",
-        "Youngstown's founding story is not only about one person. It is also about the many people whose work turned a surveyed place into neighborhoods, institutions, and a community.",
-      ],
-      highlights: [
-        "1797",
-        "John Young",
-        "Western Reserve",
-        "Early Farms & Mills",
-        "Community Building",
-      ],
-      reflection: ["What does a new community need in order to grow and last?"],
-      image: IMG.grow,
-      imageAlt: "Early settlement and community growth in Youngstown",
-    },
-    {
-      key: "youngstown-transport",
-      eyebrow: "Discover Youngstown • Coal, Canals & Railroads",
-      title: "Transportation turned local resources into regional growth.",
-      paragraphs: [
-        "Coal deposits helped establish the Mahoning Valley as an important center of fuel and industry.",
-        "The Pennsylvania and Ohio Canal opened through the region during the 1830s and 1840s, connecting farms, mines, mills, and markets. Railroads reached Youngstown in the 1850s and moved people and materials faster and farther.",
-        "Canals and railroads changed where people worked, where businesses located, and how quickly Youngstown became connected to the national economy.",
-      ],
-      highlights: [
-        "Coal",
-        "Pennsylvania & Ohio Canal",
-        "1830s–1840s",
-        "Railroads in the 1850s",
-        "Movement of Goods & People",
-      ],
-      reflection: [
-        "How can a transportation system change the future of a place?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Coal canal and railroad history of Youngstown",
-    },
-    {
-      key: "youngstown-steel",
-      eyebrow: "Discover Youngstown • Steel City",
-      title: "Iron and steel reshaped the city and the nation.",
-      paragraphs: [
-        "Coal, transportation, labor, investment, and growing markets helped iron and steel production expand across the Mahoning Valley.",
-        "Companies such as Republic Iron and Steel and many related mills, suppliers, rail operations, and manufacturers created jobs and drew thousands of families to the region.",
-        "Steel built prosperity and identity, but it also brought difficult working conditions, pollution, labor conflict, and dependence on one major industry. Mill closings later forced the city to confront economic loss and reinvention.",
-      ],
-      highlights: [
-        "Iron & Steel",
-        "Republic Iron and Steel",
-        "Industrial Labor",
-        "Neighborhood Growth",
-        "Industrial Decline & Reinvention",
-      ],
-      reflection: [
-        "What can Youngstown learn from both the success and the decline of steel?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youngstown iron and steel industry history",
-    },
-    {
-      key: "youngstown-cultures",
-      eyebrow: "Discover Youngstown • A City of Many Cultures",
-      title: "People from many places built Youngstown together.",
-      paragraphs: [
-        "Industrial growth attracted Welsh, German, Irish, Italian, Greek, Eastern European, Lebanese, Syrian, and other immigrant communities.",
-        "African American families also came through migration, seeking work, safety, education, homeownership, and opportunity while confronting discrimination and unequal access.",
-        "Churches, clubs, businesses, music, food traditions, mutual-aid networks, and neighborhoods helped people preserve identity while building a shared city.",
-      ],
-      highlights: [
-        "Immigration",
-        "African American Migration",
-        "Neighborhoods",
-        "Faith & Cultural Institutions",
-        "Food, Music & Family Traditions",
-      ],
-      reflection: [
-        "Which cultural traditions help a community remain strong across generations?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youngstown neighborhoods and cultural communities",
-    },
-    {
-      key: "youngstown-nature",
-      eyebrow: "Discover Youngstown • Parks, Forests & Wildlife",
-      title: "Youngstown is more than its industrial skyline.",
-      paragraphs: [
-        "The Mahoning River, neighborhood woods, city parks, creeks, vacant land, farms, and wildlife habitats continue to shape daily life.",
-        "Forests absorb water, cool neighborhoods, shelter wildlife, and hold evidence of environmental change. Parks and green spaces give residents places to learn, gather, move, and recover.",
-        "Bronson Family Farm connects this larger landscape to soil, pollinators, amphibians, butterflies, bees, food production, aviation, and responsible land stewardship.",
-      ],
-      highlights: [
-        "Mahoning River",
-        "City Parks",
-        "Neighborhood Woods",
-        "Creeks & Wet Areas",
-        "Pollinators & Wildlife",
-      ],
-      reflection: [
-        "What natural place in Youngstown should future generations be able to experience?",
-      ],
-      image: IMG.forest,
-      imageAlt: "Youngstown parks forests waterways and wildlife",
-    },
-    {
-      key: "youngstown-builders",
-      eyebrow: "Discover Youngstown • Builders & Innovators",
-      title: "GOOD SEED COMES FROM YOUNGSTOWN.",
-      subtitle: "Greatness Grows Here.",
-      paragraphs: [
-        "Youngstown has produced and shaped artists, athletes, educators, journalists, scientists, entrepreneurs, civic leaders, and community builders whose work traveled far beyond the Mahoning Valley.",
-        "Visitors are never expected to recognize a name. Each profile first explains who the person is or was, the work they became known for, their connection to Youngstown, and why their contribution matters.",
-        "The collection includes people such as the Warner brothers, who helped build a worldwide film company; actor Ed O'Neill; boxing champions Ray Mancini and Kelly Pavlik; educator and coach Jim Tressel; Civil Rights journalist Simeon Booker; opera artists Lawrence Brownlee and Dr. François S. Clemmons; astronomy observer Thomas Bopp; and many others.",
-        "The purpose is not celebrity. It is to show young people and visitors that achievement can begin in Youngstown through curiosity, discipline, learning, service, creativity, courage, and perseverance.",
-      ],
-      highlights: [
-        "Who were they?",
-        "What did they do?",
-        "How are they connected to Youngstown?",
-        "Why should we know them?",
-        "What can we learn from their journey?",
-      ],
-      reflection: [
-        "Which person's story makes you curious to learn more, and why?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youngstown builders innovators artists athletes and leaders",
-    },
-    {
-      key: "youngstown-agriculture",
-      eyebrow: "Discover Youngstown • Agriculture & Food",
-      title: "Food history is also labor, land, business, and family history.",
-      paragraphs: [
-        "Before heavy industry dominated the region, farms, gardens, orchards, mills, markets, and household food production were essential to local life.",
-        "Immigrant and migrant families carried seeds, recipes, growing knowledge, preservation skills, and food businesses into Youngstown neighborhoods.",
-        "Today, urban agriculture and regional farms can support fresh food access, youth employment, entrepreneurship, environmental repair, tourism, and a stronger local economy.",
-      ],
-      highlights: [
-        "Farms & Gardens",
-        "Markets",
-        "Family Food Traditions",
-        "Preservation",
-        "Urban Agriculture",
-        "Food Entrepreneurship",
-      ],
-      reflection: [
-        "What food, recipe, seed, or growing practice carries history in your family or community?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youngstown agriculture gardens food traditions and markets",
-    },
-    {
-      key: "youngstown-opportunity-today",
-      eyebrow: "Discover Youngstown • Opportunity Today",
-      title: "The next economy can grow from many kinds of work.",
-      paragraphs: [
-        "Youngstown's future is not limited to one industry. Education, skilled trades, agriculture, aviation, technology, healthcare, manufacturing, arts, tourism, entrepreneurship, and public service all create pathways.",
-        "History shows that transportation, natural resources, institutions, labor, and human talent can transform a region. Today the challenge is to connect those strengths to new opportunities without repeating past harms.",
-        "A farm task, forest discovery, design problem, community project, or documented skill can become the beginning of a career direction.",
-      ],
-      highlights: [
-        "Education",
-        "Skilled Trades",
-        "Agriculture",
-        "Aviation",
-        "Technology",
-        "Healthcare",
-        "Entrepreneurship & Tourism",
-      ],
-      reflection: [
-        "Which opportunity today connects to something you have already done or learned?",
-      ],
-      image: IMG.grow,
-      imageAlt: "Youngstown education careers entrepreneurship and opportunity",
-    },
-    {
-      key: "youngstown-your-story",
-      eyebrow: "Discover Youngstown • Your Story",
-      title: "History continues through the people living it now.",
-      paragraphs: [
-        "A city's history is never finished. New photographs, oral histories, family records, discoveries, businesses, public spaces, and acts of service become part of the record.",
-        "Young people are not outside Youngstown history. Their work, questions, skills, and ideas can help explain what the city is becoming.",
-        "Your story can connect where you came from, what you are learning, what you are building, and what you want future residents to inherit.",
-      ],
-      highlights: [
-        "Family History",
-        "Neighborhood Memory",
-        "Cultivator Work",
-        "Community Contribution",
-        "Future Youngstown",
-      ],
-      reflection: ["What part of your Youngstown story should be remembered?"],
-      image: IMG.forest,
-      imageAlt: "Youngstown youth families and future community stories",
-    },
-    {
-      key: "involved",
-      eyebrow: "Get Involved",
-      title: "Help the work continue.",
-      paragraphs: [
-        "Visitors, families, volunteers, educators, growers, researchers, businesses, and community partners can support Bronson Family Farm in practical ways.",
-        "Support may include volunteering, mentoring, sharing expertise, providing materials, sponsoring youth experiences, purchasing through the marketplace, or helping build farm infrastructure.",
-        "Every contribution should connect to a real need, a real project, and a clear community benefit.",
-      ],
-      highlights: [
-        "Volunteer",
-        "Mentor",
-        "Partner",
-        "Provide materials",
-        "Support youth experiences",
-        "Shop the marketplace",
-      ],
-      image: IMG.forest,
-      imageAlt: "Community members supporting Bronson Family Farm",
-    },
-    {
-      key: "final",
-      eyebrow: "Bronson Family Farm",
-      title: "Come see what is growing here.",
-      subtitle:
-        "The farm, the youth, the discoveries, and the work tell the story.",
-      paragraphs: [
-        "Bronson Family Farm is being built through agriculture, stewardship, learning, service, and community participation.",
-        "Explore the farm. Meet the Cultivators. Follow current projects. Discover Youngstown. Support the marketplace. Become part of the work.",
-      ],
-      highlights: ["Visit", "Learn", "Partner", "Support", "Marketplace"],
-      image: IMG.forest,
-      imageAlt: "Bronson Family Farm landscape and community",
+      image: IMG.interview,
+      imageAlt: "Approved media interview image from Bronson Family Farm",
     },
   ];
 
@@ -13928,9 +13651,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     try {
       const requestedKey = window.sessionStorage.getItem("bff_guest_start_key");
       window.sessionStorage.removeItem("bff_guest_start_key");
-      const requestedIndex = pages.findIndex(
-        (item) => item.key === requestedKey,
-      );
+      const requestedIndex = pages.findIndex((item) => item.key === requestedKey);
       return requestedIndex >= 0 ? requestedIndex : 0;
     } catch {
       return 0;
@@ -13942,192 +13663,43 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
 
   const moveTo = (nextIndex: number) => {
     setPageIndex(Math.max(0, Math.min(pages.length - 1, nextIndex)));
-    window.setTimeout(
-      () =>
-        document
-          .getElementById("guest-journey-top")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      30,
-    );
+    window.setTimeout(() => document.getElementById("guest-journey-top")?.scrollIntoView({ behavior: "smooth", block: "start" }), 30);
   };
 
   return (
-    <div
-      id="guest-journey-top"
-      className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24"
-    >
+    <div id="guest-journey-top" className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24">
       <Card>
-        <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
-          {page.eyebrow}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="text-sm font-black uppercase tracking-[0.22em] text-emerald-100/80">{page.eyebrow}</div>
+          <div className="rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-xs font-black uppercase tracking-[0.15em] text-amber-100">Public • Read Only</div>
         </div>
-        {page.openingQuote && (
-          <div className="mt-5 rounded-[1.35rem] border border-emerald-200/30 bg-emerald-300/12 p-6 text-3xl font-black leading-tight text-emerald-50 md:text-5xl">
-            {page.openingQuote}
-          </div>
-        )}
-        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">
-          {page.title}
-        </h1>
-        {page.subtitle && (
-          <p className="mt-3 text-3xl font-black text-emerald-200 md:text-4xl">
-            {page.subtitle}
-          </p>
-        )}
-
+        <h1 className="mt-2 text-5xl font-black leading-[1.02] md:text-7xl">{page.title}</h1>
+        {page.subtitle && <p className="mt-3 text-3xl font-black text-emerald-200 md:text-4xl">{page.subtitle}</p>}
         <div className="mt-3 grid gap-1.5">
-          {page.paragraphs.map((paragraph) => (
-            <p
-              key={paragraph}
-              className="max-w-none text-lg font-semibold leading-7 text-white/88 md:text-xl md:leading-8"
-            >
-              {paragraph}
-            </p>
-          ))}
+          {page.paragraphs.map((paragraph) => <p key={paragraph} className="max-w-none text-lg font-semibold leading-7 text-white/88 md:text-xl md:leading-8">{paragraph}</p>)}
         </div>
+        {page.highlights && <ul className="mt-4 grid gap-1.5 sm:grid-cols-2">{page.highlights.map((item) => <li key={item} className="flex items-start gap-2 text-lg font-black leading-6 text-white"><span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-200"/><span>{item}</span></li>)}</ul>}
 
-        {page.highlights && (
-          <div className="mt-4">
-            <ul className="grid gap-1.5 sm:grid-cols-2">
-              {page.highlights.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2 text-lg font-black leading-6 text-white"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-200"
-                  />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-white/15 pt-5">
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => moveTo(0)} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 font-black hover:bg-white/20">Visitor Home</button>
+            <button type="button" onClick={() => setScreen("portal")} className="rounded-full border border-white/15 bg-black/35 px-4 py-2 font-black hover:bg-white/10">Exit Visitor Access</button>
           </div>
-        )}
-
-        {page.reflection && (
-          <div className="mt-8 border-t border-white/15 pt-6">
-            <div className="text-sm font-black uppercase tracking-[0.2em] text-amber-100">
-              Reflection
-            </div>
-            <div className="mt-3 grid gap-2">
-              {page.reflection.map((item) => (
-                <p
-                  key={item}
-                  className="text-lg font-black leading-8 text-white md:text-xl"
-                >
-                  {item}
-                </p>
-              ))}
-            </div>
+          <div className="flex gap-2">
+            {!isFirst && <button type="button" onClick={() => moveTo(pageIndex - 1)} className="rounded-full border border-white/15 bg-white/10 px-5 py-2 font-black hover:bg-white/20">← Back</button>}
+            {!isFinal ? <button type="button" onClick={() => moveTo(pageIndex + 1)} className="rounded-full bg-emerald-300 px-5 py-2 font-black text-black hover:bg-emerald-200">{isFirst ? "Begin Media Tour →" : "Next →"}</button> : <button type="button" onClick={() => setScreen("partner")} className="rounded-full bg-emerald-300 px-5 py-2 font-black text-black hover:bg-emerald-200">Contact the Farm →</button>}
           </div>
-        )}
-
-        {!isFinal && (
-          <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
-            {!isFirst ? (
-              <button
-                type="button"
-                onClick={() => moveTo(pageIndex - 1)}
-                className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20"
-              >
-                ← Previous
-              </button>
-            ) : (
-              <span />
-            )}
-            <button
-              type="button"
-              onClick={() => moveTo(pageIndex + 1)}
-              className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black hover:bg-emerald-200"
-            >
-              {isFirst ? "Begin the Farm Story →" : "Next →"}
-            </button>
-          </div>
-        )}
-
-        {isFinal && (
-          <div className="mt-7">
-            <div className="text-xs font-black uppercase tracking-[0.28em] text-emerald-100/75">
-              Choose Your Next Step
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setScreen("events")}
-                className="rounded-[1.35rem] bg-emerald-300 p-5 text-left text-black hover:bg-emerald-200"
-              >
-                <span className="block text-xl font-black">Visit</span>
-                <span className="mt-2 block text-sm font-bold leading-6 text-black/70">
-                  Experience the farm, forest, flowers, food, and community
-                  firsthand.
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setScreen("partner")}
-                className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"
-              >
-                <span className="block text-xl font-black">Partner</span>
-                <span className="mt-2 block text-sm font-bold leading-6 text-white/70">
-                  Help grow opportunities through collaboration and shared
-                  vision.
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setScreen("support")}
-                className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"
-              >
-                <span className="block text-xl font-black">Support</span>
-                <span className="mt-2 block text-sm font-bold leading-6 text-white/70">
-                  Invest in stewardship, education, workforce development, and
-                  community impact.
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setScreen("partner")}
-                className="rounded-[1.35rem] border border-white/15 bg-white/10 p-5 text-left hover:bg-white/20"
-              >
-                <span className="block text-xl font-black">Contact</span>
-                <span className="mt-2 block text-sm font-bold leading-6 text-white/70">
-                  Start a conversation and learn more about the journey.
-                </span>
-              </button>
-            </div>
-            <div className="mt-5 flex flex-wrap justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => moveTo(pageIndex - 1)}
-                className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black hover:bg-white/20"
-              >
-                ← Get Involved
-              </button>
-              <button
-                type="button"
-                onClick={() => setScreen("portal")}
-                className="rounded-full border border-white/15 bg-black/35 px-6 py-3 font-black hover:bg-white/10"
-              >
-                Return Home
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
+        <div className="mt-4 text-sm font-bold text-white/55">{pageIndex + 1} of {pages.length} • Visitor navigation: Youngstown Story → Industry → Aviation → Greatness → Farm → Cultivators → Living Story → Media Center</div>
       </Card>
 
       <Card className="h-full overflow-hidden p-0">
         <div className="relative h-full min-h-[480px] lg:min-h-full">
-          <img
-            src={page.image}
-            alt={page.imageAlt}
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(e) => (e.currentTarget.src = IMG.backup)}
-          />
+          <img src={page.image} alt={page.imageAlt} className="absolute inset-0 h-full w-full object-cover" onError={(e) => (e.currentTarget.src = IMG.backup)} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
           <div className="relative z-10 flex h-full min-h-[480px] flex-col justify-end p-7 lg:min-h-full">
-            <h2 className="max-w-md text-3xl font-black leading-tight text-white drop-shadow-lg">
-              {page.eyebrow}
-            </h2>
+            <div className="mb-auto rounded-full border border-white/20 bg-black/45 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-white backdrop-blur">Visitor Only • Media Access</div>
+            <h2 className="max-w-md text-3xl font-black leading-tight text-white drop-shadow-lg">{page.eyebrow}</h2>
           </div>
         </div>
       </Card>
