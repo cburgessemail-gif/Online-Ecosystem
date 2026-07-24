@@ -22,6 +22,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
  * - Ecosystem 27.8 FINAL: Enforces the compact spacing standard in the rendered interface. Related banners, cards, headings, paragraphs, bullets, controls, images, and action areas now remain visually connected with substantially less empty vertical space and less scrolling throughout every pathway.
  * - Ecosystem 27.9 FINAL: Fixes the live 2:00 PM America/New_York operational-day rollover. The entire ecosystem now re-evaluates time every 30 seconds and whenever the browser regains focus or visibility, so Wednesday automatically becomes Thursday after 2:00 PM without requiring refresh or sign-in.
+ * - Ecosystem 36.1 FINAL: Repairs translation across operational, Media, and Visitor pages; restores original English when selected; adds always-visible public language controls; and expands the Media Center to a full-width readable layout.
  * - Ecosystem 36.0 FINAL: Adds truly separate public /media and /visit application entry points. /media renders only an approved, read-only press room with immediate farm, Youngstown VIP, Lansdowne Airport, youth workforce, partner, WRTA, and prior news coverage information. It never renders the Forest Gate, operational Shell, role buttons, visitor route, uploads, private records, or cross-navigation. Search appears only after the core information.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
@@ -10453,7 +10454,56 @@ const YOUNGSTOWN_VIPS = [
   ["The Packard Brothers", "Innovation & Industry", "Industrial innovators whose work helped establish Packard Electric and Youngstown's manufacturing legacy."],
 ] as const;
 
+
+function usePublicLanguage() {
+  const [language, setLanguage] = useState<LanguageCode>(() =>
+    safeRead<LanguageCode>(LANGUAGE_KEY, "en"),
+  );
+
+  const changeLanguage = (next: LanguageCode) => {
+    setLanguage(next);
+    safeWrite(LANGUAGE_KEY, next);
+    document.documentElement.lang = next;
+    document.documentElement.dir = languageDir(next);
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = languageDir(language);
+    return startTranslationObserver(language);
+  }, [language]);
+
+  return { language, changeLanguage };
+}
+
+function PublicLanguageSelector({
+  language,
+  changeLanguage,
+}: {
+  language: LanguageCode;
+  changeLanguage: (language: LanguageCode) => void;
+}) {
+  return (
+    <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-black/45 px-3 py-2 text-sm font-black text-white shadow-lg">
+      <span>{t(language, "language")}</span>
+      <select
+        aria-label={t(language, "language")}
+        value={language}
+        onChange={(event) => changeLanguage(event.target.value as LanguageCode)}
+        className="rounded-lg border border-white/20 bg-slate-950 px-3 py-2 text-base font-black text-white"
+      >
+        {languageOptions.map((option) => (
+          <option key={option.code} value={option.code}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function PublicMediaPortal() {
+  const { language, changeLanguage } = usePublicLanguage();
   const [query, setQuery] = useState("");
   const normalized = query.trim().toLowerCase();
   const searchable = [
@@ -10479,13 +10529,23 @@ function PublicMediaPortal() {
     : [];
 
   const sectionClass =
-    "rounded-[1.75rem] border border-white/10 bg-white/[0.07] p-5 shadow-2xl backdrop-blur-xl md:p-7";
+    "rounded-[1.75rem] border border-white/10 bg-white/[0.07] p-6 text-lg shadow-2xl backdrop-blur-xl md:p-9";
 
   return (
-    <main className="min-h-screen bg-black px-4 py-5 text-white md:px-8 md:py-8">
-      <div className="mx-auto grid max-w-6xl gap-4">
-        <header className="rounded-[2rem] border border-emerald-200/20 bg-gradient-to-br from-emerald-950 via-black to-slate-950 p-6 shadow-2xl md:p-10">
-          <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-200">
+    <main
+      data-bff-app-root
+      data-current-language={language}
+      key={`media-${language}`}
+      lang={language}
+      dir={languageDir(language)}
+      className="min-h-screen bg-black px-4 py-5 text-white md:px-8 md:py-8"
+    >
+      <div className="mx-auto grid w-full max-w-[1600px] gap-5">
+        <header className="relative rounded-[2rem] border border-emerald-200/20 bg-gradient-to-br from-emerald-950 via-black to-slate-950 p-6 shadow-2xl md:p-10">
+          <div className="mb-5 flex justify-end">
+            <PublicLanguageSelector language={language} changeLanguage={changeLanguage} />
+          </div>
+          <div className="text-sm font-black uppercase tracking-[0.25em] text-emerald-200">
             Official Media Center
           </div>
           <h1 className="mt-3 text-4xl font-black leading-none md:text-7xl">
@@ -10644,10 +10704,21 @@ function PublicMediaPortal() {
 }
 
 function PublicVisitorPortal() {
+  const { language, changeLanguage } = usePublicLanguage();
   return (
-    <main className="min-h-screen bg-black px-4 py-8 text-white">
-      <div className="mx-auto max-w-5xl rounded-[2rem] border border-emerald-200/20 bg-gradient-to-br from-emerald-950 via-black to-slate-950 p-7 shadow-2xl md:p-12">
-        <div className="text-xs font-black uppercase tracking-[0.3em] text-emerald-200">Visitor Experience</div>
+    <main
+      data-bff-app-root
+      data-current-language={language}
+      key={`visit-${language}`}
+      lang={language}
+      dir={languageDir(language)}
+      className="min-h-screen bg-black px-4 py-8 text-white"
+    >
+      <div className="mx-auto max-w-6xl rounded-[2rem] border border-emerald-200/20 bg-gradient-to-br from-emerald-950 via-black to-slate-950 p-7 shadow-2xl md:p-12">
+        <div className="mb-5 flex justify-end">
+          <PublicLanguageSelector language={language} changeLanguage={changeLanguage} />
+        </div>
+        <div className="text-sm font-black uppercase tracking-[0.25em] text-emerald-200">Visitor Experience</div>
         <h1 className="mt-3 text-5xl font-black md:text-7xl">Welcome to Bronson Family Farm</h1>
         <p className="mt-3 text-2xl font-black text-emerald-200">We Grow Green to Harvest Dreams</p>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/80">Discover the farm, Youngstown's history and accomplished people, Lansdowne Airport, agriculture, wildlife, youth growth, community partnerships, events, and future plans.</p>
@@ -10717,10 +10788,6 @@ function App() {
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = languageDir(language);
-    if (language === "en") {
-      activeTranslationRun++;
-      return () => undefined;
-    }
     return startTranslationObserver(language);
   }, [language, screen, message, activeUser]);
 
