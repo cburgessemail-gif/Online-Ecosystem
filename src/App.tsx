@@ -23,6 +23,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.8 FINAL: Enforces the compact spacing standard in the rendered interface. Related banners, cards, headings, paragraphs, bullets, controls, images, and action areas now remain visually connected with substantially less empty vertical space and less scrolling throughout every pathway.
  * - Ecosystem 27.9 FINAL: Fixes the live 2:00 PM America/New_York operational-day rollover. The entire ecosystem now re-evaluates time every 30 seconds and whenever the browser regains focus or visibility, so Wednesday automatically becomes Thursday after 2:00 PM without requiring refresh or sign-in.
  * - Ecosystem 36.1 FINAL: Repairs translation across operational, Media, and Visitor pages; restores original English when selected; adds always-visible public language controls; and expands the Media Center to a full-width readable layout.
+ * - Ecosystem 36.2 FINAL: Replaces element-level translation memory with text-node-level source preservation, prevents repeated and mixed-language labels during live updates, restores every original phrase reliably, and expands complete-page phrase coverage for the launch, safety, weather, Visitor, and Media experiences.
  * - Ecosystem 36.0 FINAL: Adds truly separate public /media and /visit application entry points. /media renders only an approved, read-only press room with immediate farm, Youngstown VIP, Lansdowne Airport, youth workforce, partner, WRTA, and prior news coverage information. It never renders the Forest Gate, operational Shell, role buttons, visitor route, uploads, private records, or cross-navigation. Search appears only after the core information.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
@@ -6531,6 +6532,28 @@ const launch50TranslationSupplements: Partial<
     Supervisor: "Supervisor",
   },
   it: {
+    "NURSE LINE • VISIBLE AT ALL TIMES": "LINEA INFERMIERISTICA • SEMPRE VISIBILE",
+    "Health, heat, injury, medication, or urgent support: tell your supervisor/site lead immediately.": "Per problemi di salute, caldo, infortuni, farmaci o assistenza urgente, informa immediatamente il supervisore o il responsabile del sito.",
+    "Nurse Line": "Linea Infermieristica",
+    "Weather": "Meteo",
+    "Feels": "Percepiti",
+    "Rain": "Pioggia",
+    "Wind": "Vento",
+    "Full Day": "Giornata Intera",
+    "Good for outdoor work. Keep water visible.": "Condizioni adatte al lavoro all'aperto. Tieni l'acqua bene in vista.",
+    "Use supervisor observation until live weather returns.": "Usa l'osservazione del supervisore finché non tornano disponibili i dati meteo in tempo reale.",
+    "WEATHER ALERT CHECKING": "CONTROLLO AVVISO METEO",
+    "DETAILS": "DETTAGLI",
+    "BRONSON FAMILY FARM": "BRONSON FAMILY FARM",
+    "Forest Gate Portal": "Portale d'Ingresso della Foresta",
+    "BRONSON FAMILY FARM • LANSDOWNE AIRPORT • YOUNGSTOWN, OHIO": "BRONSON FAMILY FARM • AEROPORTO LANSDOWNE • YOUNGSTOWN, OHIO",
+    "Welcome to Bronson Family Farm": "Benvenuti a Bronson Family Farm",
+    "We Grow Green to Harvest Dreams": "Coltiviamo Verde per Raccogliere Sogni",
+    "Bronson Family Farm is a youth workforce, education, and environmental stewardship program located at Lansdowne Airport in Youngstown. Young people learn through real work, real discovery, and real responsibility.": "Bronson Family Farm è un programma di formazione lavorativa giovanile, istruzione e tutela ambientale situato presso l'Aeroporto Lansdowne di Youngstown. I giovani imparano attraverso lavoro reale, scoperte reali e responsabilità reali.",
+    "Explore the Farm": "Esplora la Fattoria",
+    "Enter My Workspace": "Entra nel Mio Spazio di Lavoro",
+    "Discover Youngstown": "Scopri Youngstown",
+    "Marketplace": "Mercato",
     Calendar: "Calendario",
     Media: "Media",
     "Share My Learning": "Info da condividere",
@@ -6633,6 +6656,8 @@ function translatePhrase(language: LanguageCode, raw: string) {
   return applyCommonTranslations(language, key);
 }
 
+const originalTextByNode = new WeakMap<Text, string>();
+
 function applyScreenTranslations(language: LanguageCode) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
@@ -6652,10 +6677,7 @@ function applyScreenTranslations(language: LanguageCode) {
       const text = node.textContent || "";
       if (!parent || skip.has(parent.tagName) || !text.trim())
         return NodeFilter.FILTER_REJECT;
-      if (
-        !/[A-Za-z]/.test(text) &&
-        !parent.getAttribute("data-bff-original-text")
-      )
+      if (!/[A-Za-z]/.test(text) && !originalTextByNode.has(node as Text))
         return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
@@ -6665,20 +6687,22 @@ function applyScreenTranslations(language: LanguageCode) {
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
 
   nodes.forEach((node) => {
-    const el = node.parentElement;
-    if (!el) return;
     const current = node.textContent || "";
     const trimmed = current.trim();
     if (!trimmed) return;
-    const original = el.getAttribute("data-bff-original-text") || trimmed;
-    if (
-      !el.getAttribute("data-bff-original-text") &&
-      /[A-Za-z]/.test(trimmed)
-    ) {
-      el.setAttribute("data-bff-original-text", original);
+
+    // Preserve the source on the individual text node. Several labels often
+    // share one parent element, so element-level storage causes phrases to be
+    // copied into neighboring labels during live weather and page updates.
+    if (!originalTextByNode.has(node)) {
+      originalTextByNode.set(node, trimmed);
     }
+    const original = originalTextByNode.get(node) || trimmed;
     const translated = translatePhrase(language, original);
-    node.textContent = current.replace(trimmed, translated);
+    const leading = current.slice(0, current.indexOf(trimmed));
+    const trailing = current.slice(current.indexOf(trimmed) + trimmed.length);
+    const next = `${leading}${translated}${trailing}`;
+    if (node.textContent !== next) node.textContent = next;
   });
 
   root
@@ -6691,7 +6715,9 @@ function applyScreenTranslations(language: LanguageCode) {
         "";
       if (!el.getAttribute("data-bff-original-placeholder"))
         el.setAttribute("data-bff-original-placeholder", original);
-      el.setAttribute("placeholder", translatePhrase(language, original));
+      const next = translatePhrase(language, original);
+      if (el.getAttribute("placeholder") !== next)
+        el.setAttribute("placeholder", next);
     });
 
   root.querySelectorAll("[title]").forEach((node) => {
@@ -6702,7 +6728,21 @@ function applyScreenTranslations(language: LanguageCode) {
       "";
     if (!el.getAttribute("data-bff-original-title"))
       el.setAttribute("data-bff-original-title", original);
-    el.setAttribute("title", translatePhrase(language, original));
+    const next = translatePhrase(language, original);
+    if (el.getAttribute("title") !== next) el.setAttribute("title", next);
+  });
+
+  root.querySelectorAll("[aria-label]").forEach((node) => {
+    const el = node as HTMLElement;
+    const original =
+      el.getAttribute("data-bff-original-aria-label") ||
+      el.getAttribute("aria-label") ||
+      "";
+    if (!el.getAttribute("data-bff-original-aria-label"))
+      el.setAttribute("data-bff-original-aria-label", original);
+    const next = translatePhrase(language, original);
+    if (el.getAttribute("aria-label") !== next)
+      el.setAttribute("aria-label", next);
   });
 }
 
