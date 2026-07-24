@@ -25,6 +25,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 36.1 FINAL: Repairs translation across operational, Media, and Visitor pages; restores original English when selected; adds always-visible public language controls; and expands the Media Center to a full-width readable layout.
  * - Ecosystem 36.2 FINAL: Replaces element-level translation memory with text-node-level source preservation, prevents repeated and mixed-language labels during live updates, restores every original phrase reliably, and expands complete-page phrase coverage for the launch, safety, weather, Visitor, and Media experiences.
  * - Ecosystem 36.3 FINAL: Replaces limited dictionary-only page translation with complete asynchronous phrase translation for every visible text node and translatable field, caches completed translations, protects proper names, restores exact English, and keeps translation active across live updates and route changes.
+ * - Ecosystem 36.4 FINAL: Protects every language picker from translation, removes ambiguous and duplicated language codes, and displays stable native-language names with flags across Operational, Visitor, and Media experiences.
  * - Ecosystem 36.0 FINAL: Adds truly separate public /media and /visit application entry points. /media renders only an approved, read-only press room with immediate farm, Youngstown VIP, Lansdowne Airport, youth workforce, partner, WRTA, and prior news coverage information. It never renders the Forest Gate, operational Shell, role buttons, visitor route, uploads, private records, or cross-navigation. Search appears only after the core information.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
@@ -5288,12 +5289,12 @@ const launchVideos: LaunchVideo[] = [
 ];
 
 const languageOptions: LanguageOption[] = [
-  { code: "en", label: "English", shortLabel: "EN" },
-  { code: "es", label: "Español", shortLabel: "ES" },
-  { code: "tl", label: "Tagalog", shortLabel: "TL" },
-  { code: "it", label: "Italiano", shortLabel: "IT" },
-  { code: "he", label: "עברית", shortLabel: "HE", dir: "rtl" },
-  { code: "fr", label: "Français", shortLabel: "FR" },
+  { code: "en", label: "🇺🇸 English", shortLabel: "English" },
+  { code: "es", label: "🇪🇸 Español", shortLabel: "Español" },
+  { code: "fr", label: "🇫🇷 Français", shortLabel: "Français" },
+  { code: "it", label: "🇮🇹 Italiano", shortLabel: "Italiano" },
+  { code: "tl", label: "🇵🇭 Tagalog", shortLabel: "Tagalog" },
+  { code: "he", label: "🇮🇱 עברית", shortLabel: "עברית", dir: "rtl" },
 ];
 
 const languageText: Record<LanguageCode, Record<string, string>> = {
@@ -6812,7 +6813,11 @@ async function applyScreenTranslations(language: LanguageCode, runId?: number) {
       const text = node.textContent || "";
       if (!parent || skip.has(parent.tagName) || !text.trim())
         return NodeFilter.FILTER_REJECT;
-      if (parent.closest("[data-no-translate='true']"))
+      if (
+        parent.closest("[data-no-translate='true']") ||
+        parent.closest("[translate='no']") ||
+        parent.closest("[data-preserve='true']")
+      )
         return NodeFilter.FILTER_REJECT;
       if (!/[A-Za-z]/.test(text) && !originalTextByNode.has(node as Text))
         return NodeFilter.FILTER_REJECT;
@@ -10676,10 +10681,19 @@ function PublicLanguageSelector({
   changeLanguage: (language: LanguageCode) => void;
 }) {
   return (
-    <label className="flex items-center gap-2 rounded-xl border border-white/20 bg-black/45 px-3 py-2 text-sm font-black text-white shadow-lg">
-      <span>{t(language, "language")}</span>
+    <label
+      className="flex items-center gap-2 rounded-xl border border-white/20 bg-black/45 px-3 py-2 text-sm font-black text-white shadow-lg"
+      data-no-translate="true"
+      data-preserve="true"
+      translate="no"
+    >
+      <span aria-hidden="true">🌐</span>
+      <span>Language</span>
       <select
-        aria-label={t(language, "language")}
+        data-no-translate="true"
+        data-preserve="true"
+        translate="no"
+        aria-label="Language selector"
         value={language}
         onChange={(event) => changeLanguage(event.target.value as LanguageCode)}
         className="rounded-lg border border-white/20 bg-slate-950 px-3 py-2 text-base font-black text-white"
@@ -11571,9 +11585,17 @@ function Shell({
               </div>
             )}
 
-            <label className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2 py-1 text-[11px] font-black text-emerald-50">
-              <span className="hidden sm:inline">🌎</span>
+            <label
+              className="flex shrink-0 items-center gap-2 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-3 py-1 text-[11px] font-black text-emerald-50"
+              data-no-translate="true"
+              data-preserve="true"
+              translate="no"
+            >
+              <span aria-hidden="true">🌐</span>
               <select
+                data-no-translate="true"
+                data-preserve="true"
+                translate="no"
                 value={language}
                 onChange={(event) =>
                   changeLanguage(event.target.value as LanguageCode)
@@ -11587,7 +11609,7 @@ function Shell({
                     value={option.code}
                     className="bg-black text-white"
                   >
-                    {option.shortLabel}
+                    {option.label}
                   </option>
                 ))}
               </select>
