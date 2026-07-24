@@ -24,6 +24,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.9 FINAL: Fixes the live 2:00 PM America/New_York operational-day rollover. The entire ecosystem now re-evaluates time every 30 seconds and whenever the browser regains focus or visibility, so Wednesday automatically becomes Thursday after 2:00 PM without requiring refresh or sign-in.
  * - Ecosystem 36.1 FINAL: Repairs translation across operational, Media, and Visitor pages; restores original English when selected; adds always-visible public language controls; and expands the Media Center to a full-width readable layout.
  * - Ecosystem 36.2 FINAL: Replaces element-level translation memory with text-node-level source preservation, prevents repeated and mixed-language labels during live updates, restores every original phrase reliably, and expands complete-page phrase coverage for the launch, safety, weather, Visitor, and Media experiences.
+ * - Ecosystem 36.3 FINAL: Replaces limited dictionary-only page translation with complete asynchronous phrase translation for every visible text node and translatable field, caches completed translations, protects proper names, restores exact English, and keeps translation active across live updates and route changes.
  * - Ecosystem 36.0 FINAL: Adds truly separate public /media and /visit application entry points. /media renders only an approved, read-only press room with immediate farm, Youngstown VIP, Lansdowne Airport, youth workforce, partner, WRTA, and prior news coverage information. It never renders the Forest Gate, operational Shell, role buttons, visitor route, uploads, private records, or cross-navigation. Search appears only after the core information.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
@@ -6657,25 +6658,161 @@ function translatePhrase(language: LanguageCode, raw: string) {
 }
 
 const originalTextByNode = new WeakMap<Text, string>();
+const translatedTextByNode = new WeakMap<Text, string>();
+const dynamicTranslationMemory = new Map<string, string>();
+const dynamicTranslationRequests = new Map<string, Promise<string>>();
 
-function applyScreenTranslations(language: LanguageCode) {
+const protectedTranslationTerms = [
+  "Bronson Family Farm",
+  "Farm & Family Alliance",
+  "Lansdowne Airport",
+  "Youngstown",
+  "Mahoning Valley",
+  "WRTA",
+  "GrownBy",
+  "Central State University",
+  "Jubilee Gardens",
+  "Nesco",
+];
+
+function exactTranslation(language: LanguageCode, raw: string) {
+  const key = raw.trim();
+  return (
+    launch50TranslationSupplements[language]?.[key] ||
+    launchIntegrationTranslations[language]?.[key] ||
+    launchCriticalTranslations[language]?.[key] ||
+    launchPhraseTranslations[language]?.[key] ||
+    screenTranslations[language]?.[key] ||
+    languageText[language]?.[key]
+  );
+}
+
+function protectTranslationTerms(source: string) {
+  const values: string[] = [];
+  let protectedSource = source;
+  protectedTranslationTerms.forEach((term) => {
+    const pattern = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    protectedSource = protectedSource.replace(pattern, (match) => {
+      const token = `__BFFPROPER${values.length}__`;
+      values.push(match);
+      return token;
+    });
+  });
+  return { protectedSource, values };
+}
+
+function restoreTranslationTerms(translated: string, values: string[]) {
+  return values.reduce(
+    (output, value, index) =>
+      output.replace(new RegExp(`__BFFPROPER${index}__`, "gi"), value),
+    translated,
+  );
+}
+
+function translationCacheKey(language: LanguageCode, source: string) {
+  return `${language}::${source}`;
+}
+
+function readDynamicTranslation(language: LanguageCode, source: string) {
+  const key = translationCacheKey(language, source);
+  const memory = dynamicTranslationMemory.get(key);
+  if (memory) return memory;
+  try {
+    const stored = localStorage.getItem(`bff.translation.${key}`);
+    if (stored) {
+      dynamicTranslationMemory.set(key, stored);
+      return stored;
+    }
+  } catch {
+    // Translation still works when browser storage is unavailable.
+  }
+  return "";
+}
+
+function saveDynamicTranslation(
+  language: LanguageCode,
+  source: string,
+  translated: string,
+) {
+  const key = translationCacheKey(language, source);
+  dynamicTranslationMemory.set(key, translated);
+  try {
+    localStorage.setItem(`bff.translation.${key}`, translated);
+  } catch {
+    // The in-memory cache remains available for this browser session.
+  }
+}
+
+async function requestCompleteTranslation(
+  language: LanguageCode,
+  source: string,
+): Promise<string> {
+  if (language === "en" || !source.trim()) return source;
+
+  const exact = exactTranslation(language, source);
+  if (exact) return exact;
+
+  const cached = readDynamicTranslation(language, source);
+  if (cached) return cached;
+
+  const requestKey = translationCacheKey(language, source);
+  const pending = dynamicTranslationRequests.get(requestKey);
+  if (pending) return pending;
+
+  const task = (async () => {
+    const { protectedSource, values } = protectTranslationTerms(source);
+    try {
+      const endpoint = new URL("https://translate.googleapis.com/translate_a/single");
+      endpoint.searchParams.set("client", "gtx");
+      endpoint.searchParams.set("sl", "en");
+      endpoint.searchParams.set("tl", language);
+      endpoint.searchParams.set("dt", "t");
+      endpoint.searchParams.set("q", protectedSource);
+
+      const response = await fetch(endpoint.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Translation request failed: ${response.status}`);
+      const payload = await response.json();
+      const combined = Array.isArray(payload?.[0])
+        ? payload[0]
+            .map((part: unknown) =>
+              Array.isArray(part) && typeof part[0] === "string" ? part[0] : "",
+            )
+            .join("")
+        : "";
+      const translated = restoreTranslationTerms(combined || source, values);
+      saveDynamicTranslation(language, source, translated);
+      return translated;
+    } catch {
+      // Never leave a page blank because a translation service is temporarily unavailable.
+      // Exact built-in translations remain available and the original English stays readable.
+      return source;
+    } finally {
+      dynamicTranslationRequests.delete(requestKey);
+    }
+  })();
+
+  dynamicTranslationRequests.set(requestKey, task);
+  return task;
+}
+
+async function applyScreenTranslations(language: LanguageCode, runId?: number) {
   if (typeof document === "undefined") return;
   const root = document.querySelector("[data-bff-app-root]") || document.body;
-  const skip = new Set([
-    "SCRIPT",
-    "STYLE",
-    "INPUT",
-    "TEXTAREA",
-    "SELECT",
-    "OPTION",
-  ]);
+  const skip = new Set(["SCRIPT", "STYLE", "INPUT", "TEXTAREA"]);
   root.setAttribute("data-bff-language", language);
+  document.documentElement.lang = language;
+  document.documentElement.dir = languageDir(language);
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
       const text = node.textContent || "";
       if (!parent || skip.has(parent.tagName) || !text.trim())
+        return NodeFilter.FILTER_REJECT;
+      if (parent.closest("[data-no-translate='true']"))
         return NodeFilter.FILTER_REJECT;
       if (!/[A-Za-z]/.test(text) && !originalTextByNode.has(node as Text))
         return NodeFilter.FILTER_REJECT;
@@ -6686,64 +6823,64 @@ function applyScreenTranslations(language: LanguageCode) {
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
 
-  nodes.forEach((node) => {
-    const current = node.textContent || "";
-    const trimmed = current.trim();
-    if (!trimmed) return;
+  await Promise.all(
+    nodes.map(async (node) => {
+      const current = node.textContent || "";
+      const trimmed = current.trim();
+      if (!trimmed) return;
 
-    // Preserve the source on the individual text node. Several labels often
-    // share one parent element, so element-level storage causes phrases to be
-    // copied into neighboring labels during live weather and page updates.
-    if (!originalTextByNode.has(node)) {
-      originalTextByNode.set(node, trimmed);
-    }
-    const original = originalTextByNode.get(node) || trimmed;
-    const translated = translatePhrase(language, original);
-    const leading = current.slice(0, current.indexOf(trimmed));
-    const trailing = current.slice(current.indexOf(trimmed) + trimmed.length);
-    const next = `${leading}${translated}${trailing}`;
-    if (node.textContent !== next) node.textContent = next;
-  });
+      if (!originalTextByNode.has(node)) originalTextByNode.set(node, trimmed);
+      const original = originalTextByNode.get(node) || trimmed;
+      const leading = current.slice(0, current.indexOf(trimmed));
+      const trailing = current.slice(current.indexOf(trimmed) + trimmed.length);
+      const translated =
+        language === "en"
+          ? original
+          : await requestCompleteTranslation(language, original);
 
-  root
-    .querySelectorAll("input[placeholder], textarea[placeholder]")
-    .forEach((node) => {
-      const el = node as HTMLInputElement | HTMLTextAreaElement;
-      const original =
-        el.getAttribute("data-bff-original-placeholder") ||
-        el.getAttribute("placeholder") ||
-        "";
-      if (!el.getAttribute("data-bff-original-placeholder"))
-        el.setAttribute("data-bff-original-placeholder", original);
-      const next = translatePhrase(language, original);
-      if (el.getAttribute("placeholder") !== next)
-        el.setAttribute("placeholder", next);
-    });
+      if (runId && runId !== activeTranslationRun) return;
+      const next = `${leading}${translated}${trailing}`;
+      translatedTextByNode.set(node, translated);
+      if (node.textContent !== next) node.textContent = next;
+    }),
+  );
 
-  root.querySelectorAll("[title]").forEach((node) => {
-    const el = node as HTMLElement;
-    const original =
-      el.getAttribute("data-bff-original-title") ||
-      el.getAttribute("title") ||
-      "";
-    if (!el.getAttribute("data-bff-original-title"))
-      el.setAttribute("data-bff-original-title", original);
-    const next = translatePhrase(language, original);
-    if (el.getAttribute("title") !== next) el.setAttribute("title", next);
-  });
+  const translateAttribute = async (
+    selector: string,
+    attribute: string,
+    originalAttribute: string,
+  ) => {
+    const elements = Array.from(root.querySelectorAll(selector)) as HTMLElement[];
+    await Promise.all(
+      elements.map(async (el) => {
+        const original =
+          el.getAttribute(originalAttribute) || el.getAttribute(attribute) || "";
+        if (!el.hasAttribute(originalAttribute))
+          el.setAttribute(originalAttribute, original);
+        const translated =
+          language === "en"
+            ? original
+            : await requestCompleteTranslation(language, original);
+        if (runId && runId !== activeTranslationRun) return;
+        if (el.getAttribute(attribute) !== translated)
+          el.setAttribute(attribute, translated);
+      }),
+    );
+  };
 
-  root.querySelectorAll("[aria-label]").forEach((node) => {
-    const el = node as HTMLElement;
-    const original =
-      el.getAttribute("data-bff-original-aria-label") ||
-      el.getAttribute("aria-label") ||
-      "";
-    if (!el.getAttribute("data-bff-original-aria-label"))
-      el.setAttribute("data-bff-original-aria-label", original);
-    const next = translatePhrase(language, original);
-    if (el.getAttribute("aria-label") !== next)
-      el.setAttribute("aria-label", next);
-  });
+  await Promise.all([
+    translateAttribute(
+      "input[placeholder], textarea[placeholder]",
+      "placeholder",
+      "data-bff-original-placeholder",
+    ),
+    translateAttribute("[title]", "title", "data-bff-original-title"),
+    translateAttribute(
+      "[aria-label]",
+      "aria-label",
+      "data-bff-original-aria-label",
+    ),
+  ]);
 }
 
 let activeTranslationRun = 0;
@@ -6754,31 +6891,46 @@ function startTranslationObserver(language: LanguageCode) {
   const root = document.querySelector("[data-bff-app-root]") || document.body;
   let scheduled = false;
   let scheduledTimer: number | undefined;
-  const run = () => {
+
+  const run = async () => {
     scheduled = false;
     if (runId !== activeTranslationRun) return;
     const currentLanguage = document
       .querySelector("[data-bff-app-root]")
       ?.getAttribute("data-current-language");
     if (currentLanguage && currentLanguage !== language) return;
-    applyScreenTranslations(language);
+    await applyScreenTranslations(language, runId);
   };
+
   const schedule = () => {
     if (scheduled || runId !== activeTranslationRun) return;
     scheduled = true;
-    scheduledTimer = window.setTimeout(run, 0);
+    scheduledTimer = window.setTimeout(() => void run(), 35);
   };
-  run();
-  const observer = new MutationObserver(schedule);
+
+  void run();
+  const observer = new MutationObserver((mutations) => {
+    const meaningfulChange = mutations.some((mutation) => {
+      if (mutation.type === "characterData") {
+        const node = mutation.target as Text;
+        const current = (node.textContent || "").trim();
+        const translated = translatedTextByNode.get(node);
+        return !translated || current !== translated;
+      }
+      return true;
+    });
+    if (meaningfulChange) schedule();
+  });
   observer.observe(root, {
     childList: true,
     subtree: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ["placeholder", "title"],
+    attributeFilter: ["placeholder", "title", "aria-label"],
   });
-  const retryTimers = [50, 150, 350, 750].map((ms) =>
-    window.setTimeout(run, ms),
+
+  const retryTimers = [100, 350, 900, 1800].map((ms) =>
+    window.setTimeout(() => void run(), ms),
   );
   return () => {
     activeTranslationRun++;
