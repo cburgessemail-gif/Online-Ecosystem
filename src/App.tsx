@@ -16,7 +16,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.1 FINAL: Adds Forest Cartography, Cartographer career exploration, Forest Cartographer I–III recognition, visitor trail mapping, creek crossings, bridge locations, educational stops, trail naming, wildlife registry, and automatic Journey skills without creating a new architecture.
  * - Ecosystem 27.2 FINAL: Friday, July 17, 2026 is an administrative closure because of dangerous heat index conditions and Code Red air quality. Attendance displays “No Work Today.” No attendance, workbook response, missing-work, badge, or workforce-progress penalty is created. Forest Atlas assembly, wildlife registry expansion, educational stop cataloging, and trail naming carry forward to Week 7.
  * - Ecosystem 27.3 FINAL: Activates Week 7 for July 20–24, 2026 with Forest Atlas completion, career discovery, business and entrepreneurship, the July 23 WRTA workforce-development visit, Route #12 Lansdowne public-access planning, apprenticeship exploration, and professional communication. Replaces Week 8 placeholders with Legacy Builder and Capstone Development for July 27–31, 2026.
- * - Ecosystem 27.4 FINAL: Confirms Week 6 complete and Week 7 active. Adds the Monday, August 17, 2026 Youngstown Cultivator Showcase & Open House (11:00 AM–2:00 PM) to the ecosystem calendar and pins the invitation in the Parent / Guardian pathway using “Great Things Grow Here. Regenerative Farming. Restored Land. Empowered Youth.”
+ * - Ecosystem 27.4 FINAL: Confirms Week 6 complete and Week 7 active. Adds the Youngstown Cultivator Showcase & Open House to the ecosystem calendar and pins the invitation in the Parent / Guardian pathway.
+ * - Ecosystem 36.6 FINAL: Activates Week 8 Open House Preparation Operations for July 27–31, 2026; replaces capstone classroom activities with actual farm work; records natural wooden sign stands built from approximately six-foot branches with two criss-crossed wooden base pieces; updates the Open House to Monday, August 10, 2026, 11:00 AM–2:00 PM; and preserves the existing routing, translation, workbook, Journey, Parent, Supervisor, Mission Control, Visitor, Media, reporting, persistence, and 2:00 PM operational rollover.
  * - Ecosystem 27.5 FINAL: Rebuilds the Visitor / Guest story as a plain-language Youngstown experience connecting Mahoning Valley history, industry, General Motors, Packard Electric, Lansdowne Airport, Zachary Lansdowne, famous and accomplished Youngstown-connected people, community builders, Bronson Family Farm, and today's Cultivators. Every person profile explains who the person is or was, what they did, why they matter, and what visitors can learn without assuming prior knowledge.
  * - Ecosystem 27.6 FINAL: Applies a compact, readable system-wide spacing standard; keeps related lines, bullets, labels, and controls close together; reduces card padding and excessive scrolling; and centralizes the 2:00 PM America/New_York operational-day advance used by curriculum, calendar, workbook, Journey, parent, supervisor, and Mission Control views.
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
@@ -26,6 +27,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 36.2 FINAL: Replaces element-level translation memory with text-node-level source preservation, prevents repeated and mixed-language labels during live updates, restores every original phrase reliably, and expands complete-page phrase coverage for the launch, safety, weather, Visitor, and Media experiences.
  * - Ecosystem 36.3 FINAL: Replaces limited dictionary-only page translation with complete asynchronous phrase translation for every visible text node and translatable field, caches completed translations, protects proper names, restores exact English, and keeps translation active across live updates and route changes.
  * - Ecosystem 36.4 FINAL: Protects every language picker from translation, removes ambiguous and duplicated language codes, and displays stable native-language names with flags across Operational, Visitor, and Media experiences.
+ * - Ecosystem 36.5 FINAL: Reorders and segments the public story into Farm Story, Farm Today, Youngstown Story, and Get Involved; restores chronological farm and Youngstown history; and adds clear section navigation and position indicators.
  * - Ecosystem 36.0 FINAL: Adds truly separate public /media and /visit application entry points. /media renders only an approved, read-only press room with immediate farm, Youngstown VIP, Lansdowne Airport, youth workforce, partner, WRTA, and prior news coverage information. It never renders the Forest Gate, operational Shell, role buttons, visitor route, uploads, private records, or cross-navigation. Search appears only after the core information.
  * - Ecosystem 28.0 FINAL: Splits Thursday, July 23 into two supervised age-appropriate pathways. Youth ages 16–18 assigned to the WRTA experience travel to WRTA; youth ages 14–16 remaining at the farm work under Ms. Jesska Mack to install branch poles around the grow area only, rake grass north-to-south, complete farmwide litter pickup, stage surplus branches on the cement near the burn area, build pea trellises from tree branches, and watch the trellis videos in the ecosystem.
  */
@@ -1340,21 +1342,21 @@ const youthCurriculumWeeks = [
   },
   {
     week: 8,
-    title: "Legacy Builder & Capstone Development",
+    title: "Open House Preparation Operations",
     focus:
-      "Legacy inventory, growth story, community impact, capstone creation, recognition, Journey completion, workforce record, and future pathways.",
+      "Youth apply construction, maintenance, conservation, teamwork, agritourism, and visitor-readiness skills while preparing Bronson Family Farm to welcome the community.",
     project:
-      "What Will You Leave Behind? — Cultivator Legacy and Capstone Showcase",
+      "Prepare the Farm to Welcome Our Community — Grounds → Sign Stands → Deer Protection → Forest Trail → Visitor Readiness",
     skills: [
-      "Presentation",
-      "Reflection",
-      "Community Impact",
-      "Professional Storytelling",
-      "Legacy",
-      "Readiness",
+      "Construction",
+      "Landscape Maintenance",
+      "Environmental Stewardship",
+      "Visitor Experience",
+      "Agritourism",
+      "Teamwork",
     ],
-    badge: "🏆 Legacy Builder",
-    status: "Upcoming",
+    badge: "🏆 Community Welcome Builder",
+    status: "Current Week",
   },
 ];
 
@@ -2565,116 +2567,120 @@ const youthWeekEightDailyPlan = [
   {
     day: "Monday",
     date: "July 27, 2026",
-    curriculum: "Legacy Inventory",
+    curriculum: "Open House Preparation Launch and Visitor Route Review",
     focus:
-      "Youth identify and preserve the projects, discoveries, improvements, and community contributions they helped create during Summer 2026.",
+      "Youth begin the final program week by walking the visitor route, identifying what must be cleaned, built, protected, marked, and documented before the August 10 Open House.",
     work: [
-      "Review Weeks 1–7 projects",
-      "Select all projects contributed to",
-      "Choose the project you are most proud of",
-      "Collect approved photos, videos, audio, and written records",
-      "Confirm accomplishments saved to My Journey",
+      "Walk the entrance, taxiway, grow area, Butterfly Sanctuary, and forest trail",
+      "Identify weeds, debris, unsafe walking areas, missing signs, and unfinished visitor stops",
+      "Assign teams for grounds care, sign-stand construction, deer protection, trail preparation, and photography",
+      "Gather suitable harvested branches and reusable natural materials",
+      "Photograph starting conditions for before-and-after documentation",
+      "Review tool safety, hydration, communication, and visitor-readiness expectations",
     ],
     resources: [
-      "Legacy Inventory",
-      "Project History",
-      "My Journey Accomplishments",
-      "Story Upload",
+      "Open House Readiness Checklist",
+      "Visitor Route Review",
+      "Tool Safety Guide",
+      "Before-and-After Photo Upload",
     ],
-    reflection: "What project are you most proud of, and why?",
+    reflection:
+      "What did you notice on the visitor route, and what improvement should be completed first?",
   },
   {
     day: "Tuesday",
     date: "July 28, 2026",
-    curriculum: "My Growth Story",
+    curriculum: "Grounds Care and Natural Sign-Stand Construction",
     focus:
-      "Youth recognize growth in teamwork, leadership, communication, confidence, safety, responsibility, problem-solving, environmental awareness, and career awareness.",
+      "Youth improve the first impression of the farm and begin building freestanding wooden supports for educational signs using branches harvested on the property.",
     work: [
-      "Review beginning and current Journey records",
-      "Select all areas of growth",
-      "Choose examples that show growth",
-      "Add one growth statement to My Journey",
-      "Choose text, audio, video, or upload to tell the growth story",
+      "Remove weeds along the taxiway, entrance approaches, and visitor walking areas",
+      "Select one strong vertical branch approximately six feet tall for each sign stand",
+      "Select two shorter pieces of wood for the base of each stand",
+      "Fasten the two shorter pieces in a criss-cross pattern at the base of the vertical branch",
+      "Test each stand for balance and stability before placement",
+      "Photograph construction steps and completed work",
     ],
     resources: [
-      "Growth Inventory",
-      "My Journey Timeline",
-      "Growth Story Builder",
+      "Natural Sign-Stand Construction Guide",
+      "Measuring and Branch Selection Guide",
+      "Hand-Tool Safety Check",
+      "Work Documentation Upload",
     ],
     reflection:
-      "How are you different today than when you started the program?",
+      "How do the two criss-crossed pieces of wood help the sign stand remain stable?",
   },
   {
     day: "Wednesday",
     date: "July 29, 2026",
-    curriculum: "Community Impact and Capstone Planning",
+    curriculum: "Sign-Stand Placement and Deer Protection",
     focus:
-      "Youth identify who benefits from healthier soil, food production, pollinator habitat, visitor trails, public education, transportation access, and youth workforce development.",
+      "Youth continue building and placing natural sign stands while improving crop protection around the main grow area.",
     work: [
-      "Map Farm to Community to Region to Future Generations",
-      "Identify who benefited from your work",
-      "Choose a capstone format",
-      "Select the evidence and story to include",
-      "Plan the five required capstone elements",
+      "Complete remaining wooden sign stands",
+      "Place each freestanding stand at its approved educational stop",
+      "Prepare the base area and use rocks where needed to improve stability",
+      "Install approximately seven-foot green deer netting around the primary grow area",
+      "Check netting alignment, gaps, access points, and visitor viewing areas",
+      "Record before-and-after photographs",
     ],
     resources: [
-      "Community Impact Map",
-      "Capstone Format Selector",
-      "Capstone Planner",
-      "Evidence Checklist",
+      "Educational Sign Location List",
+      "Sign-Stand Stability Check",
+      "Deer Net Installation Guide",
+      "Crop Protection Observation Record",
     ],
-    reflection: "How did your work help someone besides yourself?",
+    reflection:
+      "How did today's construction and deer-protection work improve both the farm and the visitor experience?",
   },
   {
     day: "Thursday",
     date: "July 30, 2026",
-    curriculum: "Capstone Creation and Practice",
+    curriculum: "Forest Trail Stewardship and Educational Tour Preparation",
     focus:
-      "Youth build and practice a poster, slide presentation, photo story, video, audio documentary, Forest Atlas exhibit, trail guide, wildlife guide, or entrepreneurship proposal.",
+      "Youth prepare the forest trail and educational stopping locations so visitors can safely experience the farm's natural resources and youth-led discoveries.",
     work: [
-      "Build the chosen capstone",
-      "Explain what you did",
-      "Explain what you learned",
-      "Describe a challenge",
-      "Name what you are proud of",
-      "State what comes next",
-      "Practice presenting and receive feedback",
+      "Remove sticks, litter, and loose debris from the forest trail",
+      "Clear walking space without damaging living plants or habitat",
+      "Review creek crossings, bridge locations, and areas requiring extra caution",
+      "Prepare educational stops for forest edibles, monarch habitat, regenerative farming, cardboard mulching, and other farm stories",
+      "Place completed sign stands only at approved safe locations",
+      "Photograph trail improvements and educational stops",
     ],
     resources: [
-      "Capstone Builder",
-      "Presentation Practice",
-      "Peer Feedback Guide",
-      "Accessibility Checklist",
+      "Forest Trail Safety Review",
+      "Educational Stop Checklist",
+      "Forest Atlas",
+      "Visitor Story Documentation Upload",
     ],
-    reflection: "What do you want people to understand about your work?",
+    reflection:
+      "What should visitors learn or notice at the forest-trail location you helped prepare?",
   },
   {
     day: "Friday",
     date: "July 31, 2026",
-    curriculum: "Legacy Celebration, Recognition, and Future Pathway",
+    curriculum: "Open House Readiness, Final Walkthrough, and Program Closeout",
     focus:
-      "Youth present their work, receive noncompetitive recognition, complete workforce records, and name what future Cultivators can inherit.",
+      "Youth complete priority projects, inspect the visitor route, document their work, and close the summer program by recognizing how their labor will welcome and educate the community.",
     work: [
-      "Present capstone",
-      "Receive recognition based on demonstrated contributions",
-      "Confirm resume skills",
-      "Review or download My Journey record",
-      "Confirm workforce experience and community impact",
-      "Choose a future education, training, apprenticeship, employment, or entrepreneurship step",
-      "Complete the final Legacy reflection",
-      "Celebrate completion",
+      "Complete taxiway and visitor-area weed removal",
+      "Inspect every wooden sign stand, including the vertical branch and two criss-crossed base pieces",
+      "Confirm deer netting is secure around the grow area",
+      "Complete forest-trail cleanup and identify any remaining safety concerns",
+      "Photograph completed projects and upload final evidence",
+      "Return tools, clean work areas, and secure the site",
+      "Complete the final Open House preparation reflection",
+      "Recognize the teamwork, construction, stewardship, and leadership demonstrated during the program",
     ],
     resources: [
-      "Showcase Guide",
-      "Recognition Record",
-      "Resume Skills",
-      "Workforce Transcript",
-      "My Journey Download",
-      "Future Pathway Planner",
-      "Legacy Registry",
+      "Open House Final Readiness Checklist",
+      "Completed Project Photo Upload",
+      "My Journey Skills Record",
+      "Workforce Experience Summary",
+      "Future Cultivators Knowledge Transfer",
     ],
     reflection:
-      "What do you hope someone discovers, learns, or experiences because of the work you completed this summer?",
+      "What will visitors see, learn, or experience because of the work you completed this summer?",
   },
 ];
 
@@ -2691,19 +2697,19 @@ const youthDailyPlansByWeek: Record<number, typeof youthWeekOneDailyPlan> = {
 
 const PROGRAM_START_DATE = new Date("2026-06-08T00:00:00");
 const LAUNCH_MINIMUM_ACTIVE_WEEK = 3;
-const COMPLETED_PROGRAM_WEEKS = [1, 2, 3, 4, 5, 6] as const;
-const ACTIVE_PROGRAM_WEEK = 7;
-const SHOWCASE_DATE_ISO = "2026-08-17";
+const COMPLETED_PROGRAM_WEEKS = [1, 2, 3, 4, 5, 6, 7] as const;
+const ACTIVE_PROGRAM_WEEK = 8;
+const SHOWCASE_DATE_ISO = "2026-08-10";
 const SHOWCASE_FLYER_SRC = "/youngstown-cultivator-showcase-2026.png";
 const SHOWCASE_EVENT = {
-  title: "Youngstown Cultivator Showcase & Open House",
+  title: "Bronson Family Farm Youth Workforce Program Open House",
   date: SHOWCASE_DATE_ISO,
   time: "11:00 AM – 2:00 PM",
   location: "Bronson Family Farm • Lansdowne Airport • Youngstown, Ohio",
-  theme: "Great Things Grow Here.",
-  subtitle: "Regenerative Farming. Restored Land. Empowered Youth.",
+  theme: "We Grow Green to Harvest Dreams.",
+  subtitle: "See What Young People Built, Learned, and Prepared for Our Community.",
   parentMessage:
-    "Families are invited to walk the farm, meet our youth, see the progress, and experience regenerative farming in action.",
+    "Families and community members are invited to walk the farm, see the youth-built sign stands and visitor trail, learn about regenerative farming, and celebrate the accomplishments of the Cultivators Youth Workforce Program.",
 };
 
 function getOperationalDate(date = new Date()) {
@@ -12964,29 +12970,29 @@ function Portal({
 
   const visitorChoices = [
     {
-      label: "A Farm at an Airport",
-      detail: "Learn why Bronson Family Farm is growing at Lansdowne Airport.",
-      key: "airport",
-    },
-    {
-      label: "The Bronson Family Farm Story",
-      detail: "Meet the family, purpose, and work behind the farm.",
+      label: "1. The Bronson Family Farm Story",
+      detail: "Begin with the family vision, purpose, land, and history of the farm.",
       key: "family",
     },
     {
-      label: "Meet the Cultivators",
-      detail: "See what youth are building, growing, observing, and learning.",
+      label: "2. A Farm at Lansdowne Airport",
+      detail: "Learn how the farm's land and Youngstown's aviation history connect.",
+      key: "airport",
+    },
+    {
+      label: "3. Meet the Cultivators",
+      detail: "See what youth are building, growing, observing, and learning today.",
       key: "cultivators",
     },
     {
-      label: "Discoveries from the Field",
-      detail: "Explore wildlife, pollinators, plants, and forest discoveries.",
-      key: "discoveries",
+      label: "4. This Week and Field Discoveries",
+      detail: "Review current projects, wildlife observations, and lessons from the land.",
+      key: "this-week",
     },
     {
-      label: "Discover Youngstown",
+      label: "5. The Youngstown Story",
       detail:
-        "Explore the history, people, land, food, and opportunity of Youngstown.",
+        "Follow Youngstown chronologically—from the land before the city to opportunity today.",
       key: "youngstown-before",
     },
   ];
@@ -14029,6 +14035,26 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       imageAlt: "Bronson Family Farm landscape in Youngstown",
     },
     {
+      key: "family",
+      eyebrow: "Our Story",
+      title: "The Bronson Family Farm Story",
+      paragraphs: [
+        "Bronson Family Farm grew from a family vision to use land, agriculture, and real work to create opportunity for young people and the Youngstown community.",
+        "The work began with growing food and continued to expand through environmental stewardship, youth workforce development, pollinator habitat, forest exploration, apiary restoration, entrepreneurship, and community partnerships.",
+        "The farm is still being built. Youth, family members, volunteers, educators, growers, researchers, and community partners each contribute to what it is becoming.",
+        "The story is not an abstract idea. It is visible in every prepared row, repaired structure, documented discovery, planted seed, and new skill.",
+      ],
+      highlights: [
+        "Family vision",
+        "Youth opportunity",
+        "Food production",
+        "Environmental stewardship",
+        "Community partnership",
+      ],
+      image: IMG.forest,
+      imageAlt: "Bronson Family Farm family and community story",
+    },
+    {
       key: "airport",
       eyebrow: "Lansdowne Airport",
       title: "A Farm at an Airport?",
@@ -14048,26 +14074,6 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
       ],
       image: IMG.grow,
       imageAlt: "Bronson Family Farm growing area at Lansdowne Airport",
-    },
-    {
-      key: "family",
-      eyebrow: "Our Story",
-      title: "The Bronson Family Farm Story",
-      paragraphs: [
-        "Bronson Family Farm grew from a family vision to use land, agriculture, and real work to create opportunity for young people and the Youngstown community.",
-        "The work began with growing food and continued to expand through environmental stewardship, youth workforce development, pollinator habitat, forest exploration, apiary restoration, entrepreneurship, and community partnerships.",
-        "The farm is still being built. Youth, family members, volunteers, educators, growers, researchers, and community partners each contribute to what it is becoming.",
-        "The story is not an abstract idea. It is visible in every prepared row, repaired structure, documented discovery, planted seed, and new skill.",
-      ],
-      highlights: [
-        "Family vision",
-        "Youth opportunity",
-        "Food production",
-        "Environmental stewardship",
-        "Community partnership",
-      ],
-      image: IMG.forest,
-      imageAlt: "Bronson Family Farm family and community story",
     },
     {
       key: "cultivators",
@@ -14472,6 +14478,59 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     },
   ];
 
+  const storySections = [
+    {
+      key: "farm-story",
+      label: "Farm Story",
+      pageKeys: ["home", "family", "airport"],
+    },
+    {
+      key: "farm-today",
+      label: "Farm Today",
+      pageKeys: [
+        "cultivators",
+        "this-week",
+        "discoveries",
+        "learning",
+        "parents",
+        "opportunity",
+        "legacy",
+      ],
+    },
+    {
+      key: "youngstown-story",
+      label: "Youngstown Story",
+      pageKeys: [
+        "youngstown-before",
+        "youngstown-founding",
+        "youngstown-transport",
+        "youngstown-steel",
+        "youngstown-cultures",
+        "youngstown-nature",
+        "youngstown-builders",
+        "youngstown-agriculture",
+        "youngstown-opportunity-today",
+        "youngstown-your-story",
+      ],
+    },
+    {
+      key: "get-involved",
+      label: "Get Involved",
+      pageKeys: ["involved", "final"],
+    },
+  ] as const;
+
+  const sectionForPage = (pageKey: string) =>
+    storySections.find((section) => section.pageKeys.includes(pageKey as never)) ||
+    storySections[0];
+
+  const firstPageIndexForSection = (sectionKey: string) => {
+    const section = storySections.find((item) => item.key === sectionKey);
+    if (!section) return 0;
+    const index = pages.findIndex((item) => item.key === section.pageKeys[0]);
+    return index >= 0 ? index : 0;
+  };
+
   const [pageIndex, setPageIndex] = useState(() => {
     try {
       const requestedKey = window.sessionStorage.getItem("bff_guest_start_key");
@@ -14485,6 +14544,9 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
     }
   });
   const page = pages[pageIndex];
+  const currentSection = sectionForPage(page.key);
+  const sectionPageKeys = currentSection.pageKeys;
+  const sectionPosition = sectionPageKeys.indexOf(page.key as never) + 1;
   const isFirst = pageIndex === 0;
   const isFinal = pageIndex === pages.length - 1;
 
@@ -14500,11 +14562,42 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
   };
 
   return (
-    <div
-      id="guest-journey-top"
-      className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] scroll-mt-24"
-    >
+    <div id="guest-journey-top" className="grid gap-3 scroll-mt-24">
+      <Card className="p-4">
+        <div className="text-xs font-black uppercase tracking-[0.24em] text-emerald-100/70">
+          Public Story
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          {storySections.map((section) => {
+            const active = section.key === currentSection.key;
+            return (
+              <button
+                key={section.key}
+                type="button"
+                onClick={() => moveTo(firstPageIndexForSection(section.key))}
+                className={`rounded-2xl border px-4 py-3 text-left font-black transition ${
+                  active
+                    ? "border-emerald-200 bg-emerald-300 text-black"
+                    : "border-white/12 bg-white/8 text-white hover:bg-white/15"
+                }`}
+              >
+                {section.label}
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      <div className="grid items-stretch gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)]">
       <Card>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 py-3">
+          <span className="text-sm font-black text-emerald-200">
+            {currentSection.label}
+          </span>
+          <span className="text-xs font-black uppercase tracking-[0.16em] text-white/65">
+            {sectionPosition} of {sectionPageKeys.length}
+          </span>
+        </div>
         <div className="text-sm font-black uppercase tracking-[0.28em] text-emerald-100/80">
           {page.eyebrow}
         </div>
@@ -14679,6 +14772,7 @@ function Guest({ setScreen }: { setScreen: (screen: Screen) => void }) {
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }
@@ -27546,7 +27640,7 @@ function ParentShowcaseInvitationCard({
             {SHOWCASE_EVENT.title}
           </h3>
           <div className="mt-4 grid gap-2 text-sm font-bold text-white/90">
-            <div>📅 Monday, August 17, 2026</div>
+            <div>📅 Monday, August 10, 2026</div>
             <div>🕚 {SHOWCASE_EVENT.time}</div>
             <div>📍 {SHOWCASE_EVENT.location}</div>
           </div>
