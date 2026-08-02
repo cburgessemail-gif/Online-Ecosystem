@@ -18,6 +18,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.3 FINAL: Activates Week 7 for July 20–24, 2026 with Forest Atlas completion, career discovery, business and entrepreneurship, the July 23 WRTA workforce-development visit, Route #12 Lansdowne public-access planning, apprenticeship exploration, and professional communication. Replaces Week 8 placeholders with Legacy Builder and Capstone Development for July 27–31, 2026.
  * - Ecosystem 27.4 FINAL: Confirms Week 6 complete and Week 7 active. Adds the Youngstown Cultivator Showcase & Open House to the ecosystem calendar and pins the invitation in the Parent / Guardian pathway.
  * - Ecosystem 36.6 FINAL: Activates Week 8 Open House Preparation Operations for July 27–31, 2026; replaces capstone classroom activities with actual farm work; records natural wooden sign stands built from approximately six-foot branches with two criss-crossed wooden base pieces; updates the Open House to Monday, August 10, 2026, 11:00 AM–2:00 PM; and preserves the existing routing, translation, workbook, Journey, Parent, Supervisor, Mission Control, Visitor, Media, reporting, persistence, and 2:00 PM operational rollover.
+ * - Ecosystem 36.8 FINAL: Completes the end-of-program Cultivator Portfolio as a viewable, downloadable/print-to-PDF, and shareable final product. Youth can preview the assembled portfolio inside the ecosystem, create a clean portfolio PDF, and share a standalone portfolio file using the device share sheet when supported.
  * - Ecosystem 36.7 FINAL: Adds the end-of-program completion pathway. Each Cultivator receives three final products generated from the Workbook source of truth: an individualized professional resume, Cultivator portfolio, and certificate of completion. Resume language is limited to documented program experience and demonstrated skills; youth may add optional contact/school information without re-entering program evidence.
  * - Ecosystem 27.5 FINAL: Rebuilds the Visitor / Guest story as a plain-language Youngstown experience connecting Mahoning Valley history, industry, General Motors, Packard Electric, Lansdowne Airport, Zachary Lansdowne, famous and accomplished Youngstown-connected people, community builders, Bronson Family Farm, and today's Cultivators. Every person profile explains who the person is or was, what they did, why they matter, and what visitors can learn without assuming prior knowledge.
  * - Ecosystem 27.6 FINAL: Applies a compact, readable system-wide spacing standard; keeps related lines, bullets, labels, and controls close together; reduces card padding and excessive scrolling; and centralizes the 2:00 PM America/New_York operational-day advance used by curriculum, calendar, workbook, Journey, parent, supervisor, and Mission Control views.
@@ -32217,6 +32218,7 @@ function MyCultivatorJourneyScreen({
   );
   const [savedMessage, setSavedMessage] = useState("");
   const [activeSection, setActiveSection] = useState("finalProducts");
+  const [portfolioPreviewOpen, setPortfolioPreviewOpen] = useState(false);
   const resumeProfileKey = `cultivator-final-resume-profile:${participantId || "guest"}`;
   const [resumeProfile, setResumeProfile] = useState(() =>
     safeRead<{ email: string; phone: string; school: string; graduation: string }>(
@@ -32265,6 +32267,48 @@ function MyCultivatorJourneyScreen({
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const portfolioFileName = `cultivator-portfolio-${(activeUser?.name || "youth").replace(/\s+/g, "-").toLowerCase()}`;
+  const portfolioHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${activeUser?.name || "Cultivator"} — Cultivator Portfolio</title><style>body{font-family:Arial,sans-serif;color:#17211b;max-width:850px;margin:0 auto;padding:42px;line-height:1.55}h1{font-size:40px;margin:8px 0}h2{margin-top:32px;border-bottom:2px solid #315c42;padding-bottom:6px}.cover{text-align:center;padding:80px 20px;min-height:650px;display:flex;flex-direction:column;justify-content:center}.tag{font-weight:700;letter-spacing:.14em;text-transform:uppercase}.pill{display:inline-block;border:1px solid #777;border-radius:20px;padding:5px 10px;margin:4px}.page{page-break-before:always}.small{font-size:13px;color:#555}ul{padding-left:22px}@media print{body{padding:18px}.page{page-break-before:always}}</style></head><body><section class="cover"><div class="tag">Bronson Family Farm</div><h1>${activeUser?.name || "Cultivator"}</h1><h2 style="border:0;margin:8px 0">Cultivator Youth Workforce Portfolio</h2><p>Eight-Week Training Program • Summer 2026 • Youngstown, Ohio</p><p><strong>We Grow Green to Harvest Dreams</strong></p></section><section class="page"><h2>My Cultivator Story</h2><p>This portfolio documents my work, learning, discoveries, growth, demonstrated skills, and contributions during the eight-week Cultivators Youth Workforce Program at Bronson Family Farm.</p><h2>My 8-Week Journey</h2>${youthCurriculumWeeks.map((week) => `<h3>Week ${week.week}: ${week.title}</h3><p>${week.focus || "Hands-on workforce, agriculture, environment, community, opportunity, and legacy learning."}</p>`).join("")}<h2>Work I Completed</h2><p>Completed workbook assignments recorded: <strong>${completed.length}</strong></p><ul>${accomplishments.map((item) => `<li>${item}</li>`).join("")}</ul><h2>Skills I Developed</h2><p>${resumeSkills.slice(0, 18).map((item) => `<span class="pill">${item}</span>`).join("")}</p><h2>Discoveries & Learning</h2><p>Documented discoveries: <strong>${discoveries.length}</strong>. My Workbook, Journey entries, observations, and supervisor-validated work are part of my permanent Cultivator record.</p><h2>Community & Career Experience</h2><p>The program connected farm work to community stewardship, workforce readiness, career exploration, entrepreneurship, and local opportunities. Individual employment and volunteer experiences are included only when documented for the Cultivator.</p></section><section class="page"><h2>Professional Resume</h2><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${resumeText}</pre></section><section class="page" style="text-align:center;padding-top:100px"><div class="tag">Bronson Family Farm</div><h1>Certificate of Completion</h1><p>This recognizes</p><h1>${activeUser?.name || "Cultivator"}</h1><p>for participation in the 2026 Cultivators Youth Workforce Program, an eight-week hands-on experience in regenerative agriculture, environmental stewardship, workplace readiness, teamwork, problem solving, community connection, and career exploration.</p><p><strong>We Grow Green to Harvest Dreams</strong></p><p class="small">Youngstown, Ohio • Summer 2026</p></section></body></html>`;
+
+  const printPortfolioPdf = () => {
+    const popup = window.open("", "_blank", "noopener,noreferrer");
+    if (!popup) {
+      setSavedMessage("Please allow pop-ups so the portfolio PDF window can open.");
+      return;
+    }
+    popup.document.open();
+    popup.document.write(portfolioHtml);
+    popup.document.close();
+    popup.focus();
+    window.setTimeout(() => popup.print(), 350);
+  };
+
+  const sharePortfolio = async () => {
+    const file = new File([portfolioHtml], `${portfolioFileName}.html`, { type: "text/html" });
+    try {
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({
+          title: `${activeUser?.name || "Cultivator"} — Cultivator Portfolio`,
+          text: "My Bronson Family Farm Cultivator Youth Workforce Portfolio",
+          files: [file],
+        });
+        setSavedMessage("Shared ✓ Your portfolio was sent through your device share menu.");
+        return;
+      }
+      const blobUrl = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${portfolioFileName}.html`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+      setSavedMessage("Portfolio share file downloaded. Attach it to email, text, or another service to share it.");
+    } catch (error) {
+      if ((error as Error)?.name !== "AbortError") setSavedMessage("Sharing was not completed. You can still view or download the portfolio.");
+    }
   };
 
   const registrationAge = (() => {
@@ -32498,30 +32542,44 @@ function MyCultivatorJourneyScreen({
 
       {activeSection === "portfolio" && (
         <Card>
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">
-            My Portfolio
-          </div>
-          <h2 className="mt-2 text-3xl font-black">
-            My work, discoveries, photos, and reflections
-          </h2>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-purple-100/75">My Complete Cultivator Portfolio</div>
+          <h2 className="mt-2 text-3xl font-black">View it. Download it as a PDF. Share it.</h2>
+          <p className="mt-3 max-w-4xl text-sm font-bold leading-6 text-white/78">This is the assembled end-of-program portfolio generated from the Cultivator Workbook and Journey record. Youth do not re-enter work the ecosystem already captured.</p>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl bg-white/10 p-4 font-black">
-              Assignments: {completed.length}
-            </div>
-            <div className="rounded-2xl bg-white/10 p-4 font-black">
-              Discoveries: {discoveries.length}
-            </div>
-            <div className="rounded-2xl bg-white/10 p-4 font-black">
-              Journey record: Building automatically
-            </div>
+            <div className="rounded-2xl bg-white/10 p-4 font-black">8 curriculum weeks</div>
+            <div className="rounded-2xl bg-white/10 p-4 font-black">Assignments: {completed.length}</div>
+            <div className="rounded-2xl bg-white/10 p-4 font-black">Discoveries: {discoveries.length}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => setScreen("media")}
-            className="mt-5 rounded-full bg-purple-300 px-6 py-3 font-black text-black"
-          >
-            Add Photos, Videos, or Observations
-          </button>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="button" onClick={() => setPortfolioPreviewOpen((value) => !value)} className="rounded-full bg-purple-300 px-6 py-3 font-black text-black">👁 {portfolioPreviewOpen ? "Close Portfolio View" : "View My Portfolio"}</button>
+            <button type="button" onClick={printPortfolioPdf} className="rounded-full bg-emerald-300 px-6 py-3 font-black text-black">📥 Download / Save Portfolio PDF</button>
+            <button type="button" onClick={sharePortfolio} className="rounded-full bg-sky-300 px-6 py-3 font-black text-black">🔗 Share My Portfolio</button>
+          </div>
+          <p className="mt-3 text-xs font-bold leading-5 text-white/60">Sharing is intentional. The portfolio is not made publicly searchable. On supported phones and computers, Share opens the device share menu. Otherwise a standalone portfolio file is created for the youth to attach to email or another service.</p>
+          {portfolioPreviewOpen && (
+            <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-white/15 bg-white text-black">
+              <div className="min-h-[520px] p-8 text-center flex flex-col justify-center">
+                <div className="text-sm font-black uppercase tracking-[0.28em]">Bronson Family Farm</div>
+                <div className="mt-5 text-5xl font-black">{activeUser?.name || "Cultivator"}</div>
+                <div className="mt-3 text-2xl font-black">Cultivator Youth Workforce Portfolio</div>
+                <div className="mt-3 font-bold">Eight-Week Training Program • Summer 2026 • Youngstown, Ohio</div>
+                <div className="mt-8 text-xl font-black">We Grow Green to Harvest Dreams</div>
+              </div>
+              <div className="border-t border-black/10 p-8">
+                <h3 className="text-2xl font-black">My Cultivator Story</h3>
+                <p className="mt-2 leading-7">This portfolio documents my work, learning, discoveries, growth, demonstrated skills, and contributions during the eight-week Cultivators Youth Workforce Program at Bronson Family Farm.</p>
+                <h3 className="mt-8 text-2xl font-black">My 8-Week Journey</h3>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">{youthCurriculumWeeks.map((week) => <div key={week.week} className="rounded-xl border border-black/10 p-4"><div className="font-black">Week {week.week}: {week.title}</div><p className="mt-1 text-sm leading-6">{week.focus || "Hands-on workforce, agriculture, environment, community, opportunity, and legacy learning."}</p></div>)}</div>
+                <h3 className="mt-8 text-2xl font-black">Work I Completed</h3>
+                <ul className="mt-3 list-disc space-y-2 pl-6">{accomplishments.map((item) => <li key={item}>{item}</li>)}</ul>
+                <h3 className="mt-8 text-2xl font-black">Skills I Developed</h3>
+                <div className="mt-3 flex flex-wrap gap-2">{resumeSkills.slice(0,18).map((skill) => <span key={skill} className="rounded-full border border-black/20 px-3 py-1 text-sm font-bold">{skill}</span>)}</div>
+                <h3 className="mt-8 text-2xl font-black">Discoveries & Learning</h3><p className="mt-2 leading-7">My Workbook, Journey entries, observations, photographs, and supervisor-validated work form my permanent Cultivator record. Documented discoveries: {discoveries.length}.</p>
+                <h3 className="mt-8 text-2xl font-black">Professional Resume</h3><pre className="mt-3 whitespace-pre-wrap font-sans text-sm leading-6">{resumeText}</pre>
+                <div className="mt-10 rounded-xl border-4 border-amber-400 p-8 text-center"><div className="text-sm font-black uppercase tracking-[0.25em]">Bronson Family Farm</div><div className="mt-4 text-3xl font-black">Certificate of Completion</div><p className="mt-4">This recognizes</p><div className="mt-2 text-3xl font-black">{activeUser?.name || "Cultivator"}</div><p className="mx-auto mt-4 max-w-2xl leading-7">for participation in the 2026 Cultivators Youth Workforce Program.</p><div className="mt-5 font-black">We Grow Green to Harvest Dreams</div></div>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
