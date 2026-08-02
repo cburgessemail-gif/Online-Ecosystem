@@ -18,6 +18,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * - Ecosystem 27.3 FINAL: Activates Week 7 for July 20–24, 2026 with Forest Atlas completion, career discovery, business and entrepreneurship, the July 23 WRTA workforce-development visit, Route #12 Lansdowne public-access planning, apprenticeship exploration, and professional communication. Replaces Week 8 placeholders with Legacy Builder and Capstone Development for July 27–31, 2026.
  * - Ecosystem 27.4 FINAL: Confirms Week 6 complete and Week 7 active. Adds the Youngstown Cultivator Showcase & Open House to the ecosystem calendar and pins the invitation in the Parent / Guardian pathway.
  * - Ecosystem 36.6 FINAL: Activates Week 8 Open House Preparation Operations for July 27–31, 2026; replaces capstone classroom activities with actual farm work; records natural wooden sign stands built from approximately six-foot branches with two criss-crossed wooden base pieces; updates the Open House to Monday, August 10, 2026, 11:00 AM–2:00 PM; and preserves the existing routing, translation, workbook, Journey, Parent, Supervisor, Mission Control, Visitor, Media, reporting, persistence, and 2:00 PM operational rollover.
+ * - Ecosystem 36.7 FINAL: Adds the end-of-program completion pathway. Each Cultivator receives three final products generated from the Workbook source of truth: an individualized professional resume, Cultivator portfolio, and certificate of completion. Resume language is limited to documented program experience and demonstrated skills; youth may add optional contact/school information without re-entering program evidence.
  * - Ecosystem 27.5 FINAL: Rebuilds the Visitor / Guest story as a plain-language Youngstown experience connecting Mahoning Valley history, industry, General Motors, Packard Electric, Lansdowne Airport, Zachary Lansdowne, famous and accomplished Youngstown-connected people, community builders, Bronson Family Farm, and today's Cultivators. Every person profile explains who the person is or was, what they did, why they matter, and what visitors can learn without assuming prior knowledge.
  * - Ecosystem 27.6 FINAL: Applies a compact, readable system-wide spacing standard; keeps related lines, bullets, labels, and controls close together; reduces card padding and excessive scrolling; and centralizes the 2:00 PM America/New_York operational-day advance used by curriculum, calendar, workbook, Journey, parent, supervisor, and Mission Control views.
  * - Ecosystem 27.7 FINAL: Establishes Community Workforce Exploration as a permanent ecosystem pathway. Integrates the July 23, 2026 WRTA Workforce Exploration Day across Today’s Work, Workbook, My Journey, Parent Portal, Supervisor Dashboard, Mission Control, Calendar, reports, and workforce records while preserving the compact 27.6 architecture and 2:00 PM operational-day rule.
@@ -32215,7 +32216,56 @@ function MyCultivatorJourneyScreen({
     ),
   );
   const [savedMessage, setSavedMessage] = useState("");
-  const [activeSection, setActiveSection] = useState("firsts");
+  const [activeSection, setActiveSection] = useState("finalProducts");
+  const resumeProfileKey = `cultivator-final-resume-profile:${participantId || "guest"}`;
+  const [resumeProfile, setResumeProfile] = useState(() =>
+    safeRead<{ email: string; phone: string; school: string; graduation: string }>(
+      resumeProfileKey,
+      { email: "", phone: "", school: "", graduation: "" },
+    ),
+  );
+  const resumeSkills = skills.length ? skills : currentWeek.skills;
+  const resumeBullets = [
+    "Participated in an eight-week youth workforce development and regenerative agriculture training program at Bronson Family Farm.",
+    "Supported farm operations through site preparation, crop care, weed management, soil improvement, land stewardship, and visitor-route preparation.",
+    "Applied workplace safety practices including PPE, hydration, outdoor work protocols, and supervisor direction.",
+    "Worked collaboratively to solve real farm challenges involving weather, wildlife pressure, crop protection, and site improvement.",
+    "Participated in environmental stewardship involving pollinators, milkweed, forest habitat, natural materials, and regenerative farming practices.",
+    "Developed workplace readiness through communication, teamwork, responsibility, problem solving, documentation, and community-connected learning.",
+  ];
+  const resumeText = [
+    activeUser?.name || "Cultivator",
+    [resumeProfile.email, resumeProfile.phone].filter(Boolean).join(" | "),
+    "",
+    "PROFESSIONAL SUMMARY",
+    "Youth workforce participant with hands-on experience in regenerative agriculture, environmental stewardship, teamwork, workplace safety, and community-connected learning.",
+    "",
+    "EXPERIENCE",
+    "Cultivators Youth Workforce Participant — Bronson Family Farm",
+    "Youngstown, Ohio | Summer 2026",
+    ...resumeBullets.map((item) => `• ${item}`),
+    "",
+    "SKILLS",
+    resumeSkills.slice(0, 12).join(" • "),
+    "",
+    "EDUCATION",
+    resumeProfile.school || "School information to be added by Cultivator",
+    resumeProfile.graduation ? `Expected graduation: ${resumeProfile.graduation}` : "",
+    "",
+    "REFERENCES",
+    "Available upon request",
+  ].filter((line) => line !== "").join("\n");
+  const downloadFinalText = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
 
   const registrationAge = (() => {
     const registrations = safeRead<any[]>(REGISTRATION_KEY, []);
@@ -32268,12 +32318,14 @@ function MyCultivatorJourneyScreen({
   };
 
   const sections = [
+    ["finalProducts", "🎓 My Final Products"],
     ["firsts", "🌟 My Firsts"],
     ["growth", "📈 My Growth"],
     ["skills", "🔨 My Skills"],
     ["accomplishments", "🏆 Accomplishments"],
     ["portfolio", "📂 Portfolio"],
     ["resume", "📄 Resume"],
+    ["certificate", "🏅 Certificate"],
     ["opportunities", "🚀 Opportunities"],
     ["legacy", "🌳 Legacy"],
     ["impact", "🌎 Community Impact"],
@@ -32312,6 +32364,32 @@ function MyCultivatorJourneyScreen({
           ))}
         </div>
       </Card>
+
+      {activeSection === "finalProducts" && (
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-emerald-100/75">
+            Program Complete • Summer 2026
+          </div>
+          <h2 className="mt-2 text-3xl font-black">My Cultivator Final Products</h2>
+          <p className="mt-3 max-w-4xl text-base font-bold leading-7 text-white/80">
+            Your Workbook is the source of truth. The ecosystem uses your saved work, attendance, discoveries, photos, reflections, demonstrated skills, and supervisor validation to build your final products. You do not have to enter the same program information again.
+          </p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              ["📄", "Professional Resume", "A job-ready resume based on documented work and demonstrated skills.", "resume"],
+              ["📂", "Cultivator Portfolio", "Your eight-week story: work, learning, photos, discoveries, growth, and contributions.", "portfolio"],
+              ["🏅", "Certificate of Completion", "Formal recognition of your Cultivators Youth Workforce Program experience.", "certificate"],
+            ].map(([icon, title, copy, target]) => (
+              <button key={target} type="button" onClick={() => setActiveSection(target)} className="rounded-[1.25rem] border border-white/10 bg-white/10 p-5 text-left">
+                <div className="text-3xl">{icon}</div>
+                <div className="mt-3 text-xl font-black">{title}</div>
+                <p className="mt-2 text-sm leading-6 text-white/75">{copy}</p>
+                <div className="mt-4 text-sm font-black text-emerald-200">Open →</div>
+              </button>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {activeSection === "firsts" && (
         <Card>
@@ -32449,34 +32527,51 @@ function MyCultivatorJourneyScreen({
 
       {activeSection === "resume" && (
         <Card>
-          <div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">
-            My Resume
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-sky-100/75">My Professional Resume</div>
+          <h2 className="mt-2 text-3xl font-black">Workforce experience translated into professional language</h2>
+          <p className="mt-3 text-sm font-bold leading-6 text-white/75">Program experience is generated from your Workbook. Only add the personal information you want an employer to see.</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <input value={resumeProfile.email} onChange={(e) => setResumeProfile({ ...resumeProfile, email: e.target.value })} placeholder="Email (optional)" className="rounded-2xl border border-white/15 bg-black/30 p-3 font-bold" />
+            <input value={resumeProfile.phone} onChange={(e) => setResumeProfile({ ...resumeProfile, phone: e.target.value })} placeholder="Phone (optional)" className="rounded-2xl border border-white/15 bg-black/30 p-3 font-bold" />
+            <input value={resumeProfile.school} onChange={(e) => setResumeProfile({ ...resumeProfile, school: e.target.value })} placeholder="School" className="rounded-2xl border border-white/15 bg-black/30 p-3 font-bold" />
+            <input value={resumeProfile.graduation} onChange={(e) => setResumeProfile({ ...resumeProfile, graduation: e.target.value })} placeholder="Expected graduation year" className="rounded-2xl border border-white/15 bg-black/30 p-3 font-bold" />
           </div>
-          <h2 className="mt-2 text-3xl font-black">
-            Workforce experience translated into professional language
-          </h2>
-          <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-black/30 p-5">
-            <div className="text-xl font-black">
-              Cultivators Youth Workforce Participant
-            </div>
-            <p className="mt-2 text-sm leading-7 text-white/80">
-              Participated in regenerative agriculture, environmental
-              observation, teamwork, farm infrastructure, pollinator
-              stewardship, problem solving, and community-connected work.
-            </p>
+          <button type="button" onClick={() => { safeWrite(resumeProfileKey, resumeProfile); setSavedMessage("Saved ✓ Resume information updated."); }} className="mt-4 rounded-full bg-sky-300 px-5 py-3 font-black text-black">Save Resume Information</button>
+          <div className="mt-5 rounded-[1.25rem] border border-white/10 bg-white p-6 text-black">
+            <div className="text-3xl font-black">{activeUser?.name || "Cultivator"}</div>
+            {(resumeProfile.email || resumeProfile.phone) && <div className="mt-1 text-sm font-bold">{[resumeProfile.email, resumeProfile.phone].filter(Boolean).join(" | ")}</div>}
+            <h3 className="mt-5 text-sm font-black uppercase tracking-wider">Professional Summary</h3>
+            <p className="mt-2 text-sm leading-6">Youth workforce participant with hands-on experience in regenerative agriculture, environmental stewardship, teamwork, workplace safety, and community-connected learning.</p>
+            <h3 className="mt-5 text-sm font-black uppercase tracking-wider">Experience</h3>
+            <div className="mt-2 font-black">Cultivators Youth Workforce Participant — Bronson Family Farm</div>
+            <div className="text-sm">Youngstown, Ohio | Summer 2026</div>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6">{resumeBullets.map((item) => <li key={item}>{item}</li>)}</ul>
+            <h3 className="mt-5 text-sm font-black uppercase tracking-wider">Demonstrated Skills</h3>
+            <p className="mt-2 text-sm leading-6">{resumeSkills.slice(0, 12).join(" • ")}</p>
+            <h3 className="mt-5 text-sm font-black uppercase tracking-wider">Education</h3>
+            <p className="mt-2 text-sm">{resumeProfile.school || "Add school information above."}{resumeProfile.graduation ? ` • Expected graduation ${resumeProfile.graduation}` : ""}</p>
+            <h3 className="mt-5 text-sm font-black uppercase tracking-wider">References</h3><p className="mt-2 text-sm">Available upon request</p>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {(skills.length ? skills : currentWeek.skills)
-              .slice(0, 12)
-              .map((skill) => (
-                <span
-                  key={skill}
-                  className="rounded-full border border-sky-200/25 bg-sky-300/10 px-3 py-2 text-xs font-black"
-                >
-                  {skill}
-                </span>
-              ))}
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="button" onClick={() => downloadFinalText(`cultivator-resume-${(activeUser?.name || "youth").replace(/\s+/g, "-").toLowerCase()}.txt`, resumeText)} className="rounded-full bg-sky-300 px-6 py-3 font-black text-black">Download Resume</button>
+            <button type="button" onClick={() => window.print()} className="rounded-full border border-white/15 bg-white/10 px-6 py-3 font-black">Print / Save as PDF</button>
           </div>
+        </Card>
+      )}
+
+      {activeSection === "certificate" && (
+        <Card>
+          <div className="text-xs font-black uppercase tracking-[0.25em] text-amber-100/75">Certificate of Completion</div>
+          <div className="mt-5 rounded-[1.5rem] border-4 border-amber-300/60 bg-white p-8 text-center text-black">
+            <div className="text-sm font-black uppercase tracking-[0.3em]">Bronson Family Farm</div>
+            <h2 className="mt-4 text-4xl font-black">Certificate of Completion</h2>
+            <p className="mt-5 text-lg">This certificate recognizes</p>
+            <div className="mt-2 text-4xl font-black">{activeUser?.name || "Cultivator"}</div>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-7">for participation in the 2026 Cultivators Youth Workforce Program, an eight-week hands-on experience in regenerative agriculture, environmental stewardship, workplace readiness, teamwork, problem solving, community connection, and career exploration.</p>
+            <div className="mt-6 text-lg font-black">We Grow Green to Harvest Dreams</div>
+            <div className="mt-6 text-sm font-bold">Youngstown, Ohio • Summer 2026</div>
+          </div>
+          <button type="button" onClick={() => window.print()} className="mt-5 rounded-full bg-amber-300 px-6 py-3 font-black text-black">Print / Save Certificate as PDF</button>
         </Card>
       )}
 
